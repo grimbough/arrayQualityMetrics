@@ -1,0 +1,13 @@
+Package: arrayQualityMetrics
+Version: 0.0.1
+Title: Quality Metrics and Quality Report Generator for Microarrays
+Author: Audrey Kauffmann, Wolfgang Huber
+Maintainer: Audrey Kauffmann <audrey@ebi.ac.uk>
+Depends: R (>= 2.5.0), methods, Biobase
+Suggests:
+Description: ... describe what the package does...
+Reference: TBA
+License: The Artistic License, Version 2.0
+LazyLoad: Yes
+biocViews: Microarray, Preprocessing, Visualization
+
