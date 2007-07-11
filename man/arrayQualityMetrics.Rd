@@ -11,13 +11,15 @@ Quality metrics on ExpressionSets
   quality of a set of arrays.
 }
 \usage{
-arrayQualityMetrics(expressionset, outfile, numberofgraphs)
+arrayQualityMetrics(expressionset, outfile, log.transformed, numberofgraphs)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{expressionset}{ The \code{expressionset} must be an object of
     class ExpressionSet }
   \item{outfile}{ The name of the result file is \code{outfile} }
+  \item{log.transformed}{ TRUE if the data have already been log
+    transformed, FALSE if not. }
   \item{numberofgraphs}{ If the number of array is more than 50 it is
     adviced to define a number of experiments to represent on each
     graphics when necessary \code{numberofgraphs} }
@@ -27,7 +29,7 @@ arrayQualityMetrics(expressionset, outfile, numberofgraphs)
 Package: \tab arrayQualityMetrics\cr
 Type: \tab Package\cr
 Version: \tab 1.0\cr
-Date: \tab 2007-05-30\cr
+Date: \tab 2007-06-29\cr
 License: \tab What license is it under?\cr
 }
 ATTENTION An overview of how to use the package, including the most important 

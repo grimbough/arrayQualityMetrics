@@ -1,15 +1,13 @@
 Package: arrayQualityMetrics
-Version: 1.0.1
-Title: Quality Metrics and Quality Report Generator for Microarrays
+Title: Quality metrics on ExpressionSets
+Version: 1.0.2
+Date: 2007-05-18
 Author: Audrey Kauffmann, Wolfgang Huber
 Maintainer: Audrey Kauffmann <audrey@ebi.ac.uk>
-Depends: R (>= 2.5.0), methods, Biobase, arrayMagic, geneplotter, vsn, RColorBrewer, affyPLM, CCl4
-Description: This package performs quality metrics on AffyBatch, ExpressionSet,
-		 NchannelSet, containing microarray data from any platforms, 
-		 one or two channels. The results are designated to allow the 
-		 user to rapidly assess the quality of a set of arrays.
-Reference: TBA
-License: The Artistic License, Version 2.0
-LazyLoad: Yes
-biocViews: Microarray, Preprocessing, Visualization
-
+Depends: arrayMagic, geneplotter, vsn, RColorBrewer, affyPLM, CCl4
+Description: This package performs quality metrics on ExpressionSet containing 
+	microarray data from any platforms, one or two channels. 
+	The results are designated to allow the user to rapidly assess the
+	quality of a set of arrays.
+License: LGPL version 2 or newer
+biocViews: Microarray, QualityControl

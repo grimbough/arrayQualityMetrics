@@ -41,7 +41,7 @@ data("CCl4")
 <<arrayQM>>=
 outdir = tempdir()
 outpdf = file.path(outdir, "CCl4")
-arrayQualityMetrics(expressionset = CCl4, outfile = outpdf)
+arrayQualityMetrics(expressionset = CCl4, outfile = outpdf, log.transformed = TRUE)
 @ 
 
 The output is written to
