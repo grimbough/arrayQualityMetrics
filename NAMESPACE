@@ -1,0 +1,4 @@
+importFrom("RColorBrewer","brewer.pal")
+importFrom("geneplotter", "multiecdf","multidensity","smoothScatter")
+importFrom("genefilter", "dist2")
+export("arrayQualityMetrics")

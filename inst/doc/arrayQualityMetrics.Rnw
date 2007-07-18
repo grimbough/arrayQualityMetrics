@@ -1,0 +1,64 @@
+%\VignetteIndexEntry{arrayQualityMetrics}
+%\VignetteDepends{CCl4}
+%\VignetteKeywords{Quality}
+%\VignettePackage{arrayQualityMetrics}
+
+\documentclass[a4paper]{article}
+
+\usepackage{times}
+\usepackage{a4wide}
+\usepackage{verbatim}
+
+\newcommand{\Robject}[1]{\texttt{#1}}
+\newcommand{\Rpackage}[1]{\textit{#1}}
+\newcommand{\Rclass}[1]{\textit{#1}}
+\newcommand{\Rfunction}[1]{{\small\texttt{#1}}}
+
+\SweaveOpts{keep.source=TRUE,eps=FALSE,include=FALSE,width=4,height=4.5} 
+
+\begin{document}
+
+\title{QualityMetrics assessmment of NChannelSet}
+\author{Audrey Kauffmann, Wolfgang Huber}
+\maketitle
+
+\section*{Load the required packages}
+
+<<loadlibs>>=
+library("CCl4")
+library("arrayQualityMetrics")
+@ 
+
+\section*{Load the data}  
+The \Rpackage{CCl4} package contains an NChannelSet for rat hepatocytes treated with Carbon Tetrachloride (CCl4) data from LGC company.
+
+<<load data, results=hide>>=
+data("CCl4")
+@ 
+
+\section*{Build an quality metrics report from the NChannelSet} 
+ 
+<<arrayQM>>=
+outdir = tempdir()
+outpdf = file.path(outdir, "CCl4")
+arrayQualityMetrics(expressionset = CCl4, outfile = outpdf, log.transformed = TRUE)
+@ 
+
+The output is written to
+<<tempdir>>=
+outdir
+@ 
+
+\begin{table*}[tbp]
+\begin{minipage}{\textwidth}
+{\small
+<<sessionInfo, print=TRUE>>=
+sessionInfo()
+@ 
+}\end{minipage}
+\caption{\label{tab:sessioninfo}%
+The output of \Rfunction{sessionInfo} on the build system 
+after running this vignette.}
+\end{table*}
+
+\end{document}
