@@ -142,6 +142,7 @@ setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
               }
             if(exists("sNt"))
               {
+                writeLines("<hr><h2>Experiment Names</h2>", con)
                 for(i in seq_len(length(sN)))
                   {
                     if(i %in% seq(1,length(sN),by = 2))
@@ -744,6 +745,7 @@ aqm.expressionset = function(expressionset, outfile, log.transformed, numberofgr
       }
     if(exists("sNt"))
       {
+        writeLines("<hr><h2>Experiment Names</h2>", con)
         for(i in seq_len(length(sN)))
           {
             if(i %in% seq(1,length(sN),by = 2))

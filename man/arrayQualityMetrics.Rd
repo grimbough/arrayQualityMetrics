@@ -1,4 +1,4 @@
-rrayQualityMetrics-package}
+\name{arrayQualityMetrics-package}
 \alias{arrayQualityMetrics}
 \docType{package}
 \title{
