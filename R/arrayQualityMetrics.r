@@ -1,4 +1,4 @@
-setGeneric("arrayQualityMetrics", function(expressionset, outfile, log.transformed, numberofgraphs) standardGeneric("arrayQualityMetrics"))
+setGeneric("arrayQualityMetrics", function(expressionset, outfile, do.logtransform, split.plots) standardGeneric("arrayQualityMetrics"))
 
 
 ##lists
@@ -71,7 +71,7 @@ makePlot = function(con, name, w, h=devDims(w)$height, fun, psz=12, isPlatePlot=
 ##NChannelSet
 
 setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
-          function(expressionset, outfile, log.transformed, numberofgraphs)
+          function(expressionset, outfile, do.logtransform = FALSE, split.plots = FALSE)
           {
             fn  = paste(outfile,"_QMreport",sep="")
             title = paste(outfile, " quality metrics report", sep="")
@@ -80,17 +80,10 @@ setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
             writeLines(titletext, con)
       
             ##data preparation
-            if(log.transformed == FALSE)
-              {
-                rc = log2(assayData(expressionset)$R)
-                gc = log2(assayData(expressionset)$G)
-              }
-            if(log.transformed == TRUE)
-              {
-                rc = assayData(expressionset)$R
-                gc = assayData(expressionset)$G
-              }
-            
+            rc = if(do.logtransform) log2(assayData(expressionset)$R) else assayData(expressionset)$R
+            gc = if(do.logtransform) log2(assayData(expressionset)$G) else assayData(expressionset)$G
+
+           
             if("Rb" %in% colnames(dims(expressionset)) && "Gb" %in% colnames(dims(expressionset)))
               {
                 rbg = assayData(expressionset)$Rb
@@ -162,16 +155,10 @@ setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
               }
 
             outM = as.dist(dist2(na.omit(dat)))
-            hc = hclust(outM)
       
-            if(!missing(numberofgraphs))
-              k = numberofgraphs
-            if(missing(numberofgraphs) && numArrays > 50)
-              k = ceiling(numArrays/50)
-            if(missing(numberofgraphs) && numArrays <= 50)
-              k = 1    
-            group = cutree(hc, k = k)
-     
+            k = if(split.plots) split.plots else k = numArrays
+            ##attribute randomly the experiments to different groups
+            group = sample(rep((1:ceiling(numArrays/k)),k),numArrays)
 
 ##########################################
 ###Section 1 : Individual array quality###
@@ -705,7 +692,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
 
 ##plotting functions for ExpressionSet
 
-aqm.expressionset = function(expressionset, outfile, log.transformed, numberofgraphs)
+aqm.expressionset = function(expressionset, outfile, do.logtransform = FALSE, split.plots = FALSE)
   {
    
     fn  = paste(outfile,"_QMreport",sep="")
@@ -715,10 +702,7 @@ aqm.expressionset = function(expressionset, outfile, log.transformed, numberofgr
     writeLines(titletext, con)
 
     ##data preparation
-    if(log.transformed == FALSE)
-      dat = log2(exprs(expressionset))
-    if(log.transformed == TRUE)
-      dat = exprs(expressionset)
+    dat = if(do.logtransform) log2(exprs(expressionset)) else exprs(expressionset)
    
     sN = sampleNames(expressionset)
     ##list to use multidensity, multiecdf and boxplot
@@ -765,16 +749,11 @@ aqm.expressionset = function(expressionset, outfile, log.transformed, numberofgr
       }
     
     outM = as.dist(dist2(na.omit(dat)))
-    hc = hclust(outM)
-    
-    if(!missing(numberofgraphs))
-      k = numberofgraphs
-    if(missing(numberofgraphs) && numArrays > 50)
-      k = ceiling(numArrays/50)
-    if(missing(numberofgraphs) && numArrays <= 50)
-      k = 1    
-    group = cutree(hc, k = k)
 
+    k = if(split.plots) split.plots else k = numArrays
+    ##attribute randomly the experiments to different groups
+    group = sample(rep((1:ceiling(numArrays/k)),k),numArrays)
+   
 ##########################################
 ###Section 1 : Individual array quality###
 ##########################################
@@ -1116,9 +1095,9 @@ where I1 and I2 are the vectors of normalized intensities of two channels, on th
 
 ##ExpressionSet
 setMethod("arrayQualityMetrics",signature(expressionset="ExpressionSet"),
-          function(expressionset, outfile, log.transformed, numberofgraphs)
+          function(expressionset, outfile, do.logtransform = FALSE, split.plots = FALSE)
           {
-            l = aqm.expressionset(expressionset, outfile, numberofgraphs)
+            l = aqm.expressionset(expressionset, outfile, do.logtransform, split.plots)
             con = l[[5]]
             writeLines("</table>", con)
             closeHtmlPage(con)
@@ -1130,13 +1109,13 @@ setMethod("arrayQualityMetrics",signature(expressionset="ExpressionSet"),
 ##AffyBatch
 
 setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
-          function(expressionset, outfile, log.transformed, numberofgraphs){
+          function(expressionset, outfile, do.logtransform = FALSE, split.plots = FALSE){
             
 ############################
 ###Section 7 : Affy plots###
 ############################
             
-            l = aqm.expressionset(expressionset, outfile, numberofgraphs)
+            l = aqm.expressionset(expressionset, outfile, do.logtransform, split.plots)
             numArrays = as.numeric(l[1])
             sN = l[[2]]
             section = as.numeric(l[[3]])

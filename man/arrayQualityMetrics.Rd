@@ -11,18 +11,18 @@ Quality metrics on ExpressionSets
   quality of a set of arrays.
 }
 \usage{
-arrayQualityMetrics(expressionset, outfile, log.transformed, numberofgraphs)
+arrayQualityMetrics(expressionset, outfile, do.logtransform, split.plots)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{expressionset}{ The \code{expressionset} must be an object of
     class ExpressionSet }
   \item{outfile}{ The name of the result file is \code{outfile} }
-  \item{log.transformed}{ TRUE if the data have already been log
-    transformed, FALSE if not. }
-  \item{numberofgraphs}{ If the number of array is more than 50 it is
-    adviced to define a number of experiments to represent on each
-    graphics when necessary \code{numberofgraphs} }
+  \item{do.logtransform}{ default is FALSE. If TRUE, the data will be
+    log transformed }
+  \item{split.plots}{  default is FALSE. If the number of studied array
+    is more than 50 it is adviced to define a number of experiments to
+    represent on the density plots }
 }
 \details{
 \tabular{ll}{

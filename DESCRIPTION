@@ -1,7 +1,7 @@
 Package: arrayQualityMetrics
 Title: Quality metrics on ExpressionSets
-Version: 1.0.4
-Date: 2007-06-29
+Version: 1.0.5
+Date: 2007-07-18
 Author: Audrey Kauffmann, Wolfgang Huber
 Maintainer: Audrey Kauffmann <audrey@ebi.ac.uk>
 Depends: geneplotter, genefilter, vsn, RColorBrewer, affyPLM, CCl4
