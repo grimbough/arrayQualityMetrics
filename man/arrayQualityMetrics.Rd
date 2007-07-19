@@ -16,7 +16,7 @@ arrayQualityMetrics(expressionset, outfile, do.logtransform, split.plots)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{expressionset}{ The \code{expressionset} must be an object of
-    class ExpressionSet }
+    class ExpressionSet, AffyBatch or NChannelSet }
   \item{outfile}{ The name of the result file is \code{outfile} }
   \item{do.logtransform}{ default is FALSE. If TRUE, the data will be
     log transformed }

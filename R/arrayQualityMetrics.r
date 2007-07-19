@@ -440,7 +440,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                            par(mar=c(1,2,0,1), xaxt = "s")
                            multi("ecdf",lredc,xlimr,"","log(intensity)","")
                            par(mar=c(1,2,0,1), xaxt = "s")
-                           multi("ecdf",ldat,xlim,"","log(ratio)","")}, text="<tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><br><b><Figure %sb</b></center></td></table>\n", title="Density plots", fig = figure)
+                           multi("ecdf",ldat,xlim,"","log(ratio)","")}, text="<tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><center><br><b><Figure %sb</b></center></td></table>\n", title="Density plots", fig = figure)
               }
       
             ##Density if more than 1 group
@@ -487,10 +487,12 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                 par(mar=c(1,2,0,1), xaxt = "s")
                 multi("ecdf",ldat[group==1],xlim,"","log(ratio)","")
                 dev.off()
-                dtext = sprintf("<tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A></center></tr></td></table>\n", "Density plots", dpdf, dpng)
+                dtext = sprintf("<tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><center><br><b><Figure %sb</b></center></td></table>\n", "Density plots", dpdf, dpng, figure)
+                
+                
                 writeLines(dtext, con)
               }
-            legendhom = sprintf("<DIV STYLE=\"text-align:justify;\">The quality metrics in this section look at the distribution of the (raw, unnormalized) feature intensities for each array. <b>Figure %sa</b> shows density estimates (histograms), and <b>Figure %sb</b> presents boxplots of the same data. Arrays whose distributions are very different from the others should be considered for possible problems.</DIV>", figure, figure)          
+            legendhom = sprintf("<DIV STYLE=\"text-align:justify;\">The quality metrics in this section look at the distribution of the (raw, unnormalized) feature intensities for each array. <b>Figure %sa</b> presents boxplots and <b>Figure %sb</b> shows density estimates (histograms) of the data. Arrays whose distributions are very different from the others should be considered for possible problems.</DIV>", figure, figure)          
             writeLines(legendhom, con)
 
 
@@ -896,7 +898,7 @@ where I1 and I2 are the vectors of normalized intensities of two channels, on th
                    multi("density",ldat,xlim,"Density","","")
                    par(xaxt = "s", cex.axis = 0.8, mar = c(4,5,0,5))
                    multi("ecdf",ldat,xlim,"ECDF","log(intensity)","")
-                 }, text="<tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><br><b><Figure %sb</b></center></td></table>\n", title="Density plots", fig = figure)
+                 }, text="<tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><center><br><b><Figure %sb</b></center></td></table>\n", title="Density plots", fig = figure)
       }
                 
     ##Density if more than 1 group
@@ -924,10 +926,11 @@ where I1 and I2 are the vectors of normalized intensities of two channels, on th
         par(xaxt = "s", cex.axis = 0.8, mar = c(4,5,0,5))
         multi("ecdf",ldat[group==1],xlim,"ECDF","log(intensity)","")
         dev.off()
-        dtext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A><b>Figure %sb</b></CENTER><BR></tr></td></table>\n", "Density plots", dpdf, dpng, figure)
+        dtext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A><center><br><b>Figure %sb</b></CENTER><BR></tr></td></table>\n", "Density plots", dpdf, dpng, figure)
         writeLines(dtext, con)
       }
-    legendhom = sprintf("<DIV STYLE=\"text-align:justify;\">The quality metrics in this section look at the distribution of the (raw, unnormalized) feature intensities for each array. <b>Figure %sa</b> shows density estimates (histograms), and <b>Figure %sb</b> presents boxplots of the same data. Arrays whose distributions are very different from the others should be considered for possible problems.</DIV>", figure, figure)          
+    legendhom = sprintf("<DIV STYLE=\"text-align:justify;\">The quality metrics in this section look at the distribution of the (raw, unnormalized) feature intensities for each array. <b>Figure %sa</b> presents boxplots and <b>Figure %sb</b> shows density estimates (histograms) of the data. Arrays whose distributions are very different from the others should be considered for possible problems.</DIV>", figure, figure)          
+
     writeLines(legendhom, con)
 
 
@@ -1158,7 +1161,7 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             dev.copy(pdf, file = affypdf3)
             dev.off()
             dev.off()
-            affytext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A><BR><b>Figure %s</b></CENTER></tr></td><tr><td><b>%s</b></td><td><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A><BR><b>Figure %s</b></CENTER></tr></td><tr><td><b>%s</b></td><td><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A><BR><b>Figure %s</b></CENTER></tr></td></table>\n", "RNA degradation plot", affypdf1, affypng1, figure1, "RLE plot", affypdf2, affypng2, figure2, "NUSE plot", affypdf3, affypng3, figure3)
+            affytext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A><center><BR><b>Figure %s</b></CENTER></tr></td><tr><td><b>%s</b></td><td><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A><center><BR><b>Figure %s</b></CENTER></tr></td><tr><td><b>%s</b></td><td><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A><center><BR><b>Figure %s</b></CENTER></tr></td></table>\n", "RNA degradation plot", affypdf1, affypng1, figure1, "RLE plot", affypdf2, affypng2, figure2, "NUSE plot", affypdf3, affypng3, figure3)
             writeLines(affytext, con)
             legendaffy = sprintf("<DIV STYLE=\"text-align:justify;\">In this section we present diagnostic plots based on tools provided in the affyPLM package.
 In <b>Figure %s</b> a RNA digestion plot is computed. In this plot each array is represented by a single line. It is important to identify any array(s) that has a slope which is very different from the others. The indication is that the RNA used for that array has potentially been handled quite differently from the other arrays.
