@@ -78,7 +78,7 @@ setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
             titletext = sprintf("<hr><h1><center>%s</h1></center><table border = \"0\" cellspacing = 5 cellpadding = 2>", title)
             con = openHtmlPage(fn, title)
             writeLines(titletext, con)
-      
+
             ##data preparation
             rc = if(do.logtransform) log2(assayData(expressionset)$R) else assayData(expressionset)$R
             gc = if(do.logtransform) log2(assayData(expressionset)$G) else assayData(expressionset)$G
