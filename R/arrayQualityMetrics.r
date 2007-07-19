@@ -1,4 +1,4 @@
-setGeneric("arrayQualityMetrics", function(expressionset, outfile, do.logtransform, split.plots) standardGeneric("arrayQualityMetrics"))
+setGeneric("arrayQualityMetrics", function(expressionset, prefix, do.logtransform = FALSE, split.plots = FALSE) standardGeneric("arrayQualityMetrics"))
 
 
 ##lists
@@ -71,14 +71,14 @@ makePlot = function(con, name, w, h=devDims(w)$height, fun, psz=12, isPlatePlot=
 ##NChannelSet
 
 setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
-          function(expressionset, outfile, do.logtransform = FALSE, split.plots = FALSE)
+          function(expressionset, prefix, do.logtransform, split.plots)
           {
-            fn  = paste(outfile,"_QMreport",sep="")
-            title = paste(outfile, " quality metrics report", sep="")
+            fn  = paste(prefix,"_QMreport",sep="")
+            title = paste(prefix, " quality metrics report", sep="")
             titletext = sprintf("<hr><h1><center>%s</h1></center><table border = \"0\" cellspacing = 5 cellpadding = 2>", title)
             con = openHtmlPage(fn, title)
             writeLines(titletext, con)
-
+            
             ##data preparation
             rc = if(do.logtransform) log2(assayData(expressionset)$R) else assayData(expressionset)$R
             gc = if(do.logtransform) log2(assayData(expressionset)$G) else assayData(expressionset)$G
@@ -177,7 +177,7 @@ setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
             app = 4 + 2*(sum(numArrays>c(4,6)))
             nfig = ceiling(numArrays/8)
       
-            plotNames = paste(outfile,"_MA", 1:nfig, sep="")
+            plotNames = paste(prefix,"_MA", 1:nfig, sep="")
             mapdf = paste(plotNames, "pdf", sep=".")
             mapng = paste(plotNames, "png", sep=".")
             xlimMA = quantile(A, probs=1e-4*c(1,-1)+c(0,1))
@@ -255,8 +255,8 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
           
                 if("Rb" %in% colnames(dims(expressionset)) && "Gb" %in% colnames(dims(expressionset)))
                   {
-                    bapng = paste(outfile, "_background.png", sep = "")
-                    bapdf = paste(outfile, "_background.pdf", sep = "")
+                    bapng = paste(prefix, "_background.png", sep = "")
+                    bapdf = paste(prefix, "_background.pdf", sep = "")
                     pdf(file = bapdf)
                     nf <- layout(matrix(c(1,2,3,4,5,6),2,3,byrow = FALSE),
                                  c(1.2,1.2,1.2), c(2,2), TRUE)
@@ -295,8 +295,8 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                 ##Foreground rank representation
           
                 figure = figure +1
-                fpng = paste(outfile, "_foreground.png", sep = "")
-                fpdf = paste(outfile, "_foreground.pdf", sep = "")
+                fpng = paste(prefix, "_foreground.png", sep = "")
+                fpdf = paste(prefix, "_foreground.pdf", sep = "")
                 pdf(file = fpdf)
                 nf <- layout(matrix(c(1,2,3,4,5,6),2,3,byrow = FALSE),
                              c(1.2,1.2,1.2), c(2,2), TRUE)
@@ -347,7 +347,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                 writeLines(sec3text, con)
 
                 figure = figure +1
-                makePlot(con=con, name = paste(outfile, "_replicates", sep = ""),
+                makePlot(con=con, name = paste(prefix, "_replicates", sep = ""),
                          w=10, h=10, fun = function() {
                            lev = levels(expressionset@phenoData$replicates)
                            for(i in 1:length(lev))
@@ -403,7 +403,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                 xaxt = "n"
               }
 
-            makePlot(con=con, name = paste(outfile, "_boxplot", sep = ""),
+            makePlot(con=con, name = paste(prefix, "_boxplot", sep = ""),
                      w=8, h=8, fun = function() {
                        par(mfrow = c(1,2),
                            cex.axis = (1/log10(numArrays)-0.1),
@@ -425,7 +425,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
       
             if(max(group) == 1)
               {
-                makePlot(con=con, name = paste(outfile, "_density", sep = ""),
+                makePlot(con=con, name = paste(prefix, "_density", sep = ""),
                          w=10, h=10, fun = function() {
                            nf <- layout(matrix(c(1,2,3,4,5,6),2,3,byrow=TRUE),
                                         c(2.3,2,2), c(2,2), TRUE)
@@ -446,8 +446,8 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
             ##Density if more than 1 group
             if(max(group) > 1)
               {
-                dpng = paste(outfile,"_density.png", sep = "")
-                dpdf = paste(outfile,"_density.pdf", sep = "")
+                dpng = paste(prefix,"_density.png", sep = "")
+                dpdf = paste(prefix,"_density.pdf", sep = "")
                 pdf(file = dpdf)
                 for(n in 1:max(group))
                   {
@@ -509,7 +509,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                 writeLines(sec5text, con)
             
                 figure = figure + 1
-                gcpdf = paste(outfile,"_GCcontent.pdf", sep = "")
+                gcpdf = paste(prefix,"_GCcontent.pdf", sep = "")
                 pdf(file = gcpdf)
                 ngc = c(2:9)
                 colb = brewer.pal(9, "Blues")
@@ -546,8 +546,8 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                   }
                 dev.off()
         
-                gcopng = paste(outfile,"_overall_GCcontent.png", sep = "")
-                gcopdf = paste(outfile,"_overall_GCcontent.pdf", sep = "")
+                gcopng = paste(prefix,"_overall_GCcontent.png", sep = "")
+                gcopdf = paste(prefix,"_overall_GCcontent.pdf", sep = "")
                 png(file = gcopng)
                 nf <- layout(matrix(c(1,2,3,4,5,6,7,8,9),3,3,byrow = FALSE),
                              c(1.2,1.2,1.2), c(2,1.8,2), FALSE)
@@ -601,9 +601,9 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
           
                 facgene[genes] = 1
                 facgene[-genes] = 0
-                gpdf = paste(outfile,"_GenesMapping.pdf", sep = "")
-                gopng = paste(outfile,"_overall_GenesMapping.png", sep = "")
-                gopdf = paste(outfile,"_overall_GenesMapping.pdf", sep = "")
+                gpdf = paste(prefix,"_GenesMapping.pdf", sep = "")
+                gopng = paste(prefix,"_overall_GenesMapping.png", sep = "")
+                gopdf = paste(prefix,"_overall_GenesMapping.pdf", sep = "")
           
                 cols = brewer.pal(9, "Set1")
                 pdf(gpdf)
@@ -663,7 +663,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
             colourRange = brewer.pal(9,"Greys")
             marg = ceiling(long/(sqrt(long)/1.5)+log10(numArrays))
       
-            makePlot(con=con, name = paste(outfile, "_heatmap", sep = ""),
+            makePlot(con=con, name = paste(prefix, "_heatmap", sep = ""),
                      w=8, h=8, fun = function() {
                        heatmap(as.matrix(outM),
                                labRow = sN,
@@ -675,7 +675,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                      }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><BR><b>Figure %s</center></b></td>\n", title="Heatmap representation of the distance between experiments", fig = figure)
       
             m = matrix(pretty(outM,9),nrow=1,ncol=length(pretty(outM,9)))
-            hlpng = paste(outfile, "_heatmaplegend.png", sep = "")  
+            hlpng = paste(prefix, "_heatmaplegend.png", sep = "")  
             png(file= hlpng, width = 150, height = 450)
             image(m,xaxt="n",yaxt="n",ylab="Distance", col = colourRange, cex.lab = 0.8, mgp = c(1.5,1,0) )
             axis(2, label= as.list(pretty(outM,9)),at=seq(0,1,by=(1/(length(pretty(outM,9))-1))), cex.axis = 0.8, padj = 1)
@@ -694,15 +694,16 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
 
 ##plotting functions for ExpressionSet
 
-aqm.expressionset = function(expressionset, outfile, do.logtransform = FALSE, split.plots = FALSE)
+aqm.expressionset = function(expressionset, prefix, do.logtransform = FALSE, split.plots = FALSE)
   {
    
-    fn  = paste(outfile,"_QMreport",sep="")
-    title = paste(outfile, " quality metrics report", sep="")
+    fn  = paste(prefix,"_QMreport",sep="")
+    title = paste(prefix, " quality metrics report", sep="")
     titletext = sprintf("<hr><h1><center>%s</h1></center><table border = \"0\" cellspacing = 5 cellpadding = 2>", title)
     con = openHtmlPage(fn, title)
     writeLines(titletext, con)
 
+   
     ##data preparation
     dat = if(do.logtransform) log2(exprs(expressionset)) else exprs(expressionset)
    
@@ -773,7 +774,7 @@ aqm.expressionset = function(expressionset, outfile, do.logtransform = FALSE, sp
     app = 4 + 2*(sum(numArrays>c(4,6)))
     nfig = ceiling(numArrays/8)
     
-    plotNames = paste(outfile,"_MA", 1:nfig, sep="")
+    plotNames = paste(prefix,"_MA", 1:nfig, sep="")
     mapdf = paste(plotNames, "pdf", sep=".")
     mapng = paste(plotNames, "png", sep=".")
     xlimMA = quantile(A, probs=1e-4*c(1,-1)+c(0,1))
@@ -847,7 +848,7 @@ where I1 and I2 are the vectors of normalized intensities of two channels, on th
         writeLines(sec3text, con)
 
         figure = figure +1
-        makePlot(con=con, name = paste(outfile, "_replicates", sep = ""),
+        makePlot(con=con, name = paste(prefix, "_replicates", sep = ""),
                  w=10, h=10, fun = function() {
                    lev = levels(expressionset@phenoData$replicates)
                    for(i in 1:length(lev))
@@ -879,7 +880,7 @@ where I1 and I2 are the vectors of normalized intensities of two channels, on th
     writeLines(sec4text, con)
             
     figure = figure + 1
-    makePlot(con=con, name = paste(outfile, "_boxplot", sep = ""),
+    makePlot(con=con, name = paste(prefix, "_boxplot", sep = ""),
              w=8, h=8, fun = function() {
                colours = brewer.pal(12, "Paired")
                par(cex.axis = 0.8, pty = "s", lheight =((1/log10(numArrays))*long), mai = c(((long/12)+0.2),0.4,0.2,0.2) , omi = c(0,0,0,0))
@@ -890,7 +891,7 @@ where I1 and I2 are the vectors of normalized intensities of two channels, on th
     xlim = c(min(na.omit(dat)),max(na.omit(dat)))
     if(max(group) == 1)
       {
-        makePlot(con=con, name = paste(outfile, "_density", sep = ""),
+        makePlot(con=con, name = paste(prefix, "_density", sep = ""),
                  w=10, h=10, fun = function() {
                    xlim = c(min(na.omit(dat)),max(na.omit(dat)))
                    nf <- layout(matrix(c(1,2),2,1,byrow=TRUE), c(2.8,2.8),c(1.8,2), TRUE)
@@ -904,8 +905,8 @@ where I1 and I2 are the vectors of normalized intensities of two channels, on th
     ##Density if more than 1 group
     if(max(group) > 1)
       {
-        dpng = paste(outfile,"_density.png", sep = "")
-        dpdf = paste(outfile,"_density.pdf", sep = "")
+        dpng = paste(prefix,"_density.png", sep = "")
+        dpdf = paste(prefix,"_density.pdf", sep = "")
         pdf(file = dpdf)
         xlim = c(min(na.omit(dat)),max(na.omit(dat)))
         for(n in 1:max(group))
@@ -946,7 +947,7 @@ where I1 and I2 are the vectors of normalized intensities of two channels, on th
             sec5text = sprintf("<hr><h2>Section %s: Array platform quality</h2>", section)    
             writeLines(sec5text, con)
             figure = figure + 1
-            gcpdf = paste(outfile,"_GCcontent.pdf", sep = "")
+            gcpdf = paste(prefix,"_GCcontent.pdf", sep = "")
             pdf(file = gcpdf)
             ngc = c(2:9)
             colb = brewer.pal(9, "Blues")
@@ -969,8 +970,8 @@ where I1 and I2 are the vectors of normalized intensities of two channels, on th
               }
             dev.off()
         
-            gcopng = paste(outfile,"_overall_GCcontent.png", sep = "")
-            gcopdf = paste(outfile,"_overall_GCcontent.pdf", sep = "")
+            gcopng = paste(prefix,"_overall_GCcontent.png", sep = "")
+            gcopdf = paste(prefix,"_overall_GCcontent.pdf", sep = "")
             png(file = gcopng)
             nf <- layout(matrix(c(1,2,3),3,1,byrow = FALSE),
                          2.2, c(2,1.8,2), TRUE)
@@ -1008,9 +1009,9 @@ where I1 and I2 are the vectors of normalized intensities of two channels, on th
                     
             facgene[genes] = 1
             facgene[-genes] = 0
-            gpdf = paste(outfile,"_GenesMapping.pdf", sep = "")
-            gopng = paste(outfile,"_overall_GenesMapping.png", sep = "")
-            gopdf = paste(outfile,"_overall_GenesMapping.pdf", sep = "")
+            gpdf = paste(prefix,"_GenesMapping.pdf", sep = "")
+            gopng = paste(prefix,"_overall_GenesMapping.png", sep = "")
+            gopdf = paste(prefix,"_overall_GenesMapping.pdf", sep = "")
         
             cols = brewer.pal(9, "Set1")
             pdf(gpdf)
@@ -1070,7 +1071,7 @@ where I1 and I2 are the vectors of normalized intensities of two channels, on th
     colourRange = brewer.pal(9,"Greys")
     marg = ceiling(long/(sqrt(long)/1.5)+log10(numArrays))
     
-    makePlot(con=con, name = paste(outfile, "_heatmap", sep = ""),
+    makePlot(con=con, name = paste(prefix, "_heatmap", sep = ""),
              w=8, h=8, fun = function() {
                heatmap(as.matrix(outM),
                        labRow = sN,
@@ -1082,7 +1083,7 @@ where I1 and I2 are the vectors of normalized intensities of two channels, on th
              }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><BR><b>Figure %s</center></b></td>\n", title="Heatmap representation of the distance between experiments", fig = figure)
       
     m = matrix(pretty(outM,9),nrow=1,ncol=length(pretty(outM,9)))
-    hlpng = paste(outfile, "_heatmaplegend.png", sep = "")  
+    hlpng = paste(prefix, "_heatmaplegend.png", sep = "")  
     png(file= hlpng, width = 150, height = 450)
     image(m,xaxt="n",yaxt="n",ylab="Distance", col = colourRange, cex.lab = 0.8, mgp = c(1.5,1,0) )
     axis(2, label= as.list(pretty(outM,9)),at=seq(0,1,by=(1/(length(pretty(outM,9))-1))), cex.axis = 0.8, padj = 1)
@@ -1098,9 +1099,9 @@ where I1 and I2 are the vectors of normalized intensities of two channels, on th
 
 ##ExpressionSet
 setMethod("arrayQualityMetrics",signature(expressionset="ExpressionSet"),
-          function(expressionset, outfile, do.logtransform = FALSE, split.plots = FALSE)
+          function(expressionset, prefix, do.logtransform, split.plots)
           {
-            l = aqm.expressionset(expressionset, outfile, do.logtransform, split.plots)
+            l = aqm.expressionset(expressionset, prefix, do.logtransform, split.plots)
             con = l[[5]]
             writeLines("</table>", con)
             closeHtmlPage(con)
@@ -1112,13 +1113,13 @@ setMethod("arrayQualityMetrics",signature(expressionset="ExpressionSet"),
 ##AffyBatch
 
 setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
-          function(expressionset, outfile, do.logtransform = FALSE, split.plots = FALSE){
+          function(expressionset, prefix, do.logtransform, split.plots){
             
 ############################
 ###Section 7 : Affy plots###
 ############################
             
-            l = aqm.expressionset(expressionset, outfile, do.logtransform, split.plots)
+            l = aqm.expressionset(expressionset, prefix, do.logtransform, split.plots)
             numArrays = as.numeric(l[1])
             sN = l[[2]]
             section = as.numeric(l[[3]])
@@ -1132,8 +1133,8 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             figure1 = figure + 1
             acol = sample(brewer.pal(8, "Dark2"), numArrays, replace = (8<numArrays))
             rnaDeg = AffyRNAdeg(expressionset)
-            affypng1 = paste(outfile,"_RNAdeg.png", sep = "")
-            affypdf1 = paste(outfile,"_RNAdeg.pdf", sep = "")
+            affypng1 = paste(prefix,"_RNAdeg.png", sep = "")
+            affypdf1 = paste(prefix,"_RNAdeg.pdf", sep = "")
             png(file = affypng1)
             plotAffyRNAdeg(rnaDeg, cols = acol, lwd = 2)
             dev.copy(pdf, file = affypdf1)
@@ -1143,8 +1144,8 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             figure2 = figure1 + 1
             pp1 = preprocess(expressionset)
             dataPLM = fitPLM(pp1, background = FALSE, normalize = FALSE)
-            affypng2 = paste(outfile,"_RLE.png", sep = "")
-            affypdf2 = paste(outfile,"_RLE.pdf", sep = "")
+            affypng2 = paste(prefix,"_RLE.png", sep = "")
+            affypdf2 = paste(prefix,"_RLE.pdf", sep = "")
             png(file = affypng2)
             Mbox(dataPLM, ylim = c(-1, 1), names = sN, col = "lightblue",
                  whisklty = 0, staplelty = 0, main = "RLE", las = 3)
@@ -1153,8 +1154,8 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             dev.off()
             
             figure3 = figure2 + 1
-            affypng3 = paste(outfile,"_NUSE.png", sep = "")
-            affypdf3 = paste(outfile,"_NUSE.pdf", sep = "")
+            affypng3 = paste(prefix,"_NUSE.png", sep = "")
+            affypdf3 = paste(prefix,"_NUSE.pdf", sep = "")
             png(file = affypng3)
             boxplot(dataPLM, ylim = c(0.95, 1.5), names = sN,
                     outline = FALSE, col = "lightblue", main = "NUSE", las = 2)

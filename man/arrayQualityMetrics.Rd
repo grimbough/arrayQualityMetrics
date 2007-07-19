@@ -11,18 +11,20 @@ Quality metrics on ExpressionSets
   quality of a set of arrays.
 }
 \usage{
-arrayQualityMetrics(expressionset, outfile, do.logtransform, split.plots)
+arrayQualityMetrics(expressionset, prefix, do.logtransform = FALSE,
+split.plots = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{expressionset}{ The \code{expressionset} must be an object of
-    class ExpressionSet, AffyBatch or NChannelSet }
-  \item{outfile}{ The name of the result file is \code{outfile} }
-  \item{do.logtransform}{ default is FALSE. If TRUE, the data will be
-    log transformed }
-  \item{split.plots}{  default is FALSE. If the number of studied array
+    class ExpressionSet, AffyBatch or NChannelSet. }
+  \item{prefix}{ is the prefix of all the names of the result files that
+    are created in the working directory. }
+  \item{do.logtransform}{ If TRUE, the data will be
+    log transformed. }
+  \item{split.plots}{  If the number of studied array
     is more than 50 it is adviced to define a number of experiments to
-    represent on the density plots }
+    represent on the density plots. }
 }
 \details{
 \tabular{ll}{
