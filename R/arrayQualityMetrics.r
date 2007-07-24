@@ -49,9 +49,9 @@ makePlot = function(con, name, w, h=devDims(w)$height, fun, psz=12, isPlatePlot=
   
   htmltext = sprintf(text, title, basename(outf[1]), basename(outf[2]), fig)
   
-  writeLines(htmltext, con)
+  resret = list(res,htmltext)
   
-  return(res)
+  return(resret)
 }
 
 ##NChannelSet
@@ -59,7 +59,7 @@ makePlot = function(con, name, w, h=devDims(w)$height, fun, psz=12, isPlatePlot=
 setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
           function(expressionset, prefix, do.logtransform, split.plots)
           {
-            if(!dirname(prefix) %in% dir())
+            if(!dirname(prefix) %in% dir() && dirname(prefix) != ".")
               stop(paste(dirname(prefix)," is not an existing directory.",sep=""))
             if(!file.info(dirname(prefix))$isdir)
               stop(paste(dirname(prefix)," is not a directory.",sep=""))
@@ -71,11 +71,6 @@ setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
             writeLines(titletext, con)
 
 
-            ##TO DO: create an index with hyperlinks to the different sections
-            ##writeLines("<hr><h2>Index</h2>", con)
-            ##indextext = "<tr><td><b><a href=\"#EN\">Experiment Names</b></a></td></tr><tr><td><b><a href=\"#S1\">Individual array quality</b></a></td></tr><tr><td><b><a href=\"#S2\">Spatial Effects</b></a></td></tr><tr><td><b><a href=\"#S3\">Reproducibility</b></a></td></tr><tr><td><b><a href=\"#S4\">Homogeneity between experiments</b></a></td></tr><tr><td><b><a href=\"#S5\">Array platform quality</b></a></td></tr><tr><td><b><a href=\"#S6\">Between array comparison</b></a></td></tr></table><hr><table border = \"0\" cellspacing = 5 cellpadding = 2>"         
-            ##writeLines(indextext, con)
-                      
             ##data preparation
             rc = if(do.logtransform) log2(assayData(expressionset)$R) else assayData(expressionset)$R
             gc = if(do.logtransform) log2(assayData(expressionset)$G) else assayData(expressionset)$G
@@ -164,7 +159,6 @@ setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
             section = 1
             figure = 1
             sec1text = sprintf("<hr><h2><a name=\"S1\">Section %s: Individual array quality</a></h2>", section)
-            writeLines(sec1text, con)
             
            ##MAplots
             ##function from affyQCReport
@@ -217,23 +211,11 @@ setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
             dev.off()
     
             matext1 = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><br><b>Figure %s</b></center></td><td><A HREF=\"%s\">%s</td></A></tr></td>\n", "MvA plots",  basename(mapdf[1]),  basename(mapng[1]), figure , basename(mapdf[1]), "MvA plot 1")
-            writeLines(matext1, con)
-            if(nfig >= 2)
-              {
-                for(i in 2:nfig)
-                  {
-                    matext2 = sprintf("<tr><td></td><td></td><td><A HREF=\"%s\">%s%s</A><BR></tr></td>\n", basename(mapdf[i]), "MvA plot ", i)
-          
-                    writeLines(matext2, con)
-                  }
-              }
-            writeLines("</table>", con)
             legendMA = sprintf("<DIV STYLE=\"text-align:justify;\"><b>Figure %s</b> represents MA plot for each array. <br> M A-plots are useful for pairwise comparisons between arrays. M and A are defined as :<br>
 M = log2(I1) - log2(I2)<br>
 A = 1/2 log2(I1)+log2(I2))<br>
 where I1 and I2 are the vectors of normalized intensities of two channels, on the original data scale (i. e. not logarithm-transformed).Typically, we expect the mass of the distribution in an M A-plot to be concentrated along the M = 0 axis, and there should be no trend in the mean of M as a function of A.
 Note that a bigger width of the plot of the M-distribution at the lower end of the A scale does not necessarily imply that the variance of the M-distribution is larger at the lower end of the A scale: the visual impression might simply be caused by the fact that there is more data at the lower end of the A scale. To visualize whether there is a trend in the variance of M as a function of A, consider plotting M versus rank(A).</DIV>", figure)          
-            writeLines(legendMA, con)
             
 #################################
 ###Section 2 : Spatial Effects###
@@ -245,7 +227,6 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
               {
                 section = section + 1
                 sec2text = sprintf("<hr><h2><a name = \"S2\">Section %s: Spatial Effects</a></h2>", section)
-                writeLines(sec2text, con)
 
                 r = featureData(expressionset)$r
                 c = featureData(expressionset)$c
@@ -312,7 +293,6 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                 dev.off()
                 
                 batext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A></CENTER></td><td><IMG BORDER = \"0\" SRC=\"%s\"/></td></tr></table>\n", "Background representation on the array", basename(bapdf), basename(bapng), basename(llpng))
-                writeLines(batext, con)
           
                 ##Foreground rank representation
           
@@ -366,44 +346,45 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                 dev.off()
                 ftext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><IMG border = \"0\" SRC=\"%s\"/></A><center><b>Figure %s</b></center></td><td><IMG BORDER = \"0\" SRC=\"%s\"/></td></tr></table>\n", "Foreground representation on the array", basename(fpdf), basename(fpng), figure, basename(llpng))
 
-                writeLines(ftext, con)
                 legendlocal = sprintf("<DIV STYLE=\"text-align:justify;\"><b>Figure %s:</b> False color representations of the spatial intensity (background and foreground) distributions of each arrays. The color scale is shown in the panel on the right. The color scale was chosen proportional to the ranks. These graphical representation permit to show problems during the experimentation such as fingerprints, artifactual gradient or dye specific failure for instance.</DIV>", figure)          
-                writeLines(legendlocal, con)
               }
 
 #################################
 ###Section 3 : Reproducibility###
 #################################
-
+            
             ##Scatter plots between replicates
-            ##Have to find a better solution for the xlim and ylim.
-            if("replicates" %in% names(phenoData(expressionset)))
+            ##To improve if we keep it.
+            if(!TRUE)
               {
-                section = section + 1
-                sec3text = sprintf("<hr><h2><a name = \"S3\">Section %s: Reproducibility</a></h2>", section)          
-                writeLines(sec3text, con)
+                if("Cy3" %in% rownames(featureData(expressionset)@varMetadata) && "Cy5" %in% rownames(featureData(expressionset)@varMetadata))
+                  {
+                    section = section + 1
+                    sec3text = sprintf("<hr><h2><a name = \"S3\">Section %s: Reproducibility</a></h2>", section)          
+                    figure = figure +1              
 
-                figure = figure +1
-                makePlot(con=con, name = paste(prefix, "_replicates", sep = ""),
-                         w=10, h=10, fun = function() {
-                           lev = levels(expressionset@phenoData$replicates)
-                           for(i in 1:length(lev))
-                             {
-                               subset = dat[, names(phenoData(expressionset)$replicates[
-                                   phenoData(expressionset)$replicates == lev[i]])]
-                               comp = combn(ncol(subset),2)
-                               layout(matrix(1:16,4,4,byrow = TRUE), rep(2,4), rep(2,4), TRUE)
-                               par(mar = c(0,0,0,0))
-                               for(j in 1:ncol(comp))
-                                 {
-                                   smoothScatter(subset[,comp[1,j]],subset[,comp[2,j]], xaxt = "n", xlim = xlim, yaxt = "n", ylim = c(min(dat),max(dat)), xlab = "", ylab = "")
-                                   abline(a=0,b=1,col="red")
-                                 }
-                             }
-                         }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><br><b>Figure %s</b></center></td>\n", title="Scatter plots between replicates", fig = figure)
-                legendrepli = sprintf("<DIV STYLE=\"text-align:justify;\"><b>Figure %s</b> represents the comparison of the log2 ratio of the replicate arrays. Each pairs of replicates are directly compared thanks to a scatter plot representation and a correlation coefficient is calculated. Scatterplot with a wide distribution of the dots and with a low correlation coefficient means a bad reproducibility of the experiment.</DIV>", figure)          
-                writeLines(legendrepli, con)
+                    mplot1 = makePlot(con=con, name = paste(prefix, "_replicates", sep = ""),
+                      w=10, h=10, fun = function() {
+                        cy3cy5 = paste(CCl4@phenoData$Cy3,CCl4@phenoData$Cy5,sep="/")
+                        lev = levels(as.factor(cy3cy5))
+                        for(i in 1:length(lev))
+                          {
+                            subset = dat[, cy3cy5 == lev[i]]
+                            comp = combn(ncol(subset),2)
+                            layout(matrix(1:16,4,4,byrow = TRUE), rep(2,4), rep(2,4), TRUE)
+                            par(mar = c(0,0,0,0))
+                            for(j in 1:ncol(comp))
+                              {
+                                smoothScatter(subset[,comp[1,j]],subset[,comp[2,j]], xaxt = "n", xlim = xlim, yaxt = "n", ylim = xlim, xlab = "", ylab = "")
+                                abline(a=0,b=1,col="red")
+                              }
+                          }
+                      }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><br><b>Figure %s</b></center></td>\n", title="Scatter plots between replicates", fig = figure)
+                    htmltext1 = mplot1[[2]]
+                
+                    legendrepli = sprintf("<DIV STYLE=\"text-align:justify;\"><b>Figure %s</b> represents the comparison of the log2 ratio of the replicate arrays. Each pairs of replicates are directly compared thanks to a scatter plot representation and a correlation coefficient is calculated. Scatterplot with a wide distribution of the dots and with a low correlation coefficient means a bad reproducibility of the experiment.</DIV>", figure)          
 
+                  }
               }
       
 #################################################
@@ -413,7 +394,6 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
             ##Boxplots
             section = section + 1
             sec4text = sprintf("<hr><h2><a name = \"S4\">Section %s: Homogeneity between experiments</a></h2>", section)
-            writeLines(sec4text, con)
             
             figure = figure + 1
             colours = brewer.pal(12, "Paired")
@@ -440,7 +420,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                 xaxt = "n"
               }
 
-            makePlot(con=con, name = paste(prefix, "_boxplot", sep = ""),
+            mplot2 = makePlot(con=con, name = paste(prefix, "_boxplot", sep = ""),
                      w=8, h=8, fun = function() {
                        par(mfrow = c(1,2),
                            cex.axis = (1/log10(numArrays)-0.1),
@@ -454,6 +434,8 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                        boxplot(ldat, col = colours[2], las = 3, range = 0,
                                names = xname2)
                      }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><br><b>Figure %sa</center></b></td>\n", title="Boxplots", fig = figure)
+
+            htmltext2 = mplot2[[2]]          
       
             ##Density if 1 group
             xlim = c(min(na.omit(dat)),max(na.omit(dat)))
@@ -462,7 +444,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
       
             if(max(group) == 1)
               {
-                makePlot(con=con, name = paste(prefix, "_density", sep = ""),
+                mplot3 = makePlot(con=con, name = paste(prefix, "_density", sep = ""),
                          w=10, h=10, fun = function() {
                            nf <- layout(matrix(c(1,2,3,4,5,6),2,3,byrow=TRUE),
                                         c(2.3,2,2), c(2,2), TRUE)
@@ -478,6 +460,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                            multi("ecdf",lredc,xlimr,"","log(intensity)","")
                            par(mar=c(1,2,0,1), xaxt = "s")
                            multi("ecdf",ldat,xlim,"","log(ratio)","")}, text="<tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><center><br><b>Figure %sb</b></center></td></table>\n", title="Density plots", fig = figure)
+                htmltext3 = mplot3[[2]]          
               }
       
             ##Density if more than 1 group
@@ -525,12 +508,8 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                 multi("ecdf",ldat[group==1],xlim,"","log(ratio)","")
                 dev.off()
                 dtext = sprintf("<tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><center><br><b>Figure %sb</b></center></td></table>\n", "Density plots", basename(dpdf), basename(dpng), figure)
-                
-                
-                writeLines(dtext, con)
               }
             legendhom = sprintf("<DIV STYLE=\"text-align:justify;\">The quality metrics in this section look at the distribution of the (raw, unnormalized) feature intensities for each array. <b>Figure %sa</b> presents boxplots and <b>Figure %sb</b> shows density estimates (histograms) of the data. Arrays whose distributions are very different from the others should be considered for possible problems.</DIV>", figure, figure)          
-            writeLines(legendhom, con)
 
 
 ########################################
@@ -543,7 +522,6 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
               {
                 section = section + 1
                 sec5text = sprintf("<hr><h2><a name = \"S5\">Section %s: Array platform quality</a></h2>", section)    
-                writeLines(sec5text, con)
             
                 figure = figure + 1
                 gcpdf = paste(prefix,"_GCcontent.pdf", sep = "")
@@ -614,9 +592,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                 dev.off()
           
                 gctext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s<A HREF=\"%s\">%s</A>%s<A HREF=\"%s\">%s</A></b><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><br><b>Figure %s</b></center></tr></td></table>\n", "GC content effect ", basename(gcpdf), "per array", " and ", basename(gcopdf), "global", basename(gcopdf), basename(gcopng), figure)
-                writeLines(gctext, con)
-                legendgc = sprintf("<DIV STYLE=\"text-align:justify;\"><b>Figure %s</b> shows the distributions of the log2 intensities grouped by the percentage of cytosines (C) and guanines (G) among the nucleotides in each probe. Box plots (a), empirical cumulative distribution functions (ECDF, b) and kernel density estimates (c). Box and line colors in the three panels correspond to the same groups. Cytosine and guanine are able to form three hydrogen bonds, while adenine (A) and thymine (T) only form two, hence oligonucleotides with a higher proportion of C and G can form more stable hybridization bindings. This should result in higher intensities measured on the array, regardless of the abundance of target molecules.</DIV>",  figure)          
-                writeLines(legendgc, con)
+                legendgc = sprintf("<DIV STYLE=\"text-align:justify;\"><b>Figure %s</b> shows the distributions of the log2 intensities grouped by the percentage of cytosines (C) and guanines (G) among the nucleotides in each probe. Box plots (a), empirical cumulative distribution functions (ECDF, b) and kernel density estimates (c). Box and line colors in the three panels correspond to the same groups. Cytosine and guanine are able to form three hydrogen bonds, while adenine (A) and thymine (T) only form two, hence oligonucleotides with a higher proportion of C and G can form more stable hybridization bindings. This should result in higher intensities measured on the array, regardless of the abundance of target molecules.</DIV>",  figure)
               }
 
             ##Mapping of probes
@@ -627,7 +603,6 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                   {
                     section = section + 1
                     sec5text = sprintf("<hr><h2><a name = \"S5\">Section %s: Array platform quality</a></h2>", section)          
-                    writeLines(sec5text, con)
                   }
             
                 figure = figure + 1
@@ -681,9 +656,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                 dev.off()
 
                 gotext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s<A HREF=\"%s\">%s</A>%s<A HREF=\"%s\">%s</A></b><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><br><b>Figure %s</b></center></tr></td></table>\n", "Gene mapping ", basename(gpdf), "per array", " and ", basename(gopdf), "global", basename(gopdf), basename(gopng), figure)
-                writeLines(gotext, con)
                 legendgo = sprintf("<DIV STYLE=\"text-align:justify;\"><b>Figure %s</b> shows the density distributions of the log2 ratios grouped by the mapping of the probes. Blue, density estimate of intensities of segments that overlap an annotated mRNA in RefSeq database. Gray, segments that do not overlap a Refseq mRNA.</DIV>",  figure)          
-                writeLines(legendgo, con)
 
 
               }
@@ -694,12 +667,11 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
             ##Heatmap
             section = section + 1
             sec6text = sprintf("<hr><h2><a name = \"S6\">Section %s: Between array comparison</a></h2>", section)
-            writeLines(sec6text, con)
             figure = figure + 1
             colourRange = brewer.pal(9,"Greys")
             marg = ceiling(long/(sqrt(long)/1.5)+log10(numArrays))
       
-            makePlot(con=con, name = paste(prefix, "_heatmap", sep = ""),
+            mplot4 = makePlot(con=con, name = paste(prefix, "_heatmap", sep = ""),
                      w=8, h=8, fun = function() {
                        heatmap(as.matrix(outM),
                                labRow = sN,
@@ -709,6 +681,8 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                                main = "",
                                margins = c(marg,marg))
                      }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><BR><b>Figure %s</center></b></td>\n", title="Heatmap representation of the distance between experiments", fig = figure)
+
+            htmltext4 = mplot4[[2]]
       
             m = matrix(pretty(outM,9),nrow=1,ncol=length(pretty(outM,9)))
             hlpng = paste(prefix, "_heatmaplegend.png", sep = "")  
@@ -717,11 +691,95 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
             axis(2, label= as.list(pretty(outM,9)),at=seq(0,1,by=(1/(length(pretty(outM,9))-1))), cex.axis = 0.8, padj = 1)
             dev.off()
             hltext = sprintf("<td><IMG BORDER = \"0\" SRC=\"%s\"/></td></tr></table>\n",  basename(hlpng))
-            writeLines(hltext, con)
-            legendheatmap = sprintf("<DIV STYLE=\"text-align:justify;\"><b>Figure %s</b> shows a false color heatmap of between arrays distances, computed as the MAD of the M-value for each pair of arrays. <br>dij = c.median|xmi-xmj|<br> Here, xmi is the normalized intensity value of the m-th probe on the i-th array, on the original data scale. c = 1.4826 is a constant factor that ensures consistency with the empirical variance for Normally distributed data (see manual page of the mad function in R). This plot can serve to detect outlier arrays. Consider the following decomposition of xmi: xmi = zm + Bmi + Emi, (1)where zm is the probe effect for probe m (the same across all arrays), Emi are i.i.d. random variables with mean zero and Bmi is such that for any array i, the majority of values Bmi are negligibly small (i. e. close to zero). Bmi represents differential expression effects. In this model, all values dij are (in expectation) the same, namely sqrt(2) times the standard deviation of Emi . Arrays whose distance matrix entries are way different give cause for suspicion. The dendrogram on this plot also can serve to check if, without any probe filtering, the experiments cluster accordingly to a biological meaning.</DIV>",  figure)          
-            writeLines(legendheatmap, con)
+            legendheatmap = sprintf("<DIV STYLE=\"text-align:justify;\"><b>Figure %s</b> shows a false color heatmap of between arrays distances, computed as the MAD of the M-value for each pair of arrays. <br>dij = c.median|xmi-xmj|<br> Here, xmi is the normalized intensity value of the m-th probe on the i-th array, on the original data scale. c = 1.4826 is a constant factor that ensures consistency with the empirical variance for Normally distributed data (see manual page of the mad function in R). This plot can serve to detect outlier arrays. Consider the following decomposition of xmi: xmi = zm + Bmi + Emi, (1)where zm is the probe effect for probe m (the same across all arrays), Emi are i.i.d. random variables with mean zero and Bmi is such that for any array i, the majority of values Bmi are negligibly small (i. e. close to zero). Bmi represents differential expression effects. In this model, all values dij are (in expectation) the same, namely sqrt(2) times the standard deviation of Emi . Arrays whose distance matrix entries are way different give cause for suspicion. The dendrogram on this plot also can serve to check if, without any probe filtering, the experiments cluster accordingly to a biological meaning.</DIV>",  figure)
             
 
+#########################
+### Writing the report###
+#########################
+            
+            
+            writeLines("<hr><h2>Index</h2><table border = \"0\" cellspacing = 5 cellpadding = 2>", con)
+            
+            writeLines("<tr><td><b><a href=\"#S1\">Individual array Quality</b></a></td></tr>", con)
+            
+            if("r" %in% rownames(featureData(expressionset)@varMetadata) && "c" %in% rownames(featureData(expressionset)@varMetadata))
+              writeLines("<tr><td><b><a href=\"#S2\">Spatial Effects</b></a></td></tr>", con)
+            
+            if("replicates" %in% names(phenoData(expressionset)))
+              writeLines("<tr><td><b><a href=\"#S3\">Reproducibility</b></a></td></tr>", con)
+            
+            writeLines( "<tr><td><b><a href=\"#S4\">Homogeneity between experiments</b></a></td></tr>", con)
+            
+            if("GC" %in% rownames(featureData(expressionset)@varMetadata) || "hasTarget" %in% rownames(featureData(expressionset)@varMetadata))
+
+              writeLines("<tr><td><b><a href=\"#S5\">Array platform quality</b></a></td></tr>", con)
+            
+            writeLines("<tr><td><b><a href=\"#S6\">Between array comparison</b></a></td></tr>" , con)
+            
+            writeLines("</table><table border = \"0\" cellspacing = 5 cellpadding = 2>", con)
+
+            writeLines(sec1text, con)
+            writeLines(matext1, con)
+            if(nfig >= 2)
+              {
+                for(i in 2:nfig)
+                  {
+                    matext2 = sprintf("<tr><td></td><td></td><td><A HREF=\"%s\">%s%s</A><BR></tr></td>\n", basename(mapdf[i]), "MvA plot ", i)
+                    
+                    writeLines(matext2, con)
+                  }
+              }
+            writeLines("</table>", con)
+            writeLines(legendMA, con)
+            
+            
+            if("r" %in% rownames(featureData(expressionset)@varMetadata) && "c" %in% rownames(featureData(expressionset)@varMetadata))
+              {
+                
+                writeLines(sec2text, con)
+                writeLines(batext, con)
+                writeLines(ftext, con)
+                writeLines(legendlocal, con)
+              }
+            if("replicates" %in% names(phenoData(expressionset)))
+              {
+                writeLines(sec3text, con)
+                writeLines(htmltext1, con)
+                writeLines(legendrepli, con)
+              }
+
+            writeLines(sec4text, con)
+            writeLines(htmltext2, con)
+            
+            if(max(group) == 1)
+              writeLines(htmltext3, con)
+           
+            if(max(group) > 1)
+              writeLines(dtext, con)
+              
+            writeLines(legendhom, con)
+            if("GC" %in% rownames(featureData(expressionset)@varMetadata))
+              {
+
+                writeLines(sec5text, con)
+                writeLines(gctext, con)
+                writeLines(legendgc, con)
+              }
+
+            if("hasTarget" %in% rownames(featureData(expressionset)@varMetadata))
+              {
+                if(!"GC" %in% rownames(featureData(expressionset)@varMetadata))
+                  {
+                    writeLines(sec5text, con)
+                  }
+                writeLines(gotext, con)
+                writeLines(legendgo, con)
+              }
+            writeLines(sec6text, con)
+            writeLines(htmltext4, con)
+            writeLines(hltext, con)            
+            writeLines(legendheatmap, con)
             writeLines("</table>", con)
             closeHtmlPage(con)
     
@@ -733,7 +791,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
 aqm.expressionset = function(expressionset, prefix, do.logtransform = FALSE, split.plots = FALSE)
   {
 
-    if(!dirname(prefix) %in% dir())
+    if(!dirname(prefix) %in% dir()  && dirname(prefix) != ".")
       stop(paste(dirname(prefix)," is not an existing directory.",sep=""))
     if(!file.info(dirname(prefix))$isdir)
       stop(paste(dirname(prefix)," is not a directory.",sep=""))
@@ -808,7 +866,6 @@ aqm.expressionset = function(expressionset, prefix, do.logtransform = FALSE, spl
     section = 1
     figure = 1
     sec1text = sprintf("<hr><h2><a name = \"S1\">Section %s: Individual array quality</h2></a>", section)
-    writeLines(sec1text, con)
     
     medArray = rowMedians(dat)
     M =  dat-medArray
@@ -857,21 +914,10 @@ aqm.expressionset = function(expressionset, prefix, do.logtransform = FALSE, spl
     dev.off()
     
     matext1 = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><br><b>Figure %s</b></center></td><td><A HREF=\"%s\">%s</td></A></tr></td>\n", "MvA plots",  basename(mapdf[1]),  basename(mapng[1]), figure , basename(mapdf[1]), "MvA plot 1")
-    writeLines(matext1, con)
-    if(nfig >= 2)
-      {
-        for(i in 2:nfig)
-          {
-            matext2 = sprintf("<tr><td></td><td></td><td><A HREF=\"%s\">%s%s</A></CENTER><BR></tr></td>\n", basename(mapdf[i]), "MvA plot ", i)
-            writeLines(matext2, con)
-          }
-      }
-    writeLines("</table>", con)
     legendMA = sprintf("<DIV STYLE=\"text-align:justify;\"><b>Figure %s</b> represents MA plot for each array. <br> M A-plots are useful for pairwise comparisons between arrays. M and A are defined as :<br>
 M = log2(I1) - log2(I2)<br>
 A = 1/2 log2(I1)+log2(I2))<br>
 where I1 and I2 are the vectors of normalized intensities of two channels, on the original data scale (i. e. not logarithm-transformed). Rather than comparing each array to every other array, here we compare each array to a single median  \"pseudo\"-array. Typically, we expect the mass of the distribution in an M A-plot to be concentrated along the M = 0 axis, and there should be no trend in the mean of M as a function of A. Note that a bigger width of the plot of the M-distribution at the lower end of the A scale does not necessarily imply that the variance of the M-distribution is larger at the lower end of the A scale: the visual impression might simply be caused by the fact that there is more data at the lower end of the A scale. To visualize whether there is a trend in the variance of M as a function of A, consider plotting M versus rank(A).</DIV>", figure)          
-    writeLines(legendMA, con)
 
 
 #################################
@@ -879,35 +925,36 @@ where I1 and I2 are the vectors of normalized intensities of two channels, on th
 #################################
 
     ##Scatter plots between replicates
-    ##Have to find a better solution for the xlim and ylim.
-    if("replicates" %in% names(phenoData(expressionset)))
+    ##To improve if we keep it.
+    if(!TRUE)
       {
-        section = section + 1
-        sec3text = sprintf("<hr><h2><a name = \"S3\">Section %s: Reproducibility</h2></a>", section)          
-        writeLines(sec3text, con)
-
-        figure = figure +1
-        makePlot(con=con, name = paste(prefix, "_replicates", sep = ""),
-                 w=10, h=10, fun = function() {
-                   lev = levels(expressionset@phenoData$replicates)
-                   for(i in 1:length(lev))
-                     {
-                       subset = dat[, names(phenoData(expressionset)$replicates[
-                           phenoData(expressionset)$replicates == lev[i]])]
-                       comp = combn(ncol(subset),2)
-                       layout(matrix(1:16,4,4,byrow = TRUE), rep(2,4), rep(2,4), TRUE)
-                       par(mar = c(0,0,0,0))
-                       for(j in 1:ncol(comp))
-                         {
-                           smoothScatter(subset[,comp[1,j]],subset[,comp[2,j]], xaxt = "n", xlim = xlim, yaxt = "n", ylim = c(min(dat),max(dat)), xlab = "", ylab = "")
-                           abline(a=0,b=1,col="red")
-                         }
-                     }
-                 }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><br><b>Figure %s</b></center></td>\n", title="Scatter plots between replicates", fig = figure)
-                legendrepli = sprintf("<DIV STYLE=\"text-align:justify;\"><b>Figure %s</b> represents the comparison of the log2 intensities of the replicate arrays. Each pairs of replicates are directly compared thanks to a scatter plot representation and a correlation coefficient is calculated. Scatterplot with a wide distribution of the dots and with a low correlation coefficient means a bad reproducibility of the experiment.</DIV>", figure)          
-                writeLines(legendrepli, con)
+        if("replicates" %in% names(phenoData(expressionset)))
+          {
+            section = section + 1
+            sec3text = sprintf("<hr><h2><a name = \"S3\">Section %s: Reproducibility</h2></a>", section)          
+        
+            figure = figure +1
+            mplot1 = makePlot(con=con, name = paste(prefix, "_replicates", sep = ""),
+              w=10, h=10, fun = function() {
+                lev = levels(expressionset@phenoData$replicates)
+                for(i in 1:length(lev))
+                  {
+                    subset = dat[, names(phenoData(expressionset)$replicates[
+                        phenoData(expressionset)$replicates == lev[i]])]
+                    comp = combn(ncol(subset),2)
+                    layout(matrix(1:16,4,4,byrow = TRUE), rep(2,4), rep(2,4), TRUE)
+                    par(mar = c(0,0,0,0))
+                    for(j in 1:ncol(comp))
+                      {
+                        smoothScatter(subset[,comp[1,j]],subset[,comp[2,j]], xaxt = "n", xlim = xlim, yaxt = "n", ylim = c(min(dat),max(dat)), xlab = "", ylab = "")
+                        abline(a=0,b=1,col="red")
+                      }
+                  }
+              }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><br><b>Figure %s</b></center></td>\n", title="Scatter plots between replicates", fig = figure)
+            htmltext1 = mplot1[[2]]
+            legendrepli = sprintf("<DIV STYLE=\"text-align:justify;\"><b>Figure %s</b> represents the comparison of the log2 intensities of the replicate arrays. Each pairs of replicates are directly compared thanks to a scatter plot representation and a correlation coefficient is calculated. Scatterplot with a wide distribution of the dots and with a low correlation coefficient means a bad reproducibility of the experiment.</DIV>", figure)          
+          }
       }
-
 
 #################################################
 ###Section 4 : Homogeneity between experiments###
@@ -916,21 +963,21 @@ where I1 and I2 are the vectors of normalized intensities of two channels, on th
     ##Boxplots
     section = section + 1
     sec4text = sprintf("<hr><h2><a name = \"S4\">Section %s: Homogeneity between experiments</h2></a>", section)
-    writeLines(sec4text, con)
             
     figure = figure + 1
-    makePlot(con=con, name = paste(prefix, "_boxplot", sep = ""),
+    mplot2 = makePlot(con=con, name = paste(prefix, "_boxplot", sep = ""),
              w=8, h=8, fun = function() {
                colours = brewer.pal(12, "Paired")
                par(cex.axis = 0.8, pty = "s", lheight =((1/log10(numArrays))*long), mai = c(((long/12)+0.2),0.4,0.2,0.2) , omi = c(0,0,0,0))
     boxplot(ldat, col = colours[2], las = 3, range = 0, names = sN)
              }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><br><b>Figure %sa</center></b></td>\n", title = "Boxplots", fig = figure)
+    htmltext2 = mplot2[[2]]
     
     ##Density if 1 group
     xlim = c(min(na.omit(dat)),max(na.omit(dat)))
     if(max(group) == 1)
       {
-        makePlot(con=con, name = paste(prefix, "_density", sep = ""),
+        mplot3 = makePlot(con=con, name = paste(prefix, "_density", sep = ""),
                  w=10, h=10, fun = function() {
                    xlim = c(min(na.omit(dat)),max(na.omit(dat)))
                    nf <- layout(matrix(c(1,2),2,1,byrow=TRUE), c(2.8,2.8),c(1.8,2), TRUE)
@@ -939,6 +986,8 @@ where I1 and I2 are the vectors of normalized intensities of two channels, on th
                    par(xaxt = "s", cex.axis = 0.8, mar = c(4,5,0,5))
                    multi("ecdf",ldat,xlim,"ECDF","log(intensity)","")
                  }, text="<tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><center><br><b>Figure %sb</b></center></td></table>\n", title="Density plots", fig = figure)
+        htmltext3 = mplot3[[2]]
+
       }
                 
     ##Density if more than 1 group
@@ -967,11 +1016,9 @@ where I1 and I2 are the vectors of normalized intensities of two channels, on th
         multi("ecdf",ldat[group==1],xlim,"ECDF","log(intensity)","")
         dev.off()
         dtext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A><center><br><b>Figure %sb</b></CENTER><BR></tr></td></table>\n", "Density plots", basename(dpdf), basename(dpng), figure)
-        writeLines(dtext, con)
       }
     legendhom = sprintf("<DIV STYLE=\"text-align:justify;\">The quality metrics in this section look at the distribution of the (raw, unnormalized) feature intensities for each array. <b>Figure %sa</b> presents boxplots and <b>Figure %sb</b> shows density estimates (histograms) of the data. Arrays whose distributions are very different from the others should be considered for possible problems.</DIV>", figure, figure)          
 
-    writeLines(legendhom, con)
 
 
 
@@ -984,7 +1031,6 @@ where I1 and I2 are the vectors of normalized intensities of two channels, on th
           {
             section = section + 1
             sec5text = sprintf("<hr><h2><a name = \"S5\">Section %s: Array platform quality</h2></a>", section)    
-            writeLines(sec5text, con)
             figure = figure + 1
             gcpdf = paste(prefix,"_GCcontent.pdf", sep = "")
             pdf(file = gcpdf)
@@ -1026,9 +1072,7 @@ where I1 and I2 are the vectors of normalized intensities of two channels, on th
             dev.off()
                 
             gctext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s<A HREF=\"%s\">%s</A>%s<A HREF=\"%s\">%s</A></b><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><br><b>Figure %s</b></center></tr></td></table>\n", "GC content effect ", basename(gcpdf), "per array", " and ", basename(gcopdf), "global", basename(gcopdf), basename(gcopng), figure)
-            writeLines(gctext, con)
             legendgc = sprintf("<DIV STYLE=\"text-align:justify;\"><b>Figure %s</b> shows the distributions of the log2 intensities grouped by the percentage of cytosines (C) and guanines (G) among the nucleotides in each probe. Box plots (a), empirical cumulative distribution functions (ECDF, b) and kernel density estimates (c). Box and line colors in the three panels correspond to the same groups. Cytosine and guanine are able to form three hydrogen bonds, while adenine (A) and thymine (T) only form two, hence oligonucleotides with a higher proportion of C and G can form more stable hybridization bindings. This should result in higher intensities measured on the array, regardless of the abundance of target molecules.</DIV>",  figure)          
-            writeLines(legendgc, con)
           }
 
         ##Mapping of probes
@@ -1038,7 +1082,6 @@ where I1 and I2 are the vectors of normalized intensities of two channels, on th
               {
                 section = section + 1
                 sec5text = sprintf("<hr><h2><a name = \"S5\">Section %s: Array platform quality</h2></a>", section)          
-                writeLines(sec5text, con)
               }
             
             figure = figure + 1
@@ -1093,9 +1136,7 @@ where I1 and I2 are the vectors of normalized intensities of two channels, on th
             dev.off()
             
             gotext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s<A HREF=\"%s\">%s</A>%s<A HREF=\"%s\">%s</A></b><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><br><b>Figure %s</b></center></tr></td></table>\n", "Gene mapping ", basename(gpdf), "per array", " and ", basename(gopdf), "global", basename(gopdf), basename(gopng), figure)
-            writeLines(gotext, con)
             legendgo = sprintf("<DIV STYLE=\"text-align:justify;\"><b>Figure %s</b> shows the density distributions of the log2 ratios grouped by the mapping of the probes. Blue, density estimate of intensities of segments that overlap an annotated mRNA in RefSeq database. Gray, segments that do not overlap a Refseq mRNA.</DIV>",  figure)          
-            writeLines(legendgo, con)
           }
 
     
@@ -1106,12 +1147,11 @@ where I1 and I2 are the vectors of normalized intensities of two channels, on th
     ##Heatmap
     section = section + 1
     sec6text = sprintf("<hr><h2><a name = \"S6\">Section %s: Between array comparison</h2></a>", section)
-    writeLines(sec6text, con)
     figure = figure + 1
     colourRange = brewer.pal(9,"Greys")
     marg = ceiling(long/(sqrt(long)/1.5)+log10(numArrays))
     
-    makePlot(con=con, name = paste(prefix, "_heatmap", sep = ""),
+    mplot4 = makePlot(con=con, name = paste(prefix, "_heatmap", sep = ""),
              w=8, h=8, fun = function() {
                heatmap(as.matrix(outM),
                        labRow = sN,
@@ -1121,6 +1161,7 @@ where I1 and I2 are the vectors of normalized intensities of two channels, on th
                        main = "",
                        margins = c(marg,marg))
              }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><BR><b>Figure %s</center></b></td>\n", title="Heatmap representation of the distance between experiments", fig = figure)
+    htmltext4 = mplot4[[2]]
       
     m = matrix(pretty(outM,9),nrow=1,ncol=length(pretty(outM,9)))
     hlpng = paste(prefix, "_heatmaplegend.png", sep = "")  
@@ -1129,9 +1170,87 @@ where I1 and I2 are the vectors of normalized intensities of two channels, on th
     axis(2, label= as.list(pretty(outM,9)),at=seq(0,1,by=(1/(length(pretty(outM,9))-1))), cex.axis = 0.8, padj = 1)
     dev.off()
     hltext = sprintf("<td><IMG BORDER = \"0\" SRC=\"%s\"/></CENTER><BR></td></tr></table>\n",  basename(hlpng))
-    writeLines(hltext, con)
     legendheatmap = sprintf("<DIV STYLE=\"text-align:justify;\"><b>Figure %s</b> shows a false color heatmap of between arrays distances, computed as the MAD of the M-value for each pair of arrays. <br>dij = c.median|xmi-xmj|<br> Here, xmi is the normalized intensity value of the m-th probe on the i-th array, on the original data scale. c = 1.4826 is a constant factor that ensures consistency with the empirical variance for Normally distributed data (see manual page of the mad function in R). This plot can serve to detect outlier arrays. Consider the following decomposition of xmi: xmi = zm + Bmi + Emi, (1)where zm is the probe effect for probe m (the same across all arrays), Emi are i.i.d. random variables with mean zero and Bmi is such that for any array i, the majority of values Bmi are negligibly small (i. e. close to zero). Bmi represents differential expression effects. In this model, all values dij are (in expectation) the same, namely sqrt(2) times the standard deviation of Emi . Arrays whose distance matrix entries are way different give cause for suspicion. The dendrogram on this plot also can serve to check if, without any probe filtering, the experiments cluster accordingly to a biological meaning.</DIV>",  figure)          
+    
+
+#########################
+### Writing the report###
+#########################
+            
+            
+    writeLines("<hr><h2>Index</h2><table border = \"0\" cellspacing = 5 cellpadding = 2>", con)
+            
+    writeLines("<tr><td><b><a href=\"#S1\">Individual array Quality</b></a></td></tr>", con)
+               
+    if("replicates" %in% names(phenoData(expressionset)))
+      writeLines("<tr><td><b><a href=\"#S3\">Reproducibility</b></a></td></tr>", con)
+    
+    writeLines( "<tr><td><b><a href=\"#S4\">Homogeneity between experiments</b></a></td></tr>", con)
+    
+    if("GC" %in% rownames(featureData(expressionset)@varMetadata) || "hasTarget" %in% rownames(featureData(expressionset)@varMetadata))
+      
+      writeLines("<tr><td><b><a href=\"#S5\">Array platform quality</b></a></td></tr>", con)
+    
+    writeLines("<tr><td><b><a href=\"#S6\">Between array comparison</b></a></td></tr>" , con)
+    if(class(expressionset) == "AffyBatch")
+      {
+        writeLines("<tr><td><b><a href=\"#S2\">Spatial effects</b></a></td></tr><tr><td><b><a href=\"#S7\">Affy plots</b></a></td></tr>" , con)
+      }
+    
+    writeLines("</table><table border = \"0\" cellspacing = 5 cellpadding = 2>", con)
+    
+    writeLines(sec1text, con)
+    writeLines(matext1, con)
+    if(nfig >= 2)
+      {
+        for(i in 2:nfig)
+          {
+            matext2 = sprintf("<tr><td></td><td></td><td><A HREF=\"%s\">%s%s</A><BR></tr></td>\n", basename(mapdf[i]), "MvA plot ", i)
+            
+            writeLines(matext2, con)
+          }
+      }
+    writeLines("</table>", con)
+    writeLines(legendMA, con)    
+    
+    if("replicates" %in% names(phenoData(expressionset)))
+      {
+        writeLines(sec3text, con)
+        writeLines(htmltext1, con)
+        writeLines(legendrepli, con)
+      }
+    
+    writeLines(sec4text, con)
+    writeLines(htmltext2, con)
+    if(max(group) == 1)
+      writeLines(htmltext3, con)
+    
+    if(max(group) > 1)
+      writeLines(dtext, con)
+    
+    writeLines(legendhom, con)
+    if("GC" %in% rownames(featureData(expressionset)@varMetadata))
+      {
+        
+        writeLines(sec5text, con)
+        writeLines(gctext, con)
+        writeLines(legendgc, con)
+      }
+
+    if("hasTarget" %in% rownames(featureData(expressionset)@varMetadata))
+      {
+        if(!"GC" %in% rownames(featureData(expressionset)@varMetadata))
+          {
+            writeLines(sec5text, con)
+          }
+        writeLines(gotext, con)
+        writeLines(legendgo, con)
+      }
+    writeLines(sec6text, con)
+    writeLines(htmltext4, con)
+    writeLines(hltext, con)            
     writeLines(legendheatmap, con)
+    
 
     l = list(numArrays,sN, section, figure, con, dat)
     return(l) 
@@ -1143,6 +1262,7 @@ setMethod("arrayQualityMetrics",signature(expressionset="ExpressionSet"),
           {
             l = aqm.expressionset(expressionset, prefix, do.logtransform, split.plots)
             con = l[[5]]
+            
             writeLines("</table>", con)
             closeHtmlPage(con)
 
@@ -1252,15 +1372,20 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             dev.copy(pdf, file = affypdf3)
             dev.off()
             dev.off()
-            affytext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A><center><BR><b>Figure %s</b></CENTER></tr></td><tr><td><b>%s</b></td><td><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A><center><BR><b>Figure %s</b></CENTER></tr></td><tr><td><b>%s</b></td><td><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A><center><BR><b>Figure %s</b></CENTER></tr></td></table>\n", "RNA degradation plot", basename(affypdf1), basename(affypng1), figure1, "RLE plot", basename(affypdf2), basename(affypng2), figure2, "NUSE plot", basename(affypdf3), basename(affypng3), figure3)
+            
+            figure4 = figure3 + 1
+            affypng4 = paste(prefix,"_qc.png", sep = "")
+            affypdf4 = paste(prefix,"_qc.pdf", sep = "")
+            png(file = affypng4)
+            plot(qc(expressionset))
+            dev.copy(pdf, file = affypdf4)
+            dev.off()
+            dev.off()
+            
+            affytext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A><center><BR><b>Figure %s</b></CENTER></tr></td><tr><td><b>%s</b></td><td><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A><center><BR><b>Figure %s</b></CENTER></tr></td><tr><td><b>%s</b></td><td><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A><center><BR><b>Figure %s</b></CENTER></tr></td><tr><td><b>%s</b></td><td><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A><center><BR><b>Figure %s</b></CENTER></tr></td></table>\n", "RNA degradation plot", basename(affypdf1), basename(affypng1), figure1, "RLE plot", basename(affypdf2), basename(affypng2), figure2, "NUSE plot", basename(affypdf3), basename(affypng3), figure3, "Diagnostic plot recommended by Affy", basename(affypdf4), basename(affypng4), figure4)
             writeLines(affytext, con)
-            legendaffy = sprintf("<DIV STYLE=\"text-align:justify;\">In this section we present diagnostic plots based on tools provided in the affyPLM package.
-In <b>Figure %s</b> a RNA digestion plot is computed. In this plot each array is represented by a single line. It is important to identify any array(s) that has a slope which is very different from the others. The indication is that the RNA used for that array has potentially been handled quite differently from the other arrays.
-<b>Figure %s</b> is a Normalized Unscaled Standard Error (NUSE) plot. Low quality arrays are those that are significantly elevated or more spread out, relative to the other arrays. NUSE values are not comparable across data sets.
-<b>Figure %s</b> is a Relative Log Expression (RLE) plot and an array that has problems will either have larger spread, or will not be centered at M = 0, or both.
-</DIV>",  figure1, figure2, figure3)          
+            legendaffy = sprintf("<DIV STYLE=\"text-align:justify;\">In this section we present diagnostic plots based on tools provided in the affyPLM package. In <b>Figure %s</b> a RNA digestion plot is computed. In this plot each array is represented by a single line. It is important to identify any array(s) that has a slope which is very different from the others. The indication is that the RNA used for that array has potentially been handled quite differently from the other arrays. <b>Figure %s</b> is a Normalized Unscaled Standard Error (NUSE) plot. Low quality arrays are those that are significantly elevated or more spread out, relative to the other arrays. NUSE values are not comparable across data sets. <b>Figure %s</b> is a Relative Log Expression (RLE) plot and an array that has problems will either have larger spread, or will not be centered at M = 0, or both. <b>Figure %s</b> represents the diagnostic plot recommended by Affymetrix. It is fully describe in the QCandsimpleaffy.pdf vignette of the package simpleaffy. Any metrics (circles and triangles) that is shown in red is out of the manufacturer's specific boundaries and suggests a potential problem.</DIV>", figure1, figure2, figure3, figure4)            
             writeLines(legendaffy, con)
-
             
             writeLines("</table>", con)
             closeHtmlPage(con)

@@ -5,14 +5,16 @@
 Quality metrics on ExpressionSets
 }
 \description{
-  This package performs quality metrics on ExpressionSet containing 
-  microarray data from any platforms, one or two channels. 
-  The results are designated to allow the user to rapidly assess the
-  quality of a set of arrays.
+  This package performs quality metrics on AffyBatch, ExpressionSet
+  or NChannelSet containing  microarray data from any platforms,
+  one or two channels. The results are designated to allow the user
+  to rapidly assess the quality of a set of arrays.
 }
 \usage{
-arrayQualityMetrics(expressionset, prefix, do.logtransform = FALSE,
-split.plots = FALSE)
+arrayQualityMetrics(expressionset,
+                    prefix,
+                    do.logtransform = FALSE,
+                    split.plots = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -30,25 +32,27 @@ split.plots = FALSE)
 \tabular{ll}{
 Package: \tab arrayQualityMetrics\cr
 Type: \tab Package\cr
-Version: \tab 1.0\cr
-Date: \tab 2007-06-29\cr
-License: \tab What license is it under?\cr
+Version: \tab 1.0.8\cr
+Date: \tab 2007-07-24\cr
+License: \tab LGPL \cr
 }
-ATTENTION An overview of how to use the package, including the most important 
- functions 
 }
 \author{
-Audrey Kauffmann, Wolfgang Huber
+Audrey Kauffmann, Wolfgang Huber,
 Maintainer: <audrey@ebi.ac.uk>
 }
-\references{
-  ATTENTION ref
-}
-\keyword{ package }
-\seealso{
-See Also \code{\link[<pkg>:<pkg>-package]{<pkg>}} 
-}
 \examples{
+  \dontrun{
+    library(ALLMLL)
+    data(MLL.A)
+    arrayQualityMetrics(expressionset = MLL.A,
+                        prefix ="MLL",
+                        do.logtransform = TRUE,
+                        split.plots = 10)
+    # "MLL_QMreport.html" is a report created in the working directory
+    # on the logarithm expression data of the MLL.A AffyBatch.
+    # 10 experiments are represented by density plots.
+    }
 }
 \keyword{ hplot }
 \keyword{ graphs }% __ONLY ONE__ keyword per line
