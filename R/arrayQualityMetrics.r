@@ -78,8 +78,8 @@ setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
            
             if("Rb" %in% colnames(dims(expressionset)) && "Gb" %in% colnames(dims(expressionset)))
               {
-                rbg = if(do.logtransform) log2(assayData(expressionset)$Rb) else assayData(expressionset)$Rb
-                gbg = if(do.logtransform) log2(assayData(expressionset)$Gb) else assayData(expressionset)$Gb
+                rbg = assayData(expressionset)$Rb
+                gbg = assayData(expressionset)$Gb
               }
             ##lists to use multidensity, multiecdf and boxplot
             lredc = mat2list(rc)
@@ -223,13 +223,13 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
 
             ##Background rank representation
       
-            if("r" %in% rownames(featureData(expressionset)@varMetadata) && "c" %in% rownames(featureData(expressionset)@varMetadata))
+            if("Row" %in% rownames(featureData(expressionset)@varMetadata) && "Column" %in% rownames(featureData(expressionset)@varMetadata))
               {
                 section = section + 1
                 sec2text = sprintf("<hr><h2><a name = \"S2\">Section %s: Spatial Effects</a></h2>", section)
 
-                r = featureData(expressionset)$r
-                c = featureData(expressionset)$c
+                r = featureData(expressionset)$Row
+                c = featureData(expressionset)$Column
 
                 maxc = max(as.numeric(c))
                 maxr = max(as.numeric(r))
@@ -254,18 +254,18 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                         for(i in 1:nrow(intr))
                           {
                             re[intr[i,1],intr[i,2]] = intr[i,3]
-                            g[intg[i,1],intg[i,2]] = intg[i,3]
+                            g[intg[i,1],intg[i,2]] =  intg[i,3]
                           }
                   
-                        mr = rank(re)
-                        mg = rank(g)
+                        mr = matrix(rank(re),ncol=maxc,nrow=maxr)
+                        mg = matrix(rank(g),ncol=maxc,nrow=maxr)
                         if(maxr>maxc){
                           mr = t(mr)
                           mg = t(mg)
                         }
-                        Imr = Image(mr)
+                        Imr = Image(mr, dim(mr))
                         Imrr = resize(normalize(Imr), w=nrow(mr)/3, h=ncol(mr)/3)
-                        Img = Image(mg)
+                        Img = Image(mg, dim(mg))
                         Imgr = resize(normalize(Img), w=nrow(mg)/3, h=ncol(mg)/3)
                         par(xaxt = "n", yaxt = "n",mar=c(1,1,2,1))
                         image(Imrr, col = colourRamp)
@@ -316,16 +316,16 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                         gf[intgf[i,1],intgf[i,2]] = intgf[i,3]
                       }
                     
-                    mrf = rank(rf)
-                    mgf = rank(gf)
+                    mrf = matrix(rank(rf),ncol=max(as.numeric(c)),nrow=max(as.numeric(r)))
+                    mgf = matrix(rank(gf),ncol=max(as.numeric(c)),nrow=max(as.numeric(r)))
                     
                     if(maxr>maxc){
                       mrf = t(mrf)
                       mgf = t(mgf)
                     }
-                    Imrf = Image(mrf)
+                    Imrf = Image(mrf, dim(mrf))
                     Imrfr = resize(normalize(Imrf), w=nrow(mrf)/3, h=ncol(mrf)/3)
-                    Imgf = Image(mgf)
+                    Imgf = Image(mgf, dim(mgf))
                     Imgfr = resize(normalize(Imgf), w=nrow(mgf)/3, h=ncol(mgf)/3)
                     par(xaxt = "n", yaxt = "n",mar=c(1,1,2,1))
                     image(Imrfr, col = colourRamp)
@@ -703,7 +703,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
             
             writeLines("<tr><td><b><a href=\"#S1\">Individual array Quality</b></a></td></tr>", con)
             
-            if("r" %in% rownames(featureData(expressionset)@varMetadata) && "c" %in% rownames(featureData(expressionset)@varMetadata))
+            if("Row" %in% rownames(featureData(expressionset)@varMetadata) && "Column" %in% rownames(featureData(expressionset)@varMetadata))
               writeLines("<tr><td><b><a href=\"#S2\">Spatial Effects</b></a></td></tr>", con)
             
             if("replicates" %in% names(phenoData(expressionset)))
@@ -734,7 +734,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
             writeLines(legendMA, con)
             
             
-            if("r" %in% rownames(featureData(expressionset)@varMetadata) && "c" %in% rownames(featureData(expressionset)@varMetadata))
+            if("Row" %in% rownames(featureData(expressionset)@varMetadata) && "Column" %in% rownames(featureData(expressionset)@varMetadata))
               {
                 
                 writeLines(sec2text, con)
@@ -1306,7 +1306,7 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
                 par(xaxt = "n", yaxt = "n",mar=c(1,1,1,1))
                 rfi = rank(dat[,a])
                 mrfi = matrix(rfi,ncol=ncol(expressionset),nrow=nrow(expressionset),byrow=T)
-                Imrfi = Image(mrfi)
+                Imrfi = Image(mrfi, dim(mrfi))
                 mrir = resize(normalize(Imrfi), w=nrow(Imrfi)/3, h=ncol(Imrfi)/3)
                 image(mrir, col = colourRamp)
                 mtext(sN[a], side = 3, adj = 0.5, padj = 4 , cex = 0.8)
