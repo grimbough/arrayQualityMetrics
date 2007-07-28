@@ -1,4 +1,9 @@
-setGeneric("arrayQualityMetrics", function(expressionset, prefix, do.logtransform = FALSE, split.plots = FALSE) standardGeneric("arrayQualityMetrics"))
+setGeneric("arrayQualityMetrics",
+           function(expressionset, prefix ="",
+                          outdir=getwd(),
+                          do.logtransform = FALSE,
+                          split.plots = FALSE)
+                     standardGeneric("arrayQualityMetrics")) 
 
 
 ##lists
@@ -57,15 +62,15 @@ makePlot = function(con, name, w, h=devDims(w)$height, fun, psz=12, isPlatePlot=
 ##NChannelSet
 
 setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
-          function(expressionset, prefix, do.logtransform, split.plots)
+          function(expressionset, prefix, outdir, do.logtransform, split.plots)
           {
-            if(!dirname(prefix) %in% dir() && dirname(prefix) != ".")
-              stop(paste(dirname(prefix)," is not an existing directory.",sep=""))
-            if(!file.info(dirname(prefix))$isdir)
+            if(!file.info(outdir)$isdir)
               stop(paste(dirname(prefix)," is not a directory.",sep=""))
-
-            fn  = paste(prefix,"_QMreport",sep="")
-            title = paste(basename(prefix), " quality metrics report", sep="")
+            if( prefix != "" )
+                fn  = paste(prefix,"_QMreport",sep="")
+            else fn = "QMreport"
+            
+            title = paste(prefix, " quality metrics report", sep="")
             titletext = sprintf("<hr><h1><center>%s</h1></center><table border = \"0\" cellspacing = 5 cellpadding = 2>", title)
             con = openHtmlPage(fn, title)
             writeLines(titletext, con)
@@ -1258,7 +1263,7 @@ where I1 and I2 are the vectors of normalized intensities of two channels, on th
 
 ##ExpressionSet
 setMethod("arrayQualityMetrics",signature(expressionset="ExpressionSet"),
-          function(expressionset, prefix, do.logtransform, split.plots)
+          function(expressionset, prefix, outdir, do.logtransform, split.plots)
           {
             l = aqm.expressionset(expressionset, prefix, do.logtransform, split.plots)
             con = l[[5]]
@@ -1273,7 +1278,8 @@ setMethod("arrayQualityMetrics",signature(expressionset="ExpressionSet"),
 ##AffyBatch
 
 setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
-          function(expressionset, prefix, do.logtransform, split.plots){
+          function(expressionset, prefix, outdir, do.logtransform,
+          split.plots){
             
             
             l = aqm.expressionset(expressionset, prefix, do.logtransform, split.plots)
