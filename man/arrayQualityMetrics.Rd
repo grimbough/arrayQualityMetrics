@@ -12,18 +12,20 @@ Quality metrics on ExpressionSets
 }
 \usage{
 arrayQualityMetrics(expressionset,
-                    prefix,
+                    outdir = getwd(),
+                    force = FALSE,
                     do.logtransform = FALSE,
                     split.plots = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{expressionset}{ The \code{expressionset} must be an object of
+  \item{expressionset}{ is an object of
     class ExpressionSet, AffyBatch or NChannelSet. }
-  \item{prefix}{ is the prefix of all the names of the result files that
-    are created in the working directory. }
-  \item{do.logtransform}{ If TRUE, the data will be
-    log transformed. }
+  \item{outdir}{ is the name of the directory in which the results are
+    created. }
+    \item{force}{ if TRUE, if outdir already exists, it will be overwritten. }
+  \item{do.logtransform}{ If TRUE, the data are log transformed before
+    the analysis. }
   \item{split.plots}{  If the number of studied array
     is more than 50 it is adviced to define a number of experiments to
     represent on the density plots. }
@@ -32,8 +34,8 @@ arrayQualityMetrics(expressionset,
 \tabular{ll}{
 Package: \tab arrayQualityMetrics\cr
 Type: \tab Package\cr
-Version: \tab 1.0.8\cr
-Date: \tab 2007-07-24\cr
+Version: \tab 1.0.12\cr
+Date: \tab 2007-07-31\cr
 License: \tab LGPL \cr
 }
 }
@@ -46,7 +48,7 @@ Maintainer: <audrey@ebi.ac.uk>
     library(ALLMLL)
     data(MLL.A)
     arrayQualityMetrics(expressionset = MLL.A,
-                        prefix ="MLL",
+                        outdir ="MLL",
                         do.logtransform = TRUE,
                         split.plots = 10)
     # "MLL_QMreport.html" is a report created in the working directory

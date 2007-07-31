@@ -39,16 +39,17 @@ data("CCl4")
 \section*{Build an quality metrics report from the NChannelSet} 
  
 <<arrayQM>>=
-outpdf = "CCl4example"
+outdir = "CCl4example"
 arrayQualityMetrics(expressionset = CCl4,
-                    prefix = outpdf,
+                    outdir = outdir,
+                    force = TRUE,
                     do.logtransform = TRUE,
                     split.plots = FALSE)
 @ 
 
 The output is written to
-<<tempdir>>=
-outpdf
+<<outdir>>=
+outdir
 @ 
 
 \begin{table*}[tbp]
