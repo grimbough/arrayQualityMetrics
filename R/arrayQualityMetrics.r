@@ -1319,6 +1319,8 @@ on the <i>y</i>-axis versus the rank of the mean on the <i>x</i>-axis. The red d
       writeLines("<tr><td><b><a href=\"#S5\">Array platform quality</b></a></td></tr>", con)
     
     writeLines("<tr><td><b><a href=\"#S6\">Between array comparison</b></a></td></tr>" , con)
+    writeLines("<tr><td><b><a href=\"#S7\">Variance mean dependency</b></a></td></tr>" , con)
+
     if(is(expressionset, "AffyBatch"))
       {
         writeLines("<tr><td><b><a href=\"#S2\">Spatial plots</b></a></td></tr><tr><td><b><a href=\"#S8\">Affymetrix specific plots</b></a></td></tr>" , con)
