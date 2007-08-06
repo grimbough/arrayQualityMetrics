@@ -34,8 +34,8 @@ arrayQualityMetrics(expressionset,
 \tabular{ll}{
 Package: \tab arrayQualityMetrics\cr
 Type: \tab Package\cr
-Version: \tab 1.0.12\cr
-Date: \tab 2007-07-31\cr
+Version: \tab 1.0.13\cr
+Date: \tab 2007-08-06\cr
 License: \tab LGPL \cr
 }
 }
