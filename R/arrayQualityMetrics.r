@@ -252,7 +252,7 @@ setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
             print(update(trobj, index.cond = list(id.thispage)))
             dev.off()
     
-            matext1 = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><br><b>Figure %s</b></center></td><td><A HREF=\"%s\">%s</td></A></tr></td>\n", "MvA plots",  basename(mapdf[1]),  basename(mapng[1]), figure , basename(mapdf[1]), "MvA plot 1")
+            matext1 = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><br><b>Figure %s</b></center></td>\n", "MvA plots",  basename(mapdf[1]),  basename(mapng[1]), figure)
             legendMA = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> represents MA plot for each array. <br> M A-plots are useful for pairwise comparisons between arrays. M and A are defined as :<br>
 M = log<sub>2</sub>(I<sub>1</sub>) - log<sub>2</sub>(I<sub>2</sub>)<br>
 A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
@@ -280,86 +280,90 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
         
                 if("Rb" %in% colnames(dims(expressionset)) && "Gb" %in% colnames(dims(expressionset)))
                   {
-                    bapng = "background.png"
-                    bapdf = "background.pdf"
-                    pdf(file = bapdf)
-                    nf <- layout(matrix(c(1,2,3,4,5,6),2,3,byrow = FALSE),
-                                 c(1.2,1.2,1.2), c(2,2), TRUE)
-                    for(a in 1:numArrays)
+                    nfig2 = ceiling(numArrays/3)      
+                    bapng = paste("background", 1:nfig2, ".png", sep="")
+                    fignu = 1
+                    b = 1
+    
+                    aR = if(maxr>maxc) maxr/maxc else maxc/maxr
+
+                    intr = cbind(r,c,rbg)
+                    intg = cbind(r,c,gbg)
+
+                    for(a in seq_len(numArrays))
                       {
-                        intr = cbind(r,c,rbg[,a])
-                        intg = cbind(r,c,gbg[,a])
-                  
                         re = matrix(NA,ncol=maxc,nrow=maxr)
                         g = matrix(NA,ncol=maxc,nrow=maxr)
-                  
+                    
                         for(i in 1:nrow(intr))
                           {
-                            re[intr[i,1],intr[i,2]] = intr[i,3]
-                            g[intg[i,1],intg[i,2]] =  intg[i,3]
+                            re[intr[i,1],intr[i,2]] = intr[i,(2+a)]
+                            g[intg[i,1],intg[i,2]] = intg[i,(2+a)]
                           }
-                  
+                    
                         mr = matrix(rank(re),ncol=maxc,nrow=maxr)
                         mg = matrix(rank(g),ncol=maxc,nrow=maxr)
+                    
                         if(maxr>maxc){
                           mr = t(mr)
                           mg = t(mg)
                         }
-                        Imr = Image(mr, dim(mr))
-                        Imrr = resize(normalize(Imr), w=nrow(mr)/3, h=ncol(mr)/3)
-                        Img = Image(mg, dim(mg))
-                        Imgr = resize(normalize(Img), w=nrow(mg)/3, h=ncol(mg)/3)
-                        par(xaxt = "n", yaxt = "n",mar=c(1,1,2,1))
-                        image(Imrr, col = colourRamp)
-                        mtext(sN[a],side = 3,adj = 0.5, padj = -1 ,cex = 0.7)
-                        mtext("Red Intensity",side = 2,adj = 0.5, padj = 4 ,cex = 0.7)
-                        image(Imgr, col = colourRamp)
-                        mtext("Green Intensity",side = 2,adj = 0.5, padj = 4 ,cex = 0.7)
-                      }   
-                    dev.off()
 
-                    aR = ncol(Imrr)/nrow(Imrr)
-                    w = 350
-                    h = aR * w/3
-                    png(file = bapng, width = w, height = h)
-                    nf <- layout(matrix(c(1,2),1,2,byrow = FALSE),
-                                 c(1.2,1.2), c(2,2), TRUE)
-                    par(xaxt = "n", yaxt = "n",mar=c(1,1,1,1))
-                    image(Imgr, col = colourRamp)
-                    mtext("Red Intensity",side = 2,adj = 0.5, padj = 4 ,cex = 0.7)
-                    image(Imgr, col = colourRamp)
-                    mtext("Green Intensity",side = 2,adj = 0.5, padj = 4 ,cex = 0.7)
-                    dev.off()
+                        if(a %in% seq(1,numArrays,by=3))
+                          {
+                            png(bapng[fignu], width = 350, height = 350*aR/2)
+                            nf <- layout(matrix(c(1,2,3,4,5,6),2,3,byrow = FALSE),
+                                         widths = c(1.5,1.5,1.5),
+                                         heights = c(1.5*aR,1.5*aR),
+                                         respect = TRUE)
+                          }
+                
+                        par(xaxt = "n", yaxt = "n",mar=c(1,2,2,1))
+                        image(mr, col = colourRamp)
+                        mtext(sN[a],side = 3,adj = 0.5, padj = -1 ,cex = 0.7)
+                        mtext("Red Intensity",side = 2, line = 0.5 ,cex = 0.7)
+                        image(mg, col = colourRamp)
+
+                        mtext("Green Intensity",side = 2, line = 0.5 ,cex = 0.7)
+                        
+                        if((a%%3==0) || (a == numArrays))                   
+                          {
+                            dev.off()
+                            fignu = fignu +1
+                          }
+                      }
+                                       
                     m = matrix(pretty(mr,9),nrow=1,ncol=length(pretty(mr,9)))
                     llbpng = "localisationlegendbackground.png"
                     png(file= llbpng, width = 200, height = 600)
                     image(m,xaxt="n",yaxt="n",ylab="Rank", col = colourRamp, cex.lab = 0.8, mgp = c(1.5,1,0) )
                     axis(2, label= as.list(pretty(mr,9)),at=seq(0,1,by=(1/(length(pretty(mr,9))-1))), cex.axis = 0.7, padj = 1)
                     dev.off()
-                
-                    batext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A></CENTER></td><td><IMG BORDER = \"0\" SRC=\"%s\"/></td></tr></table>\n", "Background representation on the array", basename(bapdf), basename(bapng), basename(llbpng))
+               
+                    batext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A></CENTER></td><td><IMG BORDER = \"0\" SRC=\"%s\"/></td></tr></table>\n", "Background representation on the array", basename(bapng[1]), basename(bapng[1]), basename(llbpng))
                   }
 
                 ##Foreground rank representation
           
                 figure = figure +1
-                fpng = "foreground.png"
-                fpdf = "foreground.pdf"
-                pdf(file = fpdf)
-                nf <- layout(matrix(c(1,2,3,4,5,6),2,3,byrow = FALSE),
-                             c(1.2,1.2,1.2), c(2,2), TRUE)
-                for(a in 1:numArrays)
+                nfig3 = ceiling(numArrays/3)      
+                fpng = paste("foreground", 1:nfig3, ".png", sep="")
+                fignu = 1
+                b = 1
+    
+                aR = if(maxr>maxc) maxr/maxc else maxc/maxr
+
+                intrf = cbind(r,c,rc)
+                intgf = cbind(r,c,gc)
+                for(a in seq_len(numArrays))
                   {
-                    intrf = cbind(r,c,rc[,a])
-                    intgf = cbind(r,c,gc[,a])
-                    
-                    rf = matrix(NA,ncol=max(as.numeric(c)),nrow=max(as.numeric(r)))
-                    gf = matrix(NA,ncol=max(as.numeric(c)),nrow=max(as.numeric(r)))
+                    rf = matrix(NA,ncol=maxc,nrow=maxr)
+                    gf = matrix(NA,ncol=maxc,nrow=maxr)
                     
                     for(i in 1:nrow(intrf))
                       {
-                        rf[intrf[i,1],intrf[i,2]] = intrf[i,3]
-                        gf[intgf[i,1],intgf[i,2]] = intgf[i,3]
+                        rf[intrf[i,1],intrf[i,2]] = intrf[i,(2+a)]
+                        gf[intgf[i,1],intgf[i,2]] = intgf[i,(2+a)]
                       }
                     
                     mrf = matrix(rank(rf),ncol=max(as.numeric(c)),nrow=max(as.numeric(r)))
@@ -369,32 +373,30 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                       mrf = t(mrf)
                       mgf = t(mgf)
                     }
-                    Imrf = Image(mrf, dim(mrf))
-                    Imrfr = resize(normalize(Imrf), w=nrow(mrf)/3, h=ncol(mrf)/3)
-                    Imgf = Image(mgf, dim(mgf))
-                    Imgfr = resize(normalize(Imgf), w=nrow(mgf)/3, h=ncol(mgf)/3)
-                    par(xaxt = "n", yaxt = "n",mar=c(1,1,2,1))
-                    image(Imrfr, col = colourRamp)
+
+                    if(a %in% seq(1,numArrays,by=3))
+                      {
+                        png(fpng[fignu], width = 350, height = 350*aR/2)
+                        nf <- layout(matrix(c(1,2,3,4,5,6),2,3,byrow = FALSE),
+                                     widths = c(1.5,1.5,1.5),
+                                     heights = c(1.5*aR,1.5*aR),
+                                     respect = TRUE)
+                      }
+
+                    par(xaxt = "n", yaxt = "n",mar=c(1,2,2,1))
+                    image(mrf, col = colourRamp)
                     mtext(sN[a],side = 3,adj = 0.5, padj = -1 ,cex = 0.7)
-                    mtext("Red Intensity",side = 2,adj = 0.5, padj = 4 ,cex = 0.7)
-                    image(Imgfr, col = colourRamp)
-                    mtext("Green Intensity",side = 2,adj = 0.5, padj = 4 ,cex = 0.7)
+                    mtext("Red Intensity",side = 2, line = 0.5 ,cex = 0.7)
+                    image(mgf, col = colourRamp)
+
+                    mtext("Green Intensity",side = 2, line = 0.5 ,cex = 0.7)
+                    if((a%%3==0) || (a == numArrays))                   
+                      {
+                        dev.off()
+                        fignu = fignu +1
+                      }
                   }
-                dev.off()
-                
-                aR = ncol(Imrfr)/nrow(Imrfr)
-                w = 350
-                h = aR * w/3
-                png(file = fpng, width = w, height = h)
-                nf <- layout(matrix(c(1,2),1,2,byrow = FALSE),
-                             c(1.2,1.2), c(2,2), TRUE)
-                par(xaxt = "n", yaxt = "n",mar=c(1,1,2,1))
-                image(Imrfr, col = colourRamp)
-                mtext("Red Intensity",side = 2,adj = 0.5, padj = 4 ,cex = 0.7)
-                image(Imgfr, col = colourRamp)
-                mtext("Green Intensity",side = 2,adj = 0.5, padj = 4 ,cex = 0.7)
-                dev.off()
-                
+                              
                 m = matrix(pretty(mrf,9),nrow=1,ncol=length(pretty(mrf,9)))
                 llfpng = "localisationlegendforeground.png"
                 png(file= llfpng, width = 200, height = 600)
@@ -402,9 +404,9 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                 axis(2, label= as.list(pretty(mrf,9)),at=seq(0,1,by=(1/(length(pretty(mrf,9))-1))), cex.axis = 0.7, padj = 1)
                 dev.off()
                 
-                ftext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><IMG border = \"0\" SRC=\"%s\"/></A><center><b>Figure %s</b></center></td><td><IMG BORDER = \"0\" SRC=\"%s\"/></td></tr></table>\n", "Foreground representation on the array", basename(fpdf), basename(fpng), figure, basename(llfpng))
+                ftext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><IMG border = \"0\" SRC=\"%s\"/></A><center><b>Figure %s</b></center></td><td><IMG BORDER = \"0\" SRC=\"%s\"/></td>\n", "Foreground representation on the array", basename(fpng[1]), basename(fpng[1]), figure, basename(llfpng))
 
-                legendlocal = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s:</b> False color representations of the spatial intensity (background and foreground) distributions of each arrays. The color scale is shown in the panel on the right. The color scale was chosen proportional to the ranks. These graphical representation permit to show problems during the experimentation such as fingerprints, artifactual gradient or dye specific failure for instance.</DIV>", figure)          
+                legendlocal = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s:</b> False color representations of the spatial intensity (background when available and foreground) distributions of each arrays. The color scale is shown in the panel on the right. The color scale was chosen proportional to the ranks. These graphical representation permit to show problems during the experimentation such as fingerprints, artifactual gradient or dye specific failure for instance.</DIV>", figure)          
               }
 
 #################################
@@ -804,7 +806,7 @@ on the <i>y</i>-axis versus the rank of the mean on the <i>x</i>-axis. The red d
             writeLines(matext1, con)
             if(nfig >= 2)
               {
-                for(i in 2:nfig)
+                for(i in 1:nfig)
                   {
                     matext2 = sprintf("<tr><td></td><td></td><td><A HREF=\"%s\">%s%s</A><BR></tr></td>\n", basename(mapdf[i]), "MvA plot ", i)
                     
@@ -821,11 +823,35 @@ on the <i>y</i>-axis versus the rank of the mean on the <i>x</i>-axis. The red d
                 writeLines(sec2text, con)
                   
                 if("Rb" %in% colnames(dims(expressionset)) && "Gb" %in% colnames(dims(expressionset)))
-                  writeLines(batext, con)
+                  {
+                    writeLines(batext, con)
+                    if(nfig2 >= 2)
+                      {
+                        for(i in 2:nfig2)
+                          {
+                            batext2 = sprintf("<tr><td></td><td></td><td><A HREF=\"%s\">%s%s</A><BR></tr></td>\n", basename(bapng[i]), "Spatial plots ", i)
+                    
+                            writeLines(batext2, con)
+                          }
+                      }
+                    writeLines("</table>", con)
+                  }
                 
+
                 writeLines(ftext, con)
+                if(nfig3 >= 2)
+                  {
+                    for(i in 1:nfig3)
+                      {
+                        ftext2 = sprintf("<tr><td></td><td></td><td><A HREF=\"%s\">%s%s</A><BR></tr></td>\n", basename(fpng[i]), "Spatial plots ", i)
+                    
+                        writeLines(ftext2, con)
+                      }
+                  }
+                writeLines("</table>", con)
                 writeLines(legendlocal, con)
               }
+            
             if(!TRUE)
               {
                 if("replicates" %in% names(phenoData(expressionset)))
@@ -1019,7 +1045,7 @@ aqm.expressionset = function(expressionset, outdir = getwd(), force = FALSE, do.
     print(update(trobj, index.cond = list(id.thispage)))
     dev.off()
     
-    matext1 = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><br><b>Figure %s</b></center></td><td><A HREF=\"%s\">%s</td></A></tr></td>\n", "MvA plots",  basename(mapdf[1]),  basename(mapng[1]), figure , basename(mapdf[1]), "MvA plot 1")
+    matext1 = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><br><b>Figure %s</b></center></td>\n", "MvA plots",  basename(mapdf[1]),  basename(mapng[1]), figure)
     legendMA = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> represents MA plot for each array. <br> M A-plots are useful for pairwise comparisons between arrays. M and A are defined as :<br>
 M = log<sub>2</sub>(I<sub>1</sub>) - log<sub>2</sub>(I<sub>2</sub>)<br>
 A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
@@ -1332,7 +1358,7 @@ on the <i>y</i>-axis versus the rank of the mean on the <i>x</i>-axis. The red d
     writeLines(matext1, con)
     if(nfig >= 2)
       {
-        for(i in 2:nfig)
+        for(i in 1:nfig)
           {
             matext2 = sprintf("<tr><td></td><td></td><td><A HREF=\"%s\">%s%s</A><BR></tr></td>\n", basename(mapdf[i]), "MvA plot ", i)
             
@@ -1435,46 +1461,67 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             section = section + 1
             sec2text = sprintf("<hr><h2><a name = \"S2\">Section %s: Spatial plots</h2></a>", section)
             writeLines(sec2text, con)
-
-            fpng = "foreground.png"
-            fpdf = "foreground.pdf"
+            maxc = ncol(expressionset)
+            maxr = nrow(expressionset)
+            nfig3 = ceiling(numArrays/6)      
             colourRamp <- rgb(seq(0,1,l=256),seq(0,1,l=256),seq(1,0,l=256))
-            pdf(file = fpdf)
-            nf <- layout(matrix(c(1,2,3,4,5,6),2,3,byrow = TRUE),
-                         c(1.2,1.2,1.2), c(2,2), TRUE)
-            for(a in 1:numArrays)
-              {
-                par(xaxt = "n", yaxt = "n",mar=c(1,1,1,1))
-                rfi = rank(dat[,a])
-                mrfi = matrix(rfi,ncol=ncol(expressionset),nrow=nrow(expressionset),byrow=T)
-                Imrfi = Image(mrfi, dim(mrfi))
-                mrir = resize(normalize(Imrfi), w=nrow(Imrfi)/3, h=ncol(Imrfi)/3)
-                image(mrir, col = colourRamp)
-                mtext(sN[a], side = 3, adj = 0.5, padj = 4 , cex = 0.8)
-                
-              }
-            dev.off()
 
-            aR = ncol(Imrfi)/nrow(Imrfi)
-            w = 350
-            h = aR * w
-            png(file = fpng, width = w, height = h)
-            par(xaxt = "n", yaxt = "n",mar=c(1,1,1,1))
-            image(mrir, col = colourRamp)
-            dev.off()
-            
-            m = matrix(pretty(mrir,9),nrow=1,ncol=length(pretty(mrir,9)))
+            fpng = paste("foreground", 1:nfig3, ".png", sep="")
+            fignu = 1
+    
+            aR = if(maxr>maxc) maxr/maxc else maxc/maxr
+
+            for(a in seq_len(numArrays))
+              {
+                rfi = rank(dat[,a])
+                mrfi = matrix(rfi,ncol=maxc,nrow=maxr,byrow=T)                                        
+                if(maxr>maxc)
+                  mrfi = t(mrfi)
+                
+                if(a %in% seq(1,numArrays,by=6))
+                  {
+                    png(fpng[fignu], width = 350, height = 350*aR)
+                    nf <- layout(matrix(c(1,2,3,4,5,6),2,3,byrow = TRUE),
+                                 widths = c(1.5,1.5,1.5),
+                                 heights = c(1.5*aR,1.5*aR),
+                                 respect = TRUE)
+                  }
+                
+                par(xaxt = "n", yaxt = "n",mar=c(1,2,2,1))
+                image(mrfi, col = colourRamp)
+                mtext(sN[a],side = 3, adj = 0.5, padj = -1 ,cex = 0.7)
+                
+                if((a%%6==0) || (a == numArrays))                   
+                  {
+                    dev.off()
+                    fignu = fignu +1
+                  }
+              }
+                                   
+            m = matrix(pretty(mrfi,9),nrow=1,ncol=length(pretty(mrfi,9)))
             llpng = "localisationlegend.png" 
             png(file= llpng, width = 200, height = 600)
             image(m,xaxt="n",yaxt="n",ylab="Rank", col = colourRamp, cex.lab = 0.8, mgp = c(1.5,1,0) )
-            axis(2, label= as.list(pretty(mrir,9)),at=seq(0,1,by=(1/(length(pretty(mrir,9))-1))), cex.axis = 0.7, padj = 1)
+            axis(2, label= as.list(pretty(mrfi,9)),at=seq(0,1,by=(1/(length(pretty(mrfi,9))-1))), cex.axis = 0.7, padj = 1)
             dev.off()
+           
+            ftext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><IMG border = \"0\" SRC=\"%s\"/></A><center><b>Figure %s</b></center></td><td><IMG BORDER = \"0\" SRC=\"%s\"/></td>\n", "Intensity representation on the array", basename(fpng[1]), basename(fpng[1]), figure, basename(llpng))
             
-            ftext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><IMG border = \"0\" SRC=\"%s\"/></A><center><b>Figure %s</b></center></td><td><IMG BORDER = \"0\" SRC=\"%s\"/></td></tr></table>\n", "Intensity representation on the array", basename(fpdf), basename(fpng), figure, basename(llpng))
-            
-            writeLines(ftext, con)
             legendlocal = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s:</b> False color representations of the spatial intensity distributions of each arrays. The color scale is shown in the panel on the right. The color scale was chosen proportional to the ranks. These graphical representation permit to show problems during the experimentation such as fingerprints, artifactual gradient or dye specific failure for instance.</DIV>", figure)          
+
+            writeLines(ftext, con)
+            if(nfig3 >= 2)
+              {
+                for(i in 1:nfig3)
+                  {
+                    ftext2 = sprintf("<tr><td></td><td></td><td><A HREF=\"%s\">%s%s</A><BR></tr></td>\n", basename(fpng[i]), "Spatial plots ", i)
+                    
+                    writeLines(ftext2, con)
+                  }
+              }
+            writeLines("</table>", con)
             writeLines(legendlocal, con)
+
 
 
 
