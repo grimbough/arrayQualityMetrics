@@ -399,7 +399,9 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                               
                 m = matrix(pretty(mrf,9),nrow=1,ncol=length(pretty(mrf,9)))
                 llfpng = "localisationlegendforeground.png"
-                png(file= llfpng, width = 200, height = 600)
+                png(file= llfpng)
+                nf <- layout(1, widths = 0.9, heights = 3, respect = TRUE)
+
                 image(m,xaxt="n",yaxt="n",ylab="Rank", col = colourRamp, cex.lab = 0.8, mgp = c(1.5,1,0) )
                 axis(2, label= as.list(pretty(mrf,9)),at=seq(0,1,by=(1/(length(pretty(mrf,9))-1))), cex.axis = 0.7, padj = 1)
                 dev.off()
@@ -683,25 +685,25 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                   {
                     if(a %in% c(seq(14,numArrays,by=16),seq(15,numArrays,by=16),seq(16,numArrays,by=16)))
                       {
-                        par(mar = c(2,0,0,0))
+                        par(mar = c(2,0,0,0), cex.axis = 0.9)
                         multi("density",dat[,a]~facgene,xlim,"","","", col = cols[c(9,2)], yaxt = "n", ylim = c(0,1))
                         legend("topright",legend=sN[a], bty = "n", cex = 0.6)
                       }
                     if(a %in%  c(seq(1,numArrays,by=16),seq(5,numArrays,by=16),seq(9,numArrays,by=16)))
                       {
-                        par(mar = c(0,2,0,0))
+                        par(mar = c(0,2,0,0), cex.axis = 0.9)
                         multi("density",dat[,a]~facgene,xlim,"","","", col = cols[c(9,2)], xaxt = "n", ylim = c(0,1))
                         legend("topright",legend=sN[a], bty = "n", cex = 0.6)
                       }
                     if(a %in% seq(13,numArrays,by=16))
                       {
-                        par(mar = c(2,2,0,0))
+                        par(mar = c(2,2,0,0), cex.axis = 0.9)
                         multi("density",dat[,a]~facgene,xlim,"","","", col = cols[c(9,2)], ylim = c(0,1))
                         legend("topright",legend=sN[a], bty = "n", cex = 0.6)
                       }
                     if(!(a %in%  seq(13,numArrays,by=16)) && !(a %in%  c(seq(1,numArrays,by=16),seq(5,numArrays,by=16),seq(9,numArrays,by=16))) && !(a %in% c(seq(14,numArrays,by=16),seq(15,numArrays,by=16),seq(16,numArrays,by=16))))
                       {
-                        par(mar = c(0,0,0,0))
+                        par(mar = c(0,0,0,0), cex.axis = 0.9)
                         multi("density",dat[,a]~facgene,xlim,"","","", col = cols[c(9,2)],  xaxt = "n", yaxt = "n",ylim = c(0,1))
                         legend("topright",legend=sN[a], bty = "n", cex = 0.6)
                       }
@@ -709,7 +711,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                 dev.off()
     
                 png(file = gopng)
-                multi("density",dat~facgene,xlim,"","","", col = cols[c(9,2)])
+                multi("density",dat~facgene,xlim,"","","", col = cols[c(9,2)], cex.axis = 0.9)
                 legend("topright", c("Mapped","Unmapped"),lty=1,lwd=2,col= c(cols[c(2,9)]), bty = "n")
                 dev.copy(pdf, file = gopdf)
                 dev.off()
@@ -746,7 +748,8 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
       
             m = matrix(pretty(outM,9),nrow=1,ncol=length(pretty(outM,9)))
             hlpng = "heatmaplegend.png"
-            png(file= hlpng, width = 200, height = 600)
+            png(file= hlpng)
+            nf <- layout(1, widths = 0.9, heights = 3,respect = TRUE)
             image(m,xaxt="n",yaxt="n",ylab="Distance", col = colourRange, cex.lab = 0.8, mgp = c(1.5,1,0) )
             axis(2, label= as.list(pretty(outM,9)),at=seq(0,1,by=(1/(length(pretty(outM,9))-1))), cex.axis = 0.8, padj = 1)
             dev.off()
@@ -763,7 +766,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
       
             mplot5 = makePlot(con=con, name = "meanSd",
                      w=8, h=8, fun = function() {
-                       meanSdPlot(cbind(rc, gc)) 
+                       meanSdPlot(cbind(rc, gc), cex.axis = 0.9) 
                      }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><BR><b>Figure %s</center></b></td></table>\n", title="Standard deviation versus rank of the mean", fig = figure)
 
             htmltext5 = mplot5[[2]]
@@ -1235,25 +1238,25 @@ where I<sub>1</sub> and I<sub>2</sub> are the vectors of normalized intensities 
           {
             if(a %in% c(seq(14,numArrays,by=16),seq(15,numArrays,by=16),seq(16,numArrays,by=16)))
               {
-                par(mar = c(2,0,0,0))
+                par(mar = c(2,0,0,0), cex.axis = 0.9)
                 multi("density",dat[,a]~facgene,xlim,"","","", col = cols[c(9,2)], yaxt = "n", ylim = c(0,1))
                 legend("topright",legend=sN[a], bty = "n", cex = 0.6)
               }
             if(a %in%  c(seq(1,numArrays,by=16),seq(5,numArrays,by=16),seq(9,numArrays,by=16)))
               {
-                par(mar = c(0,2,0,0))
+                par(mar = c(0,2,0,0), cex.axis = 0.9)
                 multi("density",dat[,a]~facgene,xlim,"","","", col = cols[c(9,2)], xaxt = "n", ylim = c(0,1))
                 legend("topright",legend=sN[a], bty = "n", cex = 0.6)
               }
             if(a %in% seq(13,numArrays,by=16))
               {
-                par(mar = c(2,2,0,0))
+                par(mar = c(2,2,0,0), cex.axis = 0.9)
                 multi("density",dat[,a]~facgene,xlim,"","","", col = cols[c(9,2)], ylim = c(0,1))
                 legend("topright",legend=sN[a], bty = "n", cex = 0.6)
               }
             if(!(a %in%  seq(13,numArrays,by=16)) && !(a %in%  c(seq(1,numArrays,by=16),seq(5,numArrays,by=16),seq(9,numArrays,by=16))) && !(a %in% c(seq(14,numArrays,by=16),seq(15,numArrays,by=16),seq(16,numArrays,by=16))))
               {
-                par(mar = c(0,0,0,0))
+                par(mar = c(0,0,0,0), cex.axis = 0.9)
                 multi("density",dat[,a]~facgene,xlim,"","","", col = cols[c(9,2)],  xaxt = "n", yaxt = "n",ylim = c(0,1))
                 legend("topright",legend=sN[a], bty = "n", cex = 0.6)
               }
@@ -1261,7 +1264,7 @@ where I<sub>1</sub> and I<sub>2</sub> are the vectors of normalized intensities 
         dev.off()
         
         png(file = gopng)
-        multi("density",dat~facgene,xlim,"","","", col = cols[c(9,2)])
+        multi("density",dat~facgene,xlim,"","","", col = cols[c(9,2)], cex.axis = 0.9)
         legend("topright", c("Mapped","Unmapped"),lty=1,lwd=2,col= c(cols[c(2,9)]), bty = "n")
         dev.copy(pdf, file = gopdf)
         dev.off()
@@ -1297,7 +1300,8 @@ where I<sub>1</sub> and I<sub>2</sub> are the vectors of normalized intensities 
       
     m = matrix(pretty(outM,9),nrow=1,ncol=length(pretty(outM,9)))
     hlpng = "heatmaplegend.png"
-    png(file= hlpng, width = 200, height = 600)
+    png(file= hlpng)
+    nf <- layout(1, widths = 0.9, heights = 3,respect = TRUE)
     image(m,xaxt="n",yaxt="n",ylab="Distance", col = colourRange, cex.lab = 0.8, mgp = c(1.5,1,0) )
     axis(2, label= as.list(pretty(outM,9)),at=seq(0,1,by=(1/(length(pretty(outM,9))-1))), cex.axis = 0.8, padj = 1)
     dev.off()
@@ -1314,7 +1318,7 @@ where I<sub>1</sub> and I<sub>2</sub> are the vectors of normalized intensities 
       
     mplot5 = makePlot(con=con, name = "meanSd",
       w=8, h=8, fun = function() {
-        meanSdPlot(dat) 
+        meanSdPlot(dat, cex.axis = 0.9) 
       }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><BR><b>Figure %s</center></b></td></table>\n", title="Standard deviation versus rank of the mean", fig = figure)
 
     htmltext5 = mplot5[[2]]
@@ -1500,7 +1504,8 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
                                    
             m = matrix(pretty(mrfi,9),nrow=1,ncol=length(pretty(mrfi,9)))
             llpng = "localisationlegend.png" 
-            png(file= llpng, width = 200, height = 600)
+            png(file= llpng)            
+            nf <- layout(1, widths = 0.9, heights = 3, respect = TRUE)
             image(m,xaxt="n",yaxt="n",ylab="Rank", col = colourRamp, cex.lab = 0.8, mgp = c(1.5,1,0) )
             axis(2, label= as.list(pretty(mrfi,9)),at=seq(0,1,by=(1/(length(pretty(mrfi,9))-1))), cex.axis = 0.7, padj = 1)
             dev.off()
@@ -1529,7 +1534,8 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
 ###Section 8 : Affy plots###
 ############################
 
-            
+            cols = brewer.pal(9, "Set1")
+           
             section = section + 1
             sec8text = sprintf("<hr><h2><a name = \"S8\">Section %s: Affymetrix specific plots</h2></a>", section)
             writeLines(sec8text, con)
@@ -1551,8 +1557,9 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             affypng2 = "RLE.png"
             affypdf2 = "RLE.pdf"
             png(file = affypng2)
-            Mbox(dataPLM, ylim = c(-1, 1), names = sN, col = "lightblue",
-                 whisklty = 0, staplelty = 0, main = "RLE", las = 3)
+            Mbox(dataPLM, ylim = c(-1, 1), names = sN, col = cols[2],
+                 whisklty = 0, staplelty = 0, main = "RLE", las = 3,
+                 cex.axis = 0.8)
             dev.copy(pdf, file = affypdf2)
             dev.off()
             dev.off()
@@ -1562,7 +1569,8 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             affypdf3 = "NUSE.pdf"
             png(file = affypng3)
             boxplot(dataPLM, ylim = c(0.95, 1.5), names = sN,
-                    outline = FALSE, col = "lightblue", main = "NUSE", las = 2)
+                    outline = FALSE, col = cols[2], main = "NUSE", las = 2,
+                    cex.axis = 0.8)
             dev.copy(pdf, file = affypdf3)
             dev.off()
             dev.off()
@@ -1571,7 +1579,7 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             affypng4 = "qc.png"
             affypdf4 = "qc.pdf"
             png(file = affypng4)
-            plot(qc(expressionset))
+            plot(qc(expressionset), cex.axis = 0.8)
             dev.copy(pdf, file = affypdf4)
             dev.off()
             dev.off()
@@ -1584,7 +1592,6 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             ##PM.MM
             figure5 = figure4 + 1
             
-            cols = brewer.pal(9, "Set1")
             xlim = c(min(na.omit(dat)),max(na.omit(dat)))
 
             
@@ -1598,33 +1605,33 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
               {
                 if(a %in% c(seq(14,numArrays,by=16),seq(15,numArrays,by=16),seq(16,numArrays,by=16)))
                   {
-                    par(mar = c(2,0,0,0))
-                    pmmm(expressionset[,a],xlim,"","","", yaxt = "n", ylim = c(0,1))
+                    par(mar = c(2,0,0,0), cex.axis = 0.9)
+                    pmmm(expressionset[,a],xlim,"","","", yaxt = "n", ylim = c(0,1), cex.axis = 0.9)
                     legend("topright",legend=sN[a], bty = "n", cex = 0.6)
                   }
                 if(a %in%  c(seq(1,numArrays,by=16),seq(5,numArrays,by=16),seq(9,numArrays,by=16)))
                   {
-                    par(mar = c(0,2,0,0))
-                    pmmm(expressionset[,a],xlim,"","","", xaxt = "n", ylim = c(0,1))
+                    par(mar = c(0,2,0,0), cex.axis = 0.9)
+                    pmmm(expressionset[,a],xlim,"","","", xaxt = "n", ylim = c(0,1), cex.axis = 0.9)
                     legend("topright",legend=sN[a], bty = "n", cex = 0.6)
                   }
                 if(a %in% seq(13,numArrays,by=16))
                   {
-                    par(mar = c(2,2,0,0))
-                    pmmm(expressionset[,a],xlim,"","","", ylim = c(0,1))
+                    par(mar = c(2,2,0,0), cex.axis = 0.9)
+                    pmmm(expressionset[,a],xlim,"","","", ylim = c(0,1), cex.axis = 0.9)
                     legend("topright",legend=sN[a], bty = "n", cex = 0.6)
                   }
                 if(!(a %in%  seq(13,numArrays,by=16)) && !(a %in%  c(seq(1,numArrays,by=16),seq(5,numArrays,by=16),seq(9,numArrays,by=16))) && !(a %in% c(seq(14,numArrays,by=16),seq(15,numArrays,by=16),seq(16,numArrays,by=16))))
                   {
-                    par(mar = c(0,0,0,0))
-                    pmmm(expressionset[,a],xlim,"","","", xaxt = "n", yaxt = "n",ylim = c(0,1))
+                    par(mar = c(0,0,0,0), cex.axis = 0.9)
+                    pmmm(expressionset[,a],xlim,"","","", xaxt = "n", yaxt = "n",ylim = c(0,1), cex.axis = 0.9)
                     legend("topright",legend=sN[a], bty = "n", cex = 0.6)
                   }
               }
             dev.off()
         
             png(file = pmopng)
-            pmmm(expressionset,xlim,"","","")
+            pmmm(expressionset,xlim,"","","", cex.axis = 0.9)
             legend("topright", c("PM","MM"),lty=1,lwd=2,col= c(cols[c(2,9)]), bty = "n")
             dev.copy(pdf, file = pmopdf)
             dev.off()
