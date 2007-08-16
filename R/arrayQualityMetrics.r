@@ -335,7 +335,8 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                                        
                     m = matrix(pretty(mr,9),nrow=1,ncol=length(pretty(mr,9)))
                     llbpng = "localisationlegendbackground.png"
-                    png(file= llbpng, width = 200, height = 600)
+                    png(file= llbpng)
+                    nf <- layout(1, widths = 1.1, heights = 3, respect = TRUE)
                     image(m,xaxt="n",yaxt="n",ylab="Rank", col = colourRamp, cex.lab = 0.8, mgp = c(1.5,1,0) )
                     axis(2, label= as.list(pretty(mr,9)),at=seq(0,1,by=(1/(length(pretty(mr,9))-1))), cex.axis = 0.7, padj = 1)
                     dev.off()
@@ -400,7 +401,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                 m = matrix(pretty(mrf,9),nrow=1,ncol=length(pretty(mrf,9)))
                 llfpng = "localisationlegendforeground.png"
                 png(file= llfpng)
-                nf <- layout(1, widths = 0.9, heights = 3, respect = TRUE)
+                nf <- layout(1, widths = 1.1, heights = 3, respect = TRUE)
 
                 image(m,xaxt="n",yaxt="n",ylab="Rank", col = colourRamp, cex.lab = 0.8, mgp = c(1.5,1,0) )
                 axis(2, label= as.list(pretty(mrf,9)),at=seq(0,1,by=(1/(length(pretty(mrf,9))-1))), cex.axis = 0.7, padj = 1)
@@ -749,7 +750,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
             m = matrix(pretty(outM,9),nrow=1,ncol=length(pretty(outM,9)))
             hlpng = "heatmaplegend.png"
             png(file= hlpng)
-            nf <- layout(1, widths = 0.9, heights = 3,respect = TRUE)
+            nf <- layout(1, widths = 1.1, heights = 3,respect = TRUE)
             image(m,xaxt="n",yaxt="n",ylab="Distance", col = colourRange, cex.lab = 0.8, mgp = c(1.5,1,0) )
             axis(2, label= as.list(pretty(outM,9)),at=seq(0,1,by=(1/(length(pretty(outM,9))-1))), cex.axis = 0.8, padj = 1)
             dev.off()
@@ -1301,7 +1302,7 @@ where I<sub>1</sub> and I<sub>2</sub> are the vectors of normalized intensities 
     m = matrix(pretty(outM,9),nrow=1,ncol=length(pretty(outM,9)))
     hlpng = "heatmaplegend.png"
     png(file= hlpng)
-    nf <- layout(1, widths = 0.9, heights = 3,respect = TRUE)
+    nf <- layout(1, widths = 1.1, heights = 3,respect = TRUE)
     image(m,xaxt="n",yaxt="n",ylab="Distance", col = colourRange, cex.lab = 0.8, mgp = c(1.5,1,0) )
     axis(2, label= as.list(pretty(outM,9)),at=seq(0,1,by=(1/(length(pretty(outM,9))-1))), cex.axis = 0.8, padj = 1)
     dev.off()
@@ -1505,7 +1506,7 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             m = matrix(pretty(mrfi,9),nrow=1,ncol=length(pretty(mrfi,9)))
             llpng = "localisationlegend.png" 
             png(file= llpng)            
-            nf <- layout(1, widths = 0.9, heights = 3, respect = TRUE)
+            nf <- layout(1, widths = 1.1, heights = 3, respect = TRUE)
             image(m,xaxt="n",yaxt="n",ylab="Rank", col = colourRamp, cex.lab = 0.8, mgp = c(1.5,1,0) )
             axis(2, label= as.list(pretty(mrfi,9)),at=seq(0,1,by=(1/(length(pretty(mrfi,9))-1))), cex.axis = 0.7, padj = 1)
             dev.off()
