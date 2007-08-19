@@ -195,14 +195,14 @@ setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
             group = sample(rep((1:ceiling(numArrays/k)),k),numArrays)
 
 ##########################################
-###Section 1 : Individual array quality###
+###Section 1 : MA-plots                ###
 ##########################################
             
             section = 1
             figure = 1
-            sec1text = sprintf("<hr><h2><a name=\"S1\">Section %s: Individual array quality</a></h2>", section)
+            sec1text = sprintf("<hr><h2><a name=\"S1\">Section %s: MA-plots</a></h2>", section)
             
-           ##MAplots
+            ##MA-plots
             ##function from affyQCReport
             M = rc - gc
             A = 0.5*(rc + gc)
@@ -409,7 +409,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                 
                 ftext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><IMG border = \"0\" SRC=\"%s\"/></A><center><b>Figure %s</b></center></td><td><IMG BORDER = \"0\" SRC=\"%s\"/></td>\n", "Foreground representation on the array", basename(fpng[1]), basename(fpng[1]), figure, basename(llfpng))
 
-                legendlocal = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s:</b> False color representations of the spatial intensity (background when available and foreground) distributions of each arrays. The color scale is shown in the panel on the right. The color scale was chosen proportional to the ranks. These graphical representation permit to show problems during the experimentation such as fingerprints, artifactual gradient or dye specific failure for instance.</DIV>", figure)          
+                legendlocal = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s:</b> False color representations of the arrays' spatial distributions of feature intensities and, if available, local background estimates. The color scale is shown in the panel on the right, and it is proportional to the ranks. These plots may help in identifying patterns that may be caused, for example, spatial gradients in the hybridization chamber, air bubbles, spotting or plating problems.</DIV>", figure)          
               }
 
 #################################
@@ -783,7 +783,7 @@ on the <i>y</i>-axis versus the rank of the mean on the <i>x</i>-axis. The red d
             
             writeLines("<hr><h2>Index</h2><table border = \"0\" cellspacing = 5 cellpadding = 2>", con)
             
-            writeLines("<tr><td><b><a href=\"#S1\">Individual array Quality</b></a></td></tr>", con)
+            writeLines("<tr><td><b><a href=\"#S1\">MA-plots</b></a></td></tr>", con)
             
             if("Row" %in% rownames(featureData(expressionset)@varMetadata) && "Column" %in% rownames(featureData(expressionset)@varMetadata))
               writeLines("<tr><td><b><a href=\"#S2\">Spatial plots</b></a></td></tr>", con)
@@ -994,14 +994,14 @@ aqm.expressionset = function(expressionset, outdir = getwd(), force = FALSE, do.
     group = sample(rep((1:ceiling(numArrays/k)),k),numArrays)
    
 ##########################################
-###Section 1 : Individual array quality###
+###Section 1 : MA-plots                ###
 ##########################################
     
-    ##MAplots
+    ##MA-plots
     ##function from affyQCReport
     section = 1
     figure = 1
-    sec1text = sprintf("<hr><h2><a name = \"S1\">Section %s: Individual array quality</h2></a>", section)
+    sec1text = sprintf("<hr><h2><a name = \"S1\">Section %s: MA-plots</h2></a>", section)
     
     medArray = rowMedians(dat)
     M =  dat-medArray
@@ -1335,7 +1335,7 @@ on the <i>y</i>-axis versus the rank of the mean on the <i>x</i>-axis. The red d
             
     writeLines("<hr><h2>Index</h2><table border = \"0\" cellspacing = 5 cellpadding = 2>", con)
             
-    writeLines("<tr><td><b><a href=\"#S1\">Individual array Quality</b></a></td></tr>", con)
+    writeLines("<tr><td><b><a href=\"#S1\">MA-plots</b></a></td></tr>", con)
                
     if(!TRUE)
       {

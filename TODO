@@ -1,0 +1,59 @@
+1. Spatial plots
+-----------------
+a. Legend "Background representation on the array" --> "Spatial distribution of local background estimates"
+b. Legend "Foreground representation on the array" --> "Spatial distribution of features intensities"
+c. Layout of the PNGs (array 1) and links (to arrays 2...n) on the main page is irregular - clean up. Use table environment?
+d. For each of the additional PNGs (2...n), link could go not directly to the PNG but to a short HTML wrapper that gives a caption with array name (number as well as full name) at the bottom.
+
+2. Design
+---------
+Use lattice throughout 
+
+3.) Code duplication and maintainability
+----------------------------------------
+Please avoid duplication of long blocks of code - these should be separated
+into functions. In particular, the methods for NChannelSets and AffyBatch 
+have a lot of redundancy.
+
+4.) Rendering of the output
+----------------------------
+Abstract the output from HTML, writeReport should internally use a
+suitable meta-language that then can be easily rendered into HTML and
+Latex/PDF.
+
+
+5.) Boxplots 
+------------ 
+Have three plots (of same width), one with
+the red values, one with the green, one with the log-rations.
+
+6.) Heatmap
+-----------
+a) Same color scheme as for spatial plots should be used.
+b) Use the one from lattice (or Greg's heatmap.2?)
+heatmap is in the latticeExtra package, 
+and help(dendrogramGrob) has a complete example
+
+b) Put colors on the side that show an experimental factor of interest.
+
+7.) Asssessment
+---------------
+Develop criteria for identifying "outlier" arrays. This could be done
+(a) on the box-plots/intensity distributions (Section 3) and (b) the
+clustering that underlies the heatmap (Section 4).
+
+Section 2, spatial plots: we could develop a measure of homogeneity to
+flag arrays with gross features (perhaps based on Fourier or Wavelet
+spectra). Need to check literature, I would expect that this has been
+descrined.
+
+8.) Stratification
+------------------
+Plots for diagnosing stratification by factors such as print-tip 
+(Block), Row, Column, GC content: ecdf plots.
+
+9.) Duplicate correlation
+-------------------------
+If featureData contains a factor that identifies features containing 
+the same reporter sequence, we can check for that (scatterplots, 
+standard deviation)
