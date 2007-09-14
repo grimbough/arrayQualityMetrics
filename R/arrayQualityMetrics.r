@@ -136,7 +136,7 @@ setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
             for(a in 1:numArrays)
               dat[,a] = rc[,a] - gc[,a]
             colnames(dat) = sN
-            if(length(phenoData(expressionset)$dyeswap) != 0)
+            if("dyeswap" %in% names(phenoData(expressionset)@data))
               {
                 lev = levels(expressionset@phenoData$dyeswap)
                 if(length(lev) != 2)
@@ -265,13 +265,13 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
 
             ##Background rank representation
       
-            if("Row" %in% rownames(featureData(expressionset)@varMetadata) && "Column" %in% rownames(featureData(expressionset)@varMetadata))
+            if("X" %in% rownames(featureData(expressionset)@varMetadata) && "Y" %in% rownames(featureData(expressionset)@varMetadata))
               {
                 section = section + 1
                 sec2text = sprintf("<hr><h2><a name = \"S2\">Section %s: Spatial plots</a></h2>", section)
 
-                r = featureData(expressionset)$Row
-                c = featureData(expressionset)$Column
+                r = featureData(expressionset)$X
+                c = featureData(expressionset)$Y
 
                 maxc = max(as.numeric(c))
                 maxr = max(as.numeric(r))
@@ -312,10 +312,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                         if(a %in% seq(1,numArrays,by=3))
                           {
                             png(bapng[fignu], width = 350, height = 350*aR/2)
-                            nf <- layout(matrix(c(1,2,3,4,5,6),2,3,byrow = FALSE),
-                                         widths = c(1.5,1.5,1.5),
-                                         heights = c(1.5*aR,1.5*aR),
-                                         respect = TRUE)
+                            nf <- layout(matrix(c(1,2,3,4,5,6),2,3,byrow = FALSE),respect = FALSE)
                           }
                 
                         par(xaxt = "n", yaxt = "n",mar=c(1,2,2,1))
@@ -336,7 +333,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                     m = matrix(pretty(mr,9),nrow=1,ncol=length(pretty(mr,9)))
                     llbpng = "localisationlegendbackground.png"
                     png(file= llbpng)
-                    nf <- layout(1, widths = 1.1, heights = 3, respect = TRUE)
+                    nf <- layout(1, widths = 0.9, heights = 3, respect = TRUE)
                     image(m,xaxt="n",yaxt="n",ylab="Rank", col = colourRamp, cex.lab = 0.8, mgp = c(1.5,1,0) )
                     axis(2, label= as.list(pretty(mr,9)),at=seq(0,1,by=(1/(length(pretty(mr,9))-1))), cex.axis = 0.7, padj = 1)
                     dev.off()
@@ -379,9 +376,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                       {
                         png(fpng[fignu], width = 350, height = 350*aR/2)
                         nf <- layout(matrix(c(1,2,3,4,5,6),2,3,byrow = FALSE),
-                                     widths = c(1.5,1.5,1.5),
-                                     heights = c(1.5*aR,1.5*aR),
-                                     respect = TRUE)
+                                     respect = FALSE)
                       }
 
                     par(xaxt = "n", yaxt = "n",mar=c(1,2,2,1))
@@ -401,7 +396,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                 m = matrix(pretty(mrf,9),nrow=1,ncol=length(pretty(mrf,9)))
                 llfpng = "localisationlegendforeground.png"
                 png(file= llfpng)
-                nf <- layout(1, widths = 1.1, heights = 3, respect = TRUE)
+                nf <- layout(1, widths = 0.9, heights = 3, respect = TRUE)
 
                 image(m,xaxt="n",yaxt="n",ylab="Rank", col = colourRamp, cex.lab = 0.8, mgp = c(1.5,1,0) )
                 axis(2, label= as.list(pretty(mrf,9)),at=seq(0,1,by=(1/(length(pretty(mrf,9))-1))), cex.axis = 0.7, padj = 1)
@@ -733,24 +728,51 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
             figure = figure + 1
             colourRange = brewer.pal(9,"Greys")
             marg = ceiling(long/(sqrt(long)/1.5)+log10(numArrays))
-      
-            mplot4 = makePlot(con=con, name = "heatmap",
-                     w=8, h=8, fun = function() {
-                       heatmap(as.matrix(outM),
-                               labRow = sN,
-                               labCol = sN,
-                               col = colourRange,
-                               scale = "none",
-                               main = "",
-                               margins = c(marg,marg))
-                     }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><BR><b>Figure %s</center></b></td>\n", title="Heatmap representation of the distance between experiments", fig = figure)
+
+            if("Covariate" %in% names(phenoData(expressionset)@data))
+              {
+                colourCov = brewer.pal(12,"Set3")
+                covar = phenoData(expressionset)$Covariate
+                lev = levels(factor(covar))
+                corres = matrix(0,nrow=length(lev),ncol=2)
+                for(x in 1:length(lev))
+                  {
+                    corres[x,] = c(unique(covar[covar == lev[x]]),colourCov[x])
+                    covar[covar == lev[x]] = colourCov[x]
+                  }
+                
+                mplot4 = makePlot(con=con, name = "heatmap",
+                  w=8, h=8, fun = function() {
+                    par(mar = c(0,0,0,0))
+                    heatmap(as.matrix(outM),
+                            labRow = sN,
+                            labCol = sN,
+                            RowSideColors = covar,
+                            col = colourRange,
+                            scale = "none",
+                            main = "",
+                            margins = c(marg,marg))
+                    legend("topleft",legend=corres[,1],col=corres[,2],bty="n",pch=15, pt.cex=2, x.intersp=0.5)
+                  }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><BR><b>Figure %s</center></b></td>\n", title="Heatmap representation of the distance between experiments", fig = figure)                
+              } else {
+              mplot4 = makePlot(con=con, name = "heatmap",
+                w=8, h=8, fun = function() {
+                  heatmap(as.matrix(outM),
+                          labRow = sN,
+                          labCol = sN,
+                          col = colourRange,
+                          scale = "none",
+                          main = "",
+                          margins = c(marg,marg))
+                }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><BR><b>Figure %s</center></b></td>\n", title="Heatmap representation of the distance between experiments", fig = figure)
+            }
 
             htmltext4 = mplot4[[2]]
       
             m = matrix(pretty(outM,9),nrow=1,ncol=length(pretty(outM,9)))
             hlpng = "heatmaplegend.png"
             png(file= hlpng)
-            nf <- layout(1, widths = 1.1, heights = 3,respect = TRUE)
+            nf <- layout(1, widths = 0.9, heights = 3,respect = TRUE)
             image(m,xaxt="n",yaxt="n",ylab="Distance", col = colourRange, cex.lab = 0.8, mgp = c(1.5,1,0) )
             axis(2, label= as.list(pretty(outM,9)),at=seq(0,1,by=(1/(length(pretty(outM,9))-1))), cex.axis = 0.8, padj = 1)
             dev.off()
@@ -785,12 +807,12 @@ on the <i>y</i>-axis versus the rank of the mean on the <i>x</i>-axis. The red d
             
             writeLines("<tr><td><b><a href=\"#S1\">MA-plots</b></a></td></tr>", con)
             
-            if("Row" %in% rownames(featureData(expressionset)@varMetadata) && "Column" %in% rownames(featureData(expressionset)@varMetadata))
+            if("X" %in% rownames(featureData(expressionset)@varMetadata) && "Y" %in% rownames(featureData(expressionset)@varMetadata))
               writeLines("<tr><td><b><a href=\"#S2\">Spatial plots</b></a></td></tr>", con)
             
             if(!TRUE)
               {
-                if("replicates" %in% names(phenoData(expressionset)))
+                if("replicates" %in% names(phenoData(expressionset)@data))
                   writeLines("<tr><td><b><a href=\"#S3\">Reproducibility</b></a></td></tr>", con) 
               }
             
@@ -821,7 +843,7 @@ on the <i>y</i>-axis versus the rank of the mean on the <i>x</i>-axis. The red d
             writeLines(legendMA, con)
             
             
-            if("Row" %in% rownames(featureData(expressionset)@varMetadata) && "Column" %in% rownames(featureData(expressionset)@varMetadata))
+            if("X" %in% rownames(featureData(expressionset)@varMetadata) && "Y" %in% rownames(featureData(expressionset)@varMetadata))
               {
                 
                 writeLines(sec2text, con)
@@ -858,7 +880,7 @@ on the <i>y</i>-axis versus the rank of the mean on the <i>x</i>-axis. The red d
             
             if(!TRUE)
               {
-                if("replicates" %in% names(phenoData(expressionset)))
+                if("replicates" %in% names(phenoData(expressionset)@data))
                   {
                     writeLines(sec3text, con)
                     writeLines(htmltext1, con)
@@ -1064,7 +1086,7 @@ where I<sub>1</sub> and I<sub>2</sub> are the vectors of normalized intensities 
     ##To improve if we keep it.
     if(!TRUE)
       {
-        if("replicates" %in% names(phenoData(expressionset)))
+        if("replicates" %in% names(phenoData(expressionset)@data))
           {
             section = section + 1
             sec3text = sprintf("<hr><h2><a name = \"S3\">Section %s: Reproducibility</h2></a>", section)          
@@ -1286,23 +1308,51 @@ where I<sub>1</sub> and I<sub>2</sub> are the vectors of normalized intensities 
     figure = figure + 1
     colourRange = brewer.pal(9,"Greys")
     marg = ceiling(long/(sqrt(long)/1.5)+log10(numArrays))
-    
-    mplot4 = makePlot(con=con, name = "heatmap",
-      w=8, h=8, fun = function() {
-        heatmap(as.matrix(outM),
-                labRow = sN,
-                labCol = sN,
-                col = colourRange,
-                scale = "none",
-                main = "",
-                margins = c(marg,marg))
-      }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><BR><b>Figure %s</center></b></td>\n", title="Heatmap representation of the distance between experiments", fig = figure)
+
+
+    if("Covariate" %in% names(phenoData(expressionset)@data))
+      {
+        colourCov = brewer.pal(12,"Set3")
+        covar = phenoData(expressionset)$Covariate
+        lev = levels(factor(covar))
+        corres = matrix(0,nrow=length(lev),ncol=2)
+        for(x in 1:length(lev))
+          {
+            corres[x,] = c(unique(covar[covar == lev[x]]),colourCov[x])
+            covar[covar == lev[x]] = colourCov[x]
+          }
+                
+        mplot4 = makePlot(con=con, name = "heatmap",
+          w=8, h=8, fun = function() {
+            par(mar = c(0,0,0,0))
+            heatmap(as.matrix(outM),
+                    labRow = sN,
+                    labCol = sN,
+                    RowSideColors = covar,
+                    col = colourRange,
+                    scale = "none",
+                    main = "",
+                    margins = c(marg,marg))
+            legend("topleft",legend=corres[,1],col=corres[,2],bty="n",pch=15, pt.cex=2, x.intersp=0.5)
+          }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><BR><b>Figure %s</center></b></td>\n", title="Heatmap representation of the distance between experiments", fig = figure)                
+      } else {
+        mplot4 = makePlot(con=con, name = "heatmap",
+          w=8, h=8, fun = function() {
+            heatmap(as.matrix(outM),
+                    labRow = sN,
+                    labCol = sN,
+                    col = colourRange,
+                    scale = "none",
+                    main = "",
+                    margins = c(marg,marg))
+          }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><BR><b>Figure %s</center></b></td>\n", title="Heatmap representation of the distance between experiments", fig = figure)
+      }  
     htmltext4 = mplot4[[2]]
       
     m = matrix(pretty(outM,9),nrow=1,ncol=length(pretty(outM,9)))
     hlpng = "heatmaplegend.png"
-    png(file= hlpng)
-    nf <- layout(1, widths = 1.1, heights = 3,respect = TRUE)
+    png(file = hlpng)
+    nf <- layout(1, widths = 0.9, heights = 3,respect = TRUE)
     image(m,xaxt="n",yaxt="n",ylab="Distance", col = colourRange, cex.lab = 0.8, mgp = c(1.5,1,0) )
     axis(2, label= as.list(pretty(outM,9)),at=seq(0,1,by=(1/(length(pretty(outM,9))-1))), cex.axis = 0.8, padj = 1)
     dev.off()
@@ -1339,7 +1389,7 @@ on the <i>y</i>-axis versus the rank of the mean on the <i>x</i>-axis. The red d
                
     if(!TRUE)
       {
-        if("replicates" %in% names(phenoData(expressionset)))
+        if("replicates" %in% names(phenoData(expressionset)@data))
           writeLines("<tr><td><b><a href=\"#S3\">Reproducibility</b></a></td></tr>", con)
       }
     
@@ -1375,7 +1425,7 @@ on the <i>y</i>-axis versus the rank of the mean on the <i>x</i>-axis. The red d
     
     if(!TRUE)
       {
-          if("replicates" %in% names(phenoData(expressionset)))
+          if("replicates" %in% names(phenoData(expressionset)@data))
           {
             writeLines(sec3text, con)
             writeLines(htmltext1, con)
@@ -1485,7 +1535,7 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
                 
                 if(a %in% seq(1,numArrays,by=6))
                   {
-                    png(fpng[fignu], width = 350, height = 350*aR)
+                    png(fpng[fignu], width = 350, height = 350*aR/2)
                     nf <- layout(matrix(c(1,2,3,4,5,6),2,3,byrow = TRUE),
                                  widths = c(1.5,1.5,1.5),
                                  heights = c(1.5*aR,1.5*aR),
@@ -1505,8 +1555,8 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
                                    
             m = matrix(pretty(mrfi,9),nrow=1,ncol=length(pretty(mrfi,9)))
             llpng = "localisationlegend.png" 
-            png(file= llpng)            
-            nf <- layout(1, widths = 1.1, heights = 3, respect = TRUE)
+            png(file= llpng)
+            nf <- layout(1, widths = 0.9, heights = 3, respect = TRUE)
             image(m,xaxt="n",yaxt="n",ylab="Rank", col = colourRamp, cex.lab = 0.8, mgp = c(1.5,1,0) )
             axis(2, label= as.list(pretty(mrfi,9)),at=seq(0,1,by=(1/(length(pretty(mrfi,9))-1))), cex.axis = 0.7, padj = 1)
             dev.off()
@@ -1535,8 +1585,7 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
 ###Section 8 : Affy plots###
 ############################
 
-            cols = brewer.pal(9, "Set1")
-           
+            cols = brewer.pal(9, "Set1")            
             section = section + 1
             sec8text = sprintf("<hr><h2><a name = \"S8\">Section %s: Affymetrix specific plots</h2></a>", section)
             writeLines(sec8text, con)
@@ -1559,8 +1608,7 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             affypdf2 = "RLE.pdf"
             png(file = affypng2)
             Mbox(dataPLM, ylim = c(-1, 1), names = sN, col = cols[2],
-                 whisklty = 0, staplelty = 0, main = "RLE", las = 3,
-                 cex.axis = 0.8)
+                 whisklty = 0, staplelty = 0, main = "RLE", las = 3, cex.axis = 0.8)
             dev.copy(pdf, file = affypdf2)
             dev.off()
             dev.off()
@@ -1570,8 +1618,7 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             affypdf3 = "NUSE.pdf"
             png(file = affypng3)
             boxplot(dataPLM, ylim = c(0.95, 1.5), names = sN,
-                    outline = FALSE, col = cols[2], main = "NUSE", las = 2,
-                    cex.axis = 0.8)
+                    outline = FALSE, col = cols[2], main = "NUSE", las = 2, cex.axis = 0.8)
             dev.copy(pdf, file = affypdf3)
             dev.off()
             dev.off()
@@ -1593,6 +1640,7 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             ##PM.MM
             figure5 = figure4 + 1
             
+            cols = brewer.pal(9, "Set1")
             xlim = c(min(na.omit(dat)),max(na.omit(dat)))
 
             
@@ -1607,25 +1655,25 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
                 if(a %in% c(seq(14,numArrays,by=16),seq(15,numArrays,by=16),seq(16,numArrays,by=16)))
                   {
                     par(mar = c(2,0,0,0), cex.axis = 0.9)
-                    pmmm(expressionset[,a],xlim,"","","", yaxt = "n", ylim = c(0,1), cex.axis = 0.9)
+                    pmmm(expressionset[,a],xlim,"","","", yaxt = "n", ylim = c(0,1))
                     legend("topright",legend=sN[a], bty = "n", cex = 0.6)
                   }
                 if(a %in%  c(seq(1,numArrays,by=16),seq(5,numArrays,by=16),seq(9,numArrays,by=16)))
                   {
                     par(mar = c(0,2,0,0), cex.axis = 0.9)
-                    pmmm(expressionset[,a],xlim,"","","", xaxt = "n", ylim = c(0,1), cex.axis = 0.9)
+                    pmmm(expressionset[,a],xlim,"","","", xaxt = "n", ylim = c(0,1))
                     legend("topright",legend=sN[a], bty = "n", cex = 0.6)
                   }
                 if(a %in% seq(13,numArrays,by=16))
                   {
                     par(mar = c(2,2,0,0), cex.axis = 0.9)
-                    pmmm(expressionset[,a],xlim,"","","", ylim = c(0,1), cex.axis = 0.9)
+                    pmmm(expressionset[,a],xlim,"","","", ylim = c(0,1))
                     legend("topright",legend=sN[a], bty = "n", cex = 0.6)
                   }
                 if(!(a %in%  seq(13,numArrays,by=16)) && !(a %in%  c(seq(1,numArrays,by=16),seq(5,numArrays,by=16),seq(9,numArrays,by=16))) && !(a %in% c(seq(14,numArrays,by=16),seq(15,numArrays,by=16),seq(16,numArrays,by=16))))
                   {
                     par(mar = c(0,0,0,0), cex.axis = 0.9)
-                    pmmm(expressionset[,a],xlim,"","","", xaxt = "n", yaxt = "n",ylim = c(0,1), cex.axis = 0.9)
+                    pmmm(expressionset[,a],xlim,"","","", xaxt = "n", yaxt = "n",ylim = c(0,1))
                     legend("topright",legend=sN[a], bty = "n", cex = 0.6)
                   }
               }
