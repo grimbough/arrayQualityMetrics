@@ -15,7 +15,7 @@
   \code{\link[Biobase:class.AffyBatch]{AffyBatch}} or
   \code{\link[Biobase:class.NChannelSet]{NChannelSet}} containing
   microarray data from any platforms, one or two channels. The results,
-  a HTML report, are designated to allow the user
+  presented in a HTML report, are designated to allow the user
   to rapidly assess the quality of a set of arrays.
 }
 
@@ -34,27 +34,26 @@ arrayQualityMetrics(expressionset,
 
 \arguments{
   \item{expressionset}{ is an object of
-    class code{\link[Biobase:class.ExpressionSet]{ExpressionSet}},
-  \code{\link[Biobase:class.AffyBatch]{AffyBatch}} or
-  \code{\link[Biobase:class.NChannelSet]{NChannelSet}}.}
+    class \code{\link[Biobase:class.ExpressionSet]{ExpressionSet}},
+    \code{\link[Biobase:class.AffyBatch]{AffyBatch}} or
+    \code{\link[Biobase:class.NChannelSet]{NChannelSet}}.}
 
-  \item{outdir}{ is the name of the directory in which the results are
-    created. }
+\item{outdir}{ is the name of the directory in which the results are
+  created. }
   
-  \item{force}{ if TRUE, if \code{outdir} already exists, it will be
-    overwritten. }
+\item{force}{ if TRUE, \code{outdir} will be overwritten if it
+  already exists. }
   
-  \item{do.logtransform}{ If TRUE, the data are log transformed before
-    the analysis. }
+\item{do.logtransform}{ If TRUE, the data are log transformed before
+  the analysis. }
   
-  \item{split.plots}{  If the number of studied array
-    is more than 50 it is adviced to define a number of experiments to
-    represent on the density plots. }
+\item{split.plots}{  If the number of studied array
+  is more than 50 it is adviced to define a number of experiments to
+  represent on the density plots. }
 }
 
 \value{
-  A directory \code{outdir} containing a HTML report and all the PNG and
-  PDF plots is created.
+  A directory \code{outdir} containing a HTML report named QMreport.html and all the PNG and PDF plots is created.
 }
 
 \author{

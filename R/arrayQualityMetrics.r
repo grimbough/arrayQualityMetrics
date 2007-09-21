@@ -144,7 +144,7 @@ maplot = function(M, A, sN, numArrays)
     id.thispage <- id.thispage[id.thispage <= numArrays]
     print(update(trobj, index.cond = list(id.thispage)))
     dev.off()
-    matext1 = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><a name = \"S1.1\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</b></center></td><td>\n", "MA plots",  basename(mapdf[1]),  basename(mapng[1]), figure)
+    matext1 = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S1.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</b></center></td><td>\n", "MA plots",  basename(mapdf[1]),  basename(mapng[1]), figure)
     
     mapl = list(section=section, figure=figure, matext1=matext1, sec1text=sec1text,  nfig=nfig, mapdf=mapdf)
     return(mapl)
@@ -186,41 +186,10 @@ probesmap = function(expressionset, numArrays, section, figure, dat, sN, xlim)
     facgene[probemapping == "TRUE"] = 1
     facgene[probemapping == "FALSE"] = 0
                 
-    gpdf = "GenesMapping.pdf"
     gopng = "overall_GenesMapping.png"
     gopdf = "overall_GenesMapping.pdf"
           
     cols = brewer.pal(9, "Set1")
-    pdf(gpdf)
-    nf <- layout(matrix(1:16,4,4,byrow=TRUE), c(2,1.8,1.8,1.8), c(1.8,1.8,1.8,2), FALSE)
-    for(a in 1:numArrays)
-      {
-        if(a %in% c(seq(14,numArrays,by=16),seq(15,numArrays,by=16),seq(16,numArrays,by=16)))
-          {
-            par(mar = c(2,0,0,0), cex.axis = 0.9)
-            multi("density",dat[,a]~facgene,xlim,"","","", col = cols[c(9,2)], yaxt = "n", ylim = c(0,1))
-            legend("topright",legend=sN[a], bty = "n", cex = 0.6)
-          }
-        if(a %in%  c(seq(1,numArrays,by=16),seq(5,numArrays,by=16),seq(9,numArrays,by=16)))
-          {
-            par(mar = c(0,2,0,0), cex.axis = 0.9)
-            multi("density",dat[,a]~facgene,xlim,"","","", col = cols[c(9,2)], xaxt = "n", ylim = c(0,1))
-            legend("topright",legend=sN[a], bty = "n", cex = 0.6)
-          }
-        if(a %in% seq(13,numArrays,by=16))
-          {
-            par(mar = c(2,2,0,0), cex.axis = 0.9)
-            multi("density",dat[,a]~facgene,xlim,"","","", col = cols[c(9,2)], ylim = c(0,1))
-            legend("topright",legend=sN[a], bty = "n", cex = 0.6)
-          }
-        if(!(a %in%  seq(13,numArrays,by=16)) && !(a %in%  c(seq(1,numArrays,by=16),seq(5,numArrays,by=16),seq(9,numArrays,by=16))) && !(a %in% c(seq(14,numArrays,by=16),seq(15,numArrays,by=16),seq(16,numArrays,by=16))))
-          {
-            par(mar = c(0,0,0,0), cex.axis = 0.9)
-            multi("density",dat[,a]~facgene,xlim,"","","", col = cols[c(9,2)],  xaxt = "n", yaxt = "n",ylim = c(0,1))
-            legend("topright",legend=sN[a], bty = "n", cex = 0.6)
-          }
-      }
-    dev.off()
     
     png(file = gopng)
     multi("density",dat~facgene,xlim,"","","", col = cols[c(9,2)], cex.axis = 0.9)
@@ -229,7 +198,7 @@ probesmap = function(expressionset, numArrays, section, figure, dat, sN, xlim)
     dev.off()
     dev.off()
 
-    gotext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s<A HREF=\"%s\">%s</A>%s<A HREF=\"%s\">%s</A></b><td><A HREF=\"%s\"><center><a name = \"S3.2\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</b></center></tr></td></table>\n", "Gene mapping ", basename(gpdf), "per array", " and ", basename(gopdf), "global", basename(gopdf), basename(gopng), figure)
+    gotext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b><td><center><a name = \"S3.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</b></center></tr></td></table>\n", "Gene mapping ", basename(gopdf), basename(gopng), figure)
 
     promap = if(!"GC" %in% rownames(featureData(expressionset)@varMetadata)) list(section=section, figure=figure, gotext=gotext, sec3text=sec3text) else list(section=section, figure=figure, gotext=gotext) 
     return(promap)   
@@ -594,10 +563,10 @@ setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
             nfig = as.numeric(MAplot$nfig)
             mapdf = as.character(MAplot$mapdf)
            
-            legendMA = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> represents MA plot for each array. <br> M A-plots are useful for pairwise comparisons between arrays. M and A are defined as :<br>
+            legendMA = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> represents MA plot for each array. <br> MA plots are useful for pairwise comparisons between arrays. M and A are defined as :<br>
 M = log<sub>2</sub>(I<sub>1</sub>) - log<sub>2</sub>(I<sub>2</sub>)<br>
 A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
-where I<sub>2</sub> and I<sub>2</sub> are the vectors of intensities of two channels. Typically, we expect the mass of the distribution in an M A-plot to be concentrated along the M = 0 axis, and there should be no trend in the mean of M as a function of A.
+where I<sub>1</sub> and I<sub>2</sub> are the vectors of intensities of two channels. Typically, we expect the mass of the distribution in an MA plot to be concentrated along the M = 0 axis, and there should be no trend in the mean of M as a function of A.
 Note that a bigger width of the plot of the M-distribution at the lower end of the A scale does not necessarily imply that the variance of the M-distribution is larger at the lower end of the A scale: the visual impression might simply be caused by the fact that there is more data at the lower end of the A scale. To visualize whether there is a trend in the variance of M as a function of A, consider plotting M versus rank(A).</DIV>", figure)          
             
 #################################
@@ -675,7 +644,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                     axis(2, label= as.list(pretty(mr,9)),at=seq(0,1,by=(1/(length(pretty(mr,9))-1))), cex.axis = 0.7, padj = 1)
                     dev.off()
                
-                    batext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><a name = \"S1.2\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A></CENTER></td><td><IMG BORDER = \"0\" SRC=\"%s\"/></td></tr><td>\n", "Spatial distribution of local background intensites", basename(bapng[1]), basename(bapng[1]), basename(llbpng))
+                    batext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S1.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A></CENTER></td><td><IMG BORDER = \"0\" SRC=\"%s\"/></td><td>\n", "Spatial distribution of local background intensites", basename(bapng[1]), basename(bapng[1]), basename(llbpng))
                   }
 
                 ##Foreground rank representation
@@ -739,7 +708,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                 axis(2, label= as.list(pretty(mrf,9)),at=seq(0,1,by=(1/(length(pretty(mrf,9))-1))), cex.axis = 0.7, padj = 1)
                 dev.off()
                 
-                ftext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><a name = \"S1.3\"><IMG border = \"0\" SRC=\"%s\"/></a></A><center><b>Figure %s</b></center></td><td><IMG BORDER = \"0\" SRC=\"%s\"/></td><td>\n", "Spatial distribution of features intensites", basename(fpng[1]), basename(fpng[1]), figure, basename(llfpng))
+                ftext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><a name = \"S1.3\"><A HREF=\"%s\"><IMG border = \"0\" SRC=\"%s\"/></a></A><center><b>Figure %s</b></center></td><td><IMG BORDER = \"0\" SRC=\"%s\"/></td><td>\n", "Spatial distribution of features intensites", basename(fpng[1]), basename(fpng[1]), figure, basename(llfpng))
 
                 legendlocal = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s:</b> False color representations of the arrays' spatial distributions of feature intensities and, if available, local background estimates. The color scale is shown in the panel on the right, and it is proportional to the ranks. These plots may help in identifying patterns that may be caused, for example, spatial gradients in the hybridization chamber, air bubbles, spotting or plating problems.</DIV>", figure)          
               }
@@ -791,10 +760,10 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                                names = xname, ylim =  c(min(c(rc,gc)),max(c(rc,gc))), title = "Red Channel")
                        boxplot(ldat, col = colours[2], las = 3, range = 0,
                                names = xname, ylim = xlim, title = "Log(Ratio)")
-                     }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><a name = \"S2.1\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</center></b></td></table>\n", title="Boxplots", fig = figure)
+                     }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</center></b></td></table>\n", title="Boxplots", fig = figure)
 
             htmltext2 = mplot2[[2]]
-            legendhom1 = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> presents boxplots. On the left panel, the green boxes correspond to the log<sub>2</sub> intensities of the green channel and the red boxes to the log<sub>2</sub> intensities of the red channel. The right panel shows the boxplots of log<sub>2</sub>(ratio).</DIV>", figure)          
+            legendhom1 = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> presents boxplots. On the left panel, the green boxes correspond to the log<sub>2</sub> intensities of the green channel. On the middle panel the red boxes correspond to the log<sub>2</sub> intensities of the red channel. The right panel shows the boxplots of log<sub>2</sub>(ratio).</DIV>", figure)          
 
       
 ############################
@@ -821,7 +790,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                            par(mar=c(1,2,0,1), xaxt = "s")
                            multi("ecdf",lredc,xlimr,"","log(intensity)","")
                            par(mar=c(1,2,0,1), xaxt = "s")
-                           multi("ecdf",ldat,xlim,"","log(ratio)","")}, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><a name = \"S2.2\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></center></td></table>\n", title="Density plots", fig = figure)
+                           multi("ecdf",ldat,xlim,"","log(ratio)","")}, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></center></td></table>\n", title="Density plots", fig = figure)
                 htmltext3 = mplot3[[2]]          
               }
       
@@ -869,7 +838,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                 par(mar=c(1,2,0,1), xaxt = "s")
                 multi("ecdf",ldat[group==1],xlim,"","log(ratio)","")
                 dev.off()
-                dtext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><a name = \"S2.2\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></center></td></table>\n", "Density plots", basename(dpdf), basename(dpng), figure)
+                dtext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></center></td></table>\n", "Density plots", basename(dpdf), basename(dpng), figure)
               }
             legendhom2 = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows density estimates (histograms) of the data. Arrays whose distributions are very different from the others should be considered for possible problems.</DIV>", figure)
 
@@ -954,8 +923,8 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                 dev.off()
                 dev.off()
           
-                gctext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s<A HREF=\"%s\">%s</A>%s<A HREF=\"%s\">%s</A></b><td><A HREF=\"%s\"><center><a name = \"S3.1\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</b></center></tr></td></table>\n", "GC content effect ", basename(gcpdf), "per array", " and ", basename(gcopdf), "global", basename(gcopdf), basename(gcopng), figure)
-                legendgc = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows the distributions of the log<sub>2</sub> intensities grouped by the percentage of cytosines (C) and guanines (G) among the nucleotides in each probe. Box plots (a), empirical cumulative distribution functions (ECDF, b) and kernel density estimates (c). Box and line colors in the three panels correspond to the same groups. Cytosine and guanine are able to form three hydrogen bonds, while adenine (A) and thymine (T) only form two, hence oligonucleotides with a higher proportion of C and G can form more stable hybridization bindings. This should result in higher intensities measured on the array, regardless of the abundance of target molecules.</DIV>",  figure)
+                gctext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s<A HREF=\"%s\">%s</A>%s<A HREF=\"%s\">%s</A></b><td><center><a name = \"S3.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</b></center></tr></td></table>\n", "GC content effect ", basename(gcpdf), "per array", " and ", basename(gcopdf), "global", basename(gcopdf), basename(gcopng), figure)
+                legendgc = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows the distributions of the log<sub>2</sub> intensities grouped by the percentage of cytosines (C) and guanines (G) among the nucleotides in each probe. From the top to the bottom, kernel density estimates, empirical cumulative distribution functions (ECDF) and boxplots are represented. Box and line colors in the three panels correspond to the same groups. Cytosine and guanine are able to form three hydrogen bonds, while adenine (A) and thymine (T) only form two, hence oligonucleotides with a higher proportion of C and G can form more stable hybridization bindings. This should result in higher intensities measured on the array, regardless of the abundance of target molecules.</DIV>",  figure)
               }
 
 ######################################
@@ -1065,10 +1034,10 @@ aqm.expressionset = function(expressionset, outdir = getwd(), force = FALSE, do.
     nfig = as.numeric(MAplot$nfig)
     mapdf = as.character(MAplot$mapdf)   
     
-    legendMA = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> represents MA plot for each array. <br> M A-plots are useful for pairwise comparisons between arrays. M and A are defined as :<br>
+    legendMA = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> represents MA plot for each array. <br> MA plots are useful for pairwise comparisons between arrays. M and A are defined as :<br>
 M = log<sub>2</sub>(I<sub>1</sub>) - log<sub>2</sub>(I<sub>2</sub>)<br>
 A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
-where I<sub>1</sub> and I<sub>2</sub> are the vectors of intensities of two channels. Rather than comparing each array to every other array, here we compare each array to a single median  \"pseudo\"-array. Typically, we expect the mass of the distribution in an M A-plot to be concentrated along the M = 0 axis, and there should be no trend in the mean of M as a function of A. Note that a bigger width of the plot of the M-distribution at the lower end of the A scale does not necessarily imply that the variance of the M-distribution is larger at the lower end of the A scale: the visual impression might simply be caused by the fact that there is more data at the lower end of the A scale. To visualize whether there is a trend in the variance of M as a function of A, consider plotting M versus rank(A).</DIV>", figure)     
+where I<sub>1</sub> and I<sub>2</sub> are the vectors of intensities of two channels. Rather than comparing each array to every other array, here we compare each array to a single median  \"pseudo\"-array. Typically, we expect the mass of the distribution in an MA plot to be concentrated along the M = 0 axis, and there should be no trend in the mean of M as a function of A. Note that a bigger width of the plot of the M-distribution at the lower end of the A scale does not necessarily imply that the variance of the M-distribution is larger at the lower end of the A scale: the visual impression might simply be caused by the fact that there is more data at the lower end of the A scale. To visualize whether there is a trend in the variance of M as a function of A, consider plotting M versus rank(A).</DIV>", figure)     
 
 #################################
 ###Section 1.2 : Spatial Plots###
@@ -1121,9 +1090,9 @@ where I<sub>1</sub> and I<sub>2</sub> are the vectors of intensities of two chan
         axis(2, label= as.list(pretty(mrfi,9)),at=seq(0,1,by=(1/(length(pretty(mrfi,9))-1))), cex.axis = 0.7, padj = 1)
         dev.off()
            
-        ftext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><a name=\"S1.2\"><IMG border = \"0\" SRC=\"%s\"/></a></A><center><b>Figure %s</b></center></td><td><IMG BORDER = \"0\" SRC=\"%s\"/></td><td>\n", "Spatial distribution of features intensities", basename(fpng[1]), basename(fpng[1]), figure, basename(llpng))
+        ftext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><a name=\"S1.2\"><A HREF=\"%s\"><IMG border = \"0\" SRC=\"%s\"/></a></A><center><b>Figure %s</b></center></td><td><IMG BORDER = \"0\" SRC=\"%s\"/></td><td>\n", "Spatial distribution of features intensities", basename(fpng[1]), basename(fpng[1]), figure, basename(llpng))
 
-        legendlocal = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s:</b> False color representations of the spatial intensity distributions of each arrays. The color scale is shown in the panel on the right. The color scale was chosen proportional to the ranks. These graphical representation permit to show problems during the experimentation such as fingerprints, artifactual gradient or dye specific failure for instance.</DIV>", figure)
+        legendlocal = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s:</b> False color representations of the arrays' spatial distributions of feature intensities. The color scale is shown in the panel on the right, and it is proportional to the ranks. These plots may help in identifying patterns that may be caused, for example, spatial gradients in the hybridization chamber, air bubbles, spotting or plating problems.</DIV>", figure)
       }
 
     if(is(expressionset, "ExpressionSet"))
@@ -1138,7 +1107,7 @@ where I<sub>1</sub> and I<sub>2</sub> are the vectors of intensities of two chan
             colourRamp = rgb(seq(0,1,l=256),seq(0,1,l=256),seq(1,0,l=256))
           
             figure = figure +1
-            nfig3 = ceiling(numArrays/3)      
+            nfig3 = ceiling(numArrays/6)      
             fpng = paste("foreground", 1:nfig3, ".png", sep="")
             fignu = 1
             b = 1
@@ -1150,7 +1119,7 @@ where I<sub>1</sub> and I<sub>2</sub> are the vectors of intensities of two chan
               {
                 fg = matrix(NA,ncol=maxc,nrow=maxr)
                    
-                for(i in 1:nrow(intrf))
+                for(i in 1:nrow(intf))
                   {
                     fg[intf[i,1],intf[i,2]] = intf[i,(2+a)]
                   }
@@ -1161,7 +1130,7 @@ where I<sub>1</sub> and I<sub>2</sub> are the vectors of intensities of two chan
                   mfg = t(mfg)
                 }
 
-                if(a %in% seq(1,numArrays,by=3))
+                if(a %in% seq(1,numArrays,by=6))
                   {
                     png(fpng[fignu], width = 350, height = 350*aR/2)
                     nf <- layout(matrix(c(1,2,3,4,5,6),2,3,byrow = FALSE),
@@ -1170,8 +1139,8 @@ where I<sub>1</sub> and I<sub>2</sub> are the vectors of intensities of two chan
 
                 par(xaxt = "n", yaxt = "n",mar=c(1,2,2,1))
                 image(mfg, col = colourRamp)
-                mtext(sN[a],side = 2, line = 0.5 ,cex = 0.7)
-                if((a%%3==0) || (a == numArrays))                   
+                mtext(sN[a],side = 3, line = 0.5 ,cex = 0.7)
+                if((a%%6==0) || (a == numArrays))                   
                   {
                     dev.off()
                     fignu = fignu +1
@@ -1187,9 +1156,10 @@ where I<sub>1</sub> and I<sub>2</sub> are the vectors of intensities of two chan
             axis(2, label= as.list(pretty(mfg,9)),at=seq(0,1,by=(1/(length(pretty(mfg,9))-1))), cex.axis = 0.7, padj = 1)
             dev.off()
                 
-            ftext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><a name = \"S1.3\"><IMG border = \"0\" SRC=\"%s\"/></a></A><center><b>Figure %s</b></center></td><td><IMG BORDER = \"0\" SRC=\"%s\"/></td><td>\n", "Spatial distribution of features intensites", basename(fpng[1]), basename(fpng[1]), figure, basename(llfpng))
+            ftext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><a name = \"S1.3\"><A HREF=\"%s\"><IMG border = \"0\" SRC=\"%s\"/></a></A><center><b>Figure %s</b></center></td><td><IMG BORDER = \"0\" SRC=\"%s\"/></td><td>\n", "Spatial distribution of features intensites", basename(fpng[1]), basename(fpng[1]), figure, basename(llfpng))
 
-            legendlocal = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s:</b> False color representations of the arrays' spatial distributions of feature intensities. The color scale is shown in the panel on the right, and it is proportional to the ranks. These plots may help in identifying patterns that may be caused, for example, spatial gradients in the hybridization chamber, air bubbles, spotting or plating problems.</DIV>", figure)          
+            legendlocal = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s:</b> False color representations of the arrays' spatial distributions of feature intensities. The color scale is shown in the panel on the right, and it is proportional to the ranks. These plots may help in identifying patterns that may be caused, for example, spatial gradients in the hybridization chamber, air bubbles, spotting or plating problems.</DIV>", figure)
+
           }
       }
 
@@ -1210,9 +1180,9 @@ where I<sub>1</sub> and I<sub>2</sub> are the vectors of intensities of two chan
         colours = brewer.pal(12, "Paired")
         par(cex.axis = 1, pty = "s", lheight =((1/log10(numArrays))*long), mai = c(((long/12)+0.2),0.4,0.2,0.2) , omi = c(0,0,0,0))
         boxplot(ldat, col = colours[2], las = 3, range = 0, names = sN)
-      }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><a name = \"S2.1\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</center></b></td></table>\n", title = "Boxplots", fig = figure)
+      }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</center></b></td></table>\n", title = "Boxplots", fig = figure)
     htmltext2 = mplot2[[2]]
-    legendhom1 = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> presents boxplots of the data. Arrays whose distributions are very different from the others should be considered for possible problems.</DIV>", figure)          
+    legendhom1 = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> presents boxplots of the data.</DIV>", figure)          
     
 ############################
 ###Section 2.2 : Density ###
@@ -1231,7 +1201,7 @@ where I<sub>1</sub> and I<sub>2</sub> are the vectors of intensities of two chan
             multi("density",ldat,xlim,"Density","","")
             par(xaxt = "s", cex.axis = 0.8, mar = c(4,5,0,5))
             multi("ecdf",ldat,xlim,"ECDF","log(intensity)","")
-          }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><a name = \"S2.2\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></center></td></table>\n", title="Density plots", fig = figure)
+          }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></center></td></table>\n", title="Density plots", fig = figure)
         htmltext3 = mplot3[[2]]
       }
                 
@@ -1260,7 +1230,7 @@ where I<sub>1</sub> and I<sub>2</sub> are the vectors of intensities of two chan
         par(xaxt = "s", cex.axis = 0.8, mar = c(4,5,0,5))
         multi("ecdf",ldat[group==1],xlim,"ECDF","log(intensity)","")
         dev.off()
-        dtext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><a name = \"S2.2\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></CENTER><BR></tr></td></table>\n", "Density plots", basename(dpdf), basename(dpng), figure)
+        dtext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><a name = \"S2.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></CENTER><BR></tr></td></table>\n", "Density plots", basename(dpdf), basename(dpng), figure)
       }
     legendhom2 = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows density estimates (histograms) of the data. Arrays whose distributions are very different from the others should be considered for possible problems.</DIV>", figure)          
 
@@ -1316,8 +1286,8 @@ where I<sub>1</sub> and I<sub>2</sub> are the vectors of intensities of two chan
         dev.off()
         dev.off()
                 
-        gctext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s<A HREF=\"%s\">%s</A>%s<A HREF=\"%s\">%s</A></b><td><A HREF=\"%s\"><center><a name = \"S3.1\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</b></center></tr></td></table>\n", "GC content effect ", basename(gcpdf), "per array", " and ", basename(gcopdf), "global", basename(gcopdf), basename(gcopng), figure)
-        legendgc = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows the distributions of the log<sub>2</sub> intensities grouped by the percentage of cytosines (C) and guanines (G) among the nucleotides in each probe. Box plots (a), empirical cumulative distribution functions (ECDF, b) and kernel density estimates (c). Box and line colors in the three panels correspond to the same groups. Cytosine and guanine are able to form three hydrogen bonds, while adenine (A) and thymine (T) only form two, hence oligonucleotides with a higher proportion of C and G can form more stable hybridization bindings. This should result in higher intensities measured on the array, regardless of the abundance of target molecules.</DIV>",  figure)
+        gctext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s<A HREF=\"%s\">%s</A>%s<A HREF=\"%s\">%s</A></b><td><center><a name = \"S3.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</b></center></tr></td></table>\n", "GC content effect ", basename(gcpdf), "per array", " and ", basename(gcopdf), "global", basename(gcopdf), basename(gcopng), figure)
+        legendgc = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows the distributions of the log<sub>2</sub> intensities grouped by the percentage of cytosines (C) and guanines (G) among the nucleotides in each probe. From the top to the bottom, kernel density estimates, empirical cumulative distribution functions (ECDF) and boxplots are represented. Box and line colors in the three panels correspond to the same groups. Cytosine and guanine are able to form three hydrogen bonds, while adenine (A) and thymine (T) only form two, hence oligonucleotides with a higher proportion of C and G can form more stable hybridization bindings. This should result in higher intensities measured on the array, regardless of the abundance of target molecules.</DIV>",  figure)
       }
 
 ######################################
@@ -1464,49 +1434,17 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             dev.off()
             dev.off()
 
-            affytext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><a name = \"S6.1\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><center><BR><b>Figure %s</b></CENTER></tr></td><tr><td><b>%s</b></td><td><A HREF=\"%s\"><a name = \"S6.2\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><center><BR><b>Figure %s</b></CENTER></tr></td><tr><td><b>%s</b></td><td><A HREF=\"%s\"><a name = \"S6.3\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><center><BR><b>Figure %s</b></CENTER></tr></td><tr><td><b>%s</b></td><td><A HREF=\"%s\"><a name = \"S6.4\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><center><BR><b>Figure %s</b></CENTER></tr></td></table>\n", "RNA degradation plot", basename(affypdf1), basename(affypng1), figure1, "RLE plot", basename(affypdf2), basename(affypng2), figure2, "NUSE plot", basename(affypdf3), basename(affypng3), figure3, "Diagnostic plot recommended by Affy", basename(affypdf4), basename(affypng4), figure4)
+            affytext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><a name = \"S6.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><center><BR><b>Figure %s</b></CENTER></tr></td><tr><td><b>%s</b></td><td><a name = \"S6.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><center><BR><b>Figure %s</b></CENTER></tr></td><tr><td><b>%s</b></td><td><a name = \"S6.3\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><center><BR><b>Figure %s</b></CENTER></tr></td><tr><td><b>%s</b></td><td><a name = \"S6.4\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><center><BR><b>Figure %s</b></CENTER></tr></td></table>\n", "RNA degradation plot", basename(affypdf1), basename(affypng1), figure1, "RLE plot", basename(affypdf2), basename(affypng2), figure2, "NUSE plot", basename(affypdf3), basename(affypng3), figure3, "Diagnostic plot recommended by Affy", basename(affypdf4), basename(affypng4), figure4)
             writeLines(affytext, con)
-            legendaffy = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\">In this section we present diagnostic plots based on tools provided in the affyPLM package. In <b>Figure %s</b> a RNA digestion plot is computed. In this plot each array is represented by a single line. It is important to identify any array(s) that has a slope which is very different from the others. The indication is that the RNA used for that array has potentially been handled quite differently from the other arrays. <b>Figure %s</b> is a Normalized Unscaled Standard Error (NUSE) plot. Low quality arrays are those that are significantly elevated or more spread out, relative to the other arrays. NUSE values are not comparable across data sets. <b>Figure %s</b> is a Relative Log Expression (RLE) plot and an array that has problems will either have larger spread, or will not be centered at M = 0, or both. <b>Figure %s</b> represents the diagnostic plot recommended by Affymetrix. It is fully describe in the QCandsimpleaffy.pdf vignette of the package simpleaffy. Any metrics (circles and triangles) that is shown in red is out of the manufacturer's specific boundaries and suggests a potential problem.</DIV>", figure1, figure2, figure3, figure4)            
+            legendaffy = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\">In this section we present diagnostic plots based on tools provided in the affyPLM package. In <b>Figure %s</b> a RNA digestion plot is computed on normalized data (so that standard deviation is equal to 1). In this plot each array is represented by a single line. It is important to identify any array(s) that has a slope which is very different from the others. The indication is that the RNA used for that array has potentially been handled quite differently from the other arrays.  <b>Figure %s</b> is a Relative Log Expression (RLE) plot and an array that has problems will either have larger spread, or will not be centered at M = 0, or both. <b>Figure %s</b> is a Normalized Unscaled Standard Error (NUSE) plot. Low quality arrays are those that are significantly elevated or more spread out, relative to the other arrays. NUSE values are not comparable across data sets. Both RLE and NUSE are performed on preprocessed data (background correction and quantile normalization). <b>Figure %s</b> represents the diagnostic plot recommended by Affymetrix. It is fully describe in the simpleaffy.pdf vignette of the package simpleaffy. Any metrics (circles and triangles) that is shown in red is out of the manufacturer's specific boundaries and suggests a potential problem.</DIV>", figure1, figure2, figure3, figure4)            
             writeLines(legendaffy, con)
             
             ##PM.MM
             figure5 = figure4 + 1            
             cols = brewer.pal(9, "Set1")
             xlim = c(min(na.omit(dat)),max(na.omit(dat)))            
-            pmpdf =  "PM.MM.pdf"         
             pmopng = "overall_PM.MM.png"
-            pmopdf = "overall_PM.MM.pdf"
-        
-            pdf(pmpdf)
-            nf <- layout(matrix(1:16,4,4,byrow=TRUE), c(2,1.8,1.8,1.8), c(1.8,1.8,1.8,2), FALSE)
-            for(a in 1:numArrays)
-              {
-                if(a %in% c(seq(14,numArrays,by=16),seq(15,numArrays,by=16),seq(16,numArrays,by=16)))
-                  {
-                    par(mar = c(2,0,0,0), cex.axis = 0.9)
-                    pmmm(expressionset[,a],xlim,"","","", yaxt = "n", ylim = c(0,1))
-                    legend("topright",legend=sN[a], bty = "n", cex = 0.6)
-                  }
-                if(a %in%  c(seq(1,numArrays,by=16),seq(5,numArrays,by=16),seq(9,numArrays,by=16)))
-                  {
-                    par(mar = c(0,2,0,0), cex.axis = 0.9)
-                    pmmm(expressionset[,a],xlim,"","","", xaxt = "n", ylim = c(0,1))
-                    legend("topright",legend=sN[a], bty = "n", cex = 0.6)
-                  }
-                if(a %in% seq(13,numArrays,by=16))
-                  {
-                    par(mar = c(2,2,0,0), cex.axis = 0.9)
-                    pmmm(expressionset[,a],xlim,"","","", ylim = c(0,1))
-                    legend("topright",legend=sN[a], bty = "n", cex = 0.6)
-                  }
-                if(!(a %in%  seq(13,numArrays,by=16)) && !(a %in%  c(seq(1,numArrays,by=16),seq(5,numArrays,by=16),seq(9,numArrays,by=16))) && !(a %in% c(seq(14,numArrays,by=16),seq(15,numArrays,by=16),seq(16,numArrays,by=16))))
-                  {
-                    par(mar = c(0,0,0,0), cex.axis = 0.9)
-                    pmmm(expressionset[,a],xlim,"","","", xaxt = "n", yaxt = "n",ylim = c(0,1))
-                    legend("topright",legend=sN[a], bty = "n", cex = 0.6)
-                  }
-              }
-            dev.off()
+            pmopdf = "overall_PM.MM.pdf"       
         
             png(file = pmopng)
             pmmm(expressionset,xlim,"","","", cex.axis = 0.9)
@@ -1515,7 +1453,7 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             dev.off()
             dev.off()
             
-            pmotext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s<A HREF=\"%s\">%s</A>%s<A HREF=\"%s\">%s</A></b><td><A HREF=\"%s\"><center><a name = \"S6.5\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><br><b>Figure %s</b></center></tr></td></table>\n", "Perfect matchs and mismatchs ", basename(pmpdf), "per array", " and ", basename(pmopdf), "global", basename(pmopdf), basename(pmopng), figure5)
+            pmotext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b><td><center><a name = \"S6.5\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><br><b>Figure %s</b></center></tr></td></table>\n", "Perfect matchs and mismatchs ", basename(pmopdf), basename(pmopng), figure5)
             legendpmo = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows the density distributions of the log<sub>2</sub> intensities grouped by the matching of the probes. Blue, density estimate of intensities of perfect match probes and gray the mismatch probes.</DIV>",  figure5)
             writeLines(pmotext, con)
             writeLines(legendpmo, con)
