@@ -233,7 +233,7 @@ hmap = function(expressionset, sN, section, figure, outM)
                   scales=list(x=list(rot=90)),
                   legend=list(
                     top=list(fun=dendrogramGrob,args=list(x=d.row,side="top")),
-                    right=list(fun=dendrogramGrob,args=list(x=d.row,side="right", size.add= 1, add = list(rect = list(col = "transparent", fill = colourCov[as.factor(test)])), type = "rectangle"))),
+                    right=list(fun=dendrogramGrob,args=list(x=d.row,side="right", size.add= 1, add = list(rect = list(col = "transparent", fill = colourCov[as.factor(covar)])), type = "rectangle"))),
                   colorkey = list(space ="left"),
                   xlab="",ylab="",
                   col.regions=colourRange))

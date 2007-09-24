@@ -13,55 +13,133 @@
 \newcommand{\Rpackage}[1]{\textit{#1}}
 \newcommand{\Rclass}[1]{\textit{#1}}
 \newcommand{\Rfunction}[1]{{\small\texttt{#1}}}
+\clearpage
 
 \SweaveOpts{keep.source=TRUE,eps=FALSE,include=FALSE,width=4,height=4.5} 
 
 \begin{document}
 
-\title{QualityMetrics assessmment of NChannelSet}
+\title{Quality assessment with arrayQualityMetrics}
 \author{Audrey Kauffmann, Wolfgang Huber}
 \maketitle
 
-\section*{Load the required packages}
+\section*{Introduction}
+The function \Rfunction{arrayQualityMetrics} can be used on \Rclass{AffyBatch} for Affymetrix data sets, \Rclass{ExpressionSet} in the case of non Affymetrix one colour experiments and \Rclass{NChannelSet} for dual colour experiments. \Rfunction{arrayQualityMetrics} produces a \emph{HTML} report as an output.
 
+\section{Data preparation}
+
+\subsection{Data import}
+\Rfunction{arrayQualityMetrics} can be used on unnormalized or normalized data sets. In this example, we will produce a report on a normalized \Rclass{NChannelSet}. We first need to load the data.
+
+%
 <<loadlibs>>=
+library("Biobase")
 library("CCl4")
-library("arrayQualityMetrics")
-@ 
-
-\section*{Load the data}  
-The \Rpackage{CCl4} package contains an NChannelSet for rat hepatocytes treated with Carbon Tetrachloride (CCl4) data from LGC company.
-
-<<load data, results=hide>>=
 data("CCl4")
-@ 
+@
+% 
 
-\section*{Build an quality metrics report from the NChannelSet} 
- 
-<<arrayQM>>=
-outdir = "CCl4example"
-arrayQualityMetrics(expressionset = CCl4,
-                    outdir = outdir,
+\subsection{Normalization}
+We can normalize the data using the variance stabilization method available in the package \Rpackage{vsn}.
+
+%
+<<vsn-NChannelSet>>=
+library("vsn")
+nCCl4 = justvsn(CCl4, subsample=2000)
+@ 
+%
+
+\subsection{Data specificities}
+Some of the quality metrics provided by the package are performed using specific information about the features of the arrays.
+For an optimal use of the package, the data can be prepared accordingly to
+the following conventions.
+
+\paragraph{X and Y coordinates of the spots}
+
+To plot the images of the arrays in the case of \Rclass{ExpressionSet} and \Rclass{NChannelSet}, \Rfunction{arrayQualityMetrics} needs the
+coordinates of the spots on the chip. Two columns corresponding to the row and 
+column numbers of the features are thus required in the \Rclass{featureData}. These columns
+should be named "X" for rows and "Y" for columns. If the arrays are splited into blocks, then the function \Rfunction{addXYfromGAL} should be executed prior to \Rfunction{arrayQualityMetrics} to convert the rows and columns of the blocks in absolute "X" and "Y" on the array.
+
+%
+<<XYcoordinates>>=
+featureData(nCCl4)$X = featureData(nCCl4)$Row
+featureData(nCCl4)$Y = featureData(nCCl4)$Column
+@
+%
+
+\paragraph{GC content of the reporters}
+
+If the GC content of the reporters is known, then it is possible to include it as percentages in the
+\Rclass{featureData} of the \Rclass{NChannelSet} under the column name "GC". Then a study of
+the GC content effect on intensities of the arrays can be performed.
+
+\paragraph{Mapping of the reporters}
+
+The report can also include a study of the effect of the target mapping of the reporters. Thus a \Rclass{featureData} column named
+"HasTarget" should include logical "TRUE" if the reporter matches for a coding mRNA and "FALSE" if not.
+
+%
+<<hasTarget>>=
+featureData(nCCl4)$hasTarget = (regexpr("^NM", featureData(nCCl4)$Name) > 0)
+@
+%
+
+\paragraph{Covariate}
+
+The \Rclass{phenoData} can also have a column "Covariate" containing a group name for each sample accordingly to a factor of interest. This \Rclass{phenoData} will be used to provide side bars on the heatmap. In the case of the \emph{CCl4} dataset, the RNA hybridized to the arrays can be of good, medium or poor quality accordingly to its RIN number (see \emph{CCl4} vignette).
+
+%
+<<Covariate>>=
+datapath = system.file("extdata", package="CCl4")
+p = read.AnnotatedDataFrame("samplesInfo.txt", path=datapath)
+cond = paste(p$RIN.Cy3,p$RIN.Cy5,sep="/")
+poor = grep(cond,pattern="2.5")
+medium = grep(cond,pattern="^5/|/5")
+good = grep(cond,pattern="9.7")
+cov = rep(0, length = nrow(p))
+cov[good] = "Good"
+cov[medium] = "Medium"
+cov[poor] = "Poor"
+phenoData(nCCl4)$Covariate = cov
+@
+%
+
+\section{Report production}
+
+To produce a report, the function \Rfunction{arrayQualityMetrics} is called
+with the following arguments:
+\begin{itemize}
+\item \emph{expressionset}: is an object of class \Rclass{ExpressionSet}, 
+\Rclass{AffyBatch} or \Rclass{NChannelSet}.
+\item \emph{outdir}: is the directory in which the result files
+    are created.
+\item \emph{force}: if TRUE, if outdir already exists, it will be overwritten.
+\item \emph{do.logtransform}: if TRUE, the data are log transformed before the analysis.
+\item \emph{split.plots}: if the number of studied arrays is more than 50 it is 
+adviced to define a number of experiments to represent on the density plots.
+\end{itemize}
+
+%
+<<arrayQM2col>>=
+library("arrayQualityMetrics")
+arrayQualityMetrics(expressionset = nCCl4,
+                    outdir = "CCl4",
                     force = TRUE,
-                    do.logtransform = TRUE,
+                    do.logtransform = FALSE,
                     split.plots = FALSE)
-@ 
+@
+%
 
-The output is written to
-<<outdir>>=
-outdir
-@ 
+A report named \texttt{QMreport.html} is produced in the subdirectory \emph{CCl4}. It contains text illustrated by
+\texttt{.png} files. Each \texttt{.png} is linked to corresponding \texttt{.pdf} files in order to provide high quality images.
 
-\begin{table*}[tbp]
-\begin{minipage}{\textwidth}
-{\small
-<<sessionInfo, print=TRUE>>=
-sessionInfo()
-@ 
-}\end{minipage}
-\caption{\label{tab:sessioninfo}%
-The output of \Rfunction{sessionInfo} on the build system 
-after running this vignette.}
-\end{table*}
+
+\subsection*{Session Info}
+%
+<<pkgs, results=tex>>=
+toLatex(sessionInfo())
+@
+%
 
 \end{document}
