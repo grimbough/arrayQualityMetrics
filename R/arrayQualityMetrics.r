@@ -77,7 +77,7 @@ prepdata = function(sN, dat, numArrays, split.plots)
         sN = seq_len(length(sN))
         long = max(nchar(sN))
       }
-    if(numArrays >= 50 && long >= 4)
+    if(numArrays >= 50 && long >= 10)
       {
         sNt = cbind(sN,seq_len(length(sN)))        
         colnames(sNt)=c("SampleName","New denomination")
@@ -205,7 +205,7 @@ probesmap = function(expressionset, numArrays, section, figure, dat, sN, xlim)
   }
 
 ##Heatmap
-hmap = function(expressionset, sN, section, figure, outM)
+hmap = function(expressionset, sN, section, figure, outM, numArrays)
   {
     section = section + 1
     sec4text = sprintf("<hr><h2><a name = \"S4\">Section %s: Between array comparison</a></h2>", section)
@@ -215,18 +215,15 @@ hmap = function(expressionset, sN, section, figure, outM)
     d.row = as.dendrogram(hclust(outM))
     od.row = order.dendrogram(d.row)
     m = as.matrix(outM)
-    rownames(m) = sN
-    colnames(m) = sN
-
     hpdf = "heatmap.pdf"
     hpng = "heatmap.png"
     
    if("Covariate" %in% names(phenoData(expressionset)@data))
       {
-        colourCov = brewer.pal(12,"Set3")
         covar = phenoData(expressionset)$Covariate
         lev = levels(as.factor(covar))
         corres = matrix(0,nrow=length(lev),ncol=2)
+        colourCov = brewer.pal(12,"Set3")
 
         png(file = hpng, w = 8*72, h = 8*72)
         print(levelplot(m[od.row,od.row],
@@ -269,7 +266,7 @@ hmap = function(expressionset, sN, section, figure, outM)
 
     legendheatmap = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows a false color heatmap of between arrays distances, computed as the MAD of the M-value for each pair of arrays. <br><center><i>d<sub>ij</sub> = c &bull median|x<sub>mi</sub>-x<sub>mj</sub>|</i></center><br><br> Here, <i>x<sub>mi</sub></i> is the intensity value of the <i>m</i>-th probe on the <i>i</i>-th array, on the original data scale. <br><i>c = 1.4826</i> is a constant factor that ensures consistency with the empirical variance for Normally distributed data (see manual page of the mad function in R). This plot can serve to detect outlier arrays. <br>Consider the following decomposition of <i>x<sub>mi</sub>: x<sub>mi</sub> = z<sub>m</sub> + &beta<sub>mi</sub> + &epsilon<sub>mi</sub></i>, where <i>z<sub>m</sub></i> is the probe effect for probe <i>m</i> (the same across all arrays), <i>&epsilon<sub>mi</sub></i> are i.i.d. random variables with mean zero and <i>&beta<sub>mi</sub></i> is such that for any array <i>i</i>, the majority of values <i>&beta<sub>mi</sub></i> are negligibly small (i. e. close to zero). <i>&beta<sub>mi</sub></i> represents differential expression effects. In this model, all values <i>d<sub>ij</sub></i> are (in expectation) the same, namely <sqrt>2</sqrt> times the standard deviation of <i>&epsilon<sub>mi</i></sub> . Arrays whose distance matrix entries are way different give cause for suspicion. The dendrogram on this plot also can serve to check if, without any probe filtering, the experiments cluster accordingly to a biological meaning.</DIV></table>",  figure)
     
-    hmap = list(section=section, figure=figure, htmltext4=htmltext4,sec4text=sec4text, legendheatmap=legendheatmap)
+    hmap = list(section=section, figure=figure, htmltext4=htmltext4,sec4text=sec4text, legendheatmap=legendheatmap, numArrays=numArrays)
     return(hmap) 
   }
 
@@ -495,13 +492,24 @@ pmmm = function(x, xlim, title1, title2, title3, ...)
 setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
           function(expressionset, outdir, force, do.logtransform, split.plots)
           {
+            ##data preparation
+            if(do.logtransform)
+              {
+                if(any(na.omit(assayData(expressionset)$R) == 0))
+                  stop("Red channel contains 0 values. Log transformation of 0 will lead to infinite values. If 0 are missing values, NA can be used instead.")
+                rc = log2(assayData(expressionset)$R)
+              } else rc = assayData(expressionset)$R
+            
+            if(do.logtransform)
+              {
+                if(any(na.omit(assayData(expressionset)$G) == 0))
+                  stop("Green channel contains 0 values. Log transformation of 0 will lead to infinite values. If 0 are missing values, NA can be used instead.")
+                gc = log2(assayData(expressionset)$G)
+              } else gc = assayData(expressionset)$G
+
             olddir = getwd()
             dircreation(outdir, force)
-
-            ##data preparation
-            rc = if(do.logtransform) log2(assayData(expressionset)$R) else assayData(expressionset)$R
-            gc = if(do.logtransform) log2(assayData(expressionset)$G) else assayData(expressionset)$G
-           
+            
             if("Rb" %in% colnames(dims(expressionset)) && "Gb" %in% colnames(dims(expressionset)))
               {
                 rbg = assayData(expressionset)$Rb
@@ -524,10 +532,7 @@ setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
               {
                 lev = levels(expressionset@phenoData$dyeswap)
                 if(length(lev) != 2)
-                  {
-                    cat("The dyeswap slot of the phenoData must be binary.\n")
-                    stop()
-                  }
+                  stop("The dyeswap slot of the phenoData must be binary.\n")
                 reverseddye = names(expressionset@phenoData$dyeswap[expressionset@phenoData$dyeswap == min(lev)])
                 dat[,reverseddye] = - dat[,reverseddye]
               }
@@ -738,29 +743,29 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                 xaxt = "s"
               }
             if(numArrays > 50)
-              {
+               {
                 xname = FALSE
-                mai = c(0,0.4,0.2,0.2)
+                mai = c(0,0.4,0.2,0.2)              
                 xaxt = "n"
               }
 
             mplot2 = makePlot(con=con, name = "boxplot",
-                     w=15, h=8, fun = function() {
-                       nf = layout(matrix(1:3,1,3,byrow=TRUE),
-                                    c(2,2,2), 2, TRUE)
-                       par(cex.axis = 1,
-                           pty = "s",
-                           lheight = ((1/log10(numArrays))*long),
-                           mai = mai,
-                           omi = c(0,0,0,0),
-                           xaxt = xaxt)
-                       boxplot(lgreenc, col = colours[4], las = 3, range = 0,
-                               names = xname, ylim = c(min(c(rc,gc)),max(c(rc,gc))), title = "Green Channel")
-                       boxplot(lredc, col = colours[6], las = 3, range = 0,
-                               names = xname, ylim =  c(min(c(rc,gc)),max(c(rc,gc))), title = "Red Channel")
-                       boxplot(ldat, col = colours[2], las = 3, range = 0,
-                               names = xname, ylim = xlim, title = "Log(Ratio)")
-                     }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</center></b></td></table>\n", title="Boxplots", fig = figure)
+              w=15, h=8, fun = function() {
+                nf = layout(matrix(1:3,1,3,byrow=TRUE),
+                  c(2,2,2), 2, TRUE)
+                par(cex.axis = 1,
+                    pty = "s",
+                    lheight = ((1/log10(numArrays))*long),
+                    mai = mai,
+                    omi = c(0,0,0,0),
+                    xaxt = xaxt)
+                boxplot(lgreenc, col = colours[4], las = 3, range = 0,
+                        names = xname, ylim = c(min(c(rc,gc)),max(c(rc,gc))), title = "Green Channel")
+                boxplot(lredc, col = colours[6], las = 3, range = 0,
+                        names = xname, ylim =  c(min(c(rc,gc)),max(c(rc,gc))), title = "Red Channel")
+                boxplot(ldat, col = colours[2], las = 3, range = 0,
+                        names = xname, ylim = xlim, title = "Log(Ratio)")
+              }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</center></b></td></table>\n", title="Boxplots", fig = figure)
 
             htmltext2 = mplot2[[2]]
             legendhom1 = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> presents boxplots. On the left panel, the green boxes correspond to the log<sub>2</sub> intensities of the green channel. On the middle panel the red boxes correspond to the log<sub>2</sub> intensities of the red channel. The right panel shows the boxplots of log<sub>2</sub>(ratio).</DIV>", figure)          
@@ -776,21 +781,21 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
             if(max(group) == 1)
               {
                 mplot3 = makePlot(con=con, name = "density",
-                         w=10, h=10, fun = function() {
-                           nf <- layout(matrix(c(1,2,3,4,5,6),2,3,byrow=TRUE),
-                                        c(2.3,2,2), c(2,2), TRUE)
-                           par(mar=c(0,5,1,1),xaxt = "n", cex.axis = 0.9)
-                           multi("density",lgreenc,xlimg,"Density","","Green Channel")
-                           par(mar=c(0,2,1,1),xaxt = "n")
-                           multi("density",lredc,xlimr,"","","Red Channel")
-                           par(mar=c(0,2,1,1),xaxt = "n")
-                           multi("density",ldat,xlim,"","","Log(Ratio)")
-                           par(mar=c(1,5,0,1), xaxt = "s")
-                           multi("ecdf",lgreenc,xlimg,"ECDF","log(intensity)","")
-                           par(mar=c(1,2,0,1), xaxt = "s")
-                           multi("ecdf",lredc,xlimr,"","log(intensity)","")
-                           par(mar=c(1,2,0,1), xaxt = "s")
-                           multi("ecdf",ldat,xlim,"","log(ratio)","")}, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></center></td></table>\n", title="Density plots", fig = figure)
+                  w=10, h=10, fun = function() {
+                    nf <- layout(matrix(c(1,2,3,4,5,6),2,3,byrow=TRUE),
+                                 c(2.3,2,2), c(2,2), TRUE)
+                    par(mar=c(0,5,1,1),xaxt = "n", cex.axis = 0.9)
+                    multi("density",lgreenc,xlimg,"Density","","Green Channel")
+                    par(mar=c(0,2,1,1),xaxt = "n")
+                    multi("density",lredc,xlimr,"","","Red Channel")
+                    par(mar=c(0,2,1,1),xaxt = "n")
+                    multi("density",ldat,xlim,"","","Log(Ratio)")
+                    par(mar=c(1,5,0,1), xaxt = "s")
+                    multi("ecdf",lgreenc,xlimg,"ECDF","log(intensity)","")
+                    par(mar=c(1,2,0,1), xaxt = "s")
+                    multi("ecdf",lredc,xlimr,"","log(intensity)","")
+                    par(mar=c(1,2,0,1), xaxt = "s")
+                    multi("ecdf",ldat,xlim,"","log(ratio)","")}, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></center></td></table>\n", title="Density plots", fig = figure)
                 htmltext3 = mplot3[[2]]          
               }
       
@@ -947,7 +952,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
 ##########################################
             
             ##Heatmap
-            hmap = hmap(expressionset, sN, section, figure, outM)
+            hmap = hmap(expressionset, sN, section, figure, outM, numArrays)
             
             section = hmap$section
             figure = hmap$figure
@@ -979,7 +984,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
             closeHtmlPage(con)
             setwd(olddir)
             
-          }####end set method NChannelSet
+          } ####end set method NChannelSet
           )
 
 #################################################################
@@ -990,11 +995,16 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
 
 aqm.expressionset = function(expressionset, outdir = getwd(), force = FALSE, do.logtransform = FALSE, split.plots = FALSE, arg)
   {
+    ##data preparation
+    if(do.logtransform)
+      {
+        if(any(na.omit(exprs(expressionset)) == 0))
+          stop("Data contains 0 values. Log transformation of 0 will lead to infinite values. If 0 are missing values, NA can be used instead.")
+        dat = log2(exprs(expressionset))
+      } else dat = exprs(expressionset)
+    
     olddir = getwd()
     dircreation(outdir, force)
-   
-    ##data preparation
-    dat = if(do.logtransform) log2(exprs(expressionset)) else exprs(expressionset)
    
     sN = sampleNames(expressionset)
     ##list to use multidensity, multiecdf and boxplot
@@ -1175,11 +1185,23 @@ where I<sub>1</sub> and I<sub>2</sub> are the vectors of intensities of two chan
     sec2text = sprintf("<hr><h2><a name = \"S2\">Section %s: Homogeneity between experiments</h2></a>", section)
             
     figure = figure + 1
+    if(numArrays <= 50)
+      {
+        xname = sN
+        xaxt = "s"
+      }
+    if(numArrays > 50)
+      {
+        xname = FALSE
+        xaxt = "n"
+      }
+
+
     mplot2 = makePlot(con=con, name = "boxplot",
       w=8, h=8, fun = function() {
         colours = brewer.pal(12, "Paired")
         par(cex.axis = 1, pty = "s", lheight =((1/log10(numArrays))*long), mai = c(((long/12)+0.2),0.4,0.2,0.2) , omi = c(0,0,0,0))
-        boxplot(ldat, col = colours[2], las = 3, range = 0, names = sN)
+        boxplot(ldat, col = colours[2], las = 3, range = 0, names = xname)
       }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</center></b></td></table>\n", title = "Boxplots", fig = figure)
     htmltext2 = mplot2[[2]]
     legendhom1 = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> presents boxplots of the data.</DIV>", figure)          
@@ -1311,7 +1333,7 @@ where I<sub>1</sub> and I<sub>2</sub> are the vectors of intensities of two chan
 ##########################################
    
     ##Heatmap
-    hmap = hmap(expressionset, sN, section, figure, outM)            
+    hmap = hmap(expressionset, sN, section, figure, outM, numArrays)            
     section = hmap$section
     figure = hmap$figure
     htmltext4 = hmap$htmltext4
@@ -1394,23 +1416,29 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             
             figure1 = figure + 1
             acol = sample(brewer.pal(8, "Dark2"), numArrays, replace = (8<numArrays))
-            rnaDeg = AffyRNAdeg(expressionset)
+            rnaDeg = try(AffyRNAdeg(expressionset, log.it = do.logtransform))
+            if(class(rnaDeg)=='try-error')
+              warning("RNA degradation plot from the package 'affy' cannot be produced for this data set.")
             affypng1 = "RNAdeg.png"
             affypdf1 = "RNAdeg.pdf"
             png(file = affypng1)
-            plotAffyRNAdeg(rnaDeg, cols = acol, lwd = 2)
+            try(plotAffyRNAdeg(rnaDeg, cols = acol, lwd = 2))
             dev.copy(pdf, file = affypdf1)
             dev.off()
             dev.off()
                 
             figure2 = figure1 + 1
-            pp1 = preprocess(expressionset)
-            dataPLM = fitPLM(pp1, background = FALSE, normalize = FALSE)
+            pp1 = try(preprocess(expressionset))
+            dataPLM = try(fitPLM(pp1, background = FALSE, normalize = FALSE))
+            if(class(pp1)=='try-error')
+              warning("RLE plot from the package 'affyPLM' cannot be produced for this data set.")
+            if(class(dataPLM)=='try-error')
+              warning("RLE and NUSE plots from the package 'affyPLM' cannot be produced for this data set.")
             affypng2 = "RLE.png"
             affypdf2 = "RLE.pdf"
             png(file = affypng2)
-            Mbox(dataPLM, ylim = c(-1, 1), names = sN, col = cols[2],
-                 whisklty = 0, staplelty = 0, main = "RLE", las = 3, cex.axis = 0.8)
+            try(Mbox(dataPLM, ylim = c(-1, 1), names = sN, col = cols[2],
+                 whisklty = 0, staplelty = 0, main = "RLE", las = 3, cex.axis = 0.8))
             dev.copy(pdf, file = affypdf2)
             dev.off()
             dev.off()
@@ -1419,8 +1447,8 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             affypng3 = "NUSE.png"
             affypdf3 = "NUSE.pdf"
             png(file = affypng3)
-            boxplot(dataPLM, ylim = c(0.95, 1.5), names = sN,
-                    outline = FALSE, col = cols[2], main = "NUSE", las = 2, cex.axis = 0.8)
+            try(boxplot(dataPLM, ylim = c(0.95, 1.5), names = sN,
+                    outline = FALSE, col = cols[2], main = "NUSE", las = 2, cex.axis = 0.8))
             dev.copy(pdf, file = affypdf3)
             dev.off()
             dev.off()
@@ -1429,7 +1457,9 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             affypng4 = "qc.png"
             affypdf4 = "qc.pdf"
             png(file = affypng4)
-            plot(qc(expressionset), cex.axis = 0.8)
+            p = try(plot(qc(expressionset), cex.axis = 0.8))
+            if(class(p)=='try-error')
+              warning("QCstat plot from the package 'simpleaffy' cannot be produced for this data set.") 
             dev.copy(pdf, file = affypdf4)
             dev.off()
             dev.off()

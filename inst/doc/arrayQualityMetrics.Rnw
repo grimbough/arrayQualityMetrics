@@ -87,7 +87,7 @@ featureData(nCCl4)$hasTarget = (regexpr("^NM", featureData(nCCl4)$Name) > 0)
 
 \paragraph{Covariate}
 
-The \Rclass{phenoData} can also have a column "Covariate" containing a group name for each sample accordingly to a factor of interest. This \Rclass{phenoData} will be used to provide side bars on the heatmap. In the case of the \emph{CCl4} dataset, the RNA hybridized to the arrays can be of good, medium or poor quality accordingly to its RIN number (see \emph{CCl4} vignette).
+The \Rclass{phenoData} can also have a column "Covariate" containing a group name (up to 12 groups) for each sample accordingly to a factor of interest. This \Rclass{phenoData} will be used to provide side bars on the heatmap. In the case of the \emph{CCl4} dataset, the RNA hybridized to the arrays can be of good, medium or poor quality accordingly to its RIN number (see \emph{CCl4} vignette).
 
 %
 <<Covariate>>=
