@@ -215,6 +215,9 @@ hmap = function(expressionset, sN, section, figure, outM, numArrays)
     d.row = as.dendrogram(hclust(outM))
     od.row = order.dendrogram(d.row)
     m = as.matrix(outM)
+    colnames(m) = sN
+    rownames(m) = sN
+   
     hpdf = "heatmap.pdf"
     hpng = "heatmap.png"
     
@@ -536,7 +539,7 @@ setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
                 reverseddye = names(expressionset@phenoData$dyeswap[expressionset@phenoData$dyeswap == min(lev)])
                 dat[,reverseddye] = - dat[,reverseddye]
               }
-            ldat = lapply(1:ncol(dat), function(i) dat[,i])            
+            ldat = mat2list(dat)
      
             ##second part of data preparation
             dprep = prepdata(sN, dat, numArrays, split.plots)
@@ -556,8 +559,8 @@ setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
 #############################            
             ##MA-plots
             ##function from affyQCReport
-            M = rc - gc
-            A = 0.5*(rc + gc)
+            M = na.omit(rc) - na.omit(gc)
+            A = 0.5*(na.omit(rc) + na.omit(gc))
             
             MAplot = maplot(M, A, sN, numArrays)
             
@@ -734,6 +737,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
             xlim = c(min(na.omit(dat)),max(na.omit(dat)))
             xlimr = c(min(na.omit(rc)),max(na.omit(rc)))
             xlimg = c(min(na.omit(gc)),max(na.omit(gc)))
+            ylimrg =  c(min(na.omit(c(rc,gc))),max(na.omit(c(rc,gc))))
 
             colours = brewer.pal(12, "Paired")
             if(numArrays <= 50)
@@ -760,9 +764,9 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                     omi = c(0,0,0,0),
                     xaxt = xaxt)
                 boxplot(lgreenc, col = colours[4], las = 3, range = 0,
-                        names = xname, ylim = c(min(c(rc,gc)),max(c(rc,gc))), title = "Green Channel")
+                        names = xname, ylim = ylimrg, title = "Green Channel")
                 boxplot(lredc, col = colours[6], las = 3, range = 0,
-                        names = xname, ylim =  c(min(c(rc,gc)),max(c(rc,gc))), title = "Red Channel")
+                        names = xname, ylim = ylimrg, title = "Red Channel")
                 boxplot(ldat, col = colours[2], las = 3, range = 0,
                         names = xname, ylim = xlim, title = "Log(Ratio)")
               }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</center></b></td></table>\n", title="Boxplots", fig = figure)
@@ -1403,7 +1407,8 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             figure = as.numeric(l$figure)
             con = l$con
             dat = l$dat
-            olddir = l$olddir              
+            olddir = l$olddir
+            exprs(expressionset) = na.omit(exprs(expressionset))
 
 ############################
 ###Section 8 : Affy plots###
