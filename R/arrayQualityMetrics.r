@@ -1458,16 +1458,17 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             dev.off()
             dev.off()
             
+            qcStats = qc(expressionset)
             figure4 = figure3 + 1
             affypng4 = "qc.png"
             affypdf4 = "qc.pdf"
             png(file = affypng4)
-            p = try(plot(qc(expressionset), cex.axis = 0.8))
-            if(class(p)=='try-error')
+            p = try(plot(qcStats, cex.axis = 0.8))
+            suppressWarnings(dev.copy(pdf, file = affypdf4))
+            dev.off()
+            dev.off()
+if(class(p)=='try-error')
               warning("QCstat plot from the package 'simpleaffy' cannot be produced for this data set.") 
-            dev.copy(pdf, file = affypdf4)
-            dev.off()
-            dev.off()
 
             affytext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><a name = \"S6.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><center><BR><b>Figure %s</b></CENTER></tr></td><tr><td><b>%s</b></td><td><a name = \"S6.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><center><BR><b>Figure %s</b></CENTER></tr></td><tr><td><b>%s</b></td><td><a name = \"S6.3\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><center><BR><b>Figure %s</b></CENTER></tr></td><tr><td><b>%s</b></td><td><a name = \"S6.4\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><center><BR><b>Figure %s</b></CENTER></tr></td></table>\n", "RNA degradation plot", basename(affypdf1), basename(affypng1), figure1, "RLE plot", basename(affypdf2), basename(affypng2), figure2, "NUSE plot", basename(affypdf3), basename(affypng3), figure3, "Diagnostic plot recommended by Affy", basename(affypdf4), basename(affypng4), figure4)
             writeLines(affytext, con)
