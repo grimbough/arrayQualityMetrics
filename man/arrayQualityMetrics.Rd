@@ -4,6 +4,7 @@
 \alias{arrayQualityMetrics,ExpressionSet-method}
 \alias{arrayQualityMetrics,AffyBatch-method}
 \alias{arrayQualityMetrics,NChannelSet-method}
+\alias{arrayQualityMetrics,BeadLevelList-method}
 
 \title{
   Quality metrics on microarray experiments
@@ -13,6 +14,7 @@
   \code{arrayQualityMetrics} performs quality metrics on
   \code{\link[Biobase:class.ExpressionSet]{ExpressionSet}},
   \code{\link[Biobase:class.AffyBatch]{AffyBatch}} or
+  \code{\link[Biobase:class.BeadLevelList]{BeadLevelList}} or
   \code{\link[Biobase:class.NChannelSet]{NChannelSet}} containing
   microarray data from any platforms, one or two channels. The results,
   presented in a HTML report, are designated to allow the user
@@ -20,7 +22,8 @@
 }
 
 \usage{
-\S4method{arrayQualityMetrics}{ExpressionSet}(expressionset, outdir, force, do.logtransform, split.plots)
+\S4method{arrayQualityMetrics}{ExpressionSet}(expressionset, outdir,
+force, do.logtransform, split.plots)
 
 arrayQualityMetrics(expressionset,
                     outdir = getwd(),
@@ -30,12 +33,15 @@ arrayQualityMetrics(expressionset,
 
 \S4method{arrayQualityMetrics}{AffyBatch}(expressionset, outdir, force, do.logtransform, split.plots)
 \S4method{arrayQualityMetrics}{NChannelSet}(expressionset, outdir, force, do.logtransform, split.plots)
+\S4method{arrayQualityMetrics}{BeadLevelList}(expressionset, outdir,
+force, do.logtransform, split.plots)
 }
 
 \arguments{
   \item{expressionset}{ is an object of
     class \code{\link[Biobase:class.ExpressionSet]{ExpressionSet}},
     \code{\link[Biobase:class.AffyBatch]{AffyBatch}} or
+    \code{\link[Biobase:class.BeadLevelList]{BeadLevelList}} or
     \code{\link[Biobase:class.NChannelSet]{NChannelSet}}.}
 
 \item{outdir}{ is the name of the directory in which the results are
