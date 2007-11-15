@@ -17,11 +17,11 @@ mat2list = function(x)
       lapply(seq_len(ncol(x)), function(i) x[,i])
 
 ##makePlot
-makePlot = function(con, name, w, h=devDims(w)$height, fun, psz=12, isPlatePlot=FALSE, isImageScreen=FALSE, title, text, fig) {
+makePlot = function(con, name, w, h=devDims(w)$height, fun, isPlatePlot=FALSE, isImageScreen=FALSE, title, text, fig) {
   outf = paste(name, c("pdf", "png"), sep=".")
   nrppi = 72
 
-  pdf(outf[1], width=w, height=h, pointsize=psz)
+  pdf(outf[1], width=w, height=h, pointsize=14)
   if (isImageScreen)  fun(map=FALSE) else fun()
   dev.off()
 
@@ -33,7 +33,7 @@ makePlot = function(con, name, w, h=devDims(w)$height, fun, psz=12, isPlatePlot=
     hg = h*nrppi
   }
   
-  png(outf[2], width=wd, height=hg, pointsize=psz)
+  png(outf[2], width=wd, height=hg, pointsize=10)
   res <- fun()
   dev.off()
   
@@ -167,13 +167,13 @@ multi = function(type, x, xlim, title1, title2, title3, ...)
                 main = "",
                 xlab = "",
                 ylab = "", ...)
-    mtext(title1, side = 2, adj = 0.5, padj = -4 , cex = 0.7)
-    mtext(title2, side = 1, adj = 0.5, padj = 4 , cex = 0.7)
-    mtext(title3, side = 3, adj = 0.5, padj = -1 , cex = 0.7)
+    mtext(title1, side = 2, adj = 0.5, padj = -4 , cex = 0.9)
+    mtext(title2, side = 1, adj = 0.5, padj = 4 , cex = 0.9)
+    mtext(title3, side = 3, adj = 0.5, padj = -1 , cex = 0.9)
   }
 
 ##Mapping of probes
-probesmap = function(expressionset, numArrays, section, figure, dat, sN, xlim)
+probesmap = function(expressionset, numArrays, section, figure, dat, sN, xlim, type)
   {
     if(!"GC" %in% rownames(featureData(expressionset)@varMetadata))
       {
@@ -187,20 +187,20 @@ probesmap = function(expressionset, numArrays, section, figure, dat, sN, xlim)
     facgene = as.vector(probemapping)          
     facgene[probemapping == "TRUE"] = 1
     facgene[probemapping == "FALSE"] = 0
-                
-    gopng = "overall_GenesMapping.png"
-    gopdf = "overall_GenesMapping.pdf"
-          
-    cols = brewer.pal(9, "Set1")
-    
-    png(file = gopng)
-    multi("density",dat~facgene,xlim,"","","", col = cols[c(9,2)], cex.axis = 0.9)
-    legend("topright", c("Mapped","Unmapped"),lty=1,lwd=2,col= c(cols[c(2,9)]), bty = "n")
-    dev.copy(pdf, file = gopdf)
-    dev.off()
-    dev.off()
 
-    gotext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b><td><center><a name = \"S3.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</b></center></tr></td></table>\n", "Gene mapping ", basename(gopdf), basename(gopng), figure)
+    mplot6 = makePlot(con=con, name = "ProbesMapping",
+      w=8, h=8, fun = function() {
+        meanSdPlot(dat, cex.axis = 0.9, ylab = "Standard deviation of the intensities", xlab="Rank(mean of intensities)")        
+        cols = brewer.pal(9, "Set1")
+        if(type == 2)
+          xla = "log(ratio)"    
+        if(type == 1)
+          xla = "log(intensity)"
+        multi("density",dat~facgene,xlim,"Density",xla,"", col = cols[c(9,2)], cex.axis = 0.7)
+        legend("topright", legend=c("Mapped","Unmapped"),lty=1,lwd=2,col= c(cols[c(2,9)]), bty = "n", cex =0.9)
+      }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b><td><center><a name = \"S3.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</b></center></tr></td></table>\n",title="Probes mapping", fig = figure)
+
+    gotext = mplot6[[2]]
 
     promap = if(!"GC" %in% rownames(featureData(expressionset)@varMetadata)) list(section=section, figure=figure, gotext=gotext, sec3text=sec3text) else list(section=section, figure=figure, gotext=gotext) 
     return(promap)   
@@ -286,14 +286,14 @@ msdp = function(expressionset, section, figure, con, dat)
       
     mplot5 = makePlot(con=con, name = "meanSd",
       w=8, h=8, fun = function() {
-        meanSdPlot(dat, cex.axis = 0.9) 
+        meanSdPlot(dat, cex.axis = 0.9, ylab = "Standard deviation of the intensities", xlab="Rank(mean of intensities)") 
       }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><BR><b>Figure %s</center></b></td></table>\n", title="Standard deviation versus rank of the mean", fig = figure)
 
     htmltext5 = mplot5[[2]]
 
     legsdspe = if(is(expressionset, "BeadLevelList")) "For each bead type obtained by createBeadSummaryData from the package beadarray," else "For each feature,"
     
-    legendsdmean = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\">%s the plot on <b>Figure %s</b> shows the empirical standard deviation on the <i>y</i>-axis versus the rank of the mean on the <i>x</i>-axis. The red dots, connected by lines, show the running median of the standard deviation. It should be approximately horizontal, that is, show no substantial trend.</DIV>", legsdspe, figure)
+    legendsdmean = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\">%s the plot on <b>Figure %s</b> shows the empirical standard deviation of the intensities of all the arrays on the <i>y</i>-axis versus the rank of the mean of intensities of the arrays on the <i>x</i>-axis. The red dots, connected by lines, show the running median of the standard deviation. After vsn normalization, this should be approximately horizontal, that is, show no substantial trend.</DIV>", legsdspe, figure)
     
      msd = list(section=section, figure=figure, htmltext5=htmltext5,sec5text=sec5text, legendsdmean=legendsdmean)
     return(msd)   
@@ -322,7 +322,7 @@ pmmm = function(x, xlim, title1, title2, title3, ...)
   }
 
 ##writing the report
-report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, legendMA, batext, nfig2, bapng, ftext, pttext, legendpt, nfig3, fpng, legendlocal, sec2text, htmltext2, legendhom1, group, htmltext3, dtext, legendhom2, sec3text, gctext, legendgc, gotext, legendgo, sec4text, htmltext4, legendheatmap, sec5text, htmltext5, legendsdmean)
+report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, legendMA, batext, nfig2, bapng, ftext, pttext, legendpt, nfig3, fpng, legendlocal, sec2text, htmltext2, legendhom1, group, htmltext3, legendhom2, sec3text, gctext, legendgc, gotext, legendgo, sec4text, htmltext4, legendheatmap, sec5text, htmltext5, legendsdmean)
   {
 ### Title
     title = paste(arg$expressionset, " quality metrics report", sep="")
@@ -499,10 +499,7 @@ report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, l
     writeLines(sec2text, con)
     writeLines(htmltext2, con)
     writeLines(legendhom1, con)            
-    if(max(group) == 1)
-      writeLines(htmltext3, con)           
-    if(max(group) > 1)
-      writeLines(dtext, con)              
+    writeLines(htmltext3, con)           
     writeLines(legendhom2, con)
     
  ### Section 3
@@ -617,10 +614,10 @@ setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
             nfig = as.numeric(MAplot$nfig)
             mapdf = as.character(MAplot$mapdf)
            
-            legendMA = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> represents MA plot for each array. <br> MA plots are useful for pairwise comparisons between arrays. M and A are defined as :<br>
+            legendMA = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> represents MA plot for each array. M and A are defined as :<br>
 M = log<sub>2</sub>(I<sub>1</sub>) - log<sub>2</sub>(I<sub>2</sub>)<br>
 A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
-where I<sub>1</sub> and I<sub>2</sub> are the vectors of intensities of two channels. Typically, we expect the mass of the distribution in an MA plot to be concentrated along the M = 0 axis, and there should be no trend in the mean of M as a function of A.
+where I<sub>1</sub> and I<sub>2</sub> are the vectors of intensities of the two channels. Typically, we expect the mass of the distribution in an MA plot to be concentrated along the M = 0 axis, and there should be no trend in the mean of M as a function of A.
 Note that a bigger width of the plot of the M-distribution at the lower end of the A scale does not necessarily imply that the variance of the M-distribution is larger at the lower end of the A scale: the visual impression might simply be caused by the fact that there is more data at the lower end of the A scale. To visualize whether there is a trend in the variance of M as a function of A, consider plotting M versus rank(A).</DIV>", figure)          
             
 #################################
@@ -678,10 +675,10 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                         par(xaxt = "n", yaxt = "n",mar=c(1,2,2,1))
                         image(mr, col = colourRamp)
                         mtext(sN[a],side = 3,adj = 0.5, padj = -1 ,cex = 0.7)
-                        mtext("Red Intensity",side = 2, line = 0.5 ,cex = 0.7)
+                        mtext("Rank(red intensity)",side = 2, line = 0.5 ,cex = 0.7)
                         image(mg, col = colourRamp)
 
-                        mtext("Green Intensity",side = 2, line = 0.5 ,cex = 0.7)
+                        mtext("Rank(green intensity)",side = 2, line = 0.5 ,cex = 0.7)
                         
                         if((a%%3==0) || (a == numArrays))                   
                           {
@@ -694,7 +691,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                     llbpng = "localisationlegendbackground.png"
                     png(file= llbpng, width = 3*72, height = 7*72)
                     nf <- layout(1, widths = 0.9, heights = 3, respect = TRUE)
-                    image(m,xaxt="n",yaxt="n",ylab="Rank", col = colourRamp, cex.lab = 0.8)
+                    image(m,xaxt="n",yaxt="n",ylab="Rank(Intensity)", col = colourRamp, cex.lab = 0.8)
                     axis(2, label= as.list(pretty(mr,9)),at=seq(0,1,by=(1/(length(pretty(mr,9))-1))), cex.axis = 0.7, padj = 1)
                     dev.off()
                
@@ -746,10 +743,10 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                     par(xaxt = "n", yaxt = "n",mar=c(1,2,2,1))
                     image(mrf, col = colourRamp)
                     mtext(sN[a],side = 3,adj = 0.5, padj = -1 ,cex = 0.7)
-                    mtext("Red Intensity",side = 2, line = 0.5 ,cex = 0.7)
+                    mtext("Rank(red intensity)",side = 2, line = 0.5 ,cex = 0.7)
                     image(mgf, col = colourRamp)
 
-                    mtext("Green Intensity",side = 2, line = 0.5 ,cex = 0.7)
+                    mtext("Rank(green intensity)",side = 2, line = 0.5 ,cex = 0.7)
                     if((a%%3==0) || (a == numArrays))                   
                       {
                         dev.off()
@@ -762,7 +759,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                 png(file= llfpng, width = 3*72, height = 7*72)
                 nf <- layout(1, widths = 0.9, heights = 3, respect = TRUE)
 
-                image(m,xaxt="n",yaxt="n",ylab="Rank", col = colourRamp, cex.lab = 0.8)
+                image(m,xaxt="n",yaxt="n",ylab="Rank(Intensity)", col = colourRamp, cex.lab = 0.8)
                 axis(2, label= as.list(pretty(mrf,9)),at=seq(0,1,by=(1/(length(pretty(mrf,9))-1))), cex.axis = 0.7, padj = 1)
                 dev.off()
                 
@@ -791,12 +788,12 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                     boxplot(rc[,a]~facx, col = colours[6], range =  0, main ="", whisklty = 0, staplelty = 0)
                     mtext(sN[a], side = 3,padj=-1,adj=1.1,cex=1)
                     mtext("Row", side = 3,padj=-0.5,cex=0.8)
-                    mtext("Red Intensity", side = 2, adj = 0.5,padj=-3,cex=0.8)
+                    mtext("log(red intensity)", side = 2, adj = 0.5,padj=-4,cex=0.7)
 
                     boxplot(gc[,a]~facx, col = colours[4], lwd = 1, range =  0, main = "", whisklty = 0, staplelty = 0)
-                    mtext("Green Intensity", side = 2, adj = 0.5,padj=-3,cex=0.8)
+                    mtext("log(green intensity", side = 2, adj = 0.5,padj=-4,cex=0.7)
                     boxplot(dat[,a]~facx, col = colours[2], lwd = 1, range = 0, main = "", whisklty = 0, staplelty = 0)
-                    mtext("Log(ratio)", side = 2, adj = 0.5,padj=-3,cex=0.8)
+                    mtext("log(ratio)", side = 2, adj = 0.5,padj=-4,cex=0.7)
 
                     boxplot(rc[,a]~facy, col = colours[6], range =  0, main ="", whisklty = 0, staplelty = 0)
                     mtext("Column", side = 3,padj=-0.5,cex=0.8)
@@ -814,12 +811,12 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                 boxplot(rc[,1]~facx, col = colours[6], range =  0, main ="", whisklty = 0, staplelty = 0)
                 mtext(sN[1], side = 3,padj=-1,adj=1.1,cex=1)
                 mtext("Row", side = 3,padj=-0.5,cex=0.8)
-                mtext("Red Intensity", side = 2, adj = 0.5,padj=-3,cex=0.8)
+                mtext("log(red intensity)", side = 2, adj = 0.5,padj=-4,cex=0.7)
                 
                 boxplot(gc[,1]~facx, col = colours[4], lwd = 1, range =  0, main = "", whisklty = 0, staplelty = 0)
-                mtext("Green Intensity", side = 2, adj = 0.5,padj=-3,cex=0.8)
+                mtext("log(green intensity)", side = 2, adj = 0.5,padj=-4,cex=0.7)
                 boxplot(dat[,1]~facx, col = colours[2], lwd = 1, range = 0, main = "", whisklty = 0, staplelty = 0)
-                mtext("Log(ratio)", side = 2, adj = 0.5,padj=-3,cex=0.8)
+                mtext("log(ratio)", side = 2, adj = 0.5,padj=-4,cex=0.7)
                 
                 boxplot(rc[,1]~facy, col = colours[6], range =  0, main ="", whisklty = 0, staplelty = 0)
                 mtext("Column", side = 3,padj=-0.5,cex=0.8)
@@ -855,13 +852,13 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
             if(numArrays <= 50)
               {
                 xname = sN
-                mai = c(0,0.4,0.2,0.2)
+                mai = c(0,0.8,0.2,0.2)
                 xaxt = "s"
               }
             if(numArrays > 50)
                {
                 xname = FALSE
-                mai = c(0,0.4,0.2,0.2)              
+                mai = c(0,0.8,0.2,0.2)              
                 xaxt = "n"
               }
 
@@ -876,92 +873,51 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                     omi = c(0,0,0,0),
                     xaxt = xaxt)
                 boxplot(lredc, col = colours[6], las = 3, range = 0,
-                        names = xname, ylim = ylimrg, title = "Red Channel")
+                        names = xname, ylim = ylimrg, ylab = "log(red intensity)", cex.lab = 1.2)
                 boxplot(lgreenc, col = colours[4], las = 3, range = 0,
-                        names = xname, ylim = ylimrg, title = "Green Channel")
+                        names = xname, ylim = ylimrg, ylab = "log(green intensity)", cex.lab = 1.2)
                 boxplot(ldat, col = colours[2], las = 3, range = 0,
-                        names = xname, ylim = xlim, title = "Log(Ratio)")
+                        names = xname, ylim = xlim, ylab = "log(ratio)", cex.lab = 1.2)
               }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</center></b></td></table>\n", title="Boxplots", fig = figure)
 
             htmltext2 = mplot2[[2]]
-            legendhom1 = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> presents boxplots. On the left panel, the red boxes correspond to the log<sub>2</sub> intensities of the red channel. On the middle panel the green boxes correspond to the log<sub>2</sub> intensities of the green channel. The right panel shows the boxplots of log<sub>2</sub>(ratio).</DIV>", figure)          
+            legendhom1 = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> presents boxplots of the log<sub>2</sub>(Intensities). Each box corresponds to one array. The left panel corresponds to the red channel. The middle panel shows the green channel. The right panel shows the boxplots of log<sub>2</sub>(ratio). If the arrays are homogeneous, the boxes should have similar wides and y position.</DIV>", figure)          
 
       
 ############################
 ###Section 2.2 : Density ###
 ############################
             
-            ##Density if 1 group
             figure = figure + 1
 
-            if(max(group) == 1)
-              {
-                mplot3 = makePlot(con=con, name = "density",
-                  w=10, h=10, fun = function() {
-                    nf <- layout(matrix(c(1,2,3,4,5,6),2,3,byrow=TRUE),
-                                 c(2.3,2,2), c(2,2), TRUE)
-                    par(mar=c(0,5,1,1),xaxt = "n", cex.axis = 0.9)
-                    multi("density",lredc,xlimr,"Density","","Red Channel")
-                    par(mar=c(0,2,1,1),xaxt = "n")
-                    multi("density",lgreenc,xlimg,"","","Green Channel")
-                    par(mar=c(0,2,1,1),xaxt = "n")
-                    multi("density",ldat,xlim,"","","Log(Ratio)")
-                    par(mar=c(1,5,0,1), xaxt = "s")
-                    multi("ecdf",lredc,xlimr,"ECDF","log(intensity)","")
-                    par(mar=c(1,2,0,1), xaxt = "s")
-                    multi("ecdf",lgreenc,xlimg,"","log(intensity)","")
-                    par(mar=c(1,2,0,1), xaxt = "s")
-                    multi("ecdf",ldat,xlim,"","log(ratio)","")}, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></center></td></table>\n", title="Density plots", fig = figure)
-                htmltext3 = mplot3[[2]]          
-              }
-      
-            ##Density if more than 1 group
-            if(max(group) > 1)
-              {
-                dpng = "density.png"
-                dpdf = "density.pdf"
-                pdf(file = dpdf)
+            mplot3 = makePlot(con=con, name = "density",
+              w=10, h=10, fun = function() {
                 for(n in 1:max(group))
                   {
+
                     nf <- layout(matrix(c(1,2,3,4,5,6),2,3,byrow=TRUE),
                                  c(2.3,2,2), c(2,2), TRUE)
-              
-                    par(mar=c(0,5,1,1),xaxt = "n", cex.axis = 0.9)
-                    multi("density",lredc[group==n],xlimr,"Density","","Red Channel")
+                    par(mar=c(0,5,1,1),xaxt = "n")
+                    multi("density",lredc[group==n],xlimr,"Density","","")
+                    legend("topright",legend= sN[group==n],lty=1,col=brewer.pal(9, "Set1"), bty = "n", cex = 0.9)
                     par(mar=c(0,2,1,1),xaxt = "n")
-                    multi("density",lgreenc[group==n],xlimg,"","","Green Channel")
-                    mtext(paste("Group ", n, sep = ""),side = 3,adj = 0.5, padj = -3 ,cex = 1)
+                    multi("density",lgreenc[group==n],xlimg,"","","")
+                    legend("topright", legend=sN[group==n],lty=1,col=brewer.pal(9, "Set1"), bty = "n", cex = 0.9)
+                    if(max(group) !=1)
+                      mtext(paste("Group ", n, sep = ""),side = 3,adj = 0.5, padj = -3)
                     par(mar=c(0,2,1,1),xaxt = "n")
-                    multi("density",ldat[group==n],xlim,"","","Log(Ratio)")
+                    multi("density",ldat[group==n],xlim,"","","")
+                    legend("topright", legend=sN[group==n],lty=1,col=brewer.pal(9, "Set1"), bty = "n", cex = 0.9)
                     par(mar=c(1,5,0,1), xaxt = "s")
-                    multi("ecdf",lredc[group==n],xlimr,"ECDF","log(intensity)","")
+                    multi("ecdf",lredc[group==n],xlimr,"ECDF","log(red intensity)","")
                     par(mar=c(1,2,0,1), xaxt = "s")
-                    multi("ecdf",lgreenc[group==n],xlimg,"","log(intensity)","")
+                    multi("ecdf",lgreenc[group==n],xlimg,"","log(green intensity)","")
                     par(mar=c(1,2,0,1), xaxt = "s")
                     multi("ecdf",ldat[group==n],xlim,"","log(ratio)","")
-                  }
-                dev.off()
-                png(file = dpng)
-                nf <- layout(matrix(c(1,2,3,4,5,6),2,3,byrow=TRUE),
-                             c(2.3,2,2), c(2,2), TRUE)
-              
-                par(mar=c(0,5,1,1),xaxt = "n", cex.axis = 0.9)
-                multi("density",lredc[group==1],xlimr,"Density","","Red Channel")
-                par(mar=c(0,2,1,1),xaxt = "n")
-                multi("density",lgreenc[group==1],xlimg,"","","Green Channel")
 
-                mtext("Group 1",side = 3,adj = 0.5, padj = -3 ,cex = 1)
-                par(mar=c(0,2,1,1),xaxt = "n")
-                multi("density",ldat[group==1],xlim,"","","Log(Ratio)")
-                par(mar=c(1,5,0,1), xaxt = "s")
-                multi("ecdf",lredc[group==1],xlimr,"ECDF","log(intensity)","")
-                par(mar=c(1,2,0,1), xaxt = "s")
-                multi("ecdf",lgreenc[group==1],xlimg,"","log(intensity)","")
-                par(mar=c(1,2,0,1), xaxt = "s")
-                multi("ecdf",ldat[group==1],xlim,"","log(ratio)","")
-                dev.off()
-                dtext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></center></td></table>\n", "Density plots", basename(dpdf), basename(dpng), figure)
-              }
+                  }
+              }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></center></td></table>\n", title="Density plots", fig = figure)
+            htmltext3 = mplot3[[2]]          
             legendhom2 = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows density estimates (histograms) of the data. Arrays whose distributions are very different from the others should be considered for possible problems.</DIV>", figure)
 
 ########################################
@@ -977,75 +933,46 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                 sec3text = sprintf("<hr><h2><a name = \"S3\">Section %s: Array platform quality</a></h2>", section)    
             
                 figure = figure + 1
-                gcpdf = "GCcontent.pdf"
-                pdf(file = gcpdf)
                 ngc = c(2:9)
                 colb = brewer.pal(9, "Blues")
                 colg = brewer.pal(9, "Greens")
                 colr = brewer.pal(9, "OrRd")         
-                fac = round(as.numeric(as.matrix(featureData(expressionset)$GC)),-1)
-         
-                nf <- layout(matrix(c(1,2,3,4,5,6,7,8,9),3,3,byrow = FALSE),
-                             c(1.2,1.2,1.2), c(2,1.8,2), FALSE)
-          
-                for ( a in 1:numArrays )
-                  {
-                    par(mar=c(0,3.5,3.5,1))
-                    multi("density",rc[,a]~fac,xlimr,"Density","","Red Channel", col = colr[ngc],  xaxt = "n")
-                    par(mar=c(2,3.5,0,1))
-                    multi("ecdf",rc[,a]~fac,xlimr,"ECDF","","", col = colr[ngc])
-                    par(mar=c(2,3.5,2,1))
-                    boxplot(rc[,a]~fac, col = colr[ngc], range =  0, main ="")
-                    mtext("Boxplot",side = 2,adj = 0.5, padj = -4 ,cex = 0.7)
-              
-                    par(mar=c(0,3.5,3.5,1))
-                    multi("density",gc[,a]~fac,xlimg,"","","Green Channel", col = colg[ngc],  xaxt = "n")
-                    mtext(sN[a],side = 3,adj = 0.5, padj = -2 ,cex = 1, font = 2)
-                    par(mar=c(2,3.5,0,1))
-                    multi("ecdf",gc[,a]~fac,xlimg,"","","", col = colg[ngc])
-                    par(mar=c(2,3.5,2,1))
-                    boxplot(gc[,a]~fac, col = colg[ngc], lwd = 1, range =  0, main = "")
-                    par(mar=c(0,3.5,3.5,1))
-                    multi("density",dat[,a]~fac,xlim,"","","Log(ratio)", col = colb[ngc],  xaxt = "n")
-                    par(mar=c(2,3.5,0,1))
-                    multi("ecdf",dat[,a]~fac,xlim,"","","", col = colb[ngc])
-                    par(mar=c(2,3.5,2,1))
-                    boxplot(dat[,a]~fac, col = colb[ngc], lwd = 1, range = 0, main = "")
-                  }
-                dev.off()
-        
-                gcopng = "overall_GCcontent.png"
-                gcopdf = "overall_GCcontent.pdf"
-                png(file = gcopng)
-                nf <- layout(matrix(c(1,2,3,4,5,6,7,8,9),3,3,byrow = FALSE),
-                             c(1.2,1.2,1.2), c(2,1.8,2), FALSE)
-                par(mar=c(0,3.5,3.5,1))
-                multi("density",rc~fac,xlimr,"Density","","Red Channel", col = colr[ngc],  xaxt = "n")
-                par(mar=c(2,3.5,0,1))
+                fac = round(as.numeric(as.matrix(featureData(expressionset)$GC)),-1)      
+                gcpng = "GCcontent.png"
+                gcpdf = "GCcontent.pdf"
+
+                png(file = gcpng)
+                nf <- layout(matrix(c(1,2,3,4,5,6,7,8,9),3,3,byrow = TRUE),
+                              widths =c(2.5,2,2), heights=c(1.9,1.9,2.9), TRUE)
+                par(mar=c(0,5,1,1), xaxt = "n")
+                multi("density",rc~fac,xlimr,"Density","","", col = colr[ngc])
+                par(mar=c(0,2,1,1))
+                multi("density",gc~fac,xlimg,"","","", col = colg[ngc])
+                par(mar=c(0,2,1,1))
+                multi("density",dat~fac,xlim,"","","", col = colb[ngc])
+
+                par(mar=c(1,5,0,1), xaxt="s")
                 multi("ecdf",rc~fac,xlimr,"ECDF","","", col = colr[ngc])
-                par(mar=c(2,3.5,2,1))
-                boxplot(rc~fac, col = colr[ngc], range =  0, main ="")
-                mtext("Boxplot",side = 2,adj = 0.5, padj = -4 ,cex = 0.7)
-            
-                par(mar=c(0,3.5,3.5,1))
-                multi("density",gc~fac,xlimg,"","","Green Channel", col = colg[ngc],  xaxt = "n")
-                par(mar=c(2,3.5,0,1))
+                par(mar=c(1,2,0,1))
                 multi("ecdf",gc~fac,xlimg,"","","", col = colg[ngc])
-                par(mar=c(2,3.5,2,1))
-                boxplot(gc~fac, col = colg[ngc], lwd = 1, range =  0, main = "")
-            
-                par(mar=c(0,3.5,3.5,1))
-                multi("density",dat~fac,xlim,"","","Log(ratio)", col = colb[ngc],  xaxt = "n")
-                par(mar=c(2,3.5,0,1))
+                par(mar=c(1,2,0,1))
                 multi("ecdf",dat~fac,xlim,"","","", col = colb[ngc])
-                par(mar=c(2,3.5,2,1))
-                boxplot(dat~fac, col = colb[ngc], lwd = 1, range = 0, main = "")
-                dev.copy(pdf, file = gcopdf)
+
+
+                par(mar=c(5,5,2,1))
+                boxplot(rc~fac, col = colr[ngc], range =  0, main ="", xlab="log(red intensity)")
+                mtext("Boxplot",side = 2,adj = 0.5, padj = -4 ,cex = 0.8)
+                par(mar=c(5,2,2,1))
+                boxplot(gc~fac, col = colg[ngc], lwd = 1, range =  0, main = "", xlab="log(green intensity)")           
+                par(mar=c(5,2,2,1))
+                boxplot(dat~fac, col = colb[ngc], lwd = 1, range = 0, main = "", xlab="log(ratio)")
+                dev.copy(pdf, file = gcpdf)
                 dev.off()
                 dev.off()
-          
-                gctext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s<A HREF=\"%s\">%s</A>%s<A HREF=\"%s\">%s</A></b><td><center><a name = \"S3.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</b></center></tr></td></table>\n", "GC content effect ", basename(gcpdf), "per array", " and ", basename(gcopdf), "global", basename(gcopdf), basename(gcopng), figure)
-                legendgc = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows the distributions of the log<sub>2</sub> intensities grouped by the percentage of cytosines (C) and guanines (G) among the nucleotides in each probe. From the top to the bottom, kernel density estimates, empirical cumulative distribution functions (ECDF) and boxplots are represented. Box and line colors in the three panels correspond to the same groups. Cytosine and guanine are able to form three hydrogen bonds, while adenine (A) and thymine (T) only form two, hence oligonucleotides with a higher proportion of C and G can form more stable hybridization bindings. This should result in higher intensities measured on the array, regardless of the abundance of target molecules.</DIV>",  figure)
+
+                gctext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b><td><center><a name = \"S3.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</b></center></tr></td></table>\n", "GC content effect  ", basename(gcpdf), basename(gcpng), figure)
+
+                legendgc = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows the distributions of the log<sub>2</sub> intensities grouped by the percentage of cytosines (C) and guanines (G) among the nucleotides in each probe. From the top to the bottom, kernel density estimates, empirical cumulative distribution functions (ECDF) and boxplots are represented. Box and line colors in the three panels correspond to the same groups, the darker is the colour, the higher is the GC content. Cytosine and guanine are able to form three hydrogen bonds, while adenine (A) and thymine (T) only form two, hence oligonucleotides with a higher proportion of C and G can form more stable hybridization bindings. This should result in higher intensities measured on the array, regardless of the abundance of target molecules.</DIV>",  figure)
               }
 
 ######################################
@@ -1054,7 +981,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
     
             if("hasTarget" %in% rownames(featureData(expressionset)@varMetadata))
               {
-                pmap = probesmap(expressionset, numArrays, section, figure, dat, sN, xlim)
+                pmap = probesmap(expressionset, numArrays, section, figure, dat, sN, xlim, type = 2)
 
                 section = pmap$section
                 figure = pmap$figure
@@ -1094,7 +1021,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
 ##########################
 
             arg = as.list(match.call(expand.dots = TRUE))
-            con = if(exists("sNt")) report(expressionset=expressionset, arg=arg, sNt=sNt, sN=sN, sec1text=sec1text, mapdf=mapdf, matext1=matext1, nfig=nfig, legendMA=legendMA, batext=batext, nfig2=nfig2, bapng=bapng, ftext=ftext, pttext=pttext, legendpt=legendpt, nfig3=nfig3, fpng=fpng, legendlocal=legendlocal, sec2text=sec2text, htmltext2=htmltext2, legendhom1=legendhom1, group=group, htmltext3=htmltext3, dtext=dtext, legendhom2=legendhom2, sec3text=sec3text, gctext=gctext, legendgc=legendgc, gotext=gotext, legendgo=legendgo, sec4text=sec4text, htmltext4=htmltext4, legendheatmap=legendheatmap, sec5text=sec5text, htmltext5=htmltext5, legendsdmean=legendsdmean) else report(expressionset=expressionset, arg=arg, sNt=NULL, sN=sN, sec1text=sec1text, mapdf=mapdf, matext1=matext1, nfig=nfig, legendMA=legendMA, batext=batext, nfig2=nfig2, bapng=bapng, ftext=ftext, pttext=pttext, legendpt=legendpt, nfig3=nfig3, fpng=fpng, legendlocal=legendlocal, sec2text=sec2text, htmltext2=htmltext2, legendhom1=legendhom1, group=group, htmltext3=htmltext3, dtext=dtext, legendhom2=legendhom2, sec3text=sec3text, gctext=gctext, legendgc=legendgc, gotext=gotext, legendgo=legendgo, sec4text=sec4text, htmltext4=htmltext4, legendheatmap=legendheatmap, sec5text=sec5text, htmltext5=htmltext5, legendsdmean=legendsdmean)
+            con = if(exists("sNt")) report(expressionset=expressionset, arg=arg, sNt=sNt, sN=sN, sec1text=sec1text, mapdf=mapdf, matext1=matext1, nfig=nfig, legendMA=legendMA, batext=batext, nfig2=nfig2, bapng=bapng, ftext=ftext, pttext=pttext, legendpt=legendpt, nfig3=nfig3, fpng=fpng, legendlocal=legendlocal, sec2text=sec2text, htmltext2=htmltext2, legendhom1=legendhom1, group=group, htmltext3=htmltext3, legendhom2=legendhom2, sec3text=sec3text, gctext=gctext, legendgc=legendgc, gotext=gotext, legendgo=legendgo, sec4text=sec4text, htmltext4=htmltext4, legendheatmap=legendheatmap, sec5text=sec5text, htmltext5=htmltext5, legendsdmean=legendsdmean) else report(expressionset=expressionset, arg=arg, sNt=NULL, sN=sN, sec1text=sec1text, mapdf=mapdf, matext1=matext1, nfig=nfig, legendMA=legendMA, batext=batext, nfig2=nfig2, bapng=bapng, ftext=ftext, pttext=pttext, legendpt=legendpt, nfig3=nfig3, fpng=fpng, legendlocal=legendlocal, sec2text=sec2text, htmltext2=htmltext2, legendhom1=legendhom1, group=group, htmltext3=htmltext3, legendhom2=legendhom2, sec3text=sec3text, gctext=gctext, legendgc=legendgc, gotext=gotext, legendgo=legendgo, sec4text=sec4text, htmltext4=htmltext4, legendheatmap=legendheatmap, sec5text=sec5text, htmltext5=htmltext5, legendsdmean=legendsdmean)
 
             writeLines("</table>", con)
             closeHtmlPage(con)
@@ -1160,7 +1087,7 @@ aqm.expressionset = function(expressionset, outdir = getwd(), force = FALSE, do.
     nfig = as.numeric(MAplot$nfig)
     mapdf = as.character(MAplot$mapdf)   
     
-    legendMA = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> represents MA plot for each array. <br> MA plots are useful for pairwise comparisons between arrays. M and A are defined as :<br>
+    legendMA = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> represents MA plot for each array. M and A are defined as :<br>
 M = log<sub>2</sub>(I<sub>1</sub>) - log<sub>2</sub>(I<sub>2</sub>)<br>
 A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
 where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is the intensity of a \"pseudo\"-array, which have the median values of all the arrays. Typically, we expect the mass of the distribution in an MA plot to be concentrated along the M = 0 axis, and there should be no trend in the mean of M as a function of A. Note that a bigger width of the plot of the M-distribution at the lower end of the A scale does not necessarily imply that the variance of the M-distribution is larger at the lower end of the A scale: the visual impression might simply be caused by the fact that there is more data at the lower end of the A scale. To visualize whether there is a trend in the variance of M as a function of A, consider plotting M versus rank(A).</DIV>", figure)     
@@ -1212,7 +1139,7 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
         llpng = "localisationlegend.png" 
         png(file= llpng, width = 3*72, height = 7*72)
         nf <- layout(1, widths = 0.9, heights = 3, respect = TRUE)
-        image(m,xaxt="n",yaxt="n",ylab="Rank", col = colourRamp, cex.lab = 0.8)
+        image(m,xaxt="n",yaxt="n",ylab="Rank(Intensity)", col = colourRamp, cex.lab = 0.8)
         axis(2, label= as.list(pretty(mrfi,9)),at=seq(0,1,by=(1/(length(pretty(mrfi,9))-1))), cex.axis = 0.7, padj = 1)
         dev.off()
            
@@ -1319,7 +1246,7 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
             png(file= llfpng, width = 3*72, height = 7*72)
             nf <- layout(1, widths = 0.9, heights = 3, respect = TRUE)
 
-            image(m,xaxt="n",yaxt="n",ylab="Rank", col = colourRamp, cex.lab = 0.8)
+            image(m,xaxt="n",yaxt="n",ylab="Rank(Intensity)", col = colourRamp, cex.lab = 0.8)
             axis(2, label= as.list(pretty(mfg,9)),at=seq(0,1,by=(1/(length(pretty(mfg,9))-1))), cex.axis = 0.7, padj = 1)
             dev.off()
                 
@@ -1401,56 +1328,29 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
         boxplot(ldat, col = colours[2], las = 3, range = 0, names = xname)
       }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</center></b></td></table>\n", title = "Boxplots", fig = figure)
     htmltext2 = mplot2[[2]]
-    legendhom1 = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> presents boxplots of the data.</DIV>", figure)          
+    legendhom1 = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> presents boxplots of the log<sub>2</sub>(Intensities). Each box corresponds to one array. If the arrays are homogeneous, the boxes should have similar wides and y position.</DIV>", figure)          
     
 ############################
 ###Section 2.2 : Density ###
 ############################
     
-    ##Density if 1 group
     figure = figure + 1
     xlim = c(min(na.omit(dat)),max(na.omit(dat)))
-    if(max(group) == 1)
-      {
-        mplot3 = makePlot(con=con, name = "density",
-          w=10, h=10, fun = function() {
-            xlim = c(min(na.omit(dat)),max(na.omit(dat)))
-            nf <- layout(matrix(c(1,2),2,1,byrow=TRUE), c(2.8,2.8),c(1.8,2), TRUE)
-            par(xaxt = "n", cex.axis = 0.8, mar = c(0,5,2,5))
-            multi("density",ldat,xlim,"Density","","")
-            par(xaxt = "s", cex.axis = 0.8, mar = c(4,5,0,5))
-            multi("ecdf",ldat,xlim,"ECDF","log(intensity)","")
-          }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></center></td></table>\n", title="Density plots", fig = figure)
-        htmltext3 = mplot3[[2]]
-      }
-                
-    ##Density if more than 1 group
-    if(max(group) > 1)
-      {
-        dpng = "density.png"
-        dpdf = "density.pdf"
-        pdf(file = dpdf)
-        xlim = c(min(na.omit(dat)),max(na.omit(dat)))
+    mplot3 = makePlot(con=con, name = "density",
+      w=10, h=10, fun = function() {
         for(n in 1:max(group))
-          {
-            nf <- layout(matrix(c(1,2),2,1,byrow=TRUE), c(2.8,2.8),c(1.8,2), TRUE)
-            par(xaxt = "n", cex.axis = 0.8, mar = c(0,5,2,5))
-            multi("density",ldat[group==n],xlim,"Density","","")
-            mtext(paste("Group ", n, sep = ""),side = 3,adj = 0.5, padj = -1 ,cex = 1)
-            par(xaxt = "s", cex.axis = 0.8, mar = c(4,5,0,5))
-            multi("ecdf",ldat[group==n],xlim,"ECDF","log(intensity)","")
-          }
-        dev.off()
-        png(file = dpng)
-        nf <- layout(matrix(c(1,2),2,1,byrow=TRUE), c(2.8,2.8),c(1.8,2), TRUE)
-        par(xaxt = "n", cex.axis = 0.8, mar = c(0,5,2,5))
-        multi("density",ldat[group==1],xlim,"Density","","")
-        mtext("Group 1",side = 3,adj = 0.5, padj = -1 ,cex = 1)
-        par(xaxt = "s", cex.axis = 0.8, mar = c(4,5,0,5))
-        multi("ecdf",ldat[group==1],xlim,"ECDF","log(intensity)","")
-        dev.off()
-        dtext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><a name = \"S2.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></CENTER><BR></tr></td></table>\n", "Density plots", basename(dpdf), basename(dpng), figure)
-      }
+            {            
+              nf <- layout(matrix(c(1,2),2,1,byrow=TRUE), c(2.8,2.8),c(1.8,2), TRUE)
+              par(xaxt = "n", mar = c(0,5,2,5))
+              multi("density",ldat[group==n],xlim,"Density","","")
+              legend("topright", legend=sN[group==n],lty=1,col=brewer.pal(9, "Set1"), bty = "n", cex = 0.9)
+              if(max(group) !=1)
+                mtext(paste("Group ", n, sep = ""),side = 3,adj = 0.5, padj = -1)
+              par(xaxt = "s", mar = c(4,5,0,5))
+              multi("ecdf",ldat[group==n],xlim,"ECDF","log(intensity)","")
+            }} , text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></center></td></table>\n", title="Density plots", fig = figure)
+    htmltext3 = mplot3[[2]]
+    
     legendhom2 = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows density estimates (histograms) of the data. Arrays whose distributions are very different from the others should be considered for possible problems.</DIV>", figure)          
 
 ########################################
@@ -1466,32 +1366,15 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
         section = section + 1
         sec3text = sprintf("<hr><h2><a name = \"S3\">Section %s: Array platform quality</h2></a>", section)    
         figure = figure + 1
-        gcpdf = "GCcontent.pdf"
-        pdf(file = gcpdf)
         ngc = c(2:9)
         colb = brewer.pal(9, "Blues")
         colg = brewer.pal(9, "Greens")
         colr = brewer.pal(9, "OrRd")         
         fac = round(as.numeric(as.matrix(featureData(expressionset)$GC)),-1)
-        
-        nf <- layout(matrix(c(1,2,3,4,5,6,7,8,9),3,3,byrow = FALSE),
-                     c(1.2,1.2,1.2), c(2,1.8,2), FALSE)
-        
-        for ( a in 1:numArrays )
-          {
-            par(mar=c(0,3.5,3.5,1))
-            multi("density",dat[,a]~fac,xlim,"Density","",sN[a], col = colb[ngc],  xaxt = "n")
-            par(mar=c(2,3.5,0,1))
-            multi("ecdf",dat[,a]~fac,xlim,"ECDF","","", col = colb[ngc],  xaxt = "n")
-            par(mar=c(2,3.5,2,1))
-            boxplot(dat[,a]~fac, col = colb[ngc], lwd = 1, range = 0)
-            mtext("Boxplot",side = 2,adj = 0.5, padj = -3.3 ,cex = 0.7)
-          }
-        dev.off()
-        
-        gcopng = "overall_GCcontent.png"
-        gcopdf = "overall_GCcontent.pdf"
-        png(file = gcopng)
+               
+        gcpng = "GCcontent.png"
+        gcpdf = "GCcontent.pdf"
+        png(file = gcpng)
         nf <- layout(matrix(c(1,2,3),3,1,byrow = FALSE),
                      2.2, c(2,1.8,2), TRUE)
         par(mar=c(0,3.5,3.5,1))
@@ -1501,11 +1384,12 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
         par(mar=c(2,3.5,2,1))
         boxplot(dat~fac, col = colb[ngc], lwd = 1, range = 0)
         mtext("Boxplot",side = 2,adj = 0.5, padj = -3.3 ,cex = 0.7)
-        dev.copy(pdf, file = gcopdf)
+        dev.copy(pdf, file = gcpdf)
         dev.off()
         dev.off()
                 
-        gctext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s<A HREF=\"%s\">%s</A>%s<A HREF=\"%s\">%s</A></b><td><center><a name = \"S3.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</b></center></tr></td></table>\n", "GC content effect ", basename(gcpdf), "per array", " and ", basename(gcopdf), "global", basename(gcopdf), basename(gcopng), figure)
+        gctext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b><td><center><a name = \"S3.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</b></center></tr></td></table>\n", "GC content effect  ", basename(gcpdf), basename(gcpng), figure)
+
         legendgc = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows the distributions of the log<sub>2</sub> intensities grouped by the percentage of cytosines (C) and guanines (G) among the nucleotides in each probe. From the top to the bottom, kernel density estimates, empirical cumulative distribution functions (ECDF) and boxplots are represented. Box and line colors in the three panels correspond to the same groups. Cytosine and guanine are able to form three hydrogen bonds, while adenine (A) and thymine (T) only form two, hence oligonucleotides with a higher proportion of C and G can form more stable hybridization bindings. This should result in higher intensities measured on the array, regardless of the abundance of target molecules.</DIV>",  figure)
       }
 
@@ -1515,7 +1399,7 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
     
     if("hasTarget" %in% rownames(featureData(expressionset)@varMetadata))
       {
-        pmap = probesmap(expressionset, numArrays, section, figure, dat, sN, xlim)
+        pmap = probesmap(expressionset, numArrays, section, figure, dat, sN, xlim, type = 1)
 
         section = pmap$section
         figure = pmap$figure
@@ -1553,7 +1437,7 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
 ### Writing the report###
 #########################
     
-    con = if(exists("sNt")) report(expressionset=expressionset, arg=arg, sNt=sNt, sN=sN, sec1text=sec1text, mapdf=mapdf, matext1=matext1, nfig=nfig, legendMA=legendMA, batext=batext, nfig2=nfig2, bapng=bapng, ftext=ftext, pttext=pttext, legendpt=legendpt, nfig3=nfig3, fpng=fpng, legendlocal=legendlocal, sec2text=sec2text, htmltext2=htmltext2, legendhom1=legendhom1, group=group, htmltext3=htmltext3, dtext=dtext, legendhom2=legendhom2, sec3text=sec3text, gctext=gctext, legendgc=legendgc, gotext=gotext, legendgo=legendgo, sec4text=sec4text, htmltext4=htmltext4, legendheatmap=legendheatmap, sec5text=sec5text, htmltext5=htmltext5, legendsdmean=legendsdmean) else report(expressionset=expressionset, arg=arg, sNt=NULL, sN=sN, sec1text=sec1text, mapdf=mapdf, matext1=matext1, nfig=nfig, legendMA=legendMA, batext=batext, nfig2=nfig2, bapng=bapng, ftext=ftext, pttext=pttext, legendpt=legendpt, nfig3=nfig3, fpng=fpng, legendlocal=legendlocal, sec2text=sec2text, htmltext2=htmltext2, legendhom1=legendhom1, group=group, htmltext3=htmltext3, dtext=dtext, legendhom2=legendhom2, sec3text=sec3text, gctext=gctext, legendgc=legendgc, gotext=gotext, legendgo=legendgo, sec4text=sec4text, htmltext4=htmltext4, legendheatmap=legendheatmap, sec5text=sec5text, htmltext5=htmltext5, legendsdmean=legendsdmean)
+    con = if(exists("sNt")) report(expressionset=expressionset, arg=arg, sNt=sNt, sN=sN, sec1text=sec1text, mapdf=mapdf, matext1=matext1, nfig=nfig, legendMA=legendMA, batext=batext, nfig2=nfig2, bapng=bapng, ftext=ftext, pttext=pttext, legendpt=legendpt, nfig3=nfig3, fpng=fpng, legendlocal=legendlocal, sec2text=sec2text, htmltext2=htmltext2, legendhom1=legendhom1, group=group, htmltext3=htmltext3, legendhom2=legendhom2, sec3text=sec3text, gctext=gctext, legendgc=legendgc, gotext=gotext, legendgo=legendgo, sec4text=sec4text, htmltext4=htmltext4, legendheatmap=legendheatmap, sec5text=sec5text, htmltext5=htmltext5, legendsdmean=legendsdmean) else report(expressionset=expressionset, arg=arg, sNt=NULL, sN=sN, sec1text=sec1text, mapdf=mapdf, matext1=matext1, nfig=nfig, legendMA=legendMA, batext=batext, nfig2=nfig2, bapng=bapng, ftext=ftext, pttext=pttext, legendpt=legendpt, nfig3=nfig3, fpng=fpng, legendlocal=legendlocal, sec2text=sec2text, htmltext2=htmltext2, legendhom1=legendhom1, group=group, htmltext3=htmltext3, legendhom2=legendhom2, sec3text=sec3text, gctext=gctext, legendgc=legendgc, gotext=gotext, legendgo=legendgo, sec4text=sec4text, htmltext4=htmltext4, legendheatmap=legendheatmap, sec5text=sec5text, htmltext5=htmltext5, legendsdmean=legendsdmean)
 
 
 
@@ -1652,7 +1536,7 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             dev.off()
             dev.off()
             
-            qcStats = qc(expressionset)
+            qcStats = try(qc(expressionset))
             figure4 = figure3 + 1
             affypng4 = "qc.png"
             affypdf4 = "qc.pdf"
@@ -1661,20 +1545,22 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             suppressWarnings(dev.copy(pdf, file = affypdf4))
             dev.off()
             dev.off()
-if(class(p)=='try-error')
-              warning("QCstat plot from the package 'simpleaffy' cannot be produced for this data set.") 
+            if(class(p)=='try-error')
+              warning("QCstat plot from the package 'simpleaffy' cannot be produced for this data set.")
 
-            affytext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><a name = \"S6.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><center><BR><b>Figure %s</b></CENTER></tr></td><tr><td><b>%s</b></td><td><a name = \"S6.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><center><BR><b>Figure %s</b></CENTER></tr></td><tr><td><b>%s</b></td><td><a name = \"S6.3\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><center><BR><b>Figure %s</b></CENTER></tr></td><tr><td><b>%s</b></td><td><a name = \"S6.4\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><center><BR><b>Figure %s</b></CENTER></tr></td></table>\n", "RNA degradation plot", basename(affypdf1), basename(affypng1), figure1, "RLE plot", basename(affypdf2), basename(affypng2), figure2, "NUSE plot", basename(affypdf3), basename(affypng3), figure3, "Diagnostic plot recommended by Affy", basename(affypdf4), basename(affypng4), figure4)
+            
+            affytext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><a name = \"S6.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><center><BR><b>Figure %s</b></CENTER></tr></td><tr><td><b>%s</b></td><td><a name = \"S6.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><center><BR><b>Figure %s</b></CENTER></tr></td><tr><td><b>%s</b></td><td><a name = \"S6.3\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><center><BR><b>Figure %s</b></CENTER></tr></td><tr><td><b>%s</b></td><td><a name = \"S6.4\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><center><BR><b>Figure %s</b></CENTER></tr></td></table>\n", "RNA degradation plot", basename(affypdf1), basename(affypng1), figure1, "RLE plot", basename(affypdf2), basename(affypng2), figure2, "NUSE plot", basename(affypdf3), basename(affypng3), figure3, "Diagnostic plot recommended by Affymetrix", basename(affypdf4), basename(affypng4), figure4)
             writeLines(affytext, con)
-            legendaffy = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\">In this section we present diagnostic plots based on tools provided in the affyPLM package. In <b>Figure %s</b> a RNA digestion plot is computed on normalized data (so that standard deviation is equal to 1). In this plot each array is represented by a single line. It is important to identify any array(s) that has a slope which is very different from the others. The indication is that the RNA used for that array has potentially been handled quite differently from the other arrays.  <b>Figure %s</b> is a Relative Log Expression (RLE) plot and an array that has problems will either have larger spread, or will not be centered at M = 0, or both. <b>Figure %s</b> is a Normalized Unscaled Standard Error (NUSE) plot. Low quality arrays are those that are substantially elevated or more spread out, relative to the other arrays. NUSE values are not comparable across data sets. Both RLE and NUSE are performed on preprocessed data (background correction and quantile normalization). <b>Figure %s</b> represents the diagnostic plot recommended by Affymetrix. It is fully describe in the simpleaffy.pdf vignette of the package simpleaffy. Any metrics (circles and triangles) that is shown in red is out of the manufacturer's specific boundaries and suggests a potential problem.</DIV>", figure1, figure2, figure3, figure4)            
+            legendaffy = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\">In this section we present diagnostic plots based on tools provided in the affyPLM package. In <b>Figure %s</b> a RNA digestion plot is computed on normalized data (so that standard deviation is equal to 1). In this plot each array is represented by a single line. It is important to identify any array(s) that has a slope which is very different from the others. The indication is that the RNA used for that array has potentially been handled quite differently from the other arrays.  <b>Figure %s</b> is a Relative Log Expression (RLE) plot and an array that has problems will either have larger spread, or will not be centered at M = 0, or both. <b>Figure %s</b> is a Normalized Unscaled Standard Error (NUSE) plot. Low quality arrays are those that are substantially elevated or more spread out, relative to the other arrays. NUSE values are not comparable across data sets. Both RLE and NUSE are performed on preprocessed data (background correction and quantile normalization). <b>Figure %s</b> represents the diagnostic plot recommended by Affymetrix. It is fully describe in the simpleaffy.pdf vignette of the package simpleaffy. Any metrics that is shown in red is out of the manufacturer's specific boundaries and suggests a potential problem, any metrics shown in blue is fine.</DIV>", figure1, figure2, figure3, figure4)            
             writeLines(legendaffy, con)
             
             ##PM.MM
-            figure5 = figure4 + 1            
+            figure5 = figure4 + 1
+
             cols = brewer.pal(9, "Set1")
             xlim = c(min(na.omit(dat)),max(na.omit(dat)))            
-            pmopng = "overall_PM.MM.png"
-            pmopdf = "overall_PM.MM.pdf"       
+            pmopng = "PM.MM.png"
+            pmopdf = "PM.MM.pdf"       
         
             png(file = pmopng)
             pmmm(expressionset,xlim,"","","", cex.axis = 0.9)
@@ -1684,6 +1570,8 @@ if(class(p)=='try-error')
             dev.off()
             
             pmotext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b><td><center><a name = \"S6.5\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><br><b>Figure %s</b></center></tr></td></table>\n", "Perfect matchs and mismatchs ", basename(pmopdf), basename(pmopng), figure5)
+            
+           
             legendpmo = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows the density distributions of the log<sub>2</sub> intensities grouped by the matching of the probes. Blue, density estimate of intensities of perfect match probes (PM) and gray the mismatch probes (MM). We expect that, MM probes having poorer hybridization than PM probes, the PM curve should be shifted on the right of the MM curve.</DIV>",  figure5)
             writeLines(pmotext, con)
             writeLines(legendpmo, con)
@@ -1797,9 +1685,9 @@ setMethod("arrayQualityMetrics",signature(expressionset = "BeadLevelList"),
             if(expressionset@arrayInfo$channels == "single")
               legspe = "where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is the intensity of a \"pseudo\"-array, which have the median values of all the arrays."
             if(expressionset@arrayInfo$channels == "two")
-              legspe = "where I<sub>1</sub> and I<sub>2</sub> are the vectors of intensities of two channels."
+              legspe = "where I<sub>1</sub> and I<sub>2</sub> are the vectors of intensities of the two channels."
            
-              legendMA = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> represents MA plot for each array. <br> MA plots are useful for pairwise comparisons between arrays. M and A are defined as :<br>
+              legendMA = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> represents MA plot for each array. M and A are defined as :<br>
 M = log<sub>2</sub>(I<sub>1</sub>) - log<sub>2</sub>(I<sub>2</sub>)<br>
 A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
 %s The calculations are done on the summarized data obtained by using the function createBeadSummaryData from the package beadarray. Typically, we expect the mass of the distribution in an MA plot to be concentrated along the M = 0 axis, and there should be no trend in the mean of M as a function of A. Note that a bigger width of the plot of the M-distribution at the lower end of the A scale does not necessarily imply that the variance of the M-distribution is larger at the lower end of the A scale: the visual impression might simply be caused by the fact that there is more data at the lower end of the A scale. To visualize whether there is a trend in the variance of M as a function of A, consider plotting M versus rank(A).</DIV>", figure, legspe)                   
@@ -1925,151 +1813,78 @@ A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
                 par(cex.axis = 1, pty = "s", lheight =((1/log10(numArrays))*long), mai = mai , omi = c(0,0,0,0), xaxt = xaxt)
                 
                 if(expressionset@arrayInfo$channels == "single")
-                  boxplotBeads(expressionset, las = 3, outline = FALSE, col= colours[2], names = xname, title = "Log(Ratio)")
+                  boxplotBeads(expressionset, las = 3, outline = FALSE, col= colours[2], names = xname, ylab = "log(intensity)")
                 
                 if(expressionset@arrayInfo$channels == "two")
                   {
                     nf = layout(matrix(1:3,1,3,byrow=TRUE),
                       c(2,2,2), 2, TRUE)
-                    boxplotBeads(expressionset, las = 3, outline = FALSE, col= colours[6], names = xname, title = "Red Channel", whatToPlot = "R")
-                    boxplotBeads(expressionset, las = 3, outline = FALSE, col= colours[4], names = xname, title = "Green Channel", whatToPlot = "G")              
-                    boxplotBeads(expressionset, las = 3, outline = FALSE, col= colours[2], names = xname, title = "Log(Ratio)", whatToPlot = "M")
+                    boxplotBeads(expressionset, las = 3, outline = FALSE, col= colours[6], names = xname, ylab = "log(red intensity)", whatToPlot = "R")
+                    boxplotBeads(expressionset, las = 3, outline = FALSE, col= colours[4], names = xname, ylab = "log(green intensity)", whatToPlot = "G")              
+                    boxplotBeads(expressionset, las = 3, outline = FALSE, col= colours[2], names = xname, ylab = "log(ratio)", whatToPlot = "M")
                   }}, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</center></b></td></table>\n", title = "Boxplots", fig = figure)
             htmltext2 = mplot2[[2]]
-            legendhom1 = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> presents boxplots of the data.</DIV>", figure)          
+
+            if(expressionset@arrayInfo$channels == "single")
+              boxspe = ""
+            if(expressionset@arrayInfo$channels == "two")
+              boxspe = " The left panel corresponds to the red channel. The middle panel shows the green channel. The right panel shows the boxplots of log<sub>2</sub>(ratio)."
+           
+
+            legendhom1 = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> presents boxplots of the log<sub>2</sub>(Intensities). Each box corresponds to one array. %s If the arrays are homogeneous, the boxes should have similar wides and y position.</DIV>", figure, boxspe)          
       
 ############################
 ###Section 2.2 : Density ###
 ############################
             
-            ##Density if 1 group
             figure = figure + 1
             repe = ceiling(numArrays/9)
             colour = rep(brewer.pal(9, "Set1"),repe)
             
-            if(max(group) == 1)
-              {
-                mplot3 = makePlot(con=con, name = "density",
-                  w=10, h=10, fun = function() {
+            mplot3 = makePlot(con=con, name = "density",
+              w=10, h=10, fun = function() {
+                for(n in 1:max(group))
+                  {
                     if(expressionset@arrayInfo$channels == "single")
-                       {
-                         nf <- layout(matrix(c(1,2),2,1,byrow=TRUE), c(2.8,2.8),c(1.8,2), TRUE)                   
-                         par(xaxt = "n", cex.axis = 0.8, mar = c(0,5,2,5))
-                         plotBeadDensities(expressionset, what = "G", col = colour[seq_len(numArrays)], xlab="", ylab="", main="", xlim = xlim)                   
-                         mtext("Density", side = 2, adj = 0.5, padj = -4 , cex = 0.7)
-
-                         par(xaxt = "s", cex.axis = 0.8, mar = c(4,5,0,5))
-                         multiecdf(d, xlab="", ylab="", main="", col = colour[seq_len(numArrays)], xlim=xlim)
-                         mtext("ECDF", side = 2, adj = 0.5, padj = -4 , cex = 0.7)
-                         mtext("log(intensity)", side = 1, adj = 0.5, padj = 4 , cex = 0.7)
-                       }                  
+                      {
+                        nf <- layout(matrix(c(1,2),2,1,byrow=TRUE), c(2.8,2.8),c(1.8,2), TRUE)
+                        par(xaxt = "n", mar = c(0,5,2,5))
+                        plotBeadDensities(expressionset, what = "G", arrays = c(which(group==n)), col = colour[seq_len(numArrays)], xlab="", ylab="", main="", xlim=xlim)
+                        legend("topright", legend=sN[group==n],lty=1,col=brewer.pal(9, "Set1"), bty = "n", cex = 0.9)
+                        mtext("Density", side = 2, adj = 0.5, padj = -4 , cex = 0.9)
+                        if(max(group) != 1)
+                          mtext(paste("Group ", n, sep = ""),side = 3,adj = 0.5, padj = -1)
+                        par(xaxt = "s",  mar = c(4,5,0,5))
+                        multi("ecdf",d[group==n],xlim=xlim,"ECDF","log(intensity)","")
+                      }
+                    
                     if(expressionset@arrayInfo$channels == "two")
                       {
                         nf <- layout(matrix(c(1,2,3,4,5,6),2,3,byrow=TRUE),
                                      c(2.3,2,2), c(2,2), TRUE)
-                        par(mar=c(0,5,1,1),xaxt = "n", cex.axis = 0.9)
-                        plotBeadDensities(expressionset, what = "R", col = colour[seq_len(numArrays)], xlab="", ylab="", main="")
-                        mtext("Density", side = 2, adj = 0.5, padj = -4 , cex = 0.7)
-                        mtext("Red Channel", side = 3, adj = 0.5, padj = -1 , cex = 0.7)
+                        par(mar=c(0,5,1,1),xaxt = "n")
+                        plotBeadDensities(expressionset, what = "R", arrays = c(which(group==n)), col = colour[seq_len(numArrays)], xlab="", ylab="", main="")
+                        legend("topright",legend=sN[group==n],lty=1,col=brewer.pal(9, "Set1"), bty = "n", cex = 0.9)
+                        mtext("Density", side = 2, adj = 0.5, padj = -4 , cex = 0.9)
                         par(mar=c(0,2,1,1),xaxt = "n")
-                        plotBeadDensities(expressionset, what = "G", col = colour[seq_len(numArrays)], xlab="", ylab="", main="")                   
-                        mtext("Green Channel", side = 3, adj = 0.5, padj = -1 , cex = 0.7)
+                        plotBeadDensities(expressionset, what = "G", arrays = c(which(group==n)), col = colour[seq_len(numArrays)], xlab="", ylab="", main="")                   
+                        legend("topright",legend= sN[group==n],lty=1,col=brewer.pal(9, "Set1"), bty = "n", cex = 0.9)
+                        if(max(group) != 1)
+                          mtext(paste("Group ", n, sep = ""),side = 3,adj = 0.5, padj = -3 ,cex = 1)
                         par(mar=c(0,2,1,1),xaxt = "n")
-                        plotBeadDensities(expressionset, what = "M", col = colour[seq_len(numArrays)], xlab="", ylab="", main="")                   
-                        mtext("Log(Ratio)", side = 3, adj = 0.5, padj = -1 , cex = 0.7)
+                        plotBeadDensities(expressionset, what = "M", arrays = c(which(group==n)), col = colour[seq_len(numArrays)], xlab="", ylab="", main="")                   
+                        legend("topright", legend=sN[group==n],lty=1,col=brewer.pal(9, "Set1"), bty = "n", cex = 0.9)
                         par(mar=c(1,5,0,1), xaxt = "s")
-                        multi("ecdf",dr,xlim=xlimr,"ECDF","log(intensity)","")
+                        multi("ecdf",dr[group==n],xlim=xlimr,"ECDF","log(red intensity)","")
                         par(mar=c(1,2,0,1), xaxt = "s")
-                        multi("ecdf",dg,xlim=xlimg,"","log(intensity)","")
+                        multi("ecdf",dg[group==n],xlim=xlimg,"","log(green intensity)","")
                         par(mar=c(1,2,0,1), xaxt = "s")
-                        multi("ecdf",dlr,xlim=xlim,"","log(ratio)","")
-                      }                    
-                  }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></center></td></table>\n", title="Density plots", fig = figure)
-                htmltext3 = mplot3[[2]]
-              }
+                        multi("ecdf",dlr[group==n],xlim=xlim,"","log(ratio)","")
+                      }
+                  }
+              }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></center></td></table>\n", title="Density plots", fig = figure)
+            htmltext3 = mplot3[[2]]            
      
-            ##Density if more than 1 group
-            if(max(group) > 1)
-              {
-                dpng = "density.png"
-                dpdf = "density.pdf"
-                pdf(file = dpdf)
-                for(n in 1:max(group))
-                  {                    
-                    if(expressionset@arrayInfo$channels == "single")
-                       {
-                         nf <- layout(matrix(c(1,2),2,1,byrow=TRUE), c(2.8,2.8),c(1.8,2), TRUE)
-                         par(xaxt = "n", cex.axis = 0.8, mar = c(0,5,2,5))
-plotBeadDensities(expressionset, what = "G", arrays = c(which(group==n)), col = colour[seq_len(numArrays)], xlab="", ylab="", main="", xlim=xlim)
-                         mtext("Density", side = 2, adj = 0.5, padj = -4 , cex = 0.7)
-                         mtext(paste("Group ", n, sep = ""),side = 3,adj = 0.5, padj = -1 ,cex = 1)
-                         par(xaxt = "s", cex.axis = 0.8, mar = c(4,5,0,5))
-                         multiecdf(d[group==n], xlab="", ylab="", main="", col = colour[seq_len(numArrays)], xlim=xlim)
-                         mtext("ECDF", side = 2, adj = 0.5, padj = -4 , cex = 0.7)
-                         mtext("log(intensity)", side = 1, adj = 0.5, padj = 4 , cex = 0.7)
-                       }
-                    if(expressionset@arrayInfo$channels == "two")
-                       {
-                         nf <- layout(matrix(c(1,2,3,4,5,6),2,3,byrow=TRUE),
-                                      c(2.3,2,2), c(2,2), TRUE)
-                         par(mar=c(0,5,1,1),xaxt = "n", cex.axis = 0.9)
-                         plotBeadDensities(expressionset, what = "R", arrays = c(which(group==n)), col = colour[seq_len(numArrays)], xlab="", ylab="", main="")
-                         mtext("Density", side = 2, adj = 0.5, padj = -4 , cex = 0.7)
-                         mtext("Red Channel", side = 3, adj = 0.5, padj = -1 , cex = 0.7)
-                         par(mar=c(0,2,1,1),xaxt = "n")
-                         plotBeadDensities(expressionset, what = "G", arrays = c(which(group==n)), col = colour[seq_len(numArrays)], xlab="", ylab="", main="")                   
-                         mtext("Green Channel", side = 3, adj = 0.5, padj = -1 , cex = 0.7)
-                         mtext(paste("Group ", n, sep = ""),side = 3,adj = 0.5, padj = -3 ,cex = 1)
-                         par(mar=c(0,2,1,1),xaxt = "n")
-                         plotBeadDensities(expressionset, what = "M", arrays = c(which(group==n)), col = colour[seq_len(numArrays)], xlab="", ylab="", main="")                   
-                         mtext("Log(Ratio)", side = 3, adj = 0.5, padj = -1 , cex = 0.7)
-                         par(mar=c(1,5,0,1), xaxt = "s")
-                         multi("ecdf",dr[group==n],xlim=xlimr,"ECDF","log(intensity)","")
-                         par(mar=c(1,2,0,1), xaxt = "s")
-                         multi("ecdf",dg[group==n],xlim=xlimg,"","log(intensity)","")
-                         par(mar=c(1,2,0,1), xaxt = "s")
-                         multi("ecdf",dlr[group==n],xlim=xlim,"","log(ratio)","")
-                       }
-                  }
-                dev.off()
-                png(file = dpng)
-                if(expressionset@arrayInfo$channels == "single")
-                  {                
-                    nf <- layout(matrix(c(1,2),2,1,byrow=TRUE), c(2.8,2.8),c(1.8,2), TRUE)
-                    par(xaxt = "n", cex.axis = 0.8, mar = c(0,5,2,5))
-                    plotBeadDensities(expressionset, what = "G", arrays = c(which(group==n)), col = colour[seq_len(numArrays)], xlab="", ylab="", main="", xlim=xlim)                   
-                    mtext("Density", side = 2, adj = 0.5, padj = -4 , cex = 0.7)
-                    mtext("Group 1",side = 3,adj = 0.5, padj = -1 ,cex = 1)
-                    par(xaxt = "s", cex.axis = 0.8, mar = c(4,5,0,5))
-                    multiecdf(d[group==n], xlab="", ylab="", main="", col = colour[seq_len(numArrays)],xlim=xlim )
-                    mtext("ECDF", side = 2, adj = 0.5, padj = -4 , cex = 0.7)
-                    mtext("log(intensity)", side = 1, adj = 0.5, padj = 4 , cex = 0.7)
-                  }
-                if(expressionset@arrayInfo$channels == "two")
-                  {                
-                    nf <- layout(matrix(c(1,2,3,4,5,6),2,3,byrow=TRUE),
-                                 c(2.3,2,2), c(2,2), TRUE)
-                    par(mar=c(0,5,1,1),xaxt = "n", cex.axis = 0.9)
-                    plotBeadDensities(expressionset, what = "R", arrays = c(which(group==1)), col = colour[seq_len(numArrays)], xlab="", ylab="", main="")
-                    mtext("Density", side = 2, adj = 0.5, padj = -4 , cex = 0.7)
-                    mtext("Red Channel", side = 3, adj = 0.5, padj = -1 , cex = 0.7)
-                    par(mar=c(0,2,1,1),xaxt = "n")
-                    plotBeadDensities(expressionset, what = "G", arrays = c(which(group==1)), col = colour[seq_len(numArrays)], xlab="", ylab="", main="")                   
-                    mtext("Green Channel", side = 3, adj = 0.5, padj = -1 , cex = 0.7)
-                    mtext("Group 1",side = 3,adj = 0.5, padj = -3 ,cex = 1)
-                    par(mar=c(0,2,1,1),xaxt = "n")
-                    plotBeadDensities(expressionset, what = "M", arrays = c(which(group==1)), col = colour[seq_len(numArrays)], xlab="", ylab="", main="")                   
-                    mtext("Log(Ratio)", side = 3, adj = 0.5, padj = -1 , cex = 0.7)
-                    par(mar=c(1,5,0,1), xaxt = "s")
-                    multi("ecdf",dr[group==1],xlim=xlimr,"ECDF","log(intensity)","")
-                    par(mar=c(1,2,0,1), xaxt = "s")
-                    multi("ecdf",dg[group==1],xlim=xlimg,"","log(intensity)","")
-                    par(mar=c(1,2,0,1), xaxt = "s")
-                    multi("ecdf",dlr[group==1],xlim=xlim,"","log(ratio)","")
-                  }
-                dev.off()
-                dtext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><a name = \"S2.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></CENTER><BR></tr></td></table>\n", "Density plots", basename(dpdf), basename(dpng), figure)
-              }
             legendhom2 = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows density estimates (histograms) of the data. Arrays whose distributions are very different from the others should be considered for possible problems.</DIV>", figure)          
 
 
@@ -2119,7 +1934,7 @@ plotBeadDensities(expressionset, what = "G", arrays = c(which(group==n)), col = 
 ##########################
 
             arg = as.list(match.call(expand.dots = TRUE))
-            con = if(exists("sNt")) report(expressionset=expressionset, arg=arg, sNt=sNt, sN=sN, sec1text=sec1text, mapdf=mapdf, matext1=matext1, nfig=nfig, legendMA=legendMA, batext=batext, nfig2=nfig2, bapng=bapng, ftext=ftext, pttext=NULL, legendpt=NULL, nfig3=nfig3, fpng=fpng, legendlocal=legendlocal, sec2text=sec2text, htmltext2=htmltext2, legendhom1=legendhom1, group=group, htmltext3=htmltext3, dtext=dtext, legendhom2=legendhom2, sec3text=sec3text, gctext=gctext, legendgc=legendgc, gotext=gotext, legendgo=legendgo, sec4text=sec4text, htmltext4=htmltext4, legendheatmap=legendheatmap, sec5text=sec5text, htmltext5=htmltext5, legendsdmean=legendsdmean) else report(expressionset=expressionset, arg=arg, sNt=NULL, sN=sN, sec1text=sec1text, mapdf=mapdf, matext1=matext1, nfig=nfig, legendMA=legendMA, batext=batext, nfig2=nfig2, bapng=bapng, ftext=ftext, pttext=NULL, legendpt=NULL, nfig3=nfig3, fpng=fpng, legendlocal=legendlocal, sec2text=sec2text, htmltext2=htmltext2, legendhom1=legendhom1, group=group, htmltext3=htmltext3, dtext=dtext, legendhom2=legendhom2, sec3text=sec3text, gctext=gctext, legendgc=legendgc, gotext=gotext, legendgo=legendgo, sec4text=sec4text, htmltext4=htmltext4, legendheatmap=legendheatmap, sec5text=sec5text, htmltext5=htmltext5, legendsdmean=legendsdmean)
+            con = if(exists("sNt")) report(expressionset=expressionset, arg=arg, sNt=sNt, sN=sN, sec1text=sec1text, mapdf=mapdf, matext1=matext1, nfig=nfig, legendMA=legendMA, batext=batext, nfig2=nfig2, bapng=bapng, ftext=ftext, pttext=NULL, legendpt=NULL, nfig3=nfig3, fpng=fpng, legendlocal=legendlocal, sec2text=sec2text, htmltext2=htmltext2, legendhom1=legendhom1, group=group, htmltext3=htmltext3, legendhom2=legendhom2, sec3text=sec3text, gctext=gctext, legendgc=legendgc, gotext=gotext, legendgo=legendgo, sec4text=sec4text, htmltext4=htmltext4, legendheatmap=legendheatmap, sec5text=sec5text, htmltext5=htmltext5, legendsdmean=legendsdmean) else report(expressionset=expressionset, arg=arg, sNt=NULL, sN=sN, sec1text=sec1text, mapdf=mapdf, matext1=matext1, nfig=nfig, legendMA=legendMA, batext=batext, nfig2=nfig2, bapng=bapng, ftext=ftext, pttext=NULL, legendpt=NULL, nfig3=nfig3, fpng=fpng, legendlocal=legendlocal, sec2text=sec2text, htmltext2=htmltext2, legendhom1=legendhom1, group=group, htmltext3=htmltext3, legendhom2=legendhom2, sec3text=sec3text, gctext=gctext, legendgc=legendgc, gotext=gotext, legendgo=legendgo, sec4text=sec4text, htmltext4=htmltext4, legendheatmap=legendheatmap, sec5text=sec5text, htmltext5=htmltext5, legendsdmean=legendsdmean)
 
 
             writeLines("</table>", con)
