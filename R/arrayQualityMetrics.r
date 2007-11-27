@@ -137,14 +137,14 @@ maplot = function(M, A, sN, numArrays)
         pdf(mapdf[i], width = 8, height = 5)
         id.thispage <- (i-1) * app + id.firstpage
         id.thispage <- id.thispage[id.thispage <= numArrays]
-        print(update(trobj, index.cond = list(c((((length(id.thispage)/2)+1):length(id.thispage)),(1:(length(id.thispage)/2))))))
+        positions = na.omit(id.thispage[c(5:8,1:4)])
+        print(update(trobj, index.cond = list(positions[1:length(positions)])))
         dev.off()
       }
 
     png(mapng, width = 600, height = 300)
-    id.thispage <- (1-1) * app + id.firstpage
-    id.thispage <- id.thispage[id.thispage <= numArrays]
-    print(update(trobj, index.cond = list(c((((length(id.thispage)/2)+1):length(id.thispage)),(1:(length(id.thispage)/2))))))
+    positions = na.omit(id.firstpage[c(5:8,1:4)])
+    print(update(trobj, index.cond = list(positions[1:length(positions)])))
     dev.off()
     matext1 = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S1.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</b></center></td><td>\n", "MA plots",  basename(mapdf[1]),  basename(mapng[1]), figure)
     
@@ -544,14 +544,21 @@ setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
             if(do.logtransform)
               {
                 if(any(na.omit(assayData(expressionset)$R) == 0))
-                  stop("Red channel contains 0 values. Log transformation of 0 will lead to infinite values. If 0 are missing values, NA can be used instead.")
+                  {
+                    setwd(olddir)
+                    stop("Red channel contains 0 values. Log transformation of 0 will lead to infinite values. If 0 are missing values, NA can be used instead.")
+                  }
+                
                 rc = log2(assayData(expressionset)$R)
               } else rc = assayData(expressionset)$R
             
             if(do.logtransform)
               {
                 if(any(na.omit(assayData(expressionset)$G) == 0))
-                  stop("Green channel contains 0 values. Log transformation of 0 will lead to infinite values. If 0 are missing values, NA can be used instead.")
+                  {
+                    setwd(olddir)
+                    stop("Green channel contains 0 values. Log transformation of 0 will lead to infinite values. If 0 are missing values, NA can be used instead.")
+                  }
                 gc = log2(assayData(expressionset)$G)
               } else gc = assayData(expressionset)$G
 
@@ -578,7 +585,10 @@ setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
               {
                 lev = levels(expressionset@phenoData$dyeswap)
                 if(length(lev) != 2)
-                  stop("The dyeswap slot of the phenoData must be binary.\n")
+                  {
+                    setwd(olddir)                    
+                    stop("The dyeswap slot of the phenoData must be binary.\n")
+                  }
                 reverseddye = names(expressionset@phenoData$dyeswap[expressionset@phenoData$dyeswap == min(lev)])
                 dat[,reverseddye] = - dat[,reverseddye]
               }
@@ -1042,7 +1052,10 @@ aqm.expressionset = function(expressionset, outdir = getwd(), force = FALSE, do.
     if(do.logtransform)
       {
         if(any(na.omit(exprs(expressionset)) == 0))
-          stop("Data contains 0 values. Log transformation of 0 will lead to infinite values. If 0 are missing values, NA can be used instead.")
+          {
+            setwd(olddir)
+            stop("Data contains 0 values. Log transformation of 0 will lead to infinite values. If 0 are missing values, NA can be used instead.")
+          }
         dat = log2(exprs(expressionset))
       } else dat = exprs(expressionset)
     
@@ -1520,8 +1533,10 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             affypng2 = "RLE.png"
             affypdf2 = "RLE.pdf"
             png(file = affypng2)
-            try(Mbox(dataPLM, ylim = c(-1, 1), names = sN, col = cols[2],
-                 whisklty = 0, staplelty = 0, main = "RLE", las = 3, cex.axis = 0.8))
+            rle = try(Mbox(dataPLM, ylim = c(-1, 1),
+              names = sN, col = cols[2],
+              whisklty = 0, staplelty = 0,
+              main = "RLE", las = 3, cex.axis = 0.8))
             dev.copy(pdf, file = affypdf2)
             dev.off()
             dev.off()
@@ -1530,8 +1545,9 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             affypng3 = "NUSE.png"
             affypdf3 = "NUSE.pdf"
             png(file = affypng3)
-            try(boxplot(dataPLM, ylim = c(0.95, 1.5), names = sN,
-                    outline = FALSE, col = cols[2], main = "NUSE", las = 2, cex.axis = 0.8))
+            nuse = try(boxplot(dataPLM, ylim = c(0.95, 1.5), names = sN,
+              outline = FALSE, col = cols[2], main = "NUSE",
+              las = 2, cex.axis = 0.8))
             dev.copy(pdf, file = affypdf3)
             dev.off()
             dev.off()
@@ -1602,20 +1618,8 @@ setMethod("arrayQualityMetrics",signature(expressionset = "BeadLevelList"),
             if(expressionset@arrayInfo$channels == "two")
               {
                 summaryESRG = createBeadSummaryData(expressionset, what = "RG", imagesPerArray = 1, log = do.logtransform)
-                if(do.logtransform)
-                  {
-                    if(any(na.omit(assayData(summaryESRG)$R) == 0))
-                      stop("Red channel contains 0 values. Log transformation of 0 will lead to infinite values. If 0 are missing values, NA can be used instead.")
-                    rc = log2(assayData(summaryESRG)$R)
-                  } else rc = assayData(summaryESRG)$R
-            
-                if(do.logtransform)
-                  {
-                    if(any(na.omit(assayData(summaryESRG)$G) == 0))
-                      stop("Green channel contains 0 values. Log transformation of 0 will lead to infinite values. If 0 are missing values, NA can be used instead.")
-                    gc = log2(assayData(summaryESRG)$G)
-                  } else gc = assayData(summaryESRG)$G
-                
+                rc = assayData(summaryESRG)$R                         
+                gc = assayData(summaryESRG)$G                
                 summaryES = createBeadSummaryData(expressionset ,what = "M", imagesPerArray = 1, log = do.logtransform)
               }            
 
@@ -1635,7 +1639,7 @@ setMethod("arrayQualityMetrics",signature(expressionset = "BeadLevelList"),
                 ndiv = 6
                 dispo = TRUE
                 widthbox = 8
-                d = lapply(1:numArrays, function(i) getArrayData(expressionset, array = i, which = "G",log = do.logtransform))
+                d = lapply(1:numArrays, function(i) getArrayData(expressionset, array = i, what = "G",log = do.logtransform))
                 xlim = c(min(na.omit(unlist(d))),max(na.omit(unlist(d))))
 
               }
@@ -1644,9 +1648,9 @@ setMethod("arrayQualityMetrics",signature(expressionset = "BeadLevelList"),
                 ndiv = 3
                 dispo = FALSE
                 widthbox = 15
-                dr = lapply(1:numArrays, function(i) getArrayData(expressionset, array = i, which = "R",log = do.logtransform))
-                dg = lapply(1:numArrays, function(i) getArrayData(expressionset, array = i, which = "G",log = do.logtransform))
-                dlr = lapply(1:numArrays, function(i) getArrayData(expressionset, array = i, which = "M",log = do.logtransform))
+                dr = lapply(1:numArrays, function(i) getArrayData(expressionset, array = i, what = "R",log = do.logtransform))
+                dg = lapply(1:numArrays, function(i) getArrayData(expressionset, array = i, what = "G",log = do.logtransform))
+                dlr = lapply(1:numArrays, function(i) getArrayData(expressionset, array = i, what = "M",log = do.logtransform))
                 xlim = c(min(na.omit(unlist(dlr))),max(na.omit(unlist(dlr))))
                 xlimr = c(min(na.omit(unlist(dr))),max(na.omit(unlist(dr))))
                 xlimg = c(min(na.omit(unlist(dg))),max(na.omit(unlist(dg))))
