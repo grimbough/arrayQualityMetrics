@@ -3,7 +3,8 @@ setGeneric("arrayQualityMetrics",
                     outdir = getwd(),
                     force = FALSE,
                     do.logtransform = FALSE,
-                    split.plots = FALSE)
+                    split.plots = FALSE,
+                    intgroup = "Covariate")
            standardGeneric("arrayQualityMetrics"))
 
 #################################################################
@@ -207,7 +208,7 @@ probesmap = function(expressionset, numArrays, section, figure, dat, sN, xlim, t
   }
 
 ##Heatmap
-hmap = function(expressionset, sN, section, figure, outM, numArrays)
+hmap = function(expressionset, sN, section, figure, outM, numArrays, intgroup)
   {
     section = section + 1
     sec4text = sprintf("<hr><h2><a name = \"S4\">Section %s: Between array comparison</a></h2>", section)
@@ -223,9 +224,9 @@ hmap = function(expressionset, sN, section, figure, outM, numArrays)
     hpdf = "heatmap.pdf"
     hpng = "heatmap.png"
     
-   if("Covariate" %in% names(phenoData(expressionset)@data))
+   if(intgroup %in% colnames(pData(expressionset)))
       {
-        covar = phenoData(expressionset)$Covariate
+        covar = pData(expressionset)[colnames(pData(expressionset))==intgroup][,1]
         lev = levels(as.factor(covar))
         corres = matrix(0,nrow=length(lev),ncol=2)
         colourCov = brewer.pal(12,"Set3")
@@ -271,9 +272,9 @@ hmap = function(expressionset, sN, section, figure, outM, numArrays)
     
     leghmspe = if(is(expressionset, "BeadLevelList")) "the values used are the summarized ones obtained by using the function createBeadSummaryData from the package beadarray." else "without preprocessing." 
 
-    legendheatmap = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows a false color heatmap of between arrays distances, computed as the MAD of the M-value for each pair of arrays. <br><center><i>d<sub>ij</sub> = c &bull median|x<sub>mi</sub>-x<sub>mj</sub>|</i></center><br><br> Here, <i>x<sub>mi</sub></i> is the intensity value of the <i>m</i>-th probe on the <i>i</i>-th array, %s <br><i>c = 1.4826</i> is a constant factor that ensures consistency with the empirical variance for Normally distributed data (see manual page of the mad function in R). This plot can serve to detect outlier arrays. <br>Consider the following decomposition of <i>x<sub>mi</sub>: x<sub>mi</sub> = z<sub>m</sub> + &beta<sub>mi</sub> + &epsilon<sub>mi</sub></i>, where <i>z<sub>m</sub></i> is the probe effect for probe <i>m</i> (the same across all arrays), <i>&epsilon<sub>mi</sub></i> are i.i.d. random variables with mean zero and <i>&beta<sub>mi</sub></i> is such that for any array <i>i</i>, the majority of values <i>&beta<sub>mi</sub></i> are negligibly small (i. e. close to zero). <i>&beta<sub>mi</sub></i> represents differential expression effects. In this model, all values <i>d<sub>ij</sub></i> are (in expectation) the same, namely <sqrt>2</sqrt> times the standard deviation of <i>&epsilon<sub>mi</i></sub> . Arrays whose distance matrix entries are way different give cause for suspicion. The dendrogram on this plot also can serve to check if, without any probe filtering, the experiments cluster accordingly to a biological meaning.</DIV></table>",  figure, leghmspe)
+    legendheatmap = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows a false color heatmap of between arrays distances, computed as the median absolute difference of the M-value for each pair of arrays. <br><center><i>d<sub>xy</sub> = median|M<sub>xi</sub>-M<sub>yi</sub>|</i></center><br><br> Here, <i>M<sub>xi</sub></i> is the M-value of the <i>i</i>-th probe on the <i>x</i>-th array, %s <br>This plot can serve to detect outlier arrays. <br>Consider the following decomposition of <i>M<sub>xi</sub>: M<sub>xi</sub> = z<sub>i</sub> + &beta;<sub>xi</sub> + &epsilon;<sub>xi</sub></i>, where <i>z<sub>i</sub></i> is the probe effect for probe <i>i</i> (the same across all arrays), <i>&epsilon;<sub>xi</sub></i> are i.i.d. random variables with mean zero and <i>&beta;<sub>xi</sub></i> is such that for any array <i>x</i>, the majority of values <i>&beta;<sub>xi</sub></i> are negligibly small (i. e. close to zero). <i>&beta;<sub>xi</sub></i> represents differential expression effects. In this model, all values <i>d<sub>xy</sub></i> are (in expectation) the same, namely <sqrt>2</sqrt> times the standard deviation of <i>&epsilon;<sub>xi</i></sub> . Arrays whose distance matrix entries are way different give cause for suspicion. The dendrogram on this plot also can serve to check if, without any probe filtering, the experiments cluster accordingly to a biological meaning.</DIV></table>",  figure, leghmspe)
     
-    hmap = list(section=section, figure=figure, htmltext4=htmltext4,sec4text=sec4text, legendheatmap=legendheatmap, numArrays=numArrays)
+    hmap = list(section=section, figure=figure, htmltext4=htmltext4,sec4text=sec4text, legendheatmap=legendheatmap, numArrays=numArrays, intgroup=intgroup)
     return(hmap) 
   }
 
@@ -538,7 +539,7 @@ report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, l
 #################################################################
 
 setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
-          function(expressionset, outdir, force, do.logtransform, split.plots)
+          function(expressionset, outdir, force, do.logtransform, split.plots, intgroup)
           {
             ##data preparation
             if(do.logtransform)
@@ -1005,7 +1006,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
 ##########################################
             
             ##Heatmap
-            hmap = hmap(expressionset, sN, section, figure, outM, numArrays)
+            hmap = hmap(expressionset, sN, section, figure, outM, numArrays, intgroup = intgroup)
             
             section = hmap$section
             figure = hmap$figure
@@ -1046,7 +1047,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
 #################################################################
 #################################################################
 
-aqm.expressionset = function(expressionset, outdir = getwd(), force = FALSE, do.logtransform = FALSE, split.plots = FALSE, arg)
+aqm.expressionset = function(expressionset, outdir = getwd(), force = FALSE, do.logtransform = FALSE, split.plots = FALSE, ingroup = NULL, arg)
   {
     ##data preparation
     if(do.logtransform)
@@ -1427,7 +1428,7 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
 ##########################################
    
     ##Heatmap
-    hmap = hmap(expressionset, sN, section, figure, outM, numArrays)            
+    hmap = hmap(expressionset, sN, section, figure, outM, numArrays, intgroup)            
     section = hmap$section
     figure = hmap$figure
     htmltext4 = hmap$htmltext4
@@ -1466,11 +1467,11 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
 #################################################################
 
 setMethod("arrayQualityMetrics",signature(expressionset="ExpressionSet"),
-          function(expressionset, outdir, force, do.logtransform, split.plots)
+          function(expressionset, outdir, force, do.logtransform, split.plots, intgroup)
           {
             arg = as.list(match.call(expand.dots = TRUE))
 
-            l = aqm.expressionset(expressionset, outdir, force, do.logtransform, split.plots, arg)
+            l = aqm.expressionset(expressionset, outdir, force, do.logtransform, split.plots, intgroup, arg)
             con = l[[5]]
             olddir = l[[7]]
             
@@ -1487,11 +1488,11 @@ setMethod("arrayQualityMetrics",signature(expressionset="ExpressionSet"),
 
 setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
           function(expressionset, outdir, force, do.logtransform,
-          split.plots){
+          split.plots, intgroup){
             
             arg = as.list(match.call(expand.dots = TRUE))
 
-            l = aqm.expressionset(expressionset, outdir, force, do.logtransform, split.plots, arg)
+            l = aqm.expressionset(expressionset, outdir, force, do.logtransform, split.plots, intgroup, arg)
             numArrays = as.numeric(l$numArrays)
             sN = l$sN
             section = as.numeric(l$section)
@@ -1605,7 +1606,7 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
 ###################################################################
 
 setMethod("arrayQualityMetrics",signature(expressionset = "BeadLevelList"),
-          function(expressionset, outdir, force, do.logtransform, split.plots)
+          function(expressionset, outdir, force, do.logtransform, split.plots, intgroup)
           {
             olddir = getwd()
             dircreation(outdir, force)
@@ -1723,7 +1724,7 @@ A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
                 
              if(expressionset@arrayInfo$channels == "two")
                {
-                 imageplot(expressionset, array = a, high = "yellow", low = "blue", main="", whatToPlot="Rb", log = do.logtransform, ncolors = 256)
+                 imageplot(expressionset, array = a, high = "yellow", low = "blue", main="", whatToPlot="Rb", log = do.logtransform)
                  mtext(sN[a],side = 3,adj = 0.5, padj = -1 ,cex = 0.7)
                  mtext("Red Intensity",side = 2, line = 0.1 ,cex = 0.7)
                  imageplot(expressionset, array = a, high = "yellow", low = "blue", main="", whatToPlot="Gb", log = do.logtransform)
@@ -1912,7 +1913,7 @@ A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
 ##########################################
             
             ##Heatmap
-            hmap = hmap(expressionset, sN, section, figure, outM, numArrays)
+            hmap = hmap(expressionset, sN, section, figure, outM, numArrays, intgroup)
             
             section = hmap$section
             figure = hmap$figure

@@ -23,18 +23,20 @@
 
 \usage{
 \S4method{arrayQualityMetrics}{ExpressionSet}(expressionset, outdir,
-force, do.logtransform, split.plots)
+force, do.logtransform, split.plots, intgroup)
 
 arrayQualityMetrics(expressionset,
                     outdir = getwd(),
                     force = FALSE,
                     do.logtransform = FALSE,
-                    split.plots = FALSE)
+                    split.plots = FALSE,
+                    intgroup = "Covariate")
 
-\S4method{arrayQualityMetrics}{AffyBatch}(expressionset, outdir, force, do.logtransform, split.plots)
-\S4method{arrayQualityMetrics}{NChannelSet}(expressionset, outdir, force, do.logtransform, split.plots)
+\S4method{arrayQualityMetrics}{AffyBatch}(expressionset, outdir, force,
+do.logtransform, split.plots, intgroup)
+\S4method{arrayQualityMetrics}{NChannelSet}(expressionset, outdir, force, do.logtransform, split.plots, intgroup)
 \S4method{arrayQualityMetrics}{BeadLevelList}(expressionset, outdir,
-force, do.logtransform, split.plots)
+force, do.logtransform, split.plots, intgroup)
 }
 
 \arguments{
@@ -53,9 +55,12 @@ force, do.logtransform, split.plots)
 \item{do.logtransform}{ If TRUE, the data are log transformed before
   the analysis. }
   
-\item{split.plots}{  If the number of studied array
+\item{split.plots}{ If the number of studied array
   is more than 50 it is adviced to define a number of experiments to
   represent on the density plots. }
+
+\item{intgroup}{ Name of the column of the phenoData to be used to draw
+  a color side bar next to the heatmap. }
 }
 
 \value{
@@ -74,7 +79,8 @@ force, do.logtransform, split.plots)
     arrayQualityMetrics(expressionset = MLL.A,
                         outdir ="MLL",
                         do.logtransform = TRUE,
-                        split.plots = 10)
+                        split.plots = 10,
+                        intgroup = "Covariate")
     # "MLL_QMreport.html" is a report created in the working directory
     # on the logarithm expression data of the MLL.A AffyBatch.
     # 10 experiments are represented by density plots.
