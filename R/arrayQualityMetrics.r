@@ -72,17 +72,10 @@ prepdata = function(sN, dat, numArrays, split.plots)
     long = max(nchar(sN))
       
     ##if experiment names are to long they are replaced by figures
-    if(long >= 15)
+    sNt = cbind(sN,seq_len(length(sN)))        
+    colnames(sNt)=c("SampleName","New denomination")
+    if(long >= 15 || (numArrays >= 50 && long >= 10))
       {
-        sNt = cbind(sN,seq_len(length(sN)))        
-        colnames(sNt)=c("SampleName","New denomination")
-        sN = seq_len(length(sN))
-        long = max(nchar(sN))
-      }
-    if(numArrays >= 50 && long >= 10)
-      {
-        sNt = cbind(sN,seq_len(length(sN)))        
-        colnames(sNt)=c("SampleName","New denomination")
         sN = seq_len(length(sN))
         long = max(nchar(sN))
       }
@@ -93,7 +86,7 @@ prepdata = function(sN, dat, numArrays, split.plots)
     ##attribute randomly the experiments to different groups
     group = sample(rep((1:ceiling(numArrays/k)),k),numArrays)
     
-    dp = if(exists("sNt")) list(sN=sN, long=long, sNt=sNt, outM=outM, group=group) else list(sN=sN, long=long, outM=outM, group=group)    
+    dp = list(sN=sN, long=long, sNt=sNt, outM=outM, group=group)
     return(dp) 
   }
 
@@ -224,7 +217,7 @@ hmap = function(expressionset, sN, section, figure, outM, numArrays, intgroup)
     hpdf = "heatmap.pdf"
     hpng = "heatmap.png"
     
-   if(intgroup %in% colnames(pData(expressionset)))
+   if(intgroup %in% names(phenoData(expressionset)@data))
       {
         covar = pData(expressionset)[colnames(pData(expressionset))==intgroup][,1]
         lev = levels(as.factor(covar))
@@ -274,7 +267,12 @@ hmap = function(expressionset, sN, section, figure, outM, numArrays, intgroup)
 
     legendheatmap = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows a false color heatmap of between arrays distances, computed as the median absolute difference of the M-value for each pair of arrays. <br><center><i>d<sub>xy</sub> = median|M<sub>xi</sub>-M<sub>yi</sub>|</i></center><br><br> Here, <i>M<sub>xi</sub></i> is the M-value of the <i>i</i>-th probe on the <i>x</i>-th array, %s <br>This plot can serve to detect outlier arrays. <br>Consider the following decomposition of <i>M<sub>xi</sub>: M<sub>xi</sub> = z<sub>i</sub> + &beta;<sub>xi</sub> + &epsilon;<sub>xi</sub></i>, where <i>z<sub>i</sub></i> is the probe effect for probe <i>i</i> (the same across all arrays), <i>&epsilon;<sub>xi</sub></i> are i.i.d. random variables with mean zero and <i>&beta;<sub>xi</sub></i> is such that for any array <i>x</i>, the majority of values <i>&beta;<sub>xi</sub></i> are negligibly small (i. e. close to zero). <i>&beta;<sub>xi</sub></i> represents differential expression effects. In this model, all values <i>d<sub>xy</sub></i> are (in expectation) the same, namely <sqrt>2</sqrt> times the standard deviation of <i>&epsilon;<sub>xi</i></sub> . Arrays whose distance matrix entries are way different give cause for suspicion. The dendrogram on this plot also can serve to check if, without any probe filtering, the experiments cluster accordingly to a biological meaning.</DIV></table>",  figure, leghmspe)
     
-    hmap = list(section=section, figure=figure, htmltext4=htmltext4,sec4text=sec4text, legendheatmap=legendheatmap, numArrays=numArrays, intgroup=intgroup)
+    if(intgroup %in% names(phenoData(expressionset)@data))
+      {
+        hmap = list(section=section, figure=figure, htmltext4=htmltext4,sec4text=sec4text, legendheatmap=legendheatmap, numArrays=numArrays, intgroup=intgroup)
+      } else {
+        hmap = list(section=section, figure=figure, htmltext4=htmltext4,sec4text=sec4text, legendheatmap=legendheatmap, numArrays=numArrays)
+      }
     return(hmap) 
   }
 
@@ -322,37 +320,131 @@ pmmm = function(x, xlim, title1, title2, title3, ...)
     mtext(title3, side = 3, adj = 0.5, padj = -1 , cex = 0.7)
   }
 
+##SCORES COMPUTATION
+scores = function(expressionset, numArrays, M, ldat, outM, dat, maxc, maxr, nuse, rle)
+  {
+    ## MA plot
+    mamean = sapply(1:numArrays, function(i) mean(abs(M[,i])))
+    mastat = boxplot.stats(mamean)
+    maout = sapply(1:length(mastat$out), function(x) which(mamean == mastat$out[x]))
+    ## boxplot
+    b = boxplot(ldat, plot = FALSE, range = 0)
+    if(is(expressionset,"BeadLevelList") && expressionset@arrayInfo$channels == "single")
+       b = boxplotBeads(expressionset, plot = FALSE)
+    if(is(expressionset,"BeadLevelList") && expressionset@arrayInfo$channels == "two")
+       b = boxplotBeads(expressionset, plot = FALSE, whatToPlot = "M")
+    bmeanstat = boxplot.stats(b$stat[3,])
+    bmeanout = sapply(1:length(bmeanstat$out), function(x) which(b$stat[3,] == bmeanstat$out[x]))
+
+    biqr = b$stat[4,] -  b$stat[2,] 
+    biqrstat = boxplot.stats(biqr)
+    biqrout = sapply(1:length(biqrstat$out), function(x) which(biqr == biqrstat$out[x]))
+
+    ## heatmap
+    madsum = rowSums(as.matrix(outM), na.rm=T)
+    madstat = boxplot.stats(madsum)
+    madout = sapply(1:length(madstat$out), function(x) which(madsum == madstat$out[x]))
+
+    if(!is(expressionset, "BeadLevelList") && (is(expressionset, "AffyBatch") || ("X" %in% rownames(featureData(expressionset)@varMetadata) && "Y" %in% rownames(featureData(expressionset)@varMetadata))))
+      {
+
+        ## spatial plot
+        mdat = lapply(1:numArrays, function(x) matrix(dat[,x],ncol=maxc,nrow=maxr,byrow=T))
+        loc=0
+        for(x in 1:numArrays)
+          {
+            hhm = hist(abs(fft(mdat[[x]])), 100, plot = FALSE)
+            loc[x] = hhm$count[2]/hhm$count[1]
+          }
+        locstat = boxplot.stats(loc)
+        locout = sapply(1:length(locstat$out), function(x) which(loc == locstat$out[x]))
+      }
+
+    ## Sd mean
+    msd = meanSdPlot(dat, plot = FALSE)
+    msddiff = max(msd$sd)-min(msd$sd)
+    msdout = msddiff > 0.3
+    
+    if(is(expressionset, "AffyBatch"))
+      {
+        ## NUSE
+        nusemeanstat = boxplot.stats(nuse$stat[3,])
+        nusemeanout = sapply(1:length(nusemeanstat$out), function(x) which(nuse$stat[3,] == nusemeanstat$out[x]))
+
+        nuseiqr = nuse$stat[4,] -  nuse$stat[2,] 
+        nuseiqrstat = boxplot.stats(nuseiqr)
+        nuseiqrout = sapply(1:length(nuseiqrstat$out), function(x) which(nuseiqr == nuseiqrstat$out[x]))
+
+
+        ## RLE
+        rlemed = rle$stats[3,]
+        rleout = which(abs(rlemed) > 0.1)
+        scoresout = list(maout,union(bmeanout,biqrout),madout,locout,msdout,union(nusemeanout,nuseiqrout),rleout)
+      }
+    
+    if(!is(expressionset, "BeadLevelList") && ("X" %in% rownames(featureData(expressionset)@varMetadata) && "Y" %in% rownames(featureData(expressionset)@varMetadata)))
+      scoresout = list(maout,union(bmeanout,biqrout),madout,locout,msdout)
+    
+    if(is(expressionset, "BeadLevelList") || (!is(expressionset, "AffyBatch") && (!("X" %in% rownames(featureData(expressionset)@varMetadata) && "Y" %in% rownames(featureData(expressionset)@varMetadata)))))
+      scoresout = list(maout,union(bmeanout,biqrout),madout,msdout)
+          
+    return(scoresout)
+  }
+
 ##writing the report
-report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, legendMA, batext, nfig2, bapng, ftext, pttext, legendpt, nfig3, fpng, legendlocal, sec2text, htmltext2, legendhom1, group, htmltext3, legendhom2, sec3text, gctext, legendgc, gotext, legendgo, sec4text, htmltext4, legendheatmap, sec5text, htmltext5, legendsdmean)
+report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, legendMA, batext, nfig2, bapng, ftext, pttext, legendpt, nfig3, fpng, legendlocal, sec2text, htmltext2, legendhom1, group, htmltext3, legendhom2, sec3text, gctext, legendgc, gotext, legendgo, sec4text, htmltext4, legendheatmap, sec5text, htmltext5, legendsdmean, scores)
   {
 ### Title
     title = paste(arg$expressionset, " quality metrics report", sep="")
-    titletext = sprintf("<hr><h1><center>%s</h1></center><table border = \"0\" cellspacing = 5 cellpadding = 2 >", title)
+    titletext = sprintf("<hr><h1><center>%s</h1></center><table border = \"0\" cellspacing = 5 cellpadding = 2 style=\"font-size: 13; font-family: Lucida Grande; text-align:center\">", title)
     con = openHtmlPage("QMreport", title)
     writeLines(titletext, con)
 
 ### Experiments names
-    if(!is.null(sNt))
-      {
-        writeLines("<hr><h2>Experiment Names</h2>", con)
-        for(i in seq_len(length(sN)))
-          {
-            if(i %in% seq(1,length(sN),by = 2))
-              {
-                col1 = "#e0e0f0"
-                col2 = "#d0d0ff"
-              }
-            if(i %in% seq(2,length(sN),by = 2))
-              {
-                col1 = "#d0d0ff"
-                col2 = "#e0e0f0"
-              }
-            stext = sprintf("<tr><td BGCOLOR=\"%s\"><b>%s</b></td><td BGCOLOR=\"%s\">%s</td></tr>", col1, sNt[i,2], col2, sNt[i,1])
-            writeLines(stext, con)
-          }
-        writeLines("</table>", con)
-      }
+    writeLines("<hr><h2>Summary</h2>", con)
+    col1 = "#d0d0ff"
+    col2 = "#e0e0f0"
+    if(is(expressionset, "AffyBatch"))
+      stext1 = sprintf("<tr><td BGCOLOR=\"%s\"><b>Experiment &#35;</b></td><td BGCOLOR=\"%s\"><b>Experiment Name</b></td><td BGCOLOR=\"%s\"><b>MA-plot</b></td><td BGCOLOR=\"%s\"><b>Spatial distribution</b></td><td BGCOLOR=\"%s\"><b>Boxplots/Density plots</b></td><td BGCOLOR=\"%s\"><b>Heatmap</b></td><td BGCOLOR=\"%s\"><b>MeanSd</b></td><td BGCOLOR=\"%s\"><b>RLE</b></td><td BGCOLOR=\"%s\"><b>NUSE</b></td></tr>", col1, col2, col1, col2,col1, col2,col1, col2,col1)
 
+    if(!is(expressionset, "BeadLevelList") && ("X" %in% rownames(featureData(expressionset)@varMetadata) && "Y" %in% rownames(featureData(expressionset)@varMetadata)))
+      stext1 = sprintf("<tr><td BGCOLOR=\"%s\"><b>Experiment &#35;</b></td><td BGCOLOR=\"%s\"><b>Experiment Name</b></td><td BGCOLOR=\"%s\"><b>MA-plot</b></td><td BGCOLOR=\"%s\"><b>Spatial distribution</b></td><td BGCOLOR=\"%s\"><b>Boxplots/Density plots</b></td><td BGCOLOR=\"%s\"><b>Heatmap</b></td><td BGCOLOR=\"%s\"><b>MeanSd</b></td></tr>", col1, col2, col1, col2,col1, col2,col1)
+
+
+    if(is(expressionset, "BeadLevelList") || (!is(expressionset, "AffyBatch") && (!("X" %in% rownames(featureData(expressionset)@varMetadata) && "Y" %in% rownames(featureData(expressionset)@varMetadata)))))
+      stext1 = sprintf("<tr><td BGCOLOR=\"%s\"><b>Experiment &#35;</b></td><td BGCOLOR=\"%s\"><b>Experiment Name</b></td><td BGCOLOR=\"%s\"><b>MA-plot</b></td><td BGCOLOR=\"%s\"><b>Boxplots/Density plots</b></td><td BGCOLOR=\"%s\"><b>Heatmap</b></td><td BGCOLOR=\"%s\"><b>MeanSd</b></td></tr>", col1, col2, col1, col2,col1, col2)
+    
+    writeLines(stext1, con)
+    for(i in seq_len(length(sN)))
+      {
+        if(i %in% seq(1,length(sN),by = 2))
+          {
+            col1 = "#e0e0f0"
+            col2 = "#d0d0ff"
+          }
+        if(i %in% seq(2,length(sN),by = 2))
+          {
+            col1 = "#d0d0ff"
+            col2 = "#e0e0f0"
+          }
+        if(is(expressionset, "AffyBatch"))
+          stext2 = sprintf("<tr><td BGCOLOR=\"%s\"><b>%s</b></td><td BGCOLOR=\"%s\">%s</td><td BGCOLOR=\"%s\">%s</td><td BGCOLOR=\"%s\">%s</td><td BGCOLOR=\"%s\">%s</td><td BGCOLOR=\"%s\">%s</td><td BGCOLOR=\"%s\">%s</td><td BGCOLOR=\"%s\">%s</td><td BGCOLOR=\"%s\">%s</td></tr>", col1, sNt[i,2], col2, sNt[i,1], col1,scores[i,1] , col2,scores[i,2], col1, scores[i,3], col2,scores[i,4], col1,scores[i,5], col2,scores[i,6], col1,scores[i,7])
+        
+        if(!is(expressionset, "BeadLevelList") && ("X" %in% rownames(featureData(expressionset)@varMetadata) && "Y" %in% rownames(featureData(expressionset)@varMetadata)))
+          stext2 = sprintf("<tr><td BGCOLOR=\"%s\"><b>%s</b></td><td BGCOLOR=\"%s\">%s</td><td BGCOLOR=\"%s\">%s</td><td BGCOLOR=\"%s\">%s</td><td BGCOLOR=\"%s\">%s</td><td BGCOLOR=\"%s\">%s</td><td BGCOLOR=\"%s\">%s</td></tr>", col1, sNt[i,2], col2, sNt[i,1], col1,scores[i,1] , col2,scores[i,2], col1, scores[i,3], col2,scores[i,4], col1,scores[i,5])       
+        
+        if(is(expressionset, "BeadLevelList") || (!is(expressionset, "AffyBatch") && (!("X" %in% rownames(featureData(expressionset)@varMetadata) && "Y" %in% rownames(featureData(expressionset)@varMetadata)))))
+          stext2 = sprintf("<tr><td BGCOLOR=\"%s\"><b>%s</b></td><td BGCOLOR=\"%s\">%s</td><td BGCOLOR=\"%s\">%s</td><td BGCOLOR=\"%s\">%s</td><td BGCOLOR=\"%s\">%s</td><td BGCOLOR=\"%s\">%s</td></tr>", col1, sNt[i,2], col2, sNt[i,1], col1,scores[i,1] , col2,scores[i,2], col1, scores[i,3], col2,scores[i,4])
+        
+        writeLines(stext2, con)
+      }
+    writeLines("</table>", con)
+    
+    scoreslegend =  sprintf("If an array has been identified as having a quality problem in one of the plots below, the corresponding cell in the table will indicate \"Problem\".")
+    
+    writeLines(scoreslegend, con)
+      
+    
 ### Index
     
     writeLines("<hr><h2>Index</h2><table border = \"0\" cellspacing = 5 cellpadding = 2><UL>", con)
@@ -600,7 +692,7 @@ setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
             
             long = dprep$long
             sN = dprep$sN
-            if("sNt" %in% names(dprep)) sNt = dprep$sNt
+            sNt = dprep$sNt
             outM = dprep$outM
             group = dprep$group
 
@@ -1006,7 +1098,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
 ##########################################
             
             ##Heatmap
-            hmap = hmap(expressionset, sN, section, figure, outM, numArrays, intgroup = intgroup)
+            hmap = hmap(expressionset, sN, section, figure, outM, numArrays, intgroup)
             
             section = hmap$section
             figure = hmap$figure
@@ -1028,13 +1120,29 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
             legendsdmean = msdp$legendsdmean
 
 ##########################
-### Writing the report ###
+### Scores computation ###
 ##########################
 
+            sc = scores(expressionset=expressionset,numArrays=numArrays, M=M, ldat=ldat, outM=outM, dat=dat, maxc=maxc, maxr=maxr, nuse=NULL, rle=NULL)
+            
+            scores = matrix("",ncol=length(sc),nrow=numArrays)
+            for( i in 1:length(sc) )
+              scores[unlist(sc[[i]][1:length(sc[[1]])]),i]="Problem"
+            
+            
+##########################
+### Writing the report ###
+##########################
+            
             arg = as.list(match.call(expand.dots = TRUE))
-            con = if(exists("sNt")) report(expressionset=expressionset, arg=arg, sNt=sNt, sN=sN, sec1text=sec1text, mapdf=mapdf, matext1=matext1, nfig=nfig, legendMA=legendMA, batext=batext, nfig2=nfig2, bapng=bapng, ftext=ftext, pttext=pttext, legendpt=legendpt, nfig3=nfig3, fpng=fpng, legendlocal=legendlocal, sec2text=sec2text, htmltext2=htmltext2, legendhom1=legendhom1, group=group, htmltext3=htmltext3, legendhom2=legendhom2, sec3text=sec3text, gctext=gctext, legendgc=legendgc, gotext=gotext, legendgo=legendgo, sec4text=sec4text, htmltext4=htmltext4, legendheatmap=legendheatmap, sec5text=sec5text, htmltext5=htmltext5, legendsdmean=legendsdmean) else report(expressionset=expressionset, arg=arg, sNt=NULL, sN=sN, sec1text=sec1text, mapdf=mapdf, matext1=matext1, nfig=nfig, legendMA=legendMA, batext=batext, nfig2=nfig2, bapng=bapng, ftext=ftext, pttext=pttext, legendpt=legendpt, nfig3=nfig3, fpng=fpng, legendlocal=legendlocal, sec2text=sec2text, htmltext2=htmltext2, legendhom1=legendhom1, group=group, htmltext3=htmltext3, legendhom2=legendhom2, sec3text=sec3text, gctext=gctext, legendgc=legendgc, gotext=gotext, legendgo=legendgo, sec4text=sec4text, htmltext4=htmltext4, legendheatmap=legendheatmap, sec5text=sec5text, htmltext5=htmltext5, legendsdmean=legendsdmean)
+            con = report(expressionset=expressionset, arg=arg, sNt=sNt, sN=sN, sec1text=sec1text, mapdf=mapdf, matext1=matext1, nfig=nfig, legendMA=legendMA, batext=batext, nfig2=nfig2, bapng=bapng, ftext=ftext, pttext=pttext, legendpt=legendpt, nfig3=nfig3, fpng=fpng, legendlocal=legendlocal, sec2text=sec2text, htmltext2=htmltext2, legendhom1=legendhom1, group=group, htmltext3=htmltext3, legendhom2=legendhom2, sec3text=sec3text, gctext=gctext, legendgc=legendgc, gotext=gotext, legendgo=legendgo, sec4text=sec4text, htmltext4=htmltext4, legendheatmap=legendheatmap, sec5text=sec5text, htmltext5=htmltext5, legendsdmean=legendsdmean, scores=scores)
 
             writeLines("</table>", con)
+            z=sessionInfo("arrayQualityMetrics")
+            version = z$otherPkgs[[1]]$Version
+            rversion = sessionInfo()$R.version$version.string
+            writeLines(sprintf("<hr><DIV style=\"font-size: 13; font-family: Lucida Grande\">This report has been created with arrayQualityMetrics %s under %s</DIV>",version, rversion), con)
+
             closeHtmlPage(con)
             setwd(olddir)
             
@@ -1047,7 +1155,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
 #################################################################
 #################################################################
 
-aqm.expressionset = function(expressionset, outdir = getwd(), force = FALSE, do.logtransform = FALSE, split.plots = FALSE, intgroup = NULL, arg)
+aqm.expressionset = function(expressionset, outdir = getwd(), force = FALSE, do.logtransform = FALSE, split.plots = FALSE, intgroup = "Covariate", arg)
   {
     ##data preparation
     if(do.logtransform)
@@ -1074,7 +1182,7 @@ aqm.expressionset = function(expressionset, outdir = getwd(), force = FALSE, do.
             
     long = dprep$long
     sN = dprep$sN
-    if("sNt" %in% names(dprep)) sNt = dprep$sNt
+    sNt = dprep$sNt
     outM = dprep$outM
     group = dprep$group
       
@@ -1408,7 +1516,7 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
       }
 
 ######################################
-###Section 3.1 : Mapping of probes ###
+###Section 3.2 : Mapping of probes ###
 ######################################
     
     if("hasTarget" %in% rownames(featureData(expressionset)@varMetadata))
@@ -1420,7 +1528,7 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
         gotext = pmap$gotext
         sec3text = as.character(pmap$sec3text)
                 
-        legendgo = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows the density distributions of the log<sub>2</sub> intensities grouped by the mapping of the probes. Blue, density estimate of intensities of probes annotated \"TRUE\" in the <b>\"hasTarget\"</b> slot. Gray, probes annotated \"FALSE\" in the <b>\"hasTarget\"</b> slot. We expect that, probes mapping with a coding mRNA will have higher expression level than unannotated probes, the density curve of mapping probes should be shifted on the right of the curve of unannotated probes.</DIV>", figure)          
+        legendgo = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows the density distributions of the log<sub>2</sub> intensities grouped by the mapping of the probes. Blue, density estimate of intensities of probes annotated \"TRUE\" in the <b>\"hasTarget\"</b> slot. Gray, probes annotated \"FALSE\" in the <b>\"hasTarget\"</b> slot. We expect that, probes mapping with a coding mRNA will have higher expression level than unannotated probes, the density curve of mapping probes should be shifted to the right of the curve of unannotated probes.</DIV>", figure)          
       }
     
 ##########################################
@@ -1445,18 +1553,49 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
     figure = msdp$figure
     htmltext5 = msdp$htmltext5
     sec5text = msdp$sec5text
-    legendsdmean = msdp$legendsdmean    
+    legendsdmean = msdp$legendsdmean
+
+    
+##########################
+### Scores computation ###
+##########################
+    if(is(expressionset, "ExpressionSet"))
+      {
+        sc = scores(expressionset=expressionset,numArrays=numArrays, M=M, ldat=ldat, outM=outM, dat=dat, maxc=maxc, maxr=maxr, nuse=NULL, rle=NULL)               
+        scores = matrix("",ncol=length(sc),nrow=numArrays)
+        for( i in 1:length(sc) )
+          scores[unlist(sc[[i]][1:length(sc[[1]])]),i]="Problem"
+      }
+
 
 #########################
 ### Writing the report###
 #########################
     
-    con = if(exists("sNt")) report(expressionset=expressionset, arg=arg, sNt=sNt, sN=sN, sec1text=sec1text, mapdf=mapdf, matext1=matext1, nfig=nfig, legendMA=legendMA, batext=batext, nfig2=nfig2, bapng=bapng, ftext=ftext, pttext=pttext, legendpt=legendpt, nfig3=nfig3, fpng=fpng, legendlocal=legendlocal, sec2text=sec2text, htmltext2=htmltext2, legendhom1=legendhom1, group=group, htmltext3=htmltext3, legendhom2=legendhom2, sec3text=sec3text, gctext=gctext, legendgc=legendgc, gotext=gotext, legendgo=legendgo, sec4text=sec4text, htmltext4=htmltext4, legendheatmap=legendheatmap, sec5text=sec5text, htmltext5=htmltext5, legendsdmean=legendsdmean) else report(expressionset=expressionset, arg=arg, sNt=NULL, sN=sN, sec1text=sec1text, mapdf=mapdf, matext1=matext1, nfig=nfig, legendMA=legendMA, batext=batext, nfig2=nfig2, bapng=bapng, ftext=ftext, pttext=pttext, legendpt=legendpt, nfig3=nfig3, fpng=fpng, legendlocal=legendlocal, sec2text=sec2text, htmltext2=htmltext2, legendhom1=legendhom1, group=group, htmltext3=htmltext3, legendhom2=legendhom2, sec3text=sec3text, gctext=gctext, legendgc=legendgc, gotext=gotext, legendgo=legendgo, sec4text=sec4text, htmltext4=htmltext4, legendheatmap=legendheatmap, sec5text=sec5text, htmltext5=htmltext5, legendsdmean=legendsdmean)
-
-
-
-    l = list(numArrays=numArrays,sN=sN, section=section, figure=figure, con=con, dat=dat, olddir=olddir)
-
+    if(is(expressionset, "ExpressionSet"))
+      {
+        con = report(expressionset=expressionset, arg=arg, sNt=sNt, sN=sN, sec1text=sec1text, mapdf=mapdf, matext1=matext1, nfig=nfig, legendMA=legendMA, batext=batext, nfig2=nfig2, bapng=bapng, ftext=ftext, pttext=pttext, legendpt=legendpt, nfig3=nfig3, fpng=fpng, legendlocal=legendlocal, sec2text=sec2text, htmltext2=htmltext2, legendhom1=legendhom1, group=group, htmltext3=htmltext3, legendhom2=legendhom2, sec3text=sec3text, gctext=gctext, legendgc=legendgc, gotext=gotext, legendgo=legendgo, sec4text=sec4text, htmltext4=htmltext4, legendheatmap=legendheatmap, sec5text=sec5text, htmltext5=htmltext5, legendsdmean=legendsdmean, scores=scores)
+        l = list(numArrays=numArrays,sN=sN, section=section, figure=figure, con=con, dat=dat, olddir=olddir)
+      }
+    
+    if(is(expressionset, "AffyBatch"))
+      {
+        l = list(numArrays=numArrays, section=section, figure=figure, dat=dat, olddir=olddir, expressionset=expressionset, arg=arg, sN=sN, sec1text=sec1text, mapdf=mapdf, matext1=matext1, nfig=nfig, legendMA=legendMA, ftext=ftext, pttext=pttext, legendpt=legendpt, nfig3=nfig3, fpng=fpng, legendlocal=legendlocal, sec2text=sec2text, htmltext2=htmltext2, legendhom1=legendhom1, group=group, htmltext3=htmltext3, legendhom2=legendhom2,  sec4text=sec4text, htmltext4=htmltext4, legendheatmap=legendheatmap, sec5text=sec5text, htmltext5=htmltext5, legendsdmean=legendsdmean, M=M, outM=outM, maxc=maxc, maxr=maxr, ldat=ldat)
+        l$sNt = sNt
+        if("GC" %in% rownames(featureData(expressionset)@varMetadata))
+          {
+            l$sec3text=sec3text
+            l$gctext=gctext
+            l$legendgc=legendgc
+          }
+          if("hasTarget" %in% rownames(featureData(expressionset)@varMetadata))
+            {
+              l$sec3text=sec3text
+              l$gotext=gotext
+              l$legendgo=legendgo
+            }       
+      }
+    
     return(l) 
   }
 
@@ -1472,10 +1611,15 @@ setMethod("arrayQualityMetrics",signature(expressionset="ExpressionSet"),
             arg = as.list(match.call(expand.dots = TRUE))
 
             l = aqm.expressionset(expressionset, outdir, force, do.logtransform, split.plots, intgroup, arg)
-            con = l[[5]]
-            olddir = l[[7]]
+            con = l$con
+            olddir = l$olddir
             
             writeLines("</table>", con)
+            z=sessionInfo("arrayQualityMetrics")
+            version = z$otherPkgs[[1]]$Version
+            rversion = sessionInfo()$R.version$version.string
+            writeLines(sprintf("<hr><DIV style=\"font-size: 13; font-family: Lucida Grande\">This report has been created with arrayQualityMetrics %s under %s</DIV>",version, rversion), con)
+            
             closeHtmlPage(con)
             setwd(olddir)
           })##end set method ExpressionSet
@@ -1495,12 +1639,14 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             l = aqm.expressionset(expressionset, outdir, force, do.logtransform, split.plots, intgroup, arg)
             numArrays = as.numeric(l$numArrays)
             sN = l$sN
+            sNt = l$sNt
             section = as.numeric(l$section)
             figure = as.numeric(l$figure)
-            con = l$con
             dat = l$dat
             olddir = l$olddir
             exprs(expressionset) = na.omit(exprs(expressionset))
+            
+
 
 ############################
 ###Section 8 : Affy plots###
@@ -1509,7 +1655,6 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             cols = brewer.pal(9, "Set1")            
             section = section + 1
             sec6text = sprintf("<hr><h2><a name = \"S6\">Section %s: Affymetrix specific plots</h2></a>", section)
-            writeLines(sec6text, con)
             
             figure1 = figure + 1
             acol = sample(brewer.pal(8, "Dark2"), numArrays, replace = (8<numArrays))
@@ -1567,9 +1712,7 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
 
             
             affytext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><a name = \"S6.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><center><BR><b>Figure %s</b></CENTER></tr></td><tr><td><b>%s</b></td><td><a name = \"S6.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><center><BR><b>Figure %s</b></CENTER></tr></td><tr><td><b>%s</b></td><td><a name = \"S6.3\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><center><BR><b>Figure %s</b></CENTER></tr></td><tr><td><b>%s</b></td><td><a name = \"S6.4\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><center><BR><b>Figure %s</b></CENTER></tr></td></table>\n", "RNA degradation plot", basename(affypdf1), basename(affypng1), figure1, "RLE plot", basename(affypdf2), basename(affypng2), figure2, "NUSE plot", basename(affypdf3), basename(affypng3), figure3, "Diagnostic plot recommended by Affymetrix", basename(affypdf4), basename(affypng4), figure4)
-            writeLines(affytext, con)
             legendaffy = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\">In this section we present diagnostic plots based on tools provided in the affyPLM package. In <b>Figure %s</b> a RNA digestion plot is computed on normalized data (so that standard deviation is equal to 1). In this plot each array is represented by a single line. It is important to identify any array(s) that has a slope which is very different from the others. The indication is that the RNA used for that array has potentially been handled quite differently from the other arrays.  <b>Figure %s</b> is a Relative Log Expression (RLE) plot and an array that has problems will either have larger spread, or will not be centered at M = 0, or both. <b>Figure %s</b> is a Normalized Unscaled Standard Error (NUSE) plot. Low quality arrays are those that are substantially elevated or more spread out, relative to the other arrays. NUSE values are not comparable across data sets. Both RLE and NUSE are performed on preprocessed data (background correction and quantile normalization). <b>Figure %s</b> represents the diagnostic plot recommended by Affymetrix. It is fully describe in the simpleaffy.pdf vignette of the package simpleaffy. Any metrics that is shown in red is out of the manufacturer's specific boundaries and suggests a potential problem, any metrics shown in blue is fine.</DIV>", figure1, figure2, figure3, figure4)            
-            writeLines(legendaffy, con)
             
             ##PM.MM
             figure5 = figure4 + 1
@@ -1590,14 +1733,38 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             
            
             legendpmo = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows the density distributions of the log<sub>2</sub> intensities grouped by the matching of the probes. Blue, density estimate of intensities of perfect match probes (PM) and gray the mismatch probes (MM). We expect that, MM probes having poorer hybridization than PM probes, the PM curve should be shifted on the right of the MM curve.</DIV>",  figure5)
+
+
+##########################
+### Scores computation ###
+##########################
+            sc = scores(expressionset=expressionset,numArrays=numArrays, M=l$M, ldat=l$ldat, outM=l$outM, dat=dat, maxc=l$maxc, maxr=l$maxr, nuse=nuse, rle=rle)               
+            scores = matrix("",ncol=length(sc),nrow=numArrays)
+            for( i in 1:length(sc) )
+              scores[unlist(sc[[i]][1:length(sc[[1]])]),i]="Problem"
+            
+            
+#########################
+### Writing the report###
+#########################
+            con = report(expressionset=expressionset, arg=arg, sNt=sNt, sN=sN, sec1text=l$sec1text, mapdf=l$mapdf, matext1=l$matext1, nfig=l$nfig, legendMA=l$legendMA, batext=l$batext, nfig2=l$nfig2, bapng=l$bapng, ftext=l$ftext, pttext=l$pttext, legendpt=l$legendpt, nfig3=l$nfig3, fpng=l$fpng, legendlocal=l$legendlocal, sec2text=l$sec2text, htmltext2=l$htmltext2, legendhom1=l$legendhom1, group=l$group, htmltext3=l$htmltext3, legendhom2=l$legendhom2, sec3text=l$sec3text, gctext=l$gctext, legendgc=l$legendgc, gotext=l$gotext, legendgo=l$legendgo, sec4text=l$sec4text, htmltext4=l$htmltext4, legendheatmap=l$legendheatmap, sec5text=l$sec5text, htmltext5=l$htmltext5, legendsdmean=l$legendsdmean, scores=scores)
+            writeLines(sec6text, con)
+            writeLines(affytext, con)
+            writeLines(legendaffy, con)            
             writeLines(pmotext, con)
             writeLines(legendpmo, con)
 
+
             writeLines("</table>", con)
+            z=sessionInfo("arrayQualityMetrics")
+            version = z$otherPkgs[[1]]$Version
+            rversion = sessionInfo()$R.version$version.string
+            writeLines(sprintf("<hr><DIV style=\"font-size: 13; font-family: Lucida Grande\">This report has been created with arrayQualityMetrics %s under %s</DIV>",version, rversion), con)
+
             closeHtmlPage(con)
             setwd(olddir)
 
-          })##end set method AffyBatch
+          })##end functions for AffyBatch and ExpressionSet
 
 ###################################################################
 ###################################################################
@@ -1630,7 +1797,7 @@ setMethod("arrayQualityMetrics",signature(expressionset = "BeadLevelList"),
             dprep = prepdata(sN, dat, numArrays, split.plots)
             long = dprep$long
             sN = dprep$sN
-            if("sNt" %in% names(dprep)) sNt = dprep$sNt
+            sNt = dprep$sNt
             outM = dprep$outM
             group = dprep$group
 
@@ -1935,14 +2102,31 @@ A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
             legendsdmean = msdp$legendsdmean
 
 ##########################
+### Scores computation ###
+##########################
+            sc = scores(expressionset=expressionset, numArrays=numArrays, M=M, ldat=NULL, outM=outM, dat=dat, maxc=NULL, maxr=NULL, nuse=NULL, rle=NULL)
+            
+            scores = matrix("",ncol=length(sc),nrow=numArrays)
+            for( i in 1:length(sc) )
+              scores[unlist(sc[[i]][1:length(sc[[1]])]),i]="Problem"
+
+
+
+##########################
 ### Writing the report ###
 ##########################
 
             arg = as.list(match.call(expand.dots = TRUE))
-            con = if(exists("sNt")) report(expressionset=expressionset, arg=arg, sNt=sNt, sN=sN, sec1text=sec1text, mapdf=mapdf, matext1=matext1, nfig=nfig, legendMA=legendMA, batext=batext, nfig2=nfig2, bapng=bapng, ftext=ftext, pttext=NULL, legendpt=NULL, nfig3=nfig3, fpng=fpng, legendlocal=legendlocal, sec2text=sec2text, htmltext2=htmltext2, legendhom1=legendhom1, group=group, htmltext3=htmltext3, legendhom2=legendhom2, sec3text=sec3text, gctext=gctext, legendgc=legendgc, gotext=gotext, legendgo=legendgo, sec4text=sec4text, htmltext4=htmltext4, legendheatmap=legendheatmap, sec5text=sec5text, htmltext5=htmltext5, legendsdmean=legendsdmean) else report(expressionset=expressionset, arg=arg, sNt=NULL, sN=sN, sec1text=sec1text, mapdf=mapdf, matext1=matext1, nfig=nfig, legendMA=legendMA, batext=batext, nfig2=nfig2, bapng=bapng, ftext=ftext, pttext=NULL, legendpt=NULL, nfig3=nfig3, fpng=fpng, legendlocal=legendlocal, sec2text=sec2text, htmltext2=htmltext2, legendhom1=legendhom1, group=group, htmltext3=htmltext3, legendhom2=legendhom2, sec3text=sec3text, gctext=gctext, legendgc=legendgc, gotext=gotext, legendgo=legendgo, sec4text=sec4text, htmltext4=htmltext4, legendheatmap=legendheatmap, sec5text=sec5text, htmltext5=htmltext5, legendsdmean=legendsdmean)
+            con = report(expressionset=expressionset, arg=arg, sNt=sNt, sN=sN, sec1text=sec1text, mapdf=mapdf, matext1=matext1, nfig=nfig, legendMA=legendMA, batext=batext, nfig2=nfig2, bapng=bapng, ftext=ftext, pttext=NULL, legendpt=NULL, nfig3=nfig3, fpng=fpng, legendlocal=legendlocal, sec2text=sec2text, htmltext2=htmltext2, legendhom1=legendhom1, group=group, htmltext3=htmltext3, legendhom2=legendhom2, sec3text=sec3text, gctext=gctext, legendgc=legendgc, gotext=gotext, legendgo=legendgo, sec4text=sec4text, htmltext4=htmltext4, legendheatmap=legendheatmap, sec5text=sec5text, htmltext5=htmltext5, legendsdmean=legendsdmean, scores=scores)
 
 
             writeLines("</table>", con)
+
+            z=sessionInfo("arrayQualityMetrics")
+            version = z$otherPkgs[[1]]$Version
+            rversion = sessionInfo()$R.version$version.string
+            writeLines(sprintf("<hr><DIV style=\"font-size: 13; font-family: Lucida Grande\">This report has been created with arrayQualityMetrics %s under %s</DIV>",version, rversion), con)
+
             closeHtmlPage(con)
             setwd(olddir)
             

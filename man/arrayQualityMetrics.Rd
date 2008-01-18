@@ -79,9 +79,8 @@ force, do.logtransform, split.plots, intgroup)
     arrayQualityMetrics(expressionset = MLL.A,
                         outdir ="MLL",
                         do.logtransform = TRUE,
-                        split.plots = 10,
-                        intgroup = "Covariate")
-    # "MLL_QMreport.html" is a report created in the working directory
+                        split.plots = 10)
+    # "QMreport.html" is a report created in the "MLL" directory
     # on the logarithm expression data of the MLL.A AffyBatch.
     # 10 experiments are represented by density plots.
     }
