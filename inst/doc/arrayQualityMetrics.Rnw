@@ -24,7 +24,7 @@
 \maketitle
 
 \section*{Introduction}
-The function \Rfunction{arrayQualityMetrics} can be used on \Rclass{AffyBatch} for Affymetrix data sets, \Rclass{ExpressionSet} in the case of non Affymetrix one colour experiments and \Rclass{NChannelSet} for dual colour experiments. \Rfunction{arrayQualityMetrics} produces a \emph{HTML} report as an output.
+The function \Rfunction{arrayQualityMetrics} can be used on \Rclass{AffyBatch} for Affymetrix data sets, \Rclass{ExpressionSet} in the case of non Affymetrix one colour experiments, \Rclass{NChannelSet} for dual colour experiments and \Rclass{BeadLevelList} for Illumina bead arrays. \Rfunction{arrayQualityMetrics} produces a \emph{HTML} report as an output.
 
 \section{Data preparation}
 
@@ -87,7 +87,7 @@ featureData(nCCl4)$hasTarget = (regexpr("^NM", featureData(nCCl4)$Name) > 0)
 
 \paragraph{Covariate}
 
-The \Rclass{phenoData} can also have a column "Covariate" containing a group name (up to 12 groups) for each sample accordingly to a factor of interest. This \Rclass{phenoData} will be used to provide side bars on the heatmap. In the case of the \emph{CCl4} dataset, the RNA hybridized to the arrays can be of good, medium or poor quality accordingly to its RIN number (see \emph{CCl4} vignette).
+The \Rclass{phenoData} can also have a column containing a group name (up to 12 groups) for each sample accordingly to a factor of interest. This \Rclass{phenoData} will be used to provide side bars on the heatmap. In the case of the \emph{CCl4} dataset, the RNA hybridized to the arrays can be of good, medium or poor quality accordingly to its RIN number (see \emph{CCl4} vignette).
 
 %
 <<Covariate>>=
@@ -101,7 +101,7 @@ cov = rep(0, length = nrow(p))
 cov[good] = "Good"
 cov[medium] = "Medium"
 cov[poor] = "Poor"
-phenoData(nCCl4)$Covariate = cov
+phenoData(nCCl4)$RNAintegrity = cov
 @
 %
 
@@ -111,13 +111,14 @@ To produce a report, the function \Rfunction{arrayQualityMetrics} is called
 with the following arguments:
 \begin{itemize}
 \item \emph{expressionset}: is an object of class \Rclass{ExpressionSet}, 
-\Rclass{AffyBatch} or \Rclass{NChannelSet}.
+\Rclass{AffyBatch}, \Rclass{NChannelSet} or \Rclass{BeadLevelList}.
 \item \emph{outdir}: is the directory in which the result files
     are created.
 \item \emph{force}: if TRUE, if outdir already exists, it will be overwritten.
 \item \emph{do.logtransform}: if TRUE, the data are log transformed before the analysis.
 \item \emph{split.plots}: if the number of studied arrays is more than 50 it is 
 adviced to define a number of experiments to represent on the density plots.
+\item \emph{intgroup}: is the name of the column in the \Rclass{phenoData} that contains the information about a covariate of interest to be shown as a side bar on the heatmap. The default name to this column is \emph{'Covariate'}.
 \end{itemize}
 
 %
@@ -127,7 +128,8 @@ arrayQualityMetrics(expressionset = nCCl4,
                     outdir = "CCl4",
                     force = TRUE,
                     do.logtransform = FALSE,
-                    split.plots = FALSE)
+                    split.plots = FALSE,
+                    intgroup = "RNAintegrity")
 @
 %
 
