@@ -1047,7 +1047,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
 #################################################################
 #################################################################
 
-aqm.expressionset = function(expressionset, outdir = getwd(), force = FALSE, do.logtransform = FALSE, split.plots = FALSE, ingroup = NULL, arg)
+aqm.expressionset = function(expressionset, outdir = getwd(), force = FALSE, do.logtransform = FALSE, split.plots = FALSE, intgroup = NULL, arg)
   {
     ##data preparation
     if(do.logtransform)
