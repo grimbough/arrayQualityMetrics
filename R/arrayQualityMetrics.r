@@ -1730,7 +1730,7 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             pmotext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b><td><center><a name = \"S6.5\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><br><b>Figure %s</b></center></tr></td></table>\n", "Perfect matchs and mismatchs ", basename(pmopdf), basename(pmopng), figure5)
             
            
-            legendpmo = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows the density distributions of the log<sub>2</sub> intensities grouped by the matching of the probes. Blue, density estimate of intensities of perfect match probes (PM) and gray the mismatch probes (MM). We expect that, MM probes having poorer hybridization than PM probes, the PM curve should be shifted on the right of the MM curve.</DIV>",  figure5)
+            legendpmo = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows the density distributions of the log<sub>2</sub> intensities grouped by the matching of the probes. Blue, density estimate of intensities of perfect match probes (PM) and gray the mismatch probes (MM). We expect that, MM probes having poorer hybridization than PM probes, the PM curve should be shifted to the right of the MM curve.</DIV>",  figure5)
 
 
 ##########################
