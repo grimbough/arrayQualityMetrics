@@ -68,10 +68,10 @@ dircreation = function(outdir = getwd(), force = FALSE)
 ##second part of data preparation
 prepdata = function(sN, dat, numArrays, split.plots)
   {
-    ##maximum length of the experiment names to adjust margins and font size on the plot axis
+    ##maximum length of the arrays names to adjust margins and font size on the plot axis
     long = max(nchar(sN))
       
-    ##if experiment names are to long they are replaced by figures
+    ##if arrays names are to long they are replaced by figures
     sNt = cbind(sN,seq_len(length(sN)))        
     colnames(sNt)=c("SampleName","New denomination")
     if(long >= 15 || (numArrays >= 50 && long >= 10))
@@ -83,7 +83,7 @@ prepdata = function(sN, dat, numArrays, split.plots)
     outM = as.dist(dist2(na.omit(dat)))
       
     k = if(split.plots) split.plots else k = numArrays
-    ##attribute randomly the experiments to different groups
+    ##attribute randomly the arrays to different groups
     group = sample(rep((1:ceiling(numArrays/k)),k),numArrays)
     
     dp = list(sN=sN, long=long, sNt=sNt, outM=outM, group=group)
@@ -261,11 +261,11 @@ hmap = function(expressionset, sN, section, figure, outM, numArrays, intgroup)
         dev.off()
         dev.off()
       }   
-    htmltext4=sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><BR><b>Figure %s</center></b></td></table>\n", title="Heatmap representation of the distance between experiments", basename(hpdf), basename(hpng), fig = figure)
+    htmltext4=sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><BR><b>Figure %s</center></b></td></table>\n", title="Heatmap representation of the distance between arrays", basename(hpdf), basename(hpng), fig = figure)
     
     leghmspe = if(is(expressionset, "BeadLevelList")) "the values used are the summarized ones obtained by using the function createBeadSummaryData from the package beadarray." else "without preprocessing." 
 
-    legendheatmap = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows a false color heatmap of between arrays distances, computed as the median absolute difference of the M-value for each pair of arrays. <br><center><i>d<sub>xy</sub> = median|M<sub>xi</sub>-M<sub>yi</sub>|</i></center><br><br> Here, <i>M<sub>xi</sub></i> is the M-value of the <i>i</i>-th probe on the <i>x</i>-th array, %s <br>This plot can serve to detect outlier arrays. <br>Consider the following decomposition of <i>M<sub>xi</sub>: M<sub>xi</sub> = z<sub>i</sub> + &beta;<sub>xi</sub> + &epsilon;<sub>xi</sub></i>, where <i>z<sub>i</sub></i> is the probe effect for probe <i>i</i> (the same across all arrays), <i>&epsilon;<sub>xi</sub></i> are i.i.d. random variables with mean zero and <i>&beta;<sub>xi</sub></i> is such that for any array <i>x</i>, the majority of values <i>&beta;<sub>xi</sub></i> are negligibly small (i. e. close to zero). <i>&beta;<sub>xi</sub></i> represents differential expression effects. In this model, all values <i>d<sub>xy</sub></i> are (in expectation) the same, namely <sqrt>2</sqrt> times the standard deviation of <i>&epsilon;<sub>xi</i></sub> . Arrays whose distance matrix entries are way different give cause for suspicion. The dendrogram on this plot also can serve to check if, without any probe filtering, the experiments cluster accordingly to a biological meaning.</DIV></table>",  figure, leghmspe)
+    legendheatmap = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows a false color heatmap of between arrays distances, computed as the median absolute difference of the M-value for each pair of arrays. <br><center><i>d<sub>xy</sub> = median|M<sub>xi</sub>-M<sub>yi</sub>|</i></center><br><br> Here, <i>M<sub>xi</sub></i> is the M-value of the <i>i</i>-th probe on the <i>x</i>-th array, %s <br>This plot can serve to detect outlier arrays. <br>Consider the following decomposition of <i>M<sub>xi</sub>: M<sub>xi</sub> = z<sub>i</sub> + &beta;<sub>xi</sub> + &epsilon;<sub>xi</sub></i>, where <i>z<sub>i</sub></i> is the probe effect for probe <i>i</i> (the same across all arrays), <i>&epsilon;<sub>xi</sub></i> are i.i.d. random variables with mean zero and <i>&beta;<sub>xi</sub></i> is such that for any array <i>x</i>, the majority of values <i>&beta;<sub>xi</sub></i> are negligibly small (i. e. close to zero). <i>&beta;<sub>xi</sub></i> represents differential expression effects. In this model, all values <i>d<sub>xy</sub></i> are (in expectation) the same, namely <sqrt>2</sqrt> times the standard deviation of <i>&epsilon;<sub>xi</i></sub> . Arrays whose distance matrix entries are way different give cause for suspicion. The dendrogram on this plot also can serve to check if, without any probe filtering, the arrays cluster accordingly to a biological meaning.</DIV></table>",  figure, leghmspe)
     
     if(intgroup %in% names(phenoData(expressionset)@data))
       {
@@ -400,19 +400,19 @@ report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, l
     con = openHtmlPage("QMreport", title)
     writeLines(titletext, con)
 
-### Experiments names
+### Arrays names
     writeLines("<hr><h2>Summary</h2>", con)
     col1 = "#d0d0ff"
     col2 = "#e0e0f0"
     if(is(expressionset, "AffyBatch"))
-      stext1 = sprintf("<tr><td BGCOLOR=\"%s\"><b>Experiment &#35;</b></td><td BGCOLOR=\"%s\"><b>Experiment Name</b></td><td BGCOLOR=\"%s\"><b>MA-plot</b></td><td BGCOLOR=\"%s\"><b>Spatial distribution</b></td><td BGCOLOR=\"%s\"><b>Boxplots/Density plots</b></td><td BGCOLOR=\"%s\"><b>Heatmap</b></td><td BGCOLOR=\"%s\"><b>MeanSd</b></td><td BGCOLOR=\"%s\"><b>RLE</b></td><td BGCOLOR=\"%s\"><b>NUSE</b></td></tr>", col1, col2, col1, col2,col1, col2,col1, col2,col1)
+      stext1 = sprintf("<tr><td BGCOLOR=\"%s\"><b>Array &#35;</b></td><td BGCOLOR=\"%s\"><b>Array Name</b></td><td BGCOLOR=\"%s\"><b>MA-plot</b></td><td BGCOLOR=\"%s\"><b>Spatial distribution</b></td><td BGCOLOR=\"%s\"><b>Boxplots/Density plots</b></td><td BGCOLOR=\"%s\"><b>Heatmap</b></td><td BGCOLOR=\"%s\"><b>MeanSd</b></td><td BGCOLOR=\"%s\"><b>RLE</b></td><td BGCOLOR=\"%s\"><b>NUSE</b></td></tr>", col1, col2, col1, col2,col1, col2,col1, col2,col1)
 
     if(!is(expressionset, "BeadLevelList") && ("X" %in% rownames(featureData(expressionset)@varMetadata) && "Y" %in% rownames(featureData(expressionset)@varMetadata)))
-      stext1 = sprintf("<tr><td BGCOLOR=\"%s\"><b>Experiment &#35;</b></td><td BGCOLOR=\"%s\"><b>Experiment Name</b></td><td BGCOLOR=\"%s\"><b>MA-plot</b></td><td BGCOLOR=\"%s\"><b>Spatial distribution</b></td><td BGCOLOR=\"%s\"><b>Boxplots/Density plots</b></td><td BGCOLOR=\"%s\"><b>Heatmap</b></td><td BGCOLOR=\"%s\"><b>MeanSd</b></td></tr>", col1, col2, col1, col2,col1, col2,col1)
+      stext1 = sprintf("<tr><td BGCOLOR=\"%s\"><b>Array &#35;</b></td><td BGCOLOR=\"%s\"><b>Array Name</b></td><td BGCOLOR=\"%s\"><b>MA-plot</b></td><td BGCOLOR=\"%s\"><b>Spatial distribution</b></td><td BGCOLOR=\"%s\"><b>Boxplots/Density plots</b></td><td BGCOLOR=\"%s\"><b>Heatmap</b></td><td BGCOLOR=\"%s\"><b>MeanSd</b></td></tr>", col1, col2, col1, col2,col1, col2,col1)
 
 
     if(is(expressionset, "BeadLevelList") || (!is(expressionset, "AffyBatch") && (!("X" %in% rownames(featureData(expressionset)@varMetadata) && "Y" %in% rownames(featureData(expressionset)@varMetadata)))))
-      stext1 = sprintf("<tr><td BGCOLOR=\"%s\"><b>Experiment &#35;</b></td><td BGCOLOR=\"%s\"><b>Experiment Name</b></td><td BGCOLOR=\"%s\"><b>MA-plot</b></td><td BGCOLOR=\"%s\"><b>Boxplots/Density plots</b></td><td BGCOLOR=\"%s\"><b>Heatmap</b></td><td BGCOLOR=\"%s\"><b>MeanSd</b></td></tr>", col1, col2, col1, col2,col1, col2)
+      stext1 = sprintf("<tr><td BGCOLOR=\"%s\"><b>Array &#35;</b></td><td BGCOLOR=\"%s\"><b>Array Name</b></td><td BGCOLOR=\"%s\"><b>MA-plot</b></td><td BGCOLOR=\"%s\"><b>Boxplots/Density plots</b></td><td BGCOLOR=\"%s\"><b>Heatmap</b></td><td BGCOLOR=\"%s\"><b>MeanSd</b></td></tr>", col1, col2, col1, col2,col1, col2)
     
     writeLines(stext1, con)
     for(i in seq_len(length(sN)))
@@ -440,7 +440,7 @@ report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, l
       }
     writeLines("</table>", con)
     
-    scoreslegend =  sprintf("If an array has been identified as having a quality problem in one of the plots below, the corresponding cell in the table will indicate \"Problem\".")
+    scoreslegend =  sprintf("*array identified as having a potential problem or as being an outlier.")
     
     writeLines(scoreslegend, con)
       
@@ -474,7 +474,7 @@ report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, l
 
     writeLines("</UL>", con)
 
-    writeLines( "<LI><b><a href=\"#S2\">Homogeneity between experiments</b></a><UL><LI><a href=\"#S2.1\">Boxplots</b></a><LI><a href=\"#S2.2\">Density plots</b></a></UL>", con)
+    writeLines( "<LI><b><a href=\"#S2\">Homogeneity between arrays</b></a><UL><LI><a href=\"#S2.1\">Boxplots</b></a><LI><a href=\"#S2.2\">Density plots</b></a></UL>", con)
             
     if((!is(expressionset, "BeadLevelList")) && ("GC" %in% rownames(featureData(expressionset)@varMetadata) || "hasTarget" %in% rownames(featureData(expressionset)@varMetadata)))
       {
@@ -933,16 +933,16 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                 legendpt = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows the boxplots of the log<sub>2</sub> intensities grouped by row (left panel) and column (right panel) of the array. From the top to the bottom, red channel, green channel and log(ratio) are represented. If there is no spatial effect, the boxes should be homogeneous in wide and y position.</DIV>",  figure)
               }
 
-#################################################
-###Section 2 : Homogeneity between experiments###
-#################################################
+############################################
+###Section 2 : Homogeneity between arrays###
+############################################
 
 #############################
 ###Section 2.1 : Boxplots ###
 #############################
             
             section = section + 1
-            sec2text = sprintf("<hr><h2><a name = \"S2\">Section %s: Homogeneity between experiments</a></h2>", section)
+            sec2text = sprintf("<hr><h2><a name = \"S2\">Section %s: Homogeneity between arrays</a></h2>", section)
             
             figure = figure + 1
             
@@ -1127,7 +1127,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
             
             scores = matrix("",ncol=length(sc),nrow=numArrays)
             for( i in 1:length(sc) )
-              scores[unlist(sc[[i]][1:length(sc[[1]])]),i]="Problem"
+              scores[unlist(sc[[i]][1:length(sc[[1]])]),i]="*"
             
             
 ##########################
@@ -1161,10 +1161,7 @@ aqm.expressionset = function(expressionset, outdir = getwd(), force = FALSE, do.
     if(do.logtransform)
       {
         if(any(na.omit(exprs(expressionset)) == 0))
-          {
-            setwd(olddir)
-            stop("Data contains 0 values. Log transformation of 0 will lead to infinite values. If 0 are missing values, NA can be used instead.")
-          }
+          exprs(expressionset)[na.omit(exprs(expressionset)) == 0] = NA
         dat = log2(exprs(expressionset))
       } else dat = exprs(expressionset)
     
@@ -1419,16 +1416,16 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
           }
       }
 
-#################################################
-###Section 2 : Homogeneity between experiments###
-#################################################
+############################################
+###Section 2 : Homogeneity between arrays###
+############################################
 
 #############################
 ###Section 2.1 : Boxplots ###
 #############################
 
     section = section + 1
-    sec2text = sprintf("<hr><h2><a name = \"S2\">Section %s: Homogeneity between experiments</h2></a>", section)
+    sec2text = sprintf("<hr><h2><a name = \"S2\">Section %s: Homogeneity between arrays</h2></a>", section)
             
     figure = figure + 1
     if(numArrays <= 50)
@@ -1564,7 +1561,7 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
         sc = scores(expressionset=expressionset,numArrays=numArrays, M=M, ldat=ldat, outM=outM, dat=dat, maxc=maxc, maxr=maxr, nuse=NULL, rle=NULL)               
         scores = matrix("",ncol=length(sc),nrow=numArrays)
         for( i in 1:length(sc) )
-          scores[unlist(sc[[i]][1:length(sc[[1]])]),i]="Problem"
+          scores[unlist(sc[[i]][1:length(sc[[1]])]),i]="*"
       }
 
 
@@ -1638,6 +1635,7 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
 
             l = aqm.expressionset(expressionset, outdir, force, do.logtransform, split.plots, intgroup, arg)
             numArrays = as.numeric(l$numArrays)
+            expressionset = l$expressionset
             sN = l$sN
             sNt = l$sNt
             section = as.numeric(l$section)
@@ -1741,7 +1739,7 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             sc = scores(expressionset=expressionset,numArrays=numArrays, M=l$M, ldat=l$ldat, outM=l$outM, dat=dat, maxc=l$maxc, maxr=l$maxr, nuse=nuse, rle=rle)               
             scores = matrix("",ncol=length(sc),nrow=numArrays)
             for( i in 1:length(sc) )
-              scores[unlist(sc[[i]][1:length(sc[[1]])]),i]="Problem"
+              scores[unlist(sc[[i]][1:length(sc[[1]])]),i]="*"
             
             
 #########################
@@ -1954,16 +1952,16 @@ A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
             legendlocal = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s:</b> False color representations of the arrays' spatial distributions of feature intensities and, if available, local background estimates. These plots may help in identifying patterns that may be caused, for example, spatial gradients in the hybridization chamber, air bubbles, spotting or plating problems.</DIV>", figure)          
 
 
-#################################################
-###Section 2 : Homogeneity between experiments###
-#################################################
+############################################
+###Section 2 : Homogeneity between arrays###
+############################################
 
 #############################
 ###Section 2.1 : Boxplots ###
 #############################
             
             section = section + 1
-            sec2text = sprintf("<hr><h2><a name = \"S2\">Section %s: Homogeneity between experiments</a></h2>", section)
+            sec2text = sprintf("<hr><h2><a name = \"S2\">Section %s: Homogeneity between arrays</a></h2>", section)
             
             figure = figure + 1
             
@@ -2108,7 +2106,7 @@ A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
             
             scores = matrix("",ncol=length(sc),nrow=numArrays)
             for( i in 1:length(sc) )
-              scores[unlist(sc[[i]][1:length(sc[[1]])]),i]="Problem"
+              scores[unlist(sc[[i]][1:length(sc[[1]])]),i]="*"
 
 
 
