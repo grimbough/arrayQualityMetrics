@@ -463,7 +463,10 @@ report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, l
     if(is(expressionset, "AffyBatch"))
       {
         writeLines("<LI><a href=\"#S1.3\">Spatial distribution of features intensites</b></a>", con)
-        writeLines("<LI><a href=\"#S1.4\">Row-Column effect</b></a>", con)
+        maxc = ncol(expressionset)
+        maxr = nrow(expressionset)       
+        if(maxr*maxc < 1000000)
+          writeLines("<LI><a href=\"#S1.4\">Row-Column effect</b></a>", con)
       }
 
     if(is(expressionset, "BeadLevelList"))
@@ -538,8 +541,6 @@ report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, l
               }
             writeLines("</td></table>", con)
             writeLines(legendlocal, con)
-            writeLines(pttext, con)
-            writeLines(legendpt, con)
           }
       }
     if(is(expressionset, "AffyBatch"))
@@ -556,8 +557,13 @@ report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, l
           }
         writeLines("</td></table>", con)
         writeLines(legendlocal, con)
-        writeLines(pttext, con)
-        writeLines(legendpt, con)
+        maxc = ncol(expressionset)
+        maxr = nrow(expressionset)
+        if(maxc*maxr < 1000000)
+          {
+            writeLines(pttext, con)
+            writeLines(legendpt, con)
+          }
       }
     
     if(is(expressionset, "BeadLevelList"))
@@ -1211,16 +1217,16 @@ M = log<sub>2</sub>(I<sub>1</sub>) - log<sub>2</sub>(I<sub>2</sub>)<br>
 A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
 where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is the intensity of a \"pseudo\"-array, which have the median values of all the arrays. Typically, we expect the mass of the distribution in an MA plot to be concentrated along the M = 0 axis, and there should be no trend in the mean of M as a function of A. Note that a bigger width of the plot of the M-distribution at the lower end of the A scale does not necessarily imply that the variance of the M-distribution is larger at the lower end of the A scale: the visual impression might simply be caused by the fact that there is more data at the lower end of the A scale. To visualize whether there is a trend in the variance of M as a function of A, consider plotting M versus rank(A).</DIV>", figure)     
 
-#################################
-###Section 1.2 : Spatial Plots###
-#################################
+#########################################
+###Section 1.2 : Spatial Plots aBatch ###
+#########################################
   
     if(is(expressionset, "AffyBatch"))
       {
         figure = figure + 1
         maxc = ncol(expressionset)
         maxr = nrow(expressionset)
-        nfig3 = ceiling(numArrays/6)      
+        nfig3 = if(maxc*maxr < 1000000) ceiling(numArrays/6) else numArrays
         colourRamp <- rgb(seq(0,1,l=256),seq(0,1,l=256),seq(1,0,l=256))
 
         fpng = paste("foreground", 1:nfig3, ".png", sep="")
@@ -1234,23 +1240,31 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
             if(maxr>maxc)
               mrfi = t(mrfi)
                 
-            if(a %in% seq(1,numArrays,by=6))
-              {
-                png(fpng[fignu], width = 500, height = 500*aR/2)
-                nf <- layout(matrix(c(1,2,3,4,5,6),2,3,byrow = TRUE),
-                             widths = c(1.5,1.5,1.5),
-                             heights = c(1.5*aR,1.5*aR),
-                             respect = TRUE)
-              }
-                
+            if(maxc*maxr < 1000000){
+              if(a %in% seq(1,numArrays,by=6))
+                {
+                  png(fpng[fignu], width = 500, height = 500*aR/2)
+                  nf <- layout(matrix(c(1,2,3,4,5,6),2,3,byrow = TRUE),
+                               widths = c(1.5,1.5,1.5),
+                               heights = c(1.5*aR,1.5*aR),
+                               respect = TRUE)
+                }
+            } else png(fpng[fignu], width = 500, height = 500*aR)
+            
             par(xaxt = "n", yaxt = "n",mar=c(1,2,2,1))
             image(mrfi, col = colourRamp)
             mtext(sN[a],side = 3, adj = 0.5, padj = -1 ,cex = 0.7)
                 
-            if((a%%6==0) || (a == numArrays))                   
+            if(maxc*maxr >= 1000000)
               {
                 dev.off()
                 fignu = fignu +1
+              } else {            
+                if((a%%6==0) || (a == numArrays))
+                  {
+                    dev.off()
+                    fignu = fignu +1
+                  }
               }
           }
                                    
@@ -1266,48 +1280,54 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
 
         legendlocal = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s:</b> False color representations of the arrays' spatial distributions of feature intensities. The color scale is shown in the panel on the right, and it is proportional to the ranks. These plots may help in identifying patterns that may be caused, for example, spatial gradients in the hybridization chamber, air bubbles, spotting or plating problems.</DIV>", figure)
 
-###############################
-###Section 1.4 : R/C effect ###
-###############################
+######################################
+###Section 1.4 : R/C effect aBatch ###
+######################################
         
-        figure = figure + 1
-        ptpdf = "row_column.pdf"
-        ptpng = "row_column.png"
-        colours = brewer.pal(12, "Paired")       
-       
-        pdf(file = ptpdf, width=10, height=4)
-        nf <- layout(matrix(1:2,1,2,byrow = FALSE),
-                     c(2,2), 2, FALSE)
-        
-        for ( a in 1:numArrays )
+        if(maxc*maxr < 1000000)
           {
-            matdat = matrix(dat[,a],ncol=maxc,nrow=maxr,byrow=T)
+            figure = figure + 1
+            ptpdf = "row_column.pdf"
+            ptpng = "row_column.png"
+            colours = brewer.pal(12, "Paired")       
+       
+            pdf(file = ptpdf, width=10, height=4)
+            nf <- layout(matrix(1:2,1,2,byrow = FALSE),
+                         c(2,2), 2, FALSE)
+        
+            for ( a in 1:numArrays )
+              {
+                matdat = matrix(dat[,a],ncol=maxc,nrow=maxr,byrow=T)
+                par(mar=c(2,3.5,3.5,1), cex.axis = 0.7)
+                boxplot(matdat~row(matdat), col = colours[2], range =  0, main ="", whisklty = 0, staplelty = 0)
+                mtext(sN[a], side = 3,padj=-1,adj=1.1,cex=1)
+                mtext("Row", side = 3,padj=-0.5,cex=0.8)
+                boxplot(matdat~col(matdat), col = colours[2], range =  0, main ="", whisklty = 0, staplelty = 0)
+                mtext("Column", side = 3,padj=-0.5,cex=0.8)
+              }
+            dev.off()
+        
+            png(file = ptpng, width = 1000, height=400)
+            nf <- layout(matrix(1:2,1,2,byrow = FALSE),
+                         c(2,2), 2, FALSE)
+            matdat = matrix(dat[,1],ncol=maxc,nrow=maxr,byrow=T)
             par(mar=c(2,3.5,3.5,1), cex.axis = 0.7)
             boxplot(matdat~row(matdat), col = colours[2], range =  0, main ="", whisklty = 0, staplelty = 0)
             mtext(sN[a], side = 3,padj=-1,adj=1.1,cex=1)
             mtext("Row", side = 3,padj=-0.5,cex=0.8)
             boxplot(matdat~col(matdat), col = colours[2], range =  0, main ="", whisklty = 0, staplelty = 0)
             mtext("Column", side = 3,padj=-0.5,cex=0.8)
-          }
-        dev.off()
+            dev.off()
         
-        png(file = ptpng, width = 1000, height=400)
-        nf <- layout(matrix(1:2,1,2,byrow = FALSE),
-                     c(2,2), 2, FALSE)
-        matdat = matrix(dat[,1],ncol=maxc,nrow=maxr,byrow=T)
-        par(mar=c(2,3.5,3.5,1), cex.axis = 0.7)
-        boxplot(matdat~row(matdat), col = colours[2], range =  0, main ="", whisklty = 0, staplelty = 0)
-        mtext(sN[a], side = 3,padj=-1,adj=1.1,cex=1)
-        mtext("Row", side = 3,padj=-0.5,cex=0.8)
-        boxplot(matdat~col(matdat), col = colours[2], range =  0, main ="", whisklty = 0, staplelty = 0)
-        mtext("Column", side = 3,padj=-0.5,cex=0.8)
-        dev.off()
+            pttext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S1.4\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></center></td></table>\n", "Row-Column effect", basename(ptpdf), basename(ptpng), figure)
         
-        pttext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S1.4\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></center></td></table>\n", "Row-Column effect", basename(ptpdf), basename(ptpng), figure)
-        
-        legendpt = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows the boxplots of the log<sub>2</sub> intensities grouped by row (left panel) and column (right panel) of the array. If there is no spatial effect, the boxes should be homogeneous in wide and y position.</DIV>",  figure)
+            legendpt = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows the boxplots of the log<sub>2</sub> intensities grouped by row (left panel) and column (right panel) of the array. If there is no spatial effect, the boxes should be homogeneous in wide and y position.</DIV>",  figure)
+          }      
       }
 
+#######################################
+###Section 1.2 : Spatial Plots Eset ###
+#######################################
     if(is(expressionset, "ExpressionSet"))
       {
         if("X" %in% rownames(featureData(expressionset)@varMetadata) && "Y" %in% rownames(featureData(expressionset)@varMetadata))
@@ -1373,9 +1393,9 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
 
             legendlocal = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s:</b> False color representations of the arrays' spatial distributions of feature intensities. The color scale is shown in the panel on the right, and it is proportional to the ranks. These plots may help in identifying patterns that may be caused, for example, spatial gradients in the hybridization chamber, air bubbles, spotting or plating problems.</DIV>", figure)
 
-###############################
-###Section 1.4 : R/C effect ###
-###############################
+#####################################
+###Section 1.4 : R/C effect  Eset ###
+#####################################
             
             figure = figure + 1
             ptpdf = "rowcolumn.pdf"
@@ -1577,7 +1597,7 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
     
     if(is(expressionset, "AffyBatch"))
       {
-        l = list(numArrays=numArrays, section=section, figure=figure, dat=dat, olddir=olddir, expressionset=expressionset, arg=arg, sN=sN, sec1text=sec1text, mapdf=mapdf, matext1=matext1, nfig=nfig, legendMA=legendMA, ftext=ftext, pttext=pttext, legendpt=legendpt, nfig3=nfig3, fpng=fpng, legendlocal=legendlocal, sec2text=sec2text, htmltext2=htmltext2, legendhom1=legendhom1, group=group, htmltext3=htmltext3, legendhom2=legendhom2,  sec4text=sec4text, htmltext4=htmltext4, legendheatmap=legendheatmap, sec5text=sec5text, htmltext5=htmltext5, legendsdmean=legendsdmean, M=M, outM=outM, maxc=maxc, maxr=maxr, ldat=ldat)
+        l = list(numArrays=numArrays, section=section, figure=figure, dat=dat, olddir=olddir, expressionset=expressionset, arg=arg, sN=sN, sec1text=sec1text, mapdf=mapdf, matext1=matext1, nfig=nfig, legendMA=legendMA, ftext=ftext, nfig3=nfig3, fpng=fpng, legendlocal=legendlocal, sec2text=sec2text, htmltext2=htmltext2, legendhom1=legendhom1, group=group, htmltext3=htmltext3, legendhom2=legendhom2,  sec4text=sec4text, htmltext4=htmltext4, legendheatmap=legendheatmap, sec5text=sec5text, htmltext5=htmltext5, legendsdmean=legendsdmean, M=M, outM=outM, maxc=maxc, maxr=maxr, ldat=ldat)
         l$sNt = sNt
         if("GC" %in% rownames(featureData(expressionset)@varMetadata))
           {
@@ -1590,6 +1610,11 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
               l$sec3text=sec3text
               l$gotext=gotext
               l$legendgo=legendgo
+            }       
+          if(maxc*maxr < 1000000)
+            {
+              l$pttext=pttext
+              l$legendpt=legendpt
             }       
       }
     
@@ -1721,17 +1746,26 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             pmopdf = "PM.MM.pdf"       
         
             png(file = pmopng)
-            pmmm(expressionset,xlim,"","","", cex.axis = 0.9)
-            legend("topright", c("PM","MM"),lty=1,lwd=2,col= c(cols[c(2,9)]), bty = "n")
-            dev.copy(pdf, file = pmopdf)
-            dev.off()
-            dev.off()
-            
-            pmotext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b><td><center><a name = \"S6.5\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><br><b>Figure %s</b></center></tr></td></table>\n", "Perfect matchs and mismatchs ", basename(pmopdf), basename(pmopng), figure5)
-            
-           
-            legendpmo = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows the density distributions of the log<sub>2</sub> intensities grouped by the matching of the probes. Blue, density estimate of intensities of perfect match probes (PM) and gray the mismatch probes (MM). We expect that, MM probes having poorer hybridization than PM probes, the PM curve should be shifted to the right of the MM curve.</DIV>",  figure5)
+            pm = try(pmmm(expressionset,xlim,"","","", cex.axis = 0.9))
+            if(class(pm)=='try-error')
+              {
+                warning("PM MM plot cannot be produced for this data set.")
+                dev.off()
+                pmotext = NULL
+                legendpmo = NULL
+              }
 
+            if(class(pm)!='try-error')
+              {
+                legend("topright", c("PM","MM"),lty=1,lwd=2,col= c(cols[c(2,9)]), bty = "n")
+                dev.copy(pdf, file = pmopdf)
+                dev.off()
+                dev.off()
+                         
+                pmotext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b><td><center><a name = \"S6.5\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><br><b>Figure %s</b></center></tr></td></table>\n", "Perfect matchs and mismatchs ", basename(pmopdf), basename(pmopng), figure5)            
+           
+                legendpmo = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows the density distributions of the log<sub>2</sub> intensities grouped by the matching of the probes. Blue, density estimate of intensities of perfect match probes (PM) and gray the mismatch probes (MM). We expect that, MM probes having poorer hybridization than PM probes, the PM curve should be shifted to the right of the MM curve.</DIV>",  figure5)
+              }
 
 ##########################
 ### Scores computation ###
@@ -1748,9 +1782,12 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             con = report(expressionset=expressionset, arg=arg, sNt=sNt, sN=sN, sec1text=l$sec1text, mapdf=l$mapdf, matext1=l$matext1, nfig=l$nfig, legendMA=l$legendMA, batext=l$batext, nfig2=l$nfig2, bapng=l$bapng, ftext=l$ftext, pttext=l$pttext, legendpt=l$legendpt, nfig3=l$nfig3, fpng=l$fpng, legendlocal=l$legendlocal, sec2text=l$sec2text, htmltext2=l$htmltext2, legendhom1=l$legendhom1, group=l$group, htmltext3=l$htmltext3, legendhom2=l$legendhom2, sec3text=l$sec3text, gctext=l$gctext, legendgc=l$legendgc, gotext=l$gotext, legendgo=l$legendgo, sec4text=l$sec4text, htmltext4=l$htmltext4, legendheatmap=l$legendheatmap, sec5text=l$sec5text, htmltext5=l$htmltext5, legendsdmean=l$legendsdmean, scores=scores)
             writeLines(sec6text, con)
             writeLines(affytext, con)
-            writeLines(legendaffy, con)            
-            writeLines(pmotext, con)
-            writeLines(legendpmo, con)
+            writeLines(legendaffy, con)
+            if(!is.null(pmotext))
+              {
+                writeLines(pmotext, con)
+                writeLines(legendpmo, con)
+              }
 
 
             writeLines("</table>", con)
