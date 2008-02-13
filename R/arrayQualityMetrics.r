@@ -639,6 +639,8 @@ report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, l
 setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
           function(expressionset, outdir, force, do.logtransform, split.plots, intgroup)
           {
+            olddir = getwd()
+
             ##data preparation
             if(do.logtransform)
               {
@@ -661,7 +663,6 @@ setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
                 gc = log2(assayData(expressionset)$G)
               } else gc = assayData(expressionset)$G
 
-            olddir = getwd()
             dircreation(outdir, force)
             
             if("Rb" %in% colnames(dims(expressionset)) && "Gb" %in% colnames(dims(expressionset)))
@@ -1163,6 +1164,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
 
 aqm.expressionset = function(expressionset, outdir = getwd(), force = FALSE, do.logtransform = FALSE, split.plots = FALSE, intgroup = "Covariate", arg)
   {
+    olddir = getwd()
     ##data preparation
     if(do.logtransform)
       {
@@ -1171,7 +1173,6 @@ aqm.expressionset = function(expressionset, outdir = getwd(), force = FALSE, do.
         dat = log2(exprs(expressionset))
       } else dat = exprs(expressionset)
     
-    olddir = getwd()
     dircreation(outdir, force)
    
     sN = sampleNames(expressionset)
