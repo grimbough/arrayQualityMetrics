@@ -360,13 +360,12 @@ scores = function(expressionset, numArrays, M, ldat, outM, dat, maxc, maxr, nuse
         locout = sapply(1:length(locstat$out), function(x) which(loc == locstat$out[x]))
       }
 
-    ## Sd mean
-    msd = meanSdPlot(dat, plot = FALSE)
-    msddiff = max(msd$sd)-min(msd$sd)
-    msdout = msddiff > 0.3
-    
     if(is(expressionset, "AffyBatch"))
       {
+        ## RLE
+        rlemed = rle$stats[3,]
+        rleout = which(abs(rlemed) > 0.1)
+
         ## NUSE
         nusemeanstat = boxplot.stats(nuse$stat[3,])
         nusemeanout = sapply(1:length(nusemeanstat$out), function(x) which(nuse$stat[3,] == nusemeanstat$out[x]))
@@ -376,17 +375,14 @@ scores = function(expressionset, numArrays, M, ldat, outM, dat, maxc, maxr, nuse
         nuseiqrout = sapply(1:length(nuseiqrstat$out), function(x) which(nuseiqr == nuseiqrstat$out[x]))
 
 
-        ## RLE
-        rlemed = rle$stats[3,]
-        rleout = which(abs(rlemed) > 0.1)
-        scoresout = list(maout,union(bmeanout,biqrout),madout,locout,msdout,union(nusemeanout,nuseiqrout),rleout)
+        scoresout = list(maout,locout,union(bmeanout,biqrout),madout,rleout,union(nusemeanout,nuseiqrout))
       }
     
     if(!is(expressionset, "BeadLevelList") && ("X" %in% rownames(featureData(expressionset)@varMetadata) && "Y" %in% rownames(featureData(expressionset)@varMetadata)))
-      scoresout = list(maout,union(bmeanout,biqrout),madout,locout,msdout)
+      scoresout = list(maout,locout,union(bmeanout,biqrout),madout)
     
     if(is(expressionset, "BeadLevelList") || (!is(expressionset, "AffyBatch") && (!("X" %in% rownames(featureData(expressionset)@varMetadata) && "Y" %in% rownames(featureData(expressionset)@varMetadata)))))
-      scoresout = list(maout,union(bmeanout,biqrout),madout,msdout)
+      scoresout = list(maout,union(bmeanout,biqrout),madout)
           
     return(scoresout)
   }
@@ -405,36 +401,30 @@ report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, l
     col1 = "#d0d0ff"
     col2 = "#e0e0f0"
     if(is(expressionset, "AffyBatch"))
-      stext1 = sprintf("<tr><td BGCOLOR=\"%s\"><b>Array &#35;</b></td><td BGCOLOR=\"%s\"><b>Array Name</b></td><td BGCOLOR=\"%s\"><b>MA-plot</b></td><td BGCOLOR=\"%s\"><b>Spatial distribution</b></td><td BGCOLOR=\"%s\"><b>Boxplots/Density plots</b></td><td BGCOLOR=\"%s\"><b>Heatmap</b></td><td BGCOLOR=\"%s\"><b>MeanSd</b></td><td BGCOLOR=\"%s\"><b>RLE</b></td><td BGCOLOR=\"%s\"><b>NUSE</b></td></tr>", col1, col2, col1, col2,col1, col2,col1, col2,col1)
+      stext1 = sprintf("<tr BGCOLOR=\"%s\"><td><b>Array &#35;</b></td><td><b>Array Name</b></td><td><b>MA-plot</b></td><td><b>Spatial distribution</b></td><td><b>Boxplots/Density plots</b></td><td><b>Heatmap</b></td><td><b>RLE</b></td><td><b>NUSE</b></td></tr>", col1)
 
     if(!is(expressionset, "BeadLevelList") && ("X" %in% rownames(featureData(expressionset)@varMetadata) && "Y" %in% rownames(featureData(expressionset)@varMetadata)))
-      stext1 = sprintf("<tr><td BGCOLOR=\"%s\"><b>Array &#35;</b></td><td BGCOLOR=\"%s\"><b>Array Name</b></td><td BGCOLOR=\"%s\"><b>MA-plot</b></td><td BGCOLOR=\"%s\"><b>Spatial distribution</b></td><td BGCOLOR=\"%s\"><b>Boxplots/Density plots</b></td><td BGCOLOR=\"%s\"><b>Heatmap</b></td><td BGCOLOR=\"%s\"><b>MeanSd</b></td></tr>", col1, col2, col1, col2,col1, col2,col1)
+      stext1 = sprintf("<tr BGCOLOR=\"%s\"><td><b>Array &#35;</b></td><td><b>Array Name</b></td><td><b>MA-plot</b></td><td><b>Spatial distribution</b></td><td><b>Boxplots/Density plots</b></td><td><b>Heatmap</b></td></tr>", col1)
 
 
     if(is(expressionset, "BeadLevelList") || (!is(expressionset, "AffyBatch") && (!("X" %in% rownames(featureData(expressionset)@varMetadata) && "Y" %in% rownames(featureData(expressionset)@varMetadata)))))
-      stext1 = sprintf("<tr><td BGCOLOR=\"%s\"><b>Array &#35;</b></td><td BGCOLOR=\"%s\"><b>Array Name</b></td><td BGCOLOR=\"%s\"><b>MA-plot</b></td><td BGCOLOR=\"%s\"><b>Boxplots/Density plots</b></td><td BGCOLOR=\"%s\"><b>Heatmap</b></td><td BGCOLOR=\"%s\"><b>MeanSd</b></td></tr>", col1, col2, col1, col2,col1, col2)
+      stext1 = sprintf("<tr BGCOLOR=\"%s\"><td><b>Array &#35;</b></td><td><b>Array Name</b></td><td><b>MA-plot</b></td><td><b>Boxplots/Density plots</b></td><td><b>Heatmap</b></td></tr>", col1)
     
     writeLines(stext1, con)
     for(i in seq_len(length(sN)))
       {
         if(i %in% seq(1,length(sN),by = 2))
-          {
-            col1 = "#e0e0f0"
-            col2 = "#d0d0ff"
-          }
+          col = col2
         if(i %in% seq(2,length(sN),by = 2))
-          {
-            col1 = "#d0d0ff"
-            col2 = "#e0e0f0"
-          }
+          col = col1
         if(is(expressionset, "AffyBatch"))
-          stext2 = sprintf("<tr><td BGCOLOR=\"%s\"><b>%s</b></td><td BGCOLOR=\"%s\">%s</td><td BGCOLOR=\"%s\">%s</td><td BGCOLOR=\"%s\">%s</td><td BGCOLOR=\"%s\">%s</td><td BGCOLOR=\"%s\">%s</td><td BGCOLOR=\"%s\">%s</td><td BGCOLOR=\"%s\">%s</td><td BGCOLOR=\"%s\">%s</td></tr>", col1, sNt[i,2], col2, sNt[i,1], col1,scores[i,1] , col2,scores[i,2], col1, scores[i,3], col2,scores[i,4], col1,scores[i,5], col2,scores[i,6], col1,scores[i,7])
+          stext2 = sprintf("<tr BGCOLOR=\"%s\"><td><b>%s</b></td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>", col, sNt[i,2], sNt[i,1], scores[i,1], scores[i,2], scores[i,3], scores[i,4], scores[i,5], scores[i,6])
         
         if(!is(expressionset, "BeadLevelList") && ("X" %in% rownames(featureData(expressionset)@varMetadata) && "Y" %in% rownames(featureData(expressionset)@varMetadata)))
-          stext2 = sprintf("<tr><td BGCOLOR=\"%s\"><b>%s</b></td><td BGCOLOR=\"%s\">%s</td><td BGCOLOR=\"%s\">%s</td><td BGCOLOR=\"%s\">%s</td><td BGCOLOR=\"%s\">%s</td><td BGCOLOR=\"%s\">%s</td><td BGCOLOR=\"%s\">%s</td></tr>", col1, sNt[i,2], col2, sNt[i,1], col1,scores[i,1] , col2,scores[i,2], col1, scores[i,3], col2,scores[i,4], col1,scores[i,5])       
+          stext2 = sprintf("<tr BGCOLOR=\"%s\"><td><b>%s</b></td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>", col, sNt[i,2],sNt[i,1], scores[i,1], scores[i,2], scores[i,3], scores[i,4])       
         
         if(is(expressionset, "BeadLevelList") || (!is(expressionset, "AffyBatch") && (!("X" %in% rownames(featureData(expressionset)@varMetadata) && "Y" %in% rownames(featureData(expressionset)@varMetadata)))))
-          stext2 = sprintf("<tr><td BGCOLOR=\"%s\"><b>%s</b></td><td BGCOLOR=\"%s\">%s</td><td BGCOLOR=\"%s\">%s</td><td BGCOLOR=\"%s\">%s</td><td BGCOLOR=\"%s\">%s</td><td BGCOLOR=\"%s\">%s</td></tr>", col1, sNt[i,2], col2, sNt[i,1], col1,scores[i,1] , col2,scores[i,2], col1, scores[i,3], col2,scores[i,4])
+          stext2 = sprintf("<tr BGCOLOR=\"%s\"><td><b>%s</b></td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>", col, sNt[i,2], sNt[i,1], scores[i,1], scores[i,2], scores[i,3])
         
         writeLines(stext2, con)
       }
@@ -1774,7 +1764,7 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             sc = scores(expressionset=expressionset,numArrays=numArrays, M=l$M, ldat=l$ldat, outM=l$outM, dat=dat, maxc=l$maxc, maxr=l$maxr, nuse=nuse, rle=rle)               
             scores = matrix("",ncol=length(sc),nrow=numArrays)
             for( i in 1:length(sc) )
-              scores[unlist(sc[[i]][1:length(sc[[1]])]),i]="*"
+              scores[unlist(sc[[i]][1:length(sc[[i]])]),i]="*"
             
             
 #########################
