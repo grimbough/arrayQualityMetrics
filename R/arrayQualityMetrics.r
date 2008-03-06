@@ -80,7 +80,7 @@ prepdata = function(sN, dat, numArrays, split.plots)
         long = max(nchar(sN))
       }
 
-    outM = as.dist(dist2(na.omit(dat)))
+    outM = as.dist(dist2(dat))
       
     k = if(split.plots) split.plots else k = numArrays
     ##attribute randomly the arrays to different groups
@@ -131,13 +131,13 @@ maplot = function(M, A, sN, numArrays)
         pdf(mapdf[i], width = 8, height = 5)
         id.thispage <- (i-1) * app + id.firstpage
         id.thispage <- id.thispage[id.thispage <= numArrays]
-        positions = na.omit(id.thispage[c(5:8,1:4)])
+        positions = id.thispage[c(5:8,1:4)]
         print(update(trobj, index.cond = list(positions[1:length(positions)])))
         dev.off()
       }
 
     png(mapng, width = 600, height = 300)
-    positions = na.omit(id.firstpage[c(5:8,1:4)])
+    positions = id.firstpage[c(5:8,1:4)]
     print(update(trobj, index.cond = list(positions[1:length(positions)])))
     dev.off()
     matext1 = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S1.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</b></center></td><td>\n", "MA plots",  basename(mapdf[1]),  basename(mapng[1]), figure)
@@ -324,15 +324,16 @@ pmmm = function(x, xlim, title1, title2, title3, ...)
 scores = function(expressionset, numArrays, M, ldat, outM, dat, maxc, maxr, nuse, rle)
   {
     ## MA plot
-    mamean = sapply(1:numArrays, function(i) mean(abs(M[,i])))
+    mamean = colMeans(abs(M), na.rm=TRUE)
     mastat = boxplot.stats(mamean)
     maout = sapply(1:length(mastat$out), function(x) which(mamean == mastat$out[x]))
     ## boxplot
-    b = boxplot(ldat, plot = FALSE, range = 0)
-    if(is(expressionset,"BeadLevelList") && expressionset@arrayInfo$channels == "single")
-       b = boxplotBeads(expressionset, plot = FALSE)
-    if(is(expressionset,"BeadLevelList") && expressionset@arrayInfo$channels == "two")
-       b = boxplotBeads(expressionset, plot = FALSE, whatToPlot = "M")
+    b = if(is(expressionset,"BeadLevelList")) {
+      boxplotBeads(expressionset, plot = FALSE,
+                   whatToPlot = c(single="G", two="M")[expressionset@arrayInfo$channels])
+    } else {
+      boxplot(ldat, plot = FALSE, range = 0)
+    }
     bmeanstat = boxplot.stats(b$stat[3,])
     bmeanout = sapply(1:length(bmeanstat$out), function(x) which(b$stat[3,] == bmeanstat$out[x]))
 
@@ -341,7 +342,7 @@ scores = function(expressionset, numArrays, M, ldat, outM, dat, maxc, maxr, nuse
     biqrout = sapply(1:length(biqrstat$out), function(x) which(biqr == biqrstat$out[x]))
 
     ## heatmap
-    madsum = rowSums(as.matrix(outM), na.rm=T)
+    madsum  = rowSums(as.matrix(outM), na.rm=TRUE)
     madstat = boxplot.stats(madsum)
     madout = sapply(1:length(madstat$out), function(x) which(madsum == madstat$out[x]))
 
@@ -350,12 +351,13 @@ scores = function(expressionset, numArrays, M, ldat, outM, dat, maxc, maxr, nuse
 
         ## spatial plot
         mdat = lapply(1:numArrays, function(x) matrix(dat[,x],ncol=maxc,nrow=maxr,byrow=T))
-        loc=0
-        for(x in 1:numArrays)
-          {
-            hhm = hist(abs(fft(mdat[[x]])), 100, plot = FALSE)
-            loc[x] = hhm$count[2]/hhm$count[1]
-          }
+        loc = sapply(mdat, function(x) {
+          apg = abs(fft(x)) ## absolute values of the periodogramme
+          lowFreq = apg[1:4, 1:4]
+          lowFreq[1,1] = 0  # drop the constant component
+          highFreq = c(apg[-(1:4), ], apg[1:4, -(1:4)])
+          return(sum(lowFreq)/sum(highFreq))
+        })
         locstat = boxplot.stats(loc)
         locout = sapply(1:length(locstat$out), function(x) which(loc == locstat$out[x]))
       }
@@ -705,8 +707,8 @@ setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
 #############################            
             ##MA-plots
             ##function from affyQCReport
-            M = na.omit(rc) - na.omit(gc)
-            A = 0.5*(na.omit(rc) + na.omit(gc))
+            M = rc - gc
+            A = 0.5*(rc+gc)
             
             MAplot = maplot(M, A, sN, numArrays)
             
@@ -946,10 +948,10 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
             
             figure = figure + 1
             
-            xlim = c(min(na.omit(dat)),max(na.omit(dat)))
-            xlimr = c(min(na.omit(rc)),max(na.omit(rc)))
-            xlimg = c(min(na.omit(gc)),max(na.omit(gc)))
-            ylimrg =  c(min(na.omit(c(rc,gc))),max(na.omit(c(rc,gc))))
+            xlim = range(dat, na.rm=TRUE)
+            xlimr = range(rc, na.rm=TRUE)
+            xlimg = range(gc, na.rm=TRUE)
+            ylimrg = c(min(c(xlimr[1],xlimg[1])), max(c(xlimr[2], xlimg[2])))
 
             colours = brewer.pal(12, "Paired")
             if(numArrays <= 50)
@@ -1193,9 +1195,9 @@ aqm.expressionset = function(expressionset, outdir = getwd(), force = FALSE, do.
     
     ##MA-plots
     ##function from affyQCReport   
-    medArray = rowMedians(na.omit(dat))
-    M =  na.omit(dat)-medArray
-    A =  (na.omit(dat)+medArray)/2
+    medArray = rowMedians(dat, na.rm=TRUE)
+    M =  dat-medArray
+    A =  (dat+medArray)/2
 
     MAplot = maplot(M, A, sN, numArrays)
 
@@ -1468,7 +1470,7 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
 ############################
     
     figure = figure + 1
-    xlim = c(min(na.omit(dat)),max(na.omit(dat)))
+    xlim = range(dat, na.rm=TRUE)
     mplot3 = makePlot(con=con, name = "density",
       w=10, h=10, fun = function() {
         for(n in 1:max(group))
@@ -1661,8 +1663,6 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             figure = as.numeric(l$figure)
             dat = l$dat
             olddir = l$olddir
-            exprs(expressionset) = na.omit(exprs(expressionset))
-            
 
 
 ############################
@@ -1733,7 +1733,7 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             figure5 = figure4 + 1
 
             cols = brewer.pal(9, "Set1")
-            xlim = c(min(na.omit(dat)),max(na.omit(dat)))            
+            xlim = range(dat, na.rm=TRUE)
             pmopng = "PM.MM.png"
             pmopdf = "PM.MM.pdf"       
         
@@ -1829,27 +1829,26 @@ setMethod("arrayQualityMetrics",signature(expressionset = "BeadLevelList"),
             group = dprep$group
 
             ##one or two colour settings
-            if(expressionset@arrayInfo$channels == "single")
-              {
-                ndiv = 6
-                dispo = TRUE
-                widthbox = 8
-                d = lapply(1:numArrays, function(i) getArrayData(expressionset, array = i, what = "G",log = do.logtransform))
-                xlim = c(min(na.omit(unlist(d))),max(na.omit(unlist(d))))
-
-              }
-            if(expressionset@arrayInfo$channels == "two")
-              {
-                ndiv = 3
-                dispo = FALSE
-                widthbox = 15
-                dr = lapply(1:numArrays, function(i) getArrayData(expressionset, array = i, what = "R",log = do.logtransform))
-                dg = lapply(1:numArrays, function(i) getArrayData(expressionset, array = i, what = "G",log = do.logtransform))
-                dlr = lapply(1:numArrays, function(i) getArrayData(expressionset, array = i, what = "M",log = do.logtransform))
-                xlim = c(min(na.omit(unlist(dlr))),max(na.omit(unlist(dlr))))
-                xlimr = c(min(na.omit(unlist(dr))),max(na.omit(unlist(dr))))
-                xlimg = c(min(na.omit(unlist(dg))),max(na.omit(unlist(dg))))
-              }
+            switch(expressionset@arrayInfo$channels,
+             "single" = {
+               ndiv = 6
+               dispo = TRUE
+               widthbox = 8
+               d = lapply(1:numArrays, function(i) getArrayData(expressionset, array = i, what = "G",log = do.logtransform))
+               xlim = range(unlist(d), na.rm=TRUE)
+             },
+             "two" = {
+               ndiv = 3
+               dispo = FALSE
+               widthbox = 15
+               dr  = lapply(seq_len(numArrays), function(i) getArrayData(expressionset, array = i, what = "R",log = do.logtransform))
+               dg  = lapply(1:numArrays, function(i) getArrayData(expressionset, array = i, what = "G",log = do.logtransform))
+               dlr = lapply(1:numArrays, function(i) getArrayData(expressionset, array = i, what = "M",log = do.logtransform))
+               xlim  = range(unlist(dlr), na.rm=TRUE)
+               xlimr = range(unlist(dr), na.rm=TRUE)
+               xlimg = range(unlist(dg), na.rm=TRUE)
+             },
+             stop(sprintf("Invalid expressionset@arrayInfo$channels '%s'.", expressionset@arrayInfo$channels)))
 
 
 ####################################
