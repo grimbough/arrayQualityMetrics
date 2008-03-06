@@ -391,7 +391,10 @@ scores = function(expressionset, numArrays, M, ldat, outM, dat, maxc, maxr, nuse
 report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, legendMA, batext, nfig2, bapng, ftext, pttext, legendpt, nfig3, fpng, legendlocal, sec2text, htmltext2, legendhom1, group, htmltext3, legendhom2, sec3text, gctext, legendgc, gotext, legendgo, sec4text, htmltext4, legendheatmap, sec5text, htmltext5, legendsdmean, scores)
   {
 ### Title
-    title = paste(arg$expressionset, " quality metrics report", sep="")
+    if(length(arg$expressionset == 1))
+      title = paste(arg$expressionset, " quality metrics report", sep="")
+    if(length(arg$expressionset > 1))
+      title = "Quality metrics report"
     titletext = sprintf("<hr><h1><center>%s</h1></center><table border = \"0\" cellspacing = 5 cellpadding = 2 style=\"font-size: 13; font-family: Lucida Grande; text-align:center\">", title)
     con = openHtmlPage("QMreport", title)
     writeLines(titletext, con)
@@ -1686,9 +1689,7 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             figure2 = figure1 + 1
             pp1 = try(preprocess(expressionset))
             dataPLM = try(fitPLM(pp1, background = FALSE, normalize = FALSE))
-            if(class(pp1)=='try-error')
-              warning("RLE plot from the package 'affyPLM' cannot be produced for this data set.")
-            if(class(dataPLM)=='try-error')
+            if(class(pp1)=='try-error' || class(dataPLM)=='try-error')
               warning("RLE and NUSE plots from the package 'affyPLM' cannot be produced for this data set.")
             affypng2 = "RLE.png"
             affypdf2 = "RLE.pdf"
