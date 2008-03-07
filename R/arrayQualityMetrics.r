@@ -17,22 +17,24 @@ setGeneric("arrayQualityMetrics",
 mat2list = function(x)
       lapply(seq_len(ncol(x)), function(i) x[,i])
 
+##log
+logtransform = function(x)
+  {
+    xl = log2(x)
+    xl[xl == "-Inf"] = NA
+  }
+
 ##makePlot
-makePlot = function(con, name, w, h=devDims(w)$height, fun, isPlatePlot=FALSE, isImageScreen=FALSE, title, text, fig) {
+makePlot = function(con, name, w, h, fun, title, text, fig) {
   outf = paste(name, c("pdf", "png"), sep=".")
   nrppi = 72
 
   pdf(outf[1], width=w, height=h, pointsize=14)
-  if (isImageScreen)  fun(map=FALSE) else fun()
+  fun()
   dev.off()
 
-  if (isPlatePlot) {
-    wd = devDims(w)$pwidth
-    hg = devDims(w)$pheight
-  } else {
-    wd = w*nrppi
-    hg = h*nrppi
-  }
+  wd = w*nrppi
+  hg = h*nrppi
   
   png(outf[2], width=wd, height=hg, pointsize=10)
   res <- fun()
@@ -84,7 +86,7 @@ prepdata = function(sN, dat, numArrays, split.plots)
       
     k = if(split.plots) split.plots else k = numArrays
     ##attribute randomly the arrays to different groups
-    group = sample(rep((1:ceiling(numArrays/k)),k),numArrays)
+    group = sample(rep(seq_len(ceiling(numArrays/k)),k),numArrays)
     
     dp = list(sN=sN, long=long, sNt=sNt, outM=outM, group=group)
     return(dp) 
@@ -100,7 +102,7 @@ maplot = function(M, A, sN, numArrays)
     app = 4 + 2*(sum(numArrays>c(4,6)))
     nfig = ceiling(numArrays/8)
     
-    plotNames = paste("MA", 1:nfig, sep="")
+    plotNames = paste("MA", seq_len(nfig), sep="")
     mapdf = paste(plotNames, "pdf", sep=".")
     mapng = paste(plotNames, "png", sep=".")
     xlimMA = quantile(A, probs=1e-4*c(1,-1)+c(0,1))
@@ -121,24 +123,24 @@ maplot = function(M, A, sN, numArrays)
         y <- M[, y]
         panel.smoothScatter(x, y ,...)
       },
-      
+      as.table=TRUE,      
       layout = c(app/2, 2, 1),
       strip = function(..., bg) strip.default(..., bg ="#cce6ff"))
-    id.firstpage <- seq_len(app)
+    
+    id.firstpage = seq_len(app)
 
     for(i in seq_len(nfig))
       {
         pdf(mapdf[i], width = 8, height = 5)
-        id.thispage <- (i-1) * app + id.firstpage
-        id.thispage <- id.thispage[id.thispage <= numArrays]
-        positions = id.thispage[c(5:8,1:4)]
-        print(update(trobj, index.cond = list(positions[1:length(positions)])))
+        id.thispage = (i-1) * app + id.firstpage
+        id.thispage = id.thispage[id.thispage <= numArrays]
+        print(update(trobj, index.cond = list(id.thispage)))
         dev.off()
       }
 
     png(mapng, width = 600, height = 300)
-    positions = id.firstpage[c(5:8,1:4)]
-    print(update(trobj, index.cond = list(positions[1:length(positions)])))
+    id.thispage = id.firstpage[id.firstpage <= numArrays]
+    print(update(trobj, index.cond = list(id.thispage)))
     dev.off()
     matext1 = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S1.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</b></center></td><td>\n", "MA plots",  basename(mapdf[1]),  basename(mapng[1]), figure)
     
@@ -167,7 +169,7 @@ multi = function(type, x, xlim, title1, title2, title3, ...)
   }
 
 ##Mapping of probes
-probesmap = function(expressionset, numArrays, section, figure, dat, sN, xlim, type)
+probesmap = function(expressionset, numArrays, section, figure, dat, sN, xlim, type,con)
   {
     if(!"GC" %in% rownames(featureData(expressionset)@varMetadata))
       {
@@ -237,7 +239,7 @@ hmap = function(expressionset, sN, section, figure, outM, numArrays, intgroup)
         x=0.06
         y=0.98
         
-        for(i in 1:length(lev))
+        for(i in seq_len(length(lev)))
           {
             corres[i,] = c(unique(covar[covar == lev[i]]),colourCov[i])
             grid.text(corres[i,1], x=x, y=y, just="left")
@@ -326,7 +328,7 @@ scores = function(expressionset, numArrays, M, ldat, outM, dat, maxc, maxr, nuse
     ## MA plot
     mamean = colMeans(abs(M), na.rm=TRUE)
     mastat = boxplot.stats(mamean)
-    maout = sapply(1:length(mastat$out), function(x) which(mamean == mastat$out[x]))
+    maout = sapply(seq_len(length(mastat$out)), function(x) which(mamean == mastat$out[x]))
     ## boxplot
     b = if(is(expressionset,"BeadLevelList")) {
       boxplotBeads(expressionset, plot = FALSE,
@@ -335,22 +337,22 @@ scores = function(expressionset, numArrays, M, ldat, outM, dat, maxc, maxr, nuse
       boxplot(ldat, plot = FALSE, range = 0)
     }
     bmeanstat = boxplot.stats(b$stat[3,])
-    bmeanout = sapply(1:length(bmeanstat$out), function(x) which(b$stat[3,] == bmeanstat$out[x]))
+    bmeanout = sapply(seq_len(length(bmeanstat$out)), function(x) which(b$stat[3,] == bmeanstat$out[x]))
 
     biqr = b$stat[4,] -  b$stat[2,] 
     biqrstat = boxplot.stats(biqr)
-    biqrout = sapply(1:length(biqrstat$out), function(x) which(biqr == biqrstat$out[x]))
+    biqrout = sapply(seq_len(length(biqrstat$out)), function(x) which(biqr == biqrstat$out[x]))
 
     ## heatmap
     madsum  = rowSums(as.matrix(outM), na.rm=TRUE)
     madstat = boxplot.stats(madsum)
-    madout = sapply(1:length(madstat$out), function(x) which(madsum == madstat$out[x]))
+    madout = sapply(seq_len(length(madstat$out)), function(x) which(madsum == madstat$out[x]))
 
     if(!is(expressionset, "BeadLevelList") && (is(expressionset, "AffyBatch") || ("X" %in% rownames(featureData(expressionset)@varMetadata) && "Y" %in% rownames(featureData(expressionset)@varMetadata))))
       {
 
         ## spatial plot
-        mdat = lapply(1:numArrays, function(x) matrix(dat[,x],ncol=maxc,nrow=maxr,byrow=T))
+        mdat = lapply(seq_len(numArrays), function(x) matrix(dat[,x],ncol=maxc,nrow=maxr,byrow=T))
         loc = sapply(mdat, function(x) {
           apg = abs(fft(x)) ## absolute values of the periodogramme
           lowFreq = apg[1:4, 1:4]
@@ -359,7 +361,7 @@ scores = function(expressionset, numArrays, M, ldat, outM, dat, maxc, maxr, nuse
           return(sum(lowFreq)/sum(highFreq))
         })
         locstat = boxplot.stats(loc)
-        locout = sapply(1:length(locstat$out), function(x) which(loc == locstat$out[x]))
+        locout = sapply(seq_len(length(locstat$out)), function(x) which(loc == locstat$out[x]))
       }
 
     if(is(expressionset, "AffyBatch"))
@@ -370,11 +372,11 @@ scores = function(expressionset, numArrays, M, ldat, outM, dat, maxc, maxr, nuse
 
         ## NUSE
         nusemeanstat = boxplot.stats(nuse$stat[3,])
-        nusemeanout = sapply(1:length(nusemeanstat$out), function(x) which(nuse$stat[3,] == nusemeanstat$out[x]))
+        nusemeanout = sapply(seq_len(length(nusemeanstat$out)), function(x) which(nuse$stat[3,] == nusemeanstat$out[x]))
 
         nuseiqr = nuse$stat[4,] -  nuse$stat[2,] 
         nuseiqrstat = boxplot.stats(nuseiqr)
-        nuseiqrout = sapply(1:length(nuseiqrstat$out), function(x) which(nuseiqr == nuseiqrstat$out[x]))
+        nuseiqrout = sapply(seq_len(length(nuseiqrstat$out)), function(x) which(nuseiqr == nuseiqrstat$out[x]))
 
 
         scoresout = list(maout,locout,union(bmeanout,biqrout),madout,rleout,union(nusemeanout,nuseiqrout))
@@ -393,10 +395,10 @@ scores = function(expressionset, numArrays, M, ldat, outM, dat, maxc, maxr, nuse
 report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, legendMA, batext, nfig2, bapng, ftext, pttext, legendpt, nfig3, fpng, legendlocal, sec2text, htmltext2, legendhom1, group, htmltext3, legendhom2, sec3text, gctext, legendgc, gotext, legendgo, sec4text, htmltext4, legendheatmap, sec5text, htmltext5, legendsdmean, scores)
   {
 ### Title
-    if(length(arg$expressionset == 1))
-      title = paste(arg$expressionset, " quality metrics report", sep="")
-    if(length(arg$expressionset > 1))
-      title = "Quality metrics report"
+    #if(length(arg$expressionset == 1))
+      #title = paste(arg$expressionset, " quality metrics report", sep="")
+    #if(length(arg$expressionset > 1))
+      title = paste(deparse(substitute(arg$expressionset)), " quality metrics report", sep="")
     titletext = sprintf("<hr><h1><center>%s</h1></center><table border = \"0\" cellspacing = 5 cellpadding = 2 style=\"font-size: 13; font-family: Lucida Grande; text-align:center\">", title)
     con = openHtmlPage("QMreport", title)
     writeLines(titletext, con)
@@ -498,7 +500,7 @@ report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, l
     writeLines(matext1, con)
     if(nfig >= 2)
       {
-        for(i in 1:nfig)
+        for(i in seq_len(nfig))
           {
             matext2 = sprintf("<A HREF=\"%s\">%s%s</A><BR>\n", basename(mapdf[i]), "MvA plot ", i)                    
             writeLines(matext2, con)
@@ -527,7 +529,7 @@ report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, l
             writeLines(ftext, con)
             if(nfig3 >= 2)
               {
-                for(i in 1:nfig3)
+                for(i in seq_len(nfig3))
                   {
                     ftext2 = sprintf("<A HREF=\"%s\">%s%s</A><BR>\n", basename(fpng[i]), "Spatial plots ", i)
                     
@@ -543,7 +545,7 @@ report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, l
         writeLines(ftext, con)
         if(nfig3 >= 2)
           {
-            for(i in 1:nfig3)
+            for(i in seq_len(nfig3))
               {
                 ftext2 = sprintf("<A HREF=\"%s\">%s%s</A><BR>\n", basename(fpng[i]), "Spatial plots ", i)
                     
@@ -566,7 +568,7 @@ report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, l
         writeLines(batext, con)
         if(nfig2 >= 2)
           {
-            for(i in 1:nfig2)
+            for(i in seq_len(nfig2))
               {
                 batext2 = sprintf("<A HREF=\"%s\">%s%s</A><BR>\n", basename(bapng[i]), "Spatial plots ", i)                    
                 writeLines(batext2, con)
@@ -577,7 +579,7 @@ report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, l
         writeLines(ftext, con)
         if(nfig3 >= 2)
           {
-            for(i in 1:nfig3)
+            for(i in seq_len(nfig3))
               {
                 ftext2 = sprintf("<A HREF=\"%s\">%s%s</A><BR>\n", basename(fpng[i]), "Spatial plots ", i)
                     
@@ -635,27 +637,17 @@ setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
           function(expressionset, outdir, force, do.logtransform, split.plots, intgroup)
           {
             olddir = getwd()
+            on.exit(setwd(olddir))
 
             ##data preparation
             if(do.logtransform)
               {
-                if(any(na.omit(assayData(expressionset)$R) == 0))
-                  {
-                    setwd(olddir)
-                    stop("Red channel contains 0 values. Log transformation of 0 will lead to infinite values. If 0 are missing values, NA can be used instead.")
-                  }
-                
-                rc = log2(assayData(expressionset)$R)
+                rc = logtransform(assayData(expressionset)$R)
               } else rc = assayData(expressionset)$R
             
             if(do.logtransform)
               {
-                if(any(na.omit(assayData(expressionset)$G) == 0))
-                  {
-                    setwd(olddir)
-                    stop("Green channel contains 0 values. Log transformation of 0 will lead to infinite values. If 0 are missing values, NA can be used instead.")
-                  }
-                gc = log2(assayData(expressionset)$G)
+                gc = logtransform(assayData(expressionset)$G)
               } else gc = assayData(expressionset)$G
 
             dircreation(outdir, force)
@@ -680,10 +672,7 @@ setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
               {
                 lev = levels(expressionset@phenoData$dyeswap)
                 if(length(lev) != 2)
-                  {
-                    setwd(olddir)                    
-                    stop("The dyeswap slot of the phenoData must be binary.\n")
-                  }
+                  stop("The dyeswap slot of the phenoData must be binary.\n")
                 reverseddye = names(expressionset@phenoData$dyeswap[expressionset@phenoData$dyeswap == min(lev)])
                 dat[,reverseddye] = - dat[,reverseddye]
               }
@@ -743,7 +732,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                 if("Rb" %in% colnames(dims(expressionset)) && "Gb" %in% colnames(dims(expressionset)))
                   {
                     nfig2 = ceiling(numArrays/3)      
-                    bapng = paste("background", 1:nfig2, ".png", sep="")
+                    bapng = paste("background", seq_len(nfig2), ".png", sep="")
                     fignu = 1
                     b = 1
     
@@ -757,7 +746,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                         re = matrix(NA,ncol=maxc,nrow=maxr)
                         g = matrix(NA,ncol=maxc,nrow=maxr)
                     
-                        for(i in 1:nrow(intr))
+                        for(i in seq_len(nrow(intr)))
                           {
                             re[intr[i,1],intr[i,2]] = intr[i,(2+a)]
                             g[intg[i,1],intg[i,2]] = intg[i,(2+a)]
@@ -811,7 +800,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
           
                 figure = figure +1
                 nfig3 = ceiling(numArrays/3)      
-                fpng = paste("foreground", 1:nfig3, ".png", sep="")
+                fpng = paste("foreground", seq_len(nfig3), ".png", sep="")
                 fignu = 1
                 b = 1
     
@@ -824,7 +813,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                     rf = matrix(NA,ncol=maxc,nrow=maxr)
                     gf = matrix(NA,ncol=maxc,nrow=maxr)
                     
-                    for(i in 1:nrow(intrf))
+                    for(i in seq_len(nrow(intrf)))
                       {
                         rf[intrf[i,1],intrf[i,2]] = intrf[i,(2+a)]
                         gf[intgf[i,1],intgf[i,2]] = intgf[i,(2+a)]
@@ -887,7 +876,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                 nf <- layout(matrix(1:6,3,2,byrow = FALSE),
                              c(2.1,2), c(2,2,2), FALSE)
           
-                for ( a in 1:numArrays )
+                for ( a in seq_len(numArrays))
                   {
                     par(mar=c(2,3.5,3.5,1), cex.axis=0.7)
                     boxplot(rc[,a]~facx, col = colours[6], range =  0, main ="", whisklty = 0, staplelty = 0)
@@ -997,7 +986,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
 
             mplot3 = makePlot(con=con, name = "density",
               w=10, h=10, fun = function() {
-                for(n in 1:max(group))
+                for(n in seq_len(max(group)))
                   {
 
                     nf <- layout(matrix(c(1,2,3,4,5,6),2,3,byrow=TRUE),
@@ -1086,7 +1075,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
     
             if("hasTarget" %in% rownames(featureData(expressionset)@varMetadata))
               {
-                pmap = probesmap(expressionset, numArrays, section, figure, dat, sN, xlim, type = 2)
+                pmap = probesmap(expressionset, numArrays, section, figure, dat, sN, xlim, type = 2, con = con)
 
                 section = pmap$section
                 figure = pmap$figure
@@ -1128,8 +1117,8 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
             sc = scores(expressionset=expressionset,numArrays=numArrays, M=M, ldat=ldat, outM=outM, dat=dat, maxc=maxc, maxr=maxr, nuse=NULL, rle=NULL)
             
             scores = matrix("",ncol=length(sc),nrow=numArrays)
-            for( i in 1:length(sc) )
-              scores[unlist(sc[[i]][1:length(sc[[1]])]),i]="*"
+            for( i in seq_len(length(sc)))
+              scores[unlist(sc[[i]][seq_len(length(sc[[1]]))]),i]="*"
             
             
 ##########################
@@ -1146,7 +1135,6 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
             writeLines(sprintf("<hr><DIV style=\"font-size: 13; font-family: Lucida Grande\">This report has been created with arrayQualityMetrics %s under %s</DIV>",version, rversion), con)
 
             closeHtmlPage(con)
-            setwd(olddir)
             
           } ####end set method NChannelSet
           )
@@ -1160,12 +1148,12 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
 aqm.expressionset = function(expressionset, outdir = getwd(), force = FALSE, do.logtransform = FALSE, split.plots = FALSE, intgroup = "Covariate", arg)
   {
     olddir = getwd()
+    on.exit(setwd(olddir))
+
     ##data preparation
     if(do.logtransform)
       {
-        if(any(na.omit(exprs(expressionset)) == 0))
-          exprs(expressionset)[na.omit(exprs(expressionset)) == 0] = NA
-        dat = log2(exprs(expressionset))
+        dat = logtransform(exprs(expressionset))
       } else dat = exprs(expressionset)
     
     dircreation(outdir, force)
@@ -1196,8 +1184,8 @@ aqm.expressionset = function(expressionset, outdir = getwd(), force = FALSE, do.
     ##MA-plots
     ##function from affyQCReport   
     medArray = rowMedians(dat, na.rm=TRUE)
-    M =  dat-medArray
-    A =  (dat+medArray)/2
+    M =  dat - medArray
+    A =  (dat + medArray)/2
 
     MAplot = maplot(M, A, sN, numArrays)
 
@@ -1225,7 +1213,7 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
         nfig3 = if(maxc*maxr < 1000000) ceiling(numArrays/6) else numArrays
         colourRamp <- rgb(seq(0,1,l=256),seq(0,1,l=256),seq(1,0,l=256))
 
-        fpng = paste("foreground", 1:nfig3, ".png", sep="")
+        fpng = paste("foreground", seq_len(nfig3), ".png", sep="")
         fignu = 1
         aR = if(maxr>maxc) maxr/maxc else maxc/maxr
 
@@ -1291,7 +1279,7 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
             nf <- layout(matrix(1:2,1,2,byrow = FALSE),
                          c(2,2), 2, FALSE)
         
-            for ( a in 1:numArrays )
+            for ( a in seq_len(numArrays))
               {
                 matdat = matrix(dat[,a],ncol=maxc,nrow=maxr,byrow=T)
                 par(mar=c(2,3.5,3.5,1), cex.axis = 0.7)
@@ -1337,7 +1325,7 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
           
             figure = figure +1
             nfig3 = ceiling(numArrays/6)      
-            fpng = paste("foreground", 1:nfig3, ".png", sep="")
+            fpng = paste("foreground", seq_len(nfig3), ".png", sep="")
             fignu = 1
             b = 1
     
@@ -1348,16 +1336,14 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
               {
                 fg = matrix(NA,ncol=maxc,nrow=maxr)
                    
-                for(i in 1:nrow(intf))
-                  {
-                    fg[intf[i,1],intf[i,2]] = intf[i,(2+a)]
-                  }
+                for(i in seq_len(nrow(intf)))
+                  fg[intf[i,1],intf[i,2]] = intf[i,(2+a)]
                     
                 mfg = matrix(rank(fg),ncol=max(as.numeric(c)),nrow=max(as.numeric(r)))
                     
-                if(maxr>maxc){
+                if(maxr>maxc)
                   mfg = t(mfg)
-                }
+                
 
                 if(a %in% seq(1,numArrays,by=6))
                   {
@@ -1404,7 +1390,7 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
             nf <- layout(matrix(1:2,1,2,byrow = FALSE),
                          c(2,2), 2, FALSE)
             
-            for ( a in 1:numArrays )
+            for ( a in seq_len(numArrays))
               {
                 par(mar=c(2,3.5,3.5,1), cex.axis = 0.7)
                 boxplot(dat[,a]~facx, col = colours[2], range =  0, main ="", whisklty = 0, staplelty = 0)
@@ -1473,7 +1459,7 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
     xlim = range(dat, na.rm=TRUE)
     mplot3 = makePlot(con=con, name = "density",
       w=10, h=10, fun = function() {
-        for(n in 1:max(group))
+        for(n in seq_len(max(group)))
             {            
               nf <- layout(matrix(c(1,2),2,1,byrow=TRUE), c(2.8,2.8),c(1.8,2), TRUE)
               par(xaxt = "n", mar = c(0,5,2,5))
@@ -1534,7 +1520,7 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
     
     if("hasTarget" %in% rownames(featureData(expressionset)@varMetadata))
       {
-        pmap = probesmap(expressionset, numArrays, section, figure, dat, sN, xlim, type = 1)
+        pmap = probesmap(expressionset, numArrays, section, figure, dat, sN, xlim, type = 1, con = con)
 
         section = pmap$section
         figure = pmap$figure
@@ -1576,8 +1562,8 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
       {
         sc = scores(expressionset=expressionset,numArrays=numArrays, M=M, ldat=ldat, outM=outM, dat=dat, maxc=maxc, maxr=maxr, nuse=NULL, rle=NULL)               
         scores = matrix("",ncol=length(sc),nrow=numArrays)
-        for( i in 1:length(sc) )
-          scores[unlist(sc[[i]][1:length(sc[[1]])]),i]="*"
+        for( i in seq_len(length(sc)))
+          scores[unlist(sc[[i]][seq_len(length(sc[[1]]))]),i]="*"
       }
 
 
@@ -1587,7 +1573,7 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
     
     if(is(expressionset, "ExpressionSet"))
       {
-        con = report(expressionset=expressionset, arg=arg, sNt=sNt, sN=sN, sec1text=sec1text, mapdf=mapdf, matext1=matext1, nfig=nfig, legendMA=legendMA, batext=batext, nfig2=nfig2, bapng=bapng, ftext=ftext, pttext=pttext, legendpt=legendpt, nfig3=nfig3, fpng=fpng, legendlocal=legendlocal, sec2text=sec2text, htmltext2=htmltext2, legendhom1=legendhom1, group=group, htmltext3=htmltext3, legendhom2=legendhom2, sec3text=sec3text, gctext=gctext, legendgc=legendgc, gotext=gotext, legendgo=legendgo, sec4text=sec4text, htmltext4=htmltext4, legendheatmap=legendheatmap, sec5text=sec5text, htmltext5=htmltext5, legendsdmean=legendsdmean, scores=scores)
+        con = report(expressionset=expressionset, arg=arg, sNt=sNt, sN=sN, sec1text=sec1text, mapdf=mapdf, matext1=matext1, nfig=nfig, legendMA=legendMA,ftext=ftext, pttext=pttext, legendpt=legendpt, nfig3=nfig3, fpng=fpng, legendlocal=legendlocal, sec2text=sec2text, htmltext2=htmltext2, legendhom1=legendhom1, group=group, htmltext3=htmltext3, legendhom2=legendhom2, sec3text=sec3text, gctext=gctext, legendgc=legendgc, gotext=gotext, legendgo=legendgo, sec4text=sec4text, htmltext4=htmltext4, legendheatmap=legendheatmap, sec5text=sec5text, htmltext5=htmltext5, legendsdmean=legendsdmean, scores=scores)
         l = list(numArrays=numArrays,sN=sN, section=section, figure=figure, con=con, dat=dat, olddir=olddir)
       }
     
@@ -1639,7 +1625,6 @@ setMethod("arrayQualityMetrics",signature(expressionset="ExpressionSet"),
             writeLines(sprintf("<hr><DIV style=\"font-size: 13; font-family: Lucida Grande\">This report has been created with arrayQualityMetrics %s under %s</DIV>",version, rversion), con)
             
             closeHtmlPage(con)
-            setwd(olddir)
           })##end set method ExpressionSet
 
 #################################################################
@@ -1764,8 +1749,8 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
 ##########################
             sc = scores(expressionset=expressionset,numArrays=numArrays, M=l$M, ldat=l$ldat, outM=l$outM, dat=dat, maxc=l$maxc, maxr=l$maxr, nuse=nuse, rle=rle)               
             scores = matrix("",ncol=length(sc),nrow=numArrays)
-            for( i in 1:length(sc) )
-              scores[unlist(sc[[i]][1:length(sc[[i]])]),i]="*"
+            for( i in seq_len(length(sc)))
+              scores[unlist(sc[[i]][seq_len(length(sc[[i]]))]),i]="*"
             
             
 #########################
@@ -1789,7 +1774,6 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             writeLines(sprintf("<hr><DIV style=\"font-size: 13; font-family: Lucida Grande\">This report has been created with arrayQualityMetrics %s under %s</DIV>",version, rversion), con)
 
             closeHtmlPage(con)
-            setwd(olddir)
 
           })##end functions for AffyBatch and ExpressionSet
 
@@ -1803,6 +1787,8 @@ setMethod("arrayQualityMetrics",signature(expressionset = "BeadLevelList"),
           function(expressionset, outdir, force, do.logtransform, split.plots, intgroup)
           {
             olddir = getwd()
+            on.exit(setwd(olddir))
+
             dircreation(outdir, force)
             
             sN = arrayNames(expressionset)
@@ -1834,7 +1820,7 @@ setMethod("arrayQualityMetrics",signature(expressionset = "BeadLevelList"),
                ndiv = 6
                dispo = TRUE
                widthbox = 8
-               d = lapply(1:numArrays, function(i) getArrayData(expressionset, array = i, what = "G",log = do.logtransform))
+               d = lapply(seq_len(numArrays), function(i) getArrayData(expressionset, array = i, what = "G",log = do.logtransform))
                xlim = range(unlist(d), na.rm=TRUE)
              },
              "two" = {
@@ -1842,8 +1828,8 @@ setMethod("arrayQualityMetrics",signature(expressionset = "BeadLevelList"),
                dispo = FALSE
                widthbox = 15
                dr  = lapply(seq_len(numArrays), function(i) getArrayData(expressionset, array = i, what = "R",log = do.logtransform))
-               dg  = lapply(1:numArrays, function(i) getArrayData(expressionset, array = i, what = "G",log = do.logtransform))
-               dlr = lapply(1:numArrays, function(i) getArrayData(expressionset, array = i, what = "M",log = do.logtransform))
+               dg  = lapply(seq_len(numArrays), function(i) getArrayData(expressionset, array = i, what = "G",log = do.logtransform))
+               dlr = lapply(seq_len(numArrays), function(i) getArrayData(expressionset, array = i, what = "M",log = do.logtransform))
                xlim  = range(unlist(dlr), na.rm=TRUE)
                xlimr = range(unlist(dr), na.rm=TRUE)
                xlimg = range(unlist(dg), na.rm=TRUE)
@@ -1861,14 +1847,14 @@ setMethod("arrayQualityMetrics",signature(expressionset = "BeadLevelList"),
             ##MA-plots
             if(expressionset@arrayInfo$channels == "single")
               {
-                medArray = rowMedians(na.omit(dat))
-                M =  na.omit(dat)-medArray
-                A =  (na.omit(dat)+medArray)/2
+                medArray = rowMedians(dat, na.rm=TRUE)
+                M =  dat - medArray
+                A =  (dat + medArray)/2
               }
             if(expressionset@arrayInfo$channels == "two")
               {
-                M = na.omit(rc) - na.omit(gc)
-                A = 0.5*(na.omit(rc) + na.omit(gc))
+                M = rc - gc
+                A = 0.5*(rc +gc)
               }
             
             MAplot = maplot(M, A, sN, numArrays)
@@ -1897,7 +1883,7 @@ A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
             figure = figure + 1            
             nfig2 = ceiling(numArrays/ndiv)      
             
-            bapng = paste("background", 1:nfig2, ".png", sep="")
+            bapng = paste("background", seq_len(nfig2), ".png", sep="")
             fignu = 1
             
             for(a in seq_len(numArrays))
@@ -1941,7 +1927,7 @@ A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
             figure = figure + 1
             nfig3 = ceiling(numArrays/ndiv)      
             
-            fpng = paste("foreground", 1:nfig3, ".png", sep="")
+            fpng = paste("foreground", seq_len(nfig3), ".png", sep="")
             fignu = 1
             
             for(a in seq_len(numArrays))
@@ -2041,7 +2027,7 @@ A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
             
             mplot3 = makePlot(con=con, name = "density",
               w=10, h=10, fun = function() {
-                for(n in 1:max(group))
+                for(n in seq_len(max(group)))
                   {
                     if(expressionset@arrayInfo$channels == "single")
                       {
@@ -2133,8 +2119,8 @@ A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
             sc = scores(expressionset=expressionset, numArrays=numArrays, M=M, ldat=NULL, outM=outM, dat=dat, maxc=NULL, maxr=NULL, nuse=NULL, rle=NULL)
             
             scores = matrix("",ncol=length(sc),nrow=numArrays)
-            for( i in 1:length(sc) )
-              scores[unlist(sc[[i]][1:length(sc[[1]])]),i]="*"
+            for( i in seq_len(length(sc)))
+              scores[unlist(sc[[i]][seq_len(length(sc[[1]]))]),i]="*"
 
 
 
@@ -2144,8 +2130,6 @@ A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
 
             arg = as.list(match.call(expand.dots = TRUE))
             con = report(expressionset=expressionset, arg=arg, sNt=sNt, sN=sN, sec1text=sec1text, mapdf=mapdf, matext1=matext1, nfig=nfig, legendMA=legendMA, batext=batext, nfig2=nfig2, bapng=bapng, ftext=ftext, pttext=NULL, legendpt=NULL, nfig3=nfig3, fpng=fpng, legendlocal=legendlocal, sec2text=sec2text, htmltext2=htmltext2, legendhom1=legendhom1, group=group, htmltext3=htmltext3, legendhom2=legendhom2, sec3text=sec3text, gctext=gctext, legendgc=legendgc, gotext=gotext, legendgo=legendgo, sec4text=sec4text, htmltext4=htmltext4, legendheatmap=legendheatmap, sec5text=sec5text, htmltext5=htmltext5, legendsdmean=legendsdmean, scores=scores)
-
-
             writeLines("</table>", con)
 
             z=sessionInfo("arrayQualityMetrics")
@@ -2154,7 +2138,6 @@ A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
             writeLines(sprintf("<hr><DIV style=\"font-size: 13; font-family: Lucida Grande\">This report has been created with arrayQualityMetrics %s under %s</DIV>",version, rversion), con)
 
             closeHtmlPage(con)
-            setwd(olddir)
             
           } ####end set method BeadLevelList
           )
