@@ -22,6 +22,7 @@ logtransform = function(x)
   {
     xl = log2(x)
     xl[xl == "-Inf"] = NA
+    return(xl)
   }
 
 ##makePlot
@@ -322,6 +323,31 @@ pmmm = function(x, xlim, title1, title2, title3, ...)
     mtext(title3, side = 3, adj = 0.5, padj = -1 , cex = 0.7)
   }
 
+##boxplot.stats2 is the same as boxplot.stats except that the boxes that are les wide than the others are not detected as outliers
+boxplot.stats2 = function (x, coef = 1.5, do.conf = TRUE, do.out = TRUE) 
+{
+  if (coef < 0) 
+    stop("'coef' must not be negative")
+  nna <- !is.na(x)
+  n <- sum(nna)
+  stats <- stats::fivenum(x, na.rm = TRUE)
+  iqr <- diff(stats[c(2, 4)])
+  if (coef == 0) 
+    do.out <- FALSE
+  else {
+    out <- if (!is.na(iqr)) {
+      ##x < (stats[2] - coef * iqr) |
+      x > (stats[4] + coef *iqr)
+    }
+    else !is.finite(x)
+    if (any(out[nna], na.rm = TRUE)) 
+      stats[c(1, 5)] <- range(x[!out], na.rm = TRUE)
+  }
+  conf <- if (do.conf) 
+    stats[3] + c(-1.58, 1.58) * iqr/sqrt(n)
+  list(stats = stats, n = n, conf = conf, out = if (do.out) x[out & nna] else numeric(0))
+}
+
 ##SCORES COMPUTATION
 scores = function(expressionset, numArrays, M, ldat, outM, dat, maxc, maxr, nuse, rle)
   {
@@ -340,12 +366,12 @@ scores = function(expressionset, numArrays, M, ldat, outM, dat, maxc, maxr, nuse
     bmeanout = sapply(seq_len(length(bmeanstat$out)), function(x) which(b$stat[3,] == bmeanstat$out[x]))
 
     biqr = b$stat[4,] -  b$stat[2,] 
-    biqrstat = boxplot.stats(biqr)
+    biqrstat = boxplot.stats2(biqr)
     biqrout = sapply(seq_len(length(biqrstat$out)), function(x) which(biqr == biqrstat$out[x]))
 
     ## heatmap
     madsum  = rowSums(as.matrix(outM), na.rm=TRUE)
-    madstat = boxplot.stats(madsum)
+    madstat = boxplot.stats2(madsum)
     madout = sapply(seq_len(length(madstat$out)), function(x) which(madsum == madstat$out[x]))
 
     if(!is(expressionset, "BeadLevelList") && (is(expressionset, "AffyBatch") || ("X" %in% rownames(featureData(expressionset)@varMetadata) && "Y" %in% rownames(featureData(expressionset)@varMetadata))))
@@ -375,7 +401,7 @@ scores = function(expressionset, numArrays, M, ldat, outM, dat, maxc, maxr, nuse
         nusemeanout = sapply(seq_len(length(nusemeanstat$out)), function(x) which(nuse$stat[3,] == nusemeanstat$out[x]))
 
         nuseiqr = nuse$stat[4,] -  nuse$stat[2,] 
-        nuseiqrstat = boxplot.stats(nuseiqr)
+        nuseiqrstat = boxplot.stats2(nuseiqr)
         nuseiqrout = sapply(seq_len(length(nuseiqrstat$out)), function(x) which(nuseiqr == nuseiqrstat$out[x]))
 
 
@@ -395,10 +421,8 @@ scores = function(expressionset, numArrays, M, ldat, outM, dat, maxc, maxr, nuse
 report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, legendMA, batext, nfig2, bapng, ftext, pttext, legendpt, nfig3, fpng, legendlocal, sec2text, htmltext2, legendhom1, group, htmltext3, legendhom2, sec3text, gctext, legendgc, gotext, legendgo, sec4text, htmltext4, legendheatmap, sec5text, htmltext5, legendsdmean, scores)
   {
 ### Title
-    #if(length(arg$expressionset == 1))
-      #title = paste(arg$expressionset, " quality metrics report", sep="")
-    #if(length(arg$expressionset > 1))
-      title = paste(deparse(substitute(arg$expressionset)), " quality metrics report", sep="")
+        argum = arg$expressionset
+        title = paste(deparse(substitute(argum)), " quality metrics report", sep="")
     titletext = sprintf("<hr><h1><center>%s</h1></center><table border = \"0\" cellspacing = 5 cellpadding = 2 style=\"font-size: 13; font-family: Lucida Grande; text-align:center\">", title)
     con = openHtmlPage("QMreport", title)
     writeLines(titletext, con)
@@ -1118,7 +1142,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
             
             scores = matrix("",ncol=length(sc),nrow=numArrays)
             for( i in seq_len(length(sc)))
-              scores[unlist(sc[[i]][seq_len(length(sc[[1]]))]),i]="*"
+              scores[unlist(sc[[i]][seq_len(length(sc[[i]]))]),i]="*"
             
             
 ##########################
@@ -1148,7 +1172,6 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
 aqm.expressionset = function(expressionset, outdir = getwd(), force = FALSE, do.logtransform = FALSE, split.plots = FALSE, intgroup = "Covariate", arg)
   {
     olddir = getwd()
-    on.exit(setwd(olddir))
 
     ##data preparation
     if(do.logtransform)
@@ -1563,7 +1586,7 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
         sc = scores(expressionset=expressionset,numArrays=numArrays, M=M, ldat=ldat, outM=outM, dat=dat, maxc=maxc, maxr=maxr, nuse=NULL, rle=NULL)               
         scores = matrix("",ncol=length(sc),nrow=numArrays)
         for( i in seq_len(length(sc)))
-          scores[unlist(sc[[i]][seq_len(length(sc[[1]]))]),i]="*"
+          scores[unlist(sc[[i]][seq_len(length(sc[[i]]))]),i]="*"
       }
 
 
@@ -1617,6 +1640,8 @@ setMethod("arrayQualityMetrics",signature(expressionset="ExpressionSet"),
             l = aqm.expressionset(expressionset, outdir, force, do.logtransform, split.plots, intgroup, arg)
             con = l$con
             olddir = l$olddir
+            on.exit(setwd(olddir))
+
             
             writeLines("</table>", con)
             z=sessionInfo("arrayQualityMetrics")
@@ -1648,6 +1673,7 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             figure = as.numeric(l$figure)
             dat = l$dat
             olddir = l$olddir
+            on.exit(setwd(olddir))
 
 
 ############################
@@ -2120,7 +2146,7 @@ A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
             
             scores = matrix("",ncol=length(sc),nrow=numArrays)
             for( i in seq_len(length(sc)))
-              scores[unlist(sc[[i]][seq_len(length(sc[[1]]))]),i]="*"
+              scores[unlist(sc[[i]][seq_len(length(sc[[i]]))]),i]="*"
 
 
 
