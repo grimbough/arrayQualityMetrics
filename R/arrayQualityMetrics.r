@@ -106,8 +106,8 @@ maplot = function(M, A, sN, numArrays)
     plotNames = paste("MA", seq_len(nfig), sep="")
     mapdf = paste(plotNames, "pdf", sep=".")
     mapng = paste(plotNames, "png", sep=".")
-    xlimMA = quantile(A, probs=1e-4*c(1,-1)+c(0,1))
-    ylimMA = quantile(M, probs=1e-4*c(1,-1)+c(0,1))
+    xlimMA = quantile(A, probs=1e-4*c(1,-1)+c(0,1), na.rm=TRUE)
+    ylimMA = quantile(M, probs=1e-4*c(1,-1)+c(0,1), na.rm=TRUE)
     
     dummy.df = data.frame(sN = factor(sN, levels = sN),
       x = seq_along(sN),
@@ -483,7 +483,7 @@ report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, l
     
     if(is(expressionset, "AffyBatch"))
       {
-        writeLines("<LI><a href=\"#S1.3\">Spatial distribution of features intensites</b></a>", con)
+        writeLines("<LI><a href=\"#S1.2\">Spatial distribution of features intensites</b></a>", con)
         maxc = ncol(expressionset)
         maxr = nrow(expressionset)       
         if(maxr*maxc < 1000000)
@@ -1172,6 +1172,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
 aqm.expressionset = function(expressionset, outdir = getwd(), force = FALSE, do.logtransform = FALSE, split.plots = FALSE, intgroup = "Covariate", arg)
   {
     olddir = getwd()
+    on.exit(setwd(olddir))
 
     ##data preparation
     if(do.logtransform)
@@ -1641,6 +1642,7 @@ setMethod("arrayQualityMetrics",signature(expressionset="ExpressionSet"),
             con = l$con
             olddir = l$olddir
             on.exit(setwd(olddir))
+            setwd(outdir)
 
             
             writeLines("</table>", con)
@@ -1673,6 +1675,8 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             figure = as.numeric(l$figure)
             dat = l$dat
             olddir = l$olddir
+            setwd(outdir)
+
             on.exit(setwd(olddir))
 
 
@@ -2096,23 +2100,7 @@ A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
             htmltext3 = mplot3[[2]]            
      
             legendhom2 = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows density estimates (histograms) of the data. Arrays whose distributions are very different from the others should be considered for possible problems.</DIV>", figure)          
-
-
-########################################
-###Section 3 : Array platform quality###
-########################################
-     
-#######################
-###Section 3.1 : GC ###
-#######################
-    
-
-
-######################################
-###Section 3.1 : Mapping of probes ###
-######################################
-    
-            
+           
 ##########################################
 ###Section 4 : Between array comparison###
 ##########################################
