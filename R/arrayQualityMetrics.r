@@ -152,21 +152,23 @@ maplot = function(M, A, sN, numArrays)
 ##multidensity
 multi = function(type, x, xlim, title1, title2, title3, ...)
   {
-    if(type == "density")
-      multidensity(x,
-                   xlim = xlim,
-                   main = "",
-                   xlab = "",
-                   ylab = "", ...)
-    if(type == "ecdf")
-      multiecdf(x,
-                xlim = xlim,
-                main = "",
-                xlab = "",
-                ylab = "", ...)
-    mtext(title1, side = 2, adj = 0.5, padj = -4 , cex = 0.9)
-    mtext(title2, side = 1, adj = 0.5, padj = 4 , cex = 0.9)
-    mtext(title3, side = 3, adj = 0.5, padj = -1 , cex = 0.9)
+    switch(type,
+           "density" ={
+             multidensity(x,
+                          xlim = xlim,
+                          main = "",
+                          xlab = "",
+                          ylab = "", ...)},
+           "ecdf"={
+             multiecdf(x,
+                       xlim = xlim,
+                       main = "",
+                       xlab = "",
+                       ylab = "", ...)
+             mtext(title1, side = 2, adj = 0.5, padj = -4 , cex = 0.9)
+             mtext(title2, side = 1, adj = 0.5, padj = 4 , cex = 0.9)
+             mtext(title3, side = 3, adj = 0.5, padj = -1 , cex = 0.9)
+           })
   }
 
 ##Mapping of probes
@@ -194,8 +196,7 @@ probesmap = function(expressionset, numArrays, section, figure, dat, sN, xlim, t
         if(type == 1)
           xla = "log(intensity)"
         multi("density",dat~facgene,xlim,"Density",xla,"", col = cols[c(9,2)], cex.axis = 0.7)
-        legend("topright", legend=c("Mapped","Unmapped"),lty=1,lwd=2,col= c(cols[c(2,9)]), bty = "n", cex =0.9)
-      }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b><td><center><a name = \"S3.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</b></center></tr></td></table>\n",title="Probes mapping", fig = figure)
+        legend("topright", legend=c("Mapped","Unmapped"),lty=1,lwd=2,col= c(cols[c(2,9)]), bty = "n", cex =0.9)}, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b><td><center><a name = \"S3.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</b></center></tr></td></table>\n",title="Probes mapping", fig = figure)
 
     gotext = mplot6[[2]]
 
@@ -667,13 +668,12 @@ setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
             if(do.logtransform)
               {
                 rc = logtransform(assayData(expressionset)$R)
-              } else rc = assayData(expressionset)$R
-            
-            if(do.logtransform)
-              {
                 gc = logtransform(assayData(expressionset)$G)
-              } else gc = assayData(expressionset)$G
-
+              } else {
+                rc = assayData(expressionset)$R
+                gc = assayData(expressionset)$G
+              }
+            
             dircreation(outdir, force)
             
             if("Rb" %in% colnames(dims(expressionset)) && "Gb" %in% colnames(dims(expressionset)))
@@ -779,7 +779,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                         mr = matrix(rank(re),ncol=maxc,nrow=maxr)
                         mg = matrix(rank(g),ncol=maxc,nrow=maxr)
                     
-                        if(maxr>maxc){
+                        if(maxr > maxc){
                           mr = t(mr)
                           mg = t(mg)
                         }
@@ -798,7 +798,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
 
                         mtext("Rank(green intensity)",side = 2, line = 0.5 ,cex = 0.7)
                         
-                        if((a%%3==0) || (a == numArrays))                   
+                        if((a%%3 == 0) || (a == numArrays))                   
                           {
                             dev.off()
                             fignu = fignu +1
@@ -828,7 +828,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                 fignu = 1
                 b = 1
     
-                aR = if(maxr>maxc) maxr/maxc else maxc/maxr
+                aR = if(maxr > maxc) maxr/maxc else maxc/maxr
 
                 intrf = cbind(r,c,rc)
                 intgf = cbind(r,c,gc)
@@ -846,7 +846,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                     mrf = matrix(rank(rf),ncol=max(as.numeric(c)),nrow=max(as.numeric(r)))
                     mgf = matrix(rank(gf),ncol=max(as.numeric(c)),nrow=max(as.numeric(r)))
 
-                    if(maxr>maxc){
+                    if(maxr > maxc){
                       mrf = t(mrf)
                       mgf = t(mgf)
                     }
@@ -865,7 +865,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                     image(mgf, col = colourRamp)
 
                     mtext("Rank(green intensity)",side = 2, line = 0.5 ,cex = 0.7)
-                    if((a%%3==0) || (a == numArrays))                   
+                    if((a%%3 == 0) || (a == numArrays))                   
                       {
                         dev.off()
                         fignu = fignu +1
@@ -1239,13 +1239,13 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
 
         fpng = paste("foreground", seq_len(nfig3), ".png", sep="")
         fignu = 1
-        aR = if(maxr>maxc) maxr/maxc else maxc/maxr
+        aR = if(maxr > maxc) maxr/maxc else maxc/maxr
 
         for(a in seq_len(numArrays))
           {
             rfi = rank(dat[,a])
             mrfi = matrix(rfi,ncol=maxc,nrow=maxr,byrow=T)                                        
-            if(maxr>maxc)
+            if(maxr > maxc)
               mrfi = t(mrfi)
                 
             if(maxc*maxr < 1000000){
@@ -1353,7 +1353,7 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
             fignu = 1
             b = 1
     
-            aR = if(maxr>maxc) maxr/maxc else maxc/maxr
+            aR = if(maxr > maxc) maxr/maxc else maxc/maxr
 
             intf = cbind(r,c,dat)
             for(a in seq_len(numArrays))
@@ -1365,7 +1365,7 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
                     
                 mfg = matrix(rank(fg),ncol=max(as.numeric(c)),nrow=max(as.numeric(r)))
                     
-                if(maxr>maxc)
+                if(maxr > maxc)
                   mfg = t(mfg)
                 
 
@@ -1379,7 +1379,7 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
                 par(xaxt = "n", yaxt = "n",mar=c(1,2,2,1))
                 image(mfg, col = colourRamp)
                 mtext(sN[a],side = 3, line = 0.5 ,cex = 0.7)
-                if((a%%6==0) || (a == numArrays))                   
+                if((a%%6 == 0) || (a == numArrays))                   
                   {
                     dev.off()
                     fignu = fignu +1
@@ -1489,7 +1489,7 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
               par(xaxt = "n", mar = c(0,5,2,5))
               multi("density",ldat[group==n],xlim,"Density","","")
               legend("topright", legend=sN[group==n],lty=1,col=brewer.pal(9, "Set1"), bty = "n", cex = 0.9)
-              if(max(group) !=1)
+              if(max(group) != 1)
                 mtext(paste("Group ", n, sep = ""),side = 3,adj = 0.5, padj = -1)
               par(xaxt = "s", mar = c(4,5,0,5))
               multi("ecdf",ldat[group==n],xlim,"ECDF","log(intensity)","")
@@ -1940,7 +1940,7 @@ A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
                  mtext("Green Intensity",side = 2, line = 0.1 ,cex = 0.7)
                }
                 
-                if((a%%ndiv==0) || (a == numArrays))                   
+                if((a%%ndiv == 0) || (a == numArrays))                   
                   {
                     dev.off()
                     fignu = fignu +1
@@ -1984,7 +1984,7 @@ A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
                     mtext("Green Intensity",side = 2, line = 0.1 ,cex = 0.7)
                   }
                
-                if((a%%ndiv==0) || (a == numArrays))                   
+                if((a%%ndiv == 0) || (a == numArrays))                   
                   {
                     dev.off()
                     fignu = fignu +1
@@ -2155,4 +2155,3 @@ A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
             
           } ####end set method BeadLevelList
           )
-
