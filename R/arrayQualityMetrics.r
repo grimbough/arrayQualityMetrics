@@ -212,7 +212,7 @@ hmap = function(expressionset, sN, section, figure, outM, numArrays, intgroup)
     figure = figure + 1
     colourRange = rgb(seq(0,1,l=256),seq(0,1,l=256),seq(1,0,l=256))
 
-    d.row = as.dendrogram(hclust(outM))
+    d.row = as.dendrogram(hclust(outM, method = "single"))
     od.row = order.dendrogram(d.row)
     m = as.matrix(outM)
     colnames(m) = sN
@@ -350,7 +350,7 @@ boxplot.stats2 = function (x, coef = 1.5, do.conf = TRUE, do.out = TRUE)
 }
 
 ##SCORES COMPUTATION
-scores = function(expressionset, numArrays, M, ldat, outM, dat, maxc, maxr, nuse, rle)
+scores = function(expressionset, numArrays, M, ldat, outM, dat, rc, gc, maxc, maxr, nuse, rle)
   {
     ## MA plot
     mamean = colMeans(abs(M), na.rm=TRUE)
@@ -367,7 +367,7 @@ scores = function(expressionset, numArrays, M, ldat, outM, dat, maxc, maxr, nuse
     bmeanout = sapply(seq_len(length(bmeanstat$out)), function(x) which(b$stat[3,] == bmeanstat$out[x]))
 
     biqr = b$stat[4,] -  b$stat[2,] 
-    biqrstat = boxplot.stats2(biqr)
+    biqrstat = boxplot.stats(biqr)
     biqrout = sapply(seq_len(length(biqrstat$out)), function(x) which(biqr == biqrstat$out[x]))
 
     ## heatmap
@@ -377,18 +377,44 @@ scores = function(expressionset, numArrays, M, ldat, outM, dat, maxc, maxr, nuse
 
     if(!is(expressionset, "BeadLevelList") && (is(expressionset, "AffyBatch") || ("X" %in% rownames(featureData(expressionset)@varMetadata) && "Y" %in% rownames(featureData(expressionset)@varMetadata))))
       {
-
         ## spatial plot
-        mdat = lapply(seq_len(numArrays), function(x) matrix(dat[,x],ncol=maxc,nrow=maxr,byrow=T))
-        loc = sapply(mdat, function(x) {
-          apg = abs(fft(x)) ## absolute values of the periodogramme
-          lowFreq = apg[1:4, 1:4]
-          lowFreq[1,1] = 0  # drop the constant component
-          highFreq = c(apg[-(1:4), ], apg[1:4, -(1:4)])
-          return(sum(lowFreq)/sum(highFreq))
-        })
-        locstat = boxplot.stats(loc)
-        locout = sapply(seq_len(length(locstat$out)), function(x) which(loc == locstat$out[x]))
+        if(is(expressionset, "AffyBatch") || is(expressionset, "ExpressionSet"))
+          {
+            mdat = lapply(seq_len(numArrays), function(x) matrix(dat[,x],ncol=maxc,nrow=maxr,byrow=T))
+            loc = sapply(mdat, function(x) {
+              apg = abs(fft(x)) ## absolute values of the periodogramme
+              lowFreq = apg[1:4, 1:4]
+              lowFreq[1,1] = 0  # drop the constant component
+              highFreq = c(apg[-(1:4), ], apg[1:4, -(1:4)])
+              return(sum(lowFreq)/sum(highFreq))
+            })
+            locstat = boxplot.stats(loc)
+            locout = sapply(seq_len(length(locstat$out)), function(x) which(loc == locstat$out[x]))
+          }
+        if(is(expressionset, "NChannelSet"))
+          {
+            mdatr = lapply(seq_len(numArrays), function(x) matrix(rc[,x],ncol=maxc,nrow=maxr,byrow=T))
+            locr = sapply(mdatr, function(x) {
+              apg = abs(fft(x)) ## absolute values of the periodogramme
+              lowFreq = apg[1:4, 1:4]
+              lowFreq[1,1] = 0  # drop the constant component
+              highFreq = c(apg[-(1:4), ], apg[1:4, -(1:4)])
+              return(sum(lowFreq)/sum(highFreq))
+            })
+            locstatr = boxplot.stats(locr)
+            locoutr = sapply(seq_len(length(locstatr$out)), function(x) which(locr == locstatr$out[x]))
+            
+            mdatg = lapply(seq_len(numArrays), function(x) matrix(gc[,x],ncol=maxc,nrow=maxr,byrow=T))
+            locg = sapply(mdatg, function(x) {
+              apg = abs(fft(x)) ## absolute values of the periodogramme
+              lowFreq = apg[1:4, 1:4]
+              lowFreq[1,1] = 0  # drop the constant component
+              highFreq = c(apg[-(1:4), ], apg[1:4, -(1:4)])
+              return(sum(lowFreq)/sum(highFreq))
+            })
+            locstatg = boxplot.stats(locg)
+            locoutg = sapply(seq_len(length(locstatg$out)), function(x) which(locg == locstatg$out[x]))
+          }
       }
 
     if(is(expressionset, "AffyBatch"))
@@ -402,15 +428,18 @@ scores = function(expressionset, numArrays, M, ldat, outM, dat, maxc, maxr, nuse
         nusemeanout = sapply(seq_len(length(nusemeanstat$out)), function(x) which(nuse$stat[3,] == nusemeanstat$out[x]))
 
         nuseiqr = nuse$stat[4,] -  nuse$stat[2,] 
-        nuseiqrstat = boxplot.stats2(nuseiqr)
+        nuseiqrstat = boxplot.stats(nuseiqr)
         nuseiqrout = sapply(seq_len(length(nuseiqrstat$out)), function(x) which(nuseiqr == nuseiqrstat$out[x]))
 
 
         scoresout = list(maout,locout,union(bmeanout,biqrout),madout,rleout,union(nusemeanout,nuseiqrout))
       }
     
-    if(!is(expressionset, "BeadLevelList") && ("X" %in% rownames(featureData(expressionset)@varMetadata) && "Y" %in% rownames(featureData(expressionset)@varMetadata)))
+    if(!is(expressionset, "BeadLevelList") && ("X" %in% rownames(featureData(expressionset)@varMetadata) && "Y" %in% rownames(featureData(expressionset)@varMetadata)) && is(expressionset, "ExpressionSet") )      
       scoresout = list(maout,locout,union(bmeanout,biqrout),madout)
+    
+    if(!is(expressionset, "BeadLevelList") && ("X" %in% rownames(featureData(expressionset)@varMetadata) && "Y" %in% rownames(featureData(expressionset)@varMetadata)) && is(expressionset, "NChannelSet") )      
+      scoresout = list(maout,union(locoutr,locoutg),union(bmeanout,biqrout),madout)
     
     if(is(expressionset, "BeadLevelList") || (!is(expressionset, "AffyBatch") && (!("X" %in% rownames(featureData(expressionset)@varMetadata) && "Y" %in% rownames(featureData(expressionset)@varMetadata)))))
       scoresout = list(maout,union(bmeanout,biqrout),madout)
@@ -1138,7 +1167,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
 ### Scores computation ###
 ##########################
 
-            sc = scores(expressionset=expressionset,numArrays=numArrays, M=M, ldat=ldat, outM=outM, dat=dat, maxc=maxc, maxr=maxr, nuse=NULL, rle=NULL)
+            sc = scores(expressionset=expressionset,numArrays=numArrays, M=M, ldat=ldat, outM=outM, dat=dat, rc=rc, gc=gc, maxc=maxc, maxr=maxr, nuse=NULL, rle=NULL)
             
             scores = matrix("",ncol=length(sc),nrow=numArrays)
             for( i in seq_len(length(sc)))
@@ -1584,7 +1613,7 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
 ##########################
     if(is(expressionset, "ExpressionSet"))
       {
-        sc = scores(expressionset=expressionset,numArrays=numArrays, M=M, ldat=ldat, outM=outM, dat=dat, maxc=maxc, maxr=maxr, nuse=NULL, rle=NULL)               
+        sc = scores(expressionset=expressionset,numArrays=numArrays, M=M, ldat=ldat, outM=outM, dat=dat, rc=NULL, gc=NULL, maxc=maxc, maxr=maxr, nuse=NULL, rle=NULL)               
         scores = matrix("",ncol=length(sc),nrow=numArrays)
         for( i in seq_len(length(sc)))
           scores[unlist(sc[[i]][seq_len(length(sc[[i]]))]),i]="*"
@@ -1777,7 +1806,7 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
 ##########################
 ### Scores computation ###
 ##########################
-            sc = scores(expressionset=expressionset,numArrays=numArrays, M=l$M, ldat=l$ldat, outM=l$outM, dat=dat, maxc=l$maxc, maxr=l$maxr, nuse=nuse, rle=rle)               
+            sc = scores(expressionset=expressionset,numArrays=numArrays, M=l$M, ldat=l$ldat, outM=l$outM, dat=dat, rc=NULL, gc=NULL, maxc=l$maxc, maxr=l$maxr, nuse=nuse, rle=rle)               
             scores = matrix("",ncol=length(sc),nrow=numArrays)
             for( i in seq_len(length(sc)))
               scores[unlist(sc[[i]][seq_len(length(sc[[i]]))]),i]="*"
@@ -2130,7 +2159,7 @@ A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
 ##########################
 ### Scores computation ###
 ##########################
-            sc = scores(expressionset=expressionset, numArrays=numArrays, M=M, ldat=NULL, outM=outM, dat=dat, maxc=NULL, maxr=NULL, nuse=NULL, rle=NULL)
+            sc = scores(expressionset=expressionset, numArrays=numArrays, M=M, ldat=NULL, outM=outM, dat=dat, rc=NULL, gc=NULL, maxc=NULL, maxr=NULL, nuse=NULL, rle=NULL)
             
             scores = matrix("",ncol=length(sc),nrow=numArrays)
             for( i in seq_len(length(sc)))
