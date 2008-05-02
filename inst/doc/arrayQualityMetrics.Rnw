@@ -119,6 +119,8 @@ with the following arguments:
 \item \emph{split.plots}: if the number of studied arrays is more than 50 it is 
 adviced to define a number of experiments to represent on the density plots.
 \item \emph{intgroup}: is the name of the column in the \Rclass{phenoData} that contains the information about a covariate of interest to be shown as a side bar on the heatmap. The default name to this column is \emph{'Covariate'}.
+\item \emph{grouprep}: define if yes or no (TRUE or FALSE) you want the boxplots and density plots to be coloured according to the groups set in \emph{'intgroup'}.
+
 \end{itemize}
 
 %
@@ -129,7 +131,8 @@ arrayQualityMetrics(expressionset = nCCl4,
                     force = TRUE,
                     do.logtransform = FALSE,
                     split.plots = FALSE,
-                    intgroup = "RNAintegrity")
+                    intgroup = "RNAintegrity",
+                    grouprep = TRUE)
 @
 %
 

@@ -23,20 +23,22 @@
 
 \usage{
 \S4method{arrayQualityMetrics}{ExpressionSet}(expressionset, outdir,
-force, do.logtransform, split.plots, intgroup)
+force, do.logtransform, split.plots, intgroup, grouprep)
 
 arrayQualityMetrics(expressionset,
                     outdir = getwd(),
                     force = FALSE,
                     do.logtransform = FALSE,
                     split.plots = FALSE,
-                    intgroup = "Covariate")
+                    intgroup = "Covariate",
+                    grouprep = FALSE)
 
 \S4method{arrayQualityMetrics}{AffyBatch}(expressionset, outdir, force,
-do.logtransform, split.plots, intgroup)
-\S4method{arrayQualityMetrics}{NChannelSet}(expressionset, outdir, force, do.logtransform, split.plots, intgroup)
+do.logtransform, split.plots, intgroup, grouprep)
+\S4method{arrayQualityMetrics}{NChannelSet}(expressionset, outdir,
+force, do.logtransform, split.plots, intgroup, grouprep)
 \S4method{arrayQualityMetrics}{BeadLevelList}(expressionset, outdir,
-force, do.logtransform, split.plots, intgroup)
+force, do.logtransform, split.plots, intgroup, grouprep)
 }
 
 \arguments{
@@ -61,6 +63,11 @@ force, do.logtransform, split.plots, intgroup)
 
 \item{intgroup}{ Name of the column of the phenoData to be used to draw
   a color side bar next to the heatmap. }
+
+\item{grouprep}{ Decide if you want the boxplots and density plots to be
+  coloured function of the groups set by 'intgroup'. The default
+  is FALSE meaning that the boxplot and density plots will not be
+  represented function of the groups of 'intgroup'.}
 }
 
 \value{

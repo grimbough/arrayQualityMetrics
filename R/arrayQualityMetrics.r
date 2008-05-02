@@ -4,7 +4,8 @@ setGeneric("arrayQualityMetrics",
                     force = FALSE,
                     do.logtransform = FALSE,
                     split.plots = FALSE,
-                    intgroup = "Covariate")
+                    intgroup = "Covariate",
+                    grouprep = FALSE)
            standardGeneric("arrayQualityMetrics"))
 
 #################################################################
@@ -226,7 +227,8 @@ hmap = function(expressionset, sN, section, figure, outM, numArrays, intgroup)
         covar = pData(expressionset)[colnames(pData(expressionset))==intgroup][,1]
         lev = levels(as.factor(covar))
         corres = matrix(0,nrow=length(lev),ncol=2)
-        colourCov = brewer.pal(12,"Set3")
+        colourCov = brewer.pal(9,"Set1")
+
 
         png(file = hpng, w = 8*72, h = 8*72)
         print(levelplot(m[od.row,od.row],
@@ -688,7 +690,7 @@ report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, l
 #################################################################
 
 setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
-          function(expressionset, outdir, force, do.logtransform, split.plots, intgroup)
+          function(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
           {
             olddir = getwd()
             on.exit(setwd(olddir))
@@ -1009,24 +1011,48 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                 xaxt = "n"
               }
 
-            mplot2 = makePlot(con=con, name = "boxplot",
-              w=15, h=8, fun = function() {
-                nf = layout(matrix(1:3,1,3,byrow=TRUE),
-                  c(2,2,2), 2, TRUE)
-                par(cex.axis = 1,
-                    pty = "s",
-                    lheight = ((1/log10(numArrays))*long),
-                    mai = mai,
-                    omi = c(0,0,0,0),
-                    xaxt = xaxt)
-                boxplot(lredc, col = colours[6], las = 3, range = 0,
-                        names = xname, ylim = ylimrg, ylab = "log(red intensity)", cex.lab = 1.2)
-                boxplot(lgreenc, col = colours[4], las = 3, range = 0,
-                        names = xname, ylim = ylimrg, ylab = "log(green intensity)", cex.lab = 1.2)
-                boxplot(ldat, col = colours[2], las = 3, range = 0,
-                        names = xname, ylim = xlim, ylab = "log(ratio)", cex.lab = 1.2)
-              }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</center></b></td></table>\n", title="Boxplots", fig = figure)
-
+            if(intgroup %in% names(phenoData(expressionset)@data) && grouprep)
+              {
+                covar = pData(expressionset)[colnames(pData(expressionset))==intgroup][,1]
+                lev = levels(as.factor(covar))
+                colourCovd = brewer.pal(9,"Set1")
+                
+                mplot2 = makePlot(con=con, name = "boxplot",
+                  w=15, h=8, fun = function() {
+                    nf = layout(matrix(1:3,1,3,byrow=TRUE),
+                      c(2,2,2), 2, TRUE)
+                    par(cex.axis = 1,
+                        pty = "s",
+                        lheight = ((1/log10(numArrays))*long),
+                        mai = mai,
+                        omi = c(0,0,0,0),
+                        xaxt = xaxt)
+                    boxplot(lredc, col = colourCovd[as.factor(covar)], las = 3, range = 0,
+                            names = xname, ylim = ylimrg, ylab = "log(red intensity)", cex.lab = 1.2)
+                    boxplot(lgreenc, col = colourCovd[as.factor(covar)], las = 3, range = 0,
+                            names = xname, ylim = ylimrg, ylab = "log(green intensity)", cex.lab = 1.2)
+                    boxplot(ldat, col = colourCovd[as.factor(covar)], las = 3, range = 0,
+                            names = xname, ylim = xlim, ylab = "log(ratio)", cex.lab = 1.2)
+                  }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</center></b></td></table>\n", title="Boxplots", fig = figure)
+              } else {
+                mplot2 = makePlot(con=con, name = "boxplot",
+                  w=15, h=8, fun = function() {
+                    nf = layout(matrix(1:3,1,3,byrow=TRUE),
+                      c(2,2,2), 2, TRUE)
+                    par(cex.axis = 1,
+                        pty = "s",
+                        lheight = ((1/log10(numArrays))*long),
+                        mai = mai,
+                        omi = c(0,0,0,0),
+                        xaxt = xaxt)
+                    boxplot(lredc, col = colours[6], las = 3, range = 0,
+                            names = xname, ylim = ylimrg, ylab = "log(red intensity)", cex.lab = 1.2)
+                    boxplot(lgreenc, col = colours[4], las = 3, range = 0,
+                            names = xname, ylim = ylimrg, ylab = "log(green intensity)", cex.lab = 1.2)
+                    boxplot(ldat, col = colours[2], las = 3, range = 0,
+                            names = xname, ylim = xlim, ylab = "log(ratio)", cex.lab = 1.2)
+                  }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</center></b></td></table>\n", title="Boxplots", fig = figure)
+              }
             htmltext2 = mplot2[[2]]
             legendhom1 = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> presents boxplots of the log<sub>2</sub>(Intensities). Each box corresponds to one array. The left panel corresponds to the red channel. The middle panel shows the green channel. The right panel shows the boxplots of log<sub>2</sub>(ratio). If the arrays are homogeneous, the boxes should have similar wides and y position.</DIV>", figure)          
 
@@ -1037,33 +1063,68 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
             
             figure = figure + 1
 
-            mplot3 = makePlot(con=con, name = "density",
-              w=10, h=10, fun = function() {
-                for(n in seq_len(max(group)))
-                  {
+            if(intgroup %in% names(phenoData(expressionset)@data) && grouprep)
+              {
+                covar = pData(expressionset)[colnames(pData(expressionset))==intgroup][,1]
+                lev = levels(as.factor(covar))
+                colourCovd = brewer.pal(9,"Set1")
 
-                    nf <- layout(matrix(c(1,2,3,4,5,6),2,3,byrow=TRUE),
-                                 c(2.3,2,2), c(2,2), TRUE)
-                    par(mar=c(0,5,1,1),xaxt = "n")
-                    multi("density",lredc[group==n],xlimr,"Density","","")
-                    legend("topright",legend= sN[group==n],lty=1,col=brewer.pal(9, "Set1"), bty = "n", cex = 0.9)
-                    par(mar=c(0,2,1,1),xaxt = "n")
-                    multi("density",lgreenc[group==n],xlimg,"","","")
-                    legend("topright", legend=sN[group==n],lty=1,col=brewer.pal(9, "Set1"), bty = "n", cex = 0.9)
-                    if(max(group) !=1)
-                      mtext(paste("Group ", n, sep = ""),side = 3,adj = 0.5, padj = -3)
-                    par(mar=c(0,2,1,1),xaxt = "n")
-                    multi("density",ldat[group==n],xlim,"","","")
-                    legend("topright", legend=sN[group==n],lty=1,col=brewer.pal(9, "Set1"), bty = "n", cex = 0.9)
-                    par(mar=c(1,5,0,1), xaxt = "s")
-                    multi("ecdf",lredc[group==n],xlimr,"ECDF","log(red intensity)","")
-                    par(mar=c(1,2,0,1), xaxt = "s")
-                    multi("ecdf",lgreenc[group==n],xlimg,"","log(green intensity)","")
-                    par(mar=c(1,2,0,1), xaxt = "s")
-                    multi("ecdf",ldat[group==n],xlim,"","log(ratio)","")
+                mplot3 = makePlot(con=con, name = "density",
+                  w=10, h=10, fun = function() {
+                    for(n in seq_len(max(group)))
+                      {
 
-                  }
-              }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></center></td></table>\n", title="Density plots", fig = figure)
+                        nf <- layout(matrix(c(1,2,3,4,5,6),2,3,byrow=TRUE),
+                                     c(2.3,2,2), c(2,2), TRUE)
+                        par(mar=c(0,5,1,1),xaxt = "n")
+                        multi("density",lredc[group==n],xlimr,"Density","","", col=colourCovd[as.factor(covar[group==n])])
+                        legend("topright",legend=lev,lty=1,col=colourCovd[as.factor(covar)], bty = "n", cex = 0.9)
+                        par(mar=c(0,2,1,1),xaxt = "n")
+                        multi("density",lgreenc[group==n],xlimg,"","","", col=colourCovd[as.factor(covar[group==n])])
+                        legend("topright",legend=lev,lty=1,col=colourCovd[as.factor(covar)], bty = "n", cex = 0.9)
+                        if(max(group) !=1)
+                          mtext(paste("Group ", n, sep = ""),side = 3,adj = 0.5, padj = -3)
+                        par(mar=c(0,2,1,1),xaxt = "n")
+                        multi("density",ldat[group==n],xlim,"","","", col=colourCovd[as.factor(covar[group==n])])
+                        legend("topright",legend=lev,lty=1,col=colourCovd[as.factor(covar)], bty = "n", cex = 0.9)
+                        par(mar=c(1,5,0,1), xaxt = "s")
+                        multi("ecdf",lredc[group==n],xlimr,"ECDF","log(red intensity)","", col=colourCovd[as.factor(covar[group==n])])
+                        par(mar=c(1,2,0,1), xaxt = "s")
+                        multi("ecdf",lgreenc[group==n],xlimg,"","log(green intensity)","", col=colourCovd[as.factor(covar[group==n])])
+                        par(mar=c(1,2,0,1), xaxt = "s")
+                        multi("ecdf",ldat[group==n],xlim,"","log(ratio)","", col=colourCovd[as.factor(covar[group==n])])
+
+                      }
+                  }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></center></td></table>\n", title="Density plots", fig = figure)
+              } else {
+                mplot3 = makePlot(con=con, name = "density",
+                  w=10, h=10, fun = function() {
+                    for(n in seq_len(max(group)))
+                      {
+
+                        nf <- layout(matrix(c(1,2,3,4,5,6),2,3,byrow=TRUE),
+                                     c(2.3,2,2), c(2,2), TRUE)
+                        par(mar=c(0,5,1,1),xaxt = "n")
+                        multi("density",lredc[group==n],xlimr,"Density","","")
+                        legend("topright",legend= sN[group==n],lty=1,col=brewer.pal(9, "Set1"), bty = "n", cex = 0.9)
+                        par(mar=c(0,2,1,1),xaxt = "n")
+                        multi("density",lgreenc[group==n],xlimg,"","","")
+                        legend("topright", legend=sN[group==n],lty=1,col=brewer.pal(9, "Set1"), bty = "n", cex = 0.9)
+                        if(max(group) !=1)
+                          mtext(paste("Group ", n, sep = ""),side = 3,adj = 0.5, padj = -3)
+                        par(mar=c(0,2,1,1),xaxt = "n")
+                        multi("density",ldat[group==n],xlim,"","","")
+                        legend("topright", legend=sN[group==n],lty=1,col=brewer.pal(9, "Set1"), bty = "n", cex = 0.9)
+                        par(mar=c(1,5,0,1), xaxt = "s")
+                        multi("ecdf",lredc[group==n],xlimr,"ECDF","log(red intensity)","")
+                        par(mar=c(1,2,0,1), xaxt = "s")
+                        multi("ecdf",lgreenc[group==n],xlimg,"","log(green intensity)","")
+                        par(mar=c(1,2,0,1), xaxt = "s")
+                        multi("ecdf",ldat[group==n],xlim,"","log(ratio)","")
+                      }
+                  }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></center></td></table>\n", title="Density plots", fig = figure)
+              }
+            
             htmltext3 = mplot3[[2]]          
             legendhom2 = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows density estimates (histograms) of the data. Arrays whose distributions are very different from the others should be considered for possible problems.</DIV>", figure)
 
@@ -1198,7 +1259,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
 #################################################################
 #################################################################
 
-aqm.expressionset = function(expressionset, outdir = getwd(), force = FALSE, do.logtransform = FALSE, split.plots = FALSE, intgroup = "Covariate", arg)
+aqm.expressionset = function(expressionset, outdir = getwd(), force = FALSE, do.logtransform = FALSE, split.plots = FALSE, intgroup = "Covariate", arg, grouprep)
   {
     olddir = getwd()
     on.exit(setwd(olddir))
@@ -1493,14 +1554,26 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
         xname = FALSE
         xaxt = "n"
       }
+    if(intgroup %in% names(phenoData(expressionset)@data) && grouprep)
+      {
+        covar = pData(expressionset)[colnames(pData(expressionset))==intgroup][,1]
+        lev = levels(as.factor(covar))
+        colourCovd = brewer.pal(9,"Set1")
 
-
-    mplot2 = makePlot(con=con, name = "boxplot",
-      w=8, h=8, fun = function() {
-        colours = brewer.pal(12, "Paired")
-        par(cex.axis = 1, pty = "s", lheight =((1/log10(numArrays))*long), mai = c(((long/12)+0.2),0.4,0.2,0.2) , omi = c(0,0,0,0))
-        boxplot(ldat, col = colours[2], las = 3, range = 0, names = xname)
-      }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</center></b></td></table>\n", title = "Boxplots", fig = figure)
+        mplot2 = makePlot(con=con, name = "boxplot",
+          w=8, h=8, fun = function() {
+            par(cex.axis = 1, pty = "s", lheight =((1/log10(numArrays))*long), mai = c(((long/12)+0.2),0.4,0.2,0.2) , omi = c(0,0,0,0))
+            boxplot(ldat, col = colourCovd[as.factor(covar)], las = 3, range = 0, names = xname)
+          }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</center></b></td></table>\n", title = "Boxplots", fig = figure)
+      } else {
+        mplot2 = makePlot(con=con, name = "boxplot",
+          w=8, h=8, fun = function() {
+            colours = brewer.pal(12, "Paired")
+            par(cex.axis = 1, pty = "s", lheight =((1/log10(numArrays))*long), mai = c(((long/12)+0.2),0.4,0.2,0.2) , omi = c(0,0,0,0))
+            boxplot(ldat, col = colours[2], las = 3, range = 0, names = xname)
+          }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</center></b></td></table>\n", title = "Boxplots", fig = figure)
+      }
+    
     htmltext2 = mplot2[[2]]
     legendhom1 = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> presents boxplots of the log<sub>2</sub>(Intensities). Each box corresponds to one array. If the arrays are homogeneous, the boxes should have similar wides and y position.</DIV>", figure)          
     
@@ -1510,19 +1583,41 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
     
     figure = figure + 1
     xlim = range(dat, na.rm=TRUE)
-    mplot3 = makePlot(con=con, name = "density",
-      w=10, h=10, fun = function() {
-        for(n in seq_len(max(group)))
-            {            
-              nf <- layout(matrix(c(1,2),2,1,byrow=TRUE), c(2.8,2.8),c(1.8,2), TRUE)
-              par(xaxt = "n", mar = c(0,5,2,5))
-              multi("density",ldat[group==n],xlim,"Density","","")
-              legend("topright", legend=sN[group==n],lty=1,col=brewer.pal(9, "Set1"), bty = "n", cex = 0.9)
-              if(max(group) != 1)
-                mtext(paste("Group ", n, sep = ""),side = 3,adj = 0.5, padj = -1)
-              par(xaxt = "s", mar = c(4,5,0,5))
-              multi("ecdf",ldat[group==n],xlim,"ECDF","log(intensity)","")
-            }} , text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></center></td></table>\n", title="Density plots", fig = figure)
+
+    if(intgroup %in% names(phenoData(expressionset)@data) && grouprep)
+      {
+        covar = pData(expressionset)[colnames(pData(expressionset))==intgroup][,1]
+        lev = levels(as.factor(covar))
+        colourCovd = brewer.pal(9,"Set1")
+
+        mplot3 = makePlot(con=con, name = "density",
+          w=10, h=10, fun = function() {
+            for(n in seq_len(max(group)))
+              {            
+                nf <- layout(matrix(c(1,2),2,1,byrow=TRUE), c(2.8,2.8),c(1.8,2), TRUE)
+                par(xaxt = "n", mar = c(0,5,2,5))
+                multi("density",ldat[group==n],xlim,"Density","","", col=colourCovd[as.factor(covar[group==n])])
+                legend("topright",legend=lev,lty=1,col=colourCovd[as.factor(covar)], bty = "n", cex = 0.9)
+                if(max(group) != 1)
+                  mtext(paste("Group ", n, sep = ""),side = 3,adj = 0.5, padj = -1)
+                par(xaxt = "s", mar = c(4,5,0,5))
+                multi("ecdf",ldat[group==n],xlim,"ECDF","log(intensity)","", col=colourCovd[as.factor(covar[group==n])])
+              }} , text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></center></td></table>\n", title="Density plots", fig = figure)
+      } else{    
+        mplot3 = makePlot(con=con, name = "density",
+          w=10, h=10, fun = function() {
+            for(n in seq_len(max(group)))
+              {            
+                nf <- layout(matrix(c(1,2),2,1,byrow=TRUE), c(2.8,2.8),c(1.8,2), TRUE)
+                par(xaxt = "n", mar = c(0,5,2,5))
+                multi("density",ldat[group==n],xlim,"Density","","")
+                legend("topright", legend=sN[group==n],lty=1,col=brewer.pal(9, "Set1"), bty = "n", cex = 0.9)
+                if(max(group) != 1)
+                  mtext(paste("Group ", n, sep = ""),side = 3,adj = 0.5, padj = -1)
+                par(xaxt = "s", mar = c(4,5,0,5))
+                multi("ecdf",ldat[group==n],xlim,"ECDF","log(intensity)","")
+              }} , text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></center></td></table>\n", title="Density plots", fig = figure)
+      }
     htmltext3 = mplot3[[2]]
     
     legendhom2 = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows density estimates (histograms) of the data. Arrays whose distributions are very different from the others should be considered for possible problems.</DIV>", figure)          
@@ -1663,11 +1758,11 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
 #################################################################
 
 setMethod("arrayQualityMetrics",signature(expressionset="ExpressionSet"),
-          function(expressionset, outdir, force, do.logtransform, split.plots, intgroup)
+          function(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
           {
             arg = as.list(match.call(expand.dots = TRUE))
 
-            l = aqm.expressionset(expressionset, outdir, force, do.logtransform, split.plots, intgroup, arg)
+            l = aqm.expressionset(expressionset, outdir, force, do.logtransform, split.plots, intgroup, arg, grouprep)
             con = l$con
             olddir = l$olddir
             on.exit(setwd(olddir))
@@ -1691,11 +1786,11 @@ setMethod("arrayQualityMetrics",signature(expressionset="ExpressionSet"),
 
 setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
           function(expressionset, outdir, force, do.logtransform,
-          split.plots, intgroup){
+          split.plots, intgroup, grouprep){
             
             arg = as.list(match.call(expand.dots = TRUE))
 
-            l = aqm.expressionset(expressionset, outdir, force, do.logtransform, split.plots, intgroup, arg)
+            l = aqm.expressionset(expressionset, outdir, force, do.logtransform, split.plots, intgroup, arg, grouprep)
             numArrays = as.numeric(l$numArrays)
             expressionset = l$expressionset
             sN = l$sN
@@ -1843,7 +1938,7 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
 ###################################################################
 
 setMethod("arrayQualityMetrics",signature(expressionset = "BeadLevelList"),
-          function(expressionset, outdir, force, do.logtransform, split.plots, intgroup)
+          function(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
           {
             olddir = getwd()
             on.exit(setwd(olddir))
@@ -2051,21 +2146,47 @@ A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
                 mai = c(0,0.4,0.2,0.2)              
                 xaxt = "n"
               }
-            mplot2 = makePlot(con=con, name = "boxplot",
-              w=widthbox, h=8, fun = function() {
-                par(cex.axis = 1, pty = "s", lheight =((1/log10(numArrays))*long), mai = mai , omi = c(0,0,0,0), xaxt = xaxt)
+
+            if(intgroup %in% names(phenoData(expressionset)@data) && grouprep)
+              {
+                covar = pData(expressionset)[colnames(pData(expressionset))==intgroup][,1]
+                lev = levels(as.factor(covar))
+                colourCovd = brewer.pal(9,"Set1")
+
+                mplot2 = makePlot(con=con, name = "boxplot",
+                  w=widthbox, h=8, fun = function() {
+                    par(cex.axis = 1, pty = "s", lheight =((1/log10(numArrays))*long), mai = mai , omi = c(0,0,0,0), xaxt = xaxt)
                 
-                if(expressionset@arrayInfo$channels == "single")
-                  boxplotBeads(expressionset, las = 3, outline = FALSE, col= colours[2], names = xname, ylab = "log(intensity)")
+                    if(expressionset@arrayInfo$channels == "single")
+                      boxplotBeads(expressionset, las = 3, outline = FALSE,  col = colourCovd[as.factor(covar)], names = xname, ylab = "log(intensity)")
                 
-                if(expressionset@arrayInfo$channels == "two")
-                  {
-                    nf = layout(matrix(1:3,1,3,byrow=TRUE),
-                      c(2,2,2), 2, TRUE)
-                    boxplotBeads(expressionset, las = 3, outline = FALSE, col= colours[6], names = xname, ylab = "log(red intensity)", whatToPlot = "R")
-                    boxplotBeads(expressionset, las = 3, outline = FALSE, col= colours[4], names = xname, ylab = "log(green intensity)", whatToPlot = "G")              
-                    boxplotBeads(expressionset, las = 3, outline = FALSE, col= colours[2], names = xname, ylab = "log(ratio)", whatToPlot = "M")
-                  }}, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</center></b></td></table>\n", title = "Boxplots", fig = figure)
+                    if(expressionset@arrayInfo$channels == "two")
+                      {
+                        nf = layout(matrix(1:3,1,3,byrow=TRUE),
+                          c(2,2,2), 2, TRUE)
+                        boxplotBeads(expressionset, las = 3, outline = FALSE, col = colourCovd[as.factor(covar)], names = xname, ylab = "log(red intensity)", whatToPlot = "R")
+                        boxplotBeads(expressionset, las = 3, outline = FALSE, col = colourCovd[as.factor(covar)], names = xname, ylab = "log(green intensity)", whatToPlot = "G")              
+                        boxplotBeads(expressionset, las = 3, outline = FALSE, col = colourCovd[as.factor(covar)], names = xname, ylab = "log(ratio)", whatToPlot = "M")
+                      }}, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</center></b></td></table>\n", title = "Boxplots", fig = figure)
+              } else {
+                mplot2 = makePlot(con=con, name = "boxplot",
+                  w=widthbox, h=8, fun = function() {
+                    par(cex.axis = 1, pty = "s", lheight =((1/log10(numArrays))*long), mai = mai , omi = c(0,0,0,0), xaxt = xaxt)
+                
+                    if(expressionset@arrayInfo$channels == "single")
+                      boxplotBeads(expressionset, las = 3, outline = FALSE, col= colours[2], names = xname, ylab = "log(intensity)")
+                
+                    if(expressionset@arrayInfo$channels == "two")
+                      {
+                        nf = layout(matrix(1:3,1,3,byrow=TRUE),
+                          c(2,2,2), 2, TRUE)
+                        boxplotBeads(expressionset, las = 3, outline = FALSE, col= colours[6], names = xname, ylab = "log(red intensity)", whatToPlot = "R")
+                        boxplotBeads(expressionset, las = 3, outline = FALSE, col= colours[4], names = xname, ylab = "log(green intensity)", whatToPlot = "G")              
+                        boxplotBeads(expressionset, las = 3, outline = FALSE, col= colours[2], names = xname, ylab = "log(ratio)", whatToPlot = "M")
+                      }}, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</center></b></td></table>\n", title = "Boxplots", fig = figure)
+
+
+              }
             htmltext2 = mplot2[[2]]
 
             if(expressionset@arrayInfo$channels == "single")
@@ -2083,49 +2204,100 @@ A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
             figure = figure + 1
             repe = ceiling(numArrays/9)
             colour = rep(brewer.pal(9, "Set1"),repe)
-            
-            mplot3 = makePlot(con=con, name = "density",
-              w=10, h=10, fun = function() {
-                for(n in seq_len(max(group)))
-                  {
-                    if(expressionset@arrayInfo$channels == "single")
+
+            if(intgroup %in% names(phenoData(expressionset)@data) && grouprep)
+              {
+                covar = pData(expressionset)[colnames(pData(expressionset))==intgroup][,1]
+                lev = levels(as.factor(covar))
+                colourCovd = brewer.pal(9,"Set1")
+                
+                mplot3 = makePlot(con=con, name = "density",
+                  w=10, h=10, fun = function() {
+                    for(n in seq_len(max(group)))
                       {
-                        nf <- layout(matrix(c(1,2),2,1,byrow=TRUE), c(2.8,2.8),c(1.8,2), TRUE)
-                        par(xaxt = "n", mar = c(0,5,2,5))
-                        plotBeadDensities(expressionset, what = "G", arrays = c(which(group==n)), col = colour[seq_len(numArrays)], xlab="", ylab="", main="", xlim=xlim)
-                        legend("topright", legend=sN[group==n],lty=1,col=brewer.pal(9, "Set1"), bty = "n", cex = 0.9)
-                        mtext("Density", side = 2, adj = 0.5, padj = -4 , cex = 0.9)
-                        if(max(group) != 1)
-                          mtext(paste("Group ", n, sep = ""),side = 3,adj = 0.5, padj = -1)
-                        par(xaxt = "s",  mar = c(4,5,0,5))
-                        multi("ecdf",d[group==n],xlim=xlim,"ECDF","log(intensity)","")
-                      }
+                        if(expressionset@arrayInfo$channels == "single")
+                          {
+                            nf <- layout(matrix(c(1,2),2,1,byrow=TRUE), c(2.8,2.8),c(1.8,2), TRUE)
+                            par(xaxt = "n", mar = c(0,5,2,5))
+                            plotBeadDensities(expressionset, what = "G", arrays = c(which(group==n)), col=colourCovd[as.factor(covar[group==n])], xlab="", ylab="", main="", xlim=xlim)
+                            legend("topright",legend=lev,lty=1,col=colourCovd[as.factor(covar)], bty = "n", cex = 0.9)
+                            mtext("Density", side = 2, adj = 0.5, padj = -4 , cex = 0.9)
+                            if(max(group) != 1)
+                              mtext(paste("Group ", n, sep = ""),side = 3,adj = 0.5, padj = -1)
+                            par(xaxt = "s",  mar = c(4,5,0,5))
+                            multi("ecdf",d[group==n],xlim=xlim,"ECDF","log(intensity)","", col=colourCovd[as.factor(covar[group==n])])
+                          }
                     
-                    if(expressionset@arrayInfo$channels == "two")
-                      {
-                        nf <- layout(matrix(c(1,2,3,4,5,6),2,3,byrow=TRUE),
-                                     c(2.3,2,2), c(2,2), TRUE)
-                        par(mar=c(0,5,1,1),xaxt = "n")
-                        plotBeadDensities(expressionset, what = "R", arrays = c(which(group==n)), col = colour[seq_len(numArrays)], xlab="", ylab="", main="")
-                        legend("topright",legend=sN[group==n],lty=1,col=brewer.pal(9, "Set1"), bty = "n", cex = 0.9)
-                        mtext("Density", side = 2, adj = 0.5, padj = -4 , cex = 0.9)
-                        par(mar=c(0,2,1,1),xaxt = "n")
-                        plotBeadDensities(expressionset, what = "G", arrays = c(which(group==n)), col = colour[seq_len(numArrays)], xlab="", ylab="", main="")                   
-                        legend("topright",legend= sN[group==n],lty=1,col=brewer.pal(9, "Set1"), bty = "n", cex = 0.9)
-                        if(max(group) != 1)
-                          mtext(paste("Group ", n, sep = ""),side = 3,adj = 0.5, padj = -3 ,cex = 1)
-                        par(mar=c(0,2,1,1),xaxt = "n")
-                        plotBeadDensities(expressionset, what = "M", arrays = c(which(group==n)), col = colour[seq_len(numArrays)], xlab="", ylab="", main="")                   
-                        legend("topright", legend=sN[group==n],lty=1,col=brewer.pal(9, "Set1"), bty = "n", cex = 0.9)
-                        par(mar=c(1,5,0,1), xaxt = "s")
-                        multi("ecdf",dr[group==n],xlim=xlimr,"ECDF","log(red intensity)","")
-                        par(mar=c(1,2,0,1), xaxt = "s")
-                        multi("ecdf",dg[group==n],xlim=xlimg,"","log(green intensity)","")
-                        par(mar=c(1,2,0,1), xaxt = "s")
-                        multi("ecdf",dlr[group==n],xlim=xlim,"","log(ratio)","")
+                        if(expressionset@arrayInfo$channels == "two")
+                          {
+                            nf <- layout(matrix(c(1,2,3,4,5,6),2,3,byrow=TRUE),
+                                         c(2.3,2,2), c(2,2), TRUE)
+                            par(mar=c(0,5,1,1),xaxt = "n")
+                            plotBeadDensities(expressionset, what = "R", arrays = c(which(group==n)), col =colourCovd[as.factor(covar[group==n])], xlab="", ylab="", main="")
+                            legend("topright",legend=lev,lty=1,col=colourCovd[as.factor(covar)], bty = "n", cex = 0.9)
+                            mtext("Density", side = 2, adj = 0.5, padj = -4 , cex = 0.9)
+                            par(mar=c(0,2,1,1),xaxt = "n")
+                            plotBeadDensities(expressionset, what = "G", arrays = c(which(group==n)), col =colourCovd[as.factor(covar[group==n])], xlab="", ylab="", main="")                   
+                            legend("topright",legend=lev,lty=1,col=colourCovd[as.factor(covar)], bty = "n", cex = 0.9)
+                            if(max(group) != 1)
+                              mtext(paste("Group ", n, sep = ""),side = 3,adj = 0.5, padj = -3 ,cex = 1)
+                            par(mar=c(0,2,1,1),xaxt = "n")
+                            plotBeadDensities(expressionset, what = "M", arrays = c(which(group==n)), col =colourCovd[as.factor(covar[group==n])], xlab="", ylab="", main="")
+                            legend("topright",legend=lev,lty=1,col=colourCovd[as.factor(covar)], bty = "n", cex = 0.9)
+                            par(mar=c(1,5,0,1), xaxt = "s")
+                            multi("ecdf",dr[group==n],xlim=xlimr,"ECDF","log(red intensity)","", col =colourCovd[as.factor(covar[group==n])])
+                            par(mar=c(1,2,0,1), xaxt = "s")
+                            multi("ecdf",dg[group==n],xlim=xlimg,"","log(green intensity)","", col =colourCovd[as.factor(covar[group==n])])
+                            par(mar=c(1,2,0,1), xaxt = "s")
+                            multi("ecdf",dlr[group==n],xlim=xlim,"","log(ratio)","", col =colourCovd[as.factor(covar[group==n])])
+                          }
                       }
-                  }
-              }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></center></td></table>\n", title="Density plots", fig = figure)
+                  }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></center></td></table>\n", title="Density plots", fig = figure)
+              } else {          
+            
+                mplot3 = makePlot(con=con, name = "density",
+                  w=10, h=10, fun = function() {
+                    for(n in seq_len(max(group)))
+                      {
+                        if(expressionset@arrayInfo$channels == "single")
+                          {
+                            nf <- layout(matrix(c(1,2),2,1,byrow=TRUE), c(2.8,2.8),c(1.8,2), TRUE)
+                            par(xaxt = "n", mar = c(0,5,2,5))
+                            plotBeadDensities(expressionset, what = "G", arrays = c(which(group==n)), col = colour[seq_len(numArrays)], xlab="", ylab="", main="", xlim=xlim)
+                            legend("topright", legend=sN[group==n],lty=1,col=brewer.pal(9, "Set1"), bty = "n", cex = 0.9)
+                            mtext("Density", side = 2, adj = 0.5, padj = -4 , cex = 0.9)
+                            if(max(group) != 1)
+                              mtext(paste("Group ", n, sep = ""),side = 3,adj = 0.5, padj = -1)
+                            par(xaxt = "s",  mar = c(4,5,0,5))
+                            multi("ecdf",d[group==n],xlim=xlim,"ECDF","log(intensity)","")
+                          }
+                    
+                        if(expressionset@arrayInfo$channels == "two")
+                          {
+                            nf <- layout(matrix(c(1,2,3,4,5,6),2,3,byrow=TRUE),
+                                         c(2.3,2,2), c(2,2), TRUE)
+                            par(mar=c(0,5,1,1),xaxt = "n")
+                            plotBeadDensities(expressionset, what = "R", arrays = c(which(group==n)), col = colour[seq_len(numArrays)], xlab="", ylab="", main="")
+                            legend("topright",legend=sN[group==n],lty=1,col=brewer.pal(9, "Set1"), bty = "n", cex = 0.9)
+                            mtext("Density", side = 2, adj = 0.5, padj = -4 , cex = 0.9)
+                            par(mar=c(0,2,1,1),xaxt = "n")
+                            plotBeadDensities(expressionset, what = "G", arrays = c(which(group==n)), col = colour[seq_len(numArrays)], xlab="", ylab="", main="")                   
+                            legend("topright",legend= sN[group==n],lty=1,col=brewer.pal(9, "Set1"), bty = "n", cex = 0.9)
+                            if(max(group) != 1)
+                              mtext(paste("Group ", n, sep = ""),side = 3,adj = 0.5, padj = -3 ,cex = 1)
+                            par(mar=c(0,2,1,1),xaxt = "n")
+                            plotBeadDensities(expressionset, what = "M", arrays = c(which(group==n)), col = colour[seq_len(numArrays)], xlab="", ylab="", main="")                   
+                            legend("topright", legend=sN[group==n],lty=1,col=brewer.pal(9, "Set1"), bty = "n", cex = 0.9)
+                            par(mar=c(1,5,0,1), xaxt = "s")
+                            multi("ecdf",dr[group==n],xlim=xlimr,"ECDF","log(red intensity)","")
+                            par(mar=c(1,2,0,1), xaxt = "s")
+                            multi("ecdf",dg[group==n],xlim=xlimg,"","log(green intensity)","")
+                            par(mar=c(1,2,0,1), xaxt = "s")
+                            multi("ecdf",dlr[group==n],xlim=xlim,"","log(ratio)","")
+                          }
+                      }
+                  }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></center></td></table>\n", title="Density plots", fig = figure)
+              }
             htmltext3 = mplot3[[2]]            
      
             legendhom2 = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows density estimates (histograms) of the data. Arrays whose distributions are very different from the others should be considered for possible problems.</DIV>", figure)          
