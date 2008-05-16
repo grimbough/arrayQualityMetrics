@@ -222,47 +222,53 @@ hmap = function(expressionset, sN, section, figure, outM, numArrays, intgroup)
     hpdf = "heatmap.pdf"
     hpng = "heatmap.png"
     
-   if(intgroup %in% names(phenoData(expressionset)@data))
+   if(all(intgroup %in% names(phenoData(expressionset)@data)))
       {
-        covar = pData(expressionset)[colnames(pData(expressionset))==intgroup][,1]
-        lev = levels(as.factor(covar))
-        corres = matrix(0,nrow=length(lev),ncol=2)
-        colourCov = brewer.pal(9,"Set1")
+        covar = lapply(1:length(intgroup), function(i) pData(expressionset)[colnames(pData(expressionset))==intgroup[i]][,1])
+        lev = lapply(1:length(intgroup), function(i) levels(as.factor(unlist(covar[i]))))
+        corres = lapply(1:length(intgroup), function(i) matrix(0,nrow=length(lev[[i]]),ncol=2))
+        colourCov = lapply(1:length(intgroup), function(i) brewer.pal(8,rownames(brewer.pal.info[brewer.pal.info$category=="qual",])[i]))
 
 
         png(file = hpng, w = 8*72, h = 8*72)
         print(levelplot(m[od.row,od.row],
-                  scales=list(x=list(rot=90)),
-                  legend=list(
-                    top=list(fun=dendrogramGrob,args=list(x=d.row,side="top")),
-                    right=list(fun=dendrogramGrob,args=list(x=d.row,side="right", size.add= 1, add = list(rect = list(col = "transparent", fill = colourCov[as.factor(covar)])), type = "rectangle"))),
-                  colorkey = list(space ="left"),
-                  xlab="",ylab="",
-                  col.regions=colourRange))
-        
-        x=0.06
-        y=0.98
-        
-        for(i in seq_len(length(lev)))
-          {
-            corres[i,] = c(unique(covar[covar == lev[i]]),colourCov[i])
-            grid.text(corres[i,1], x=x, y=y, just="left")
-            grid.rect(gp=gpar(fill=corres[i,2],col="transparent"), x=x-0.02, y=y, width=0.02, height=0.02)
-            y=y-0.03
-          }
+                        scales=list(x=list(rot=90)),
+                        legend=list(
+                          top=list(fun=dendrogramGrob,args=list(x=d.row,side="top")),
+                          right=list(fun=dendrogramGrob,
+                            args=list(x=d.row,side="right", size.add=1, 
+                              add = sapply(1:length(intgroup), function(i) list(rect = list(col="transparent",fill = unlist(colourCov[i])[as.factor(unlist(covar[i]))]))),
+                              type = "rectangle"))),
+                        colorkey = list(space ="left"),
+                        xlab="",ylab="",
+                        col.regions=colourRange))
+
+        x = 0.06
+        y = 0.98
+
+        lapply(1:length(intgroup), function(i)
+               {
+                 for(j in seq_len(length(lev[[i]])))
+                   {
+                     corres[[i]][j,] = c(unique(covar[[i]][covar[[i]] == lev[[i]][j]]),colourCov[[i]][j])
+                     grid.text(corres[[i]][j,1], x = if(i>1)(x+(i/(max(nchar(covar[[i-1]]))*1.5))) else x, y=y, just="left")
+                     grid.rect(gp=gpar(fill=corres[[i]][j,2],col="transparent"), x = if(i>1)(x+(i/(max(nchar(covar[[i-1]]))*1.5))-0.02) else x-0.02, y=y, width=0.02, height=0.02)
+y=y-0.03
+                   }
+               })
         dev.copy(pdf, file = hpdf)
         dev.off()
         dev.off()
       } else {
         png(file = hpng, w = 8*72, h = 8*72)
         print(levelplot(m[od.row,od.row],
-                  scales=list(x=list(rot=90)),
-                  legend=list(
-                    top=list(fun=dendrogramGrob,args=list(x=d.row,side="top")),
-                    right=list(fun=dendrogramGrob,args=list(x=d.row,side="right"))),
-                  colorkey = list(space ="left"),
-                  xlab="",ylab="",
-                  col.regions=colourRange))
+                        scales=list(x=list(rot=90)),
+                        legend=list(
+                          top=list(fun=dendrogramGrob,args=list(x=d.row,side="top")),
+                          right=list(fun=dendrogramGrob,args=list(x=d.row,side="right"))),
+                        colorkey = list(space ="left"),
+                        xlab="",ylab="",
+                        col.regions=colourRange))
         dev.copy(pdf, file = hpdf)
         dev.off()
         dev.off()
@@ -273,7 +279,7 @@ hmap = function(expressionset, sN, section, figure, outM, numArrays, intgroup)
 
     legendheatmap = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows a false color heatmap of between arrays distances, computed as the median absolute difference of the M-value for each pair of arrays. <br><center><i>d<sub>xy</sub> = median|M<sub>xi</sub>-M<sub>yi</sub>|</i></center><br><br> Here, <i>M<sub>xi</sub></i> is the M-value of the <i>i</i>-th probe on the <i>x</i>-th array, %s <br>This plot can serve to detect outlier arrays. <br>Consider the following decomposition of <i>M<sub>xi</sub>: M<sub>xi</sub> = z<sub>i</sub> + &beta;<sub>xi</sub> + &epsilon;<sub>xi</sub></i>, where <i>z<sub>i</sub></i> is the probe effect for probe <i>i</i> (the same across all arrays), <i>&epsilon;<sub>xi</sub></i> are i.i.d. random variables with mean zero and <i>&beta;<sub>xi</sub></i> is such that for any array <i>x</i>, the majority of values <i>&beta;<sub>xi</sub></i> are negligibly small (i. e. close to zero). <i>&beta;<sub>xi</sub></i> represents differential expression effects. In this model, all values <i>d<sub>xy</sub></i> are (in expectation) the same, namely <sqrt>2</sqrt> times the standard deviation of <i>&epsilon;<sub>xi</i></sub> . Arrays whose distance matrix entries are way different give cause for suspicion. The dendrogram on this plot also can serve to check if, without any probe filtering, the arrays cluster accordingly to a biological meaning.</DIV></table>",  figure, leghmspe)
     
-    if(intgroup %in% names(phenoData(expressionset)@data))
+    if(all(intgroup %in% names(phenoData(expressionset)@data)))
       {
         hmap = list(section=section, figure=figure, htmltext4=htmltext4,sec4text=sec4text, legendheatmap=legendheatmap, numArrays=numArrays, intgroup=intgroup)
       } else {
@@ -1011,9 +1017,9 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                 xaxt = "n"
               }
 
-            if(intgroup %in% names(phenoData(expressionset)@data) && grouprep)
+            if(all(intgroup %in% names(phenoData(expressionset)@data)) && grouprep)
               {
-                covar = pData(expressionset)[colnames(pData(expressionset))==intgroup][,1]
+                covar = pData(expressionset)[colnames(pData(expressionset))==intgroup[1]][,1]
                 lev = levels(as.factor(covar))
                 colourCovd = brewer.pal(9,"Set1")
                 
@@ -1063,9 +1069,9 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
             
             figure = figure + 1
 
-            if(intgroup %in% names(phenoData(expressionset)@data) && grouprep)
+            if(all(intgroup %in% names(phenoData(expressionset)@data)) && grouprep)
               {
-                covar = pData(expressionset)[colnames(pData(expressionset))==intgroup][,1]
+                covar = pData(expressionset)[colnames(pData(expressionset))==intgroup[1]][,1]
                 lev = levels(as.factor(covar))
                 colourCovd = brewer.pal(9,"Set1")
 
@@ -1554,9 +1560,9 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
         xname = FALSE
         xaxt = "n"
       }
-    if(intgroup %in% names(phenoData(expressionset)@data) && grouprep)
+    if(all(intgroup %in% names(phenoData(expressionset)@data)) && grouprep)
       {
-        covar = pData(expressionset)[colnames(pData(expressionset))==intgroup][,1]
+        covar = pData(expressionset)[colnames(pData(expressionset))==intgroup[1]][,1]
         lev = levels(as.factor(covar))
         colourCovd = brewer.pal(9,"Set1")
 
@@ -1584,9 +1590,9 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
     figure = figure + 1
     xlim = range(dat, na.rm=TRUE)
 
-    if(intgroup %in% names(phenoData(expressionset)@data) && grouprep)
+    if(all(intgroup %in% names(phenoData(expressionset)@data)) && grouprep)
       {
-        covar = pData(expressionset)[colnames(pData(expressionset))==intgroup][,1]
+        covar = pData(expressionset)[colnames(pData(expressionset))==intgroup[1]][,1]
         lev = levels(as.factor(covar))
         colourCovd = brewer.pal(9,"Set1")
 
@@ -2147,9 +2153,9 @@ A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
                 xaxt = "n"
               }
 
-            if(intgroup %in% names(phenoData(expressionset)@data) && grouprep)
+            if(all(intgroup %in% names(phenoData(expressionset)@data)) && grouprep)
               {
-                covar = pData(expressionset)[colnames(pData(expressionset))==intgroup][,1]
+                covar = pData(expressionset)[colnames(pData(expressionset))==intgroup[1]][,1]
                 lev = levels(as.factor(covar))
                 colourCovd = brewer.pal(9,"Set1")
 
@@ -2205,9 +2211,9 @@ A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
             repe = ceiling(numArrays/9)
             colour = rep(brewer.pal(9, "Set1"),repe)
 
-            if(intgroup %in% names(phenoData(expressionset)@data) && grouprep)
+            if(all(intgroup %in% names(phenoData(expressionset)@data)) && grouprep)
               {
-                covar = pData(expressionset)[colnames(pData(expressionset))==intgroup][,1]
+                covar = pData(expressionset)[colnames(pData(expressionset))==intgroup[1]][,1]
                 lev = levels(as.factor(covar))
                 colourCovd = brewer.pal(9,"Set1")
                 
