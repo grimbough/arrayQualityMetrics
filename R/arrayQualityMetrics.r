@@ -1073,7 +1073,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
               {
                 covar = pData(expressionset)[colnames(pData(expressionset))==intgroup[1]][,1]
                 lev = levels(as.factor(covar))
-                colourCovd = brewer.pal(9,"Set1")
+                colourCovd = brewer.pal(8,rownames(brewer.pal.info[brewer.pal.info$category=="qual",])[1])
 
                 mplot3 = makePlot(con=con, name = "density",
                   w=10, h=10, fun = function() {
@@ -1564,7 +1564,7 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
       {
         covar = pData(expressionset)[colnames(pData(expressionset))==intgroup[1]][,1]
         lev = levels(as.factor(covar))
-        colourCovd = brewer.pal(9,"Set1")
+        colourCovd = brewer.pal(8,rownames(brewer.pal.info[brewer.pal.info$category=="qual",])[1])
 
         mplot2 = makePlot(con=con, name = "boxplot",
           w=8, h=8, fun = function() {
@@ -1594,7 +1594,7 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
       {
         covar = pData(expressionset)[colnames(pData(expressionset))==intgroup[1]][,1]
         lev = levels(as.factor(covar))
-        colourCovd = brewer.pal(9,"Set1")
+        colourCovd = brewer.pal(8,rownames(brewer.pal.info[brewer.pal.info$category=="qual",])[1])
 
         mplot3 = makePlot(con=con, name = "density",
           w=10, h=10, fun = function() {
@@ -2157,7 +2157,7 @@ A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
               {
                 covar = pData(expressionset)[colnames(pData(expressionset))==intgroup[1]][,1]
                 lev = levels(as.factor(covar))
-                colourCovd = brewer.pal(9,"Set1")
+                colourCovd = brewer.pal(8,rownames(brewer.pal.info[brewer.pal.info$category=="qual",])[1])
 
                 mplot2 = makePlot(con=con, name = "boxplot",
                   w=widthbox, h=8, fun = function() {
@@ -2215,7 +2215,7 @@ A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
               {
                 covar = pData(expressionset)[colnames(pData(expressionset))==intgroup[1]][,1]
                 lev = levels(as.factor(covar))
-                colourCovd = brewer.pal(9,"Set1")
+                colourCovd = brewer.pal(8,rownames(brewer.pal.info[brewer.pal.info$category=="qual",])[1])
                 
                 mplot3 = makePlot(con=con, name = "density",
                   w=10, h=10, fun = function() {
