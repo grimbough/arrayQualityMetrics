@@ -695,8 +695,7 @@ report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, l
 #################################################################
 #################################################################
 
-setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"),
-          function(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
+setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet", function(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
           {
             olddir = getwd()
             on.exit(setwd(olddir))
