@@ -695,7 +695,7 @@ report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, l
 #################################################################
 #################################################################
 
-setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet", function(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
+setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"), function(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
           {
             olddir = getwd()
             on.exit(setwd(olddir))
@@ -1010,7 +1010,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                 xaxt = "s"
               }
             if(numArrays > 50)
-               {
+              {
                 xname = FALSE
                 mai = c(0,0.8,0.2,0.2)              
                 xaxt = "n"
@@ -1156,7 +1156,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
 
                 png(file = gcpng)
                 nf <- layout(matrix(c(1,2,3,4,5,6,7,8,9),3,3,byrow = TRUE),
-                              widths =c(2.5,2,2), heights=c(1.9,1.9,2.9), TRUE)
+                             widths =c(2.5,2,2), heights=c(1.9,1.9,2.9), TRUE)
                 par(mar=c(0,5,1,1), xaxt = "n")
                 multi("density",rc~fac,xlimr,"Density","","", col = colr[ngc])
                 par(mar=c(0,2,1,1))
@@ -1255,9 +1255,9 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
 
             closeHtmlPage(con)
             
-          } ####end set method NChannelSet
-          )
-
+          })####end set method NChannelSet
+          
+         
 #################################################################
 #################################################################
 #################### ExpressionSet Functions ####################
@@ -1754,7 +1754,7 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
       }
     
     return(l) 
-  }
+}
 
 #################################################################
 #################################################################
@@ -1781,7 +1781,7 @@ setMethod("arrayQualityMetrics",signature(expressionset="ExpressionSet"),
             writeLines(sprintf("<hr><DIV style=\"font-size: 13; font-family: Lucida Grande\">This report has been created with arrayQualityMetrics %s under %s</DIV>",version, rversion), con)
             
             closeHtmlPage(con)
-          })##end set method ExpressionSet
+          }) ##end set method ExpressionSet
 
 #################################################################
 #################################################################
@@ -1791,7 +1791,8 @@ setMethod("arrayQualityMetrics",signature(expressionset="ExpressionSet"),
 
 setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
           function(expressionset, outdir, force, do.logtransform,
-          split.plots, intgroup, grouprep){
+          split.plots, intgroup, grouprep)
+          {
             
             arg = as.list(match.call(expand.dots = TRUE))
 
@@ -1934,7 +1935,7 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
 
             closeHtmlPage(con)
 
-          })##end functions for AffyBatch and ExpressionSet
+          }) ##end functions for AffyBatch and ExpressionSet
 
 ###################################################################
 ###################################################################
@@ -1975,25 +1976,25 @@ setMethod("arrayQualityMetrics",signature(expressionset = "BeadLevelList"),
 
             ##one or two colour settings
             switch(expressionset@arrayInfo$channels,
-             "single" = {
-               ndiv = 6
-               dispo = TRUE
-               widthbox = 8
-               d = lapply(seq_len(numArrays), function(i) getArrayData(expressionset, array = i, what = "G",log = do.logtransform))
-               xlim = range(unlist(d), na.rm=TRUE)
-             },
-             "two" = {
-               ndiv = 3
-               dispo = FALSE
-               widthbox = 15
-               dr  = lapply(seq_len(numArrays), function(i) getArrayData(expressionset, array = i, what = "R",log = do.logtransform))
-               dg  = lapply(seq_len(numArrays), function(i) getArrayData(expressionset, array = i, what = "G",log = do.logtransform))
-               dlr = lapply(seq_len(numArrays), function(i) getArrayData(expressionset, array = i, what = "M",log = do.logtransform))
-               xlim  = range(unlist(dlr), na.rm=TRUE)
-               xlimr = range(unlist(dr), na.rm=TRUE)
-               xlimg = range(unlist(dg), na.rm=TRUE)
-             },
-             stop(sprintf("Invalid expressionset@arrayInfo$channels '%s'.", expressionset@arrayInfo$channels)))
+                   "single" = {
+                     ndiv = 6
+                     dispo = TRUE
+                     widthbox = 8
+                     d = lapply(seq_len(numArrays), function(i) getArrayData(expressionset, array = i, what = "G",log = do.logtransform))
+                     xlim = range(unlist(d), na.rm=TRUE)
+                   },
+                   "two" = {
+                     ndiv = 3
+                     dispo = FALSE
+                     widthbox = 15
+                     dr  = lapply(seq_len(numArrays), function(i) getArrayData(expressionset, array = i, what = "R",log = do.logtransform))
+                     dg  = lapply(seq_len(numArrays), function(i) getArrayData(expressionset, array = i, what = "G",log = do.logtransform))
+                     dlr = lapply(seq_len(numArrays), function(i) getArrayData(expressionset, array = i, what = "M",log = do.logtransform))
+                     xlim  = range(unlist(dlr), na.rm=TRUE)
+                     xlimr = range(unlist(dr), na.rm=TRUE)
+                     xlimg = range(unlist(dg), na.rm=TRUE)
+                   },
+                   stop(sprintf("Invalid expressionset@arrayInfo$channels '%s'.", expressionset@arrayInfo$channels)))
 
 
 ####################################
@@ -2030,7 +2031,7 @@ setMethod("arrayQualityMetrics",signature(expressionset = "BeadLevelList"),
             if(expressionset@arrayInfo$channels == "two")
               legspe = "where I<sub>1</sub> and I<sub>2</sub> are the vectors of intensities of the two channels."
            
-              legendMA = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> represents MA plot for each array. M and A are defined as :<br>
+            legendMA = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> represents MA plot for each array. M and A are defined as :<br>
 M = log<sub>2</sub>(I<sub>1</sub>) - log<sub>2</sub>(I<sub>2</sub>)<br>
 A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
 %s The calculations are done on the summarized data obtained by using the function createBeadSummaryData from the package beadarray. Typically, we expect the mass of the distribution in an MA plot to be concentrated along the M = 0 axis, and there should be no trend in the mean of M as a function of A. Note that a bigger width of the plot of the M-distribution at the lower end of the A scale does not necessarily imply that the variance of the M-distribution is larger at the lower end of the A scale: the visual impression might simply be caused by the fact that there is more data at the lower end of the A scale. To visualize whether there is a trend in the variance of M as a function of A, consider plotting M versus rank(A).</DIV>", figure, legspe)                   
@@ -2054,20 +2055,20 @@ A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
                                  respect = TRUE)
                   }
                 
-             if(expressionset@arrayInfo$channels == "single")
-               {
-                 imageplot(expressionset, array = a, high = "yellow", low = "blue", main="", whatToPlot="Gb", log = do.logtransform)
-                 mtext(sN[a],side = 3, adj = 0.5, padj = -1 ,cex = 0.7)
-               }
+                if(expressionset@arrayInfo$channels == "single")
+                  {
+                    imageplot(expressionset, array = a, high = "yellow", low = "blue", main="", whatToPlot="Gb", log = do.logtransform)
+                    mtext(sN[a],side = 3, adj = 0.5, padj = -1 ,cex = 0.7)
+                  }
                 
-             if(expressionset@arrayInfo$channels == "two")
-               {
-                 imageplot(expressionset, array = a, high = "yellow", low = "blue", main="", whatToPlot="Rb", log = do.logtransform)
-                 mtext(sN[a],side = 3,adj = 0.5, padj = -1 ,cex = 0.7)
-                 mtext("Red Intensity",side = 2, line = 0.1 ,cex = 0.7)
-                 imageplot(expressionset, array = a, high = "yellow", low = "blue", main="", whatToPlot="Gb", log = do.logtransform)
-                 mtext("Green Intensity",side = 2, line = 0.1 ,cex = 0.7)
-               }
+                if(expressionset@arrayInfo$channels == "two")
+                  {
+                    imageplot(expressionset, array = a, high = "yellow", low = "blue", main="", whatToPlot="Rb", log = do.logtransform)
+                    mtext(sN[a],side = 3,adj = 0.5, padj = -1 ,cex = 0.7)
+                    mtext("Red Intensity",side = 2, line = 0.1 ,cex = 0.7)
+                    imageplot(expressionset, array = a, high = "yellow", low = "blue", main="", whatToPlot="Gb", log = do.logtransform)
+                    mtext("Green Intensity",side = 2, line = 0.1 ,cex = 0.7)
+                  }
                 
                 if((a%%ndiv == 0) || (a == numArrays))                   
                   {
@@ -2146,7 +2147,7 @@ A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
                 xaxt = "s"
               }
             if(numArrays > 50)
-               {
+              {
                 xname = FALSE
                 mai = c(0,0.4,0.2,0.2)              
                 xaxt = "n"
