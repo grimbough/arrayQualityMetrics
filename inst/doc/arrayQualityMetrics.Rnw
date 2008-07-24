@@ -24,7 +24,7 @@
 \maketitle
 
 \section*{Introduction}
-The function \Rfunction{arrayQualityMetrics} can be used on \Rclass{AffyBatch} for Affymetrix data sets, \Rclass{ExpressionSet} in the case of non Affymetrix one colour experiments, \Rclass{NChannelSet} for dual colour experiments and \Rclass{BeadLevelList} for Illumina bead arrays. \Rfunction{arrayQualityMetrics} produces a \emph{HTML} report as an output.
+The function \Rfunction{arrayQualityMetrics} can be used on \Rclass{AffyBatch} for Affymetrix data sets, \Rclass{ExpressionSet} in the case of non Affymetrix one colour experiments, \Rclass{NChannelSet} or \Rclass{RGList} for dual colour experiments and \Rclass{BeadLevelList} for Illumina bead arrays. \Rfunction{arrayQualityMetrics} produces a \emph{HTML} report as an output.
 
 \section{Data preparation}
 
@@ -111,7 +111,7 @@ To produce a report, the function \Rfunction{arrayQualityMetrics} is called
 with the following arguments:
 \begin{itemize}
 \item \emph{expressionset}: is an object of class \Rclass{ExpressionSet}, 
-\Rclass{AffyBatch}, \Rclass{NChannelSet} or \Rclass{BeadLevelList}.
+\Rclass{AffyBatch}, \Rclass{NChannelSet}, \Rclass{RGList} or \Rclass{BeadLevelList}.
 \item \emph{outdir}: is the directory in which the result files
     are created.
 \item \emph{force}: if TRUE, if outdir already exists, it will be overwritten.

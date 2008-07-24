@@ -691,12 +691,28 @@ report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, l
 
 #################################################################
 #################################################################
+########################## RGList Method ########################
+#################################################################
+#################################################################
+
+setMethod("arrayQualityMetrics",signature(expressionset = "RGList"), function(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
+          {
+            expressionset = try(rg2ncs(expressionset))
+            if(inherits(expressionset,'try-error'))
+              stop("The expressionset is a RGList and cannot be converted automatically in a NChannelSet. Try to convert it manually.\n")
+           arrayQualityMetrics(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
+          })####end set method RGList
+
+
+#################################################################
+#################################################################
 ####################### NChannelSet Method ######################
 #################################################################
 #################################################################
 
 setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"), function(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
           {
+            
             olddir = getwd()
             on.exit(setwd(olddir))
 
