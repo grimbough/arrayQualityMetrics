@@ -6,9 +6,18 @@
 
 addXYfromGAL = function(x, gal.file, nBlocks, skip, ...)
   {
-    gal = read.table(gal.file, skip = skip, sep = "\t", nrows = nBlocks, quote="", as.is = T, ...)
-    block = gsub("\"Block", "", gal[,1])
-    block = gsub("=", "", block)
+    galtype = readLines(gal.file,n=(skip+1))
+    sep = if(length(grep("\t",galtype[skip+1])) == 1) "\t" else " "
+    
+    gal = read.table(gal.file, skip = skip, sep = sep, nrows = nBlocks, quote="", as.is = T, ...)
+    
+    if(length(grep(",",galtype[skip+1])) == 1)
+      gal = sapply(1:ncol(gal),function(i) gsub(",","",gal[,i]))
+
+    if(length(grep("=$",gal[,1])) == 0)
+      gal = cbind(matrix(unlist(strsplit(gal[,1],"=")),ncol=2,byrow=T),gal[,2:ncol(gal)])
+    
+    block = seq_len(nBlocks)
 
     Xfac = seq_len(length(levels(as.factor(gal[,2]))))
     Yfac = seq_len(length(levels(as.factor(gal[,3]))))
