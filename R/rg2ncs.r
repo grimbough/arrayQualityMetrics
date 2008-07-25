@@ -18,6 +18,6 @@ rg2ncs = function(RG, type = "complete")
         pd = new("AnnotatedDataFrame", data = RG$targets)
         phenoData(ncs) = try(pd)
       }
-
+    return(ncs)
   }
 
