@@ -1,6 +1,6 @@
 Package: arrayQualityMetrics
 Title: Quality metrics on microarray data sets
-Version: 1.7.12
+Version: 1.7.13
 Author: Audrey Kauffmann, Wolfgang Huber
 Maintainer: Audrey Kauffmann <audrey@ebi.ac.uk>
 Depends: R (>= 2.6.0), Biobase (>= 1.15.13), geneplotter (>= 1.15.2), genefilter(>= 1.17.12), vsn (>= 3.4.8), RColorBrewer, affyPLM, simpleaffy, lattice, latticeExtra, grid, beadarray, methods

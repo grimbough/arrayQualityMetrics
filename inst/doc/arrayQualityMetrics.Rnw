@@ -32,6 +32,10 @@ The function \Rfunction{arrayQualityMetrics} can be used on \Rclass{AffyBatch} f
 \Rfunction{arrayQualityMetrics} can be used on unnormalized or normalized data sets. In this example, we will produce a report on a normalized \Rclass{NChannelSet}. We first need to load the data.
 
 %
+<<options,echo=FALSE>>=
+if (Sys.info()["sysname"] == "Darwin")
+  options(bitmapType = "cairo")
+@
 <<loadlibs>>=
 library("Biobase")
 library("CCl4")
