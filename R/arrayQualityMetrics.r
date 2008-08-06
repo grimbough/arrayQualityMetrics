@@ -229,8 +229,15 @@ hmap = function(expressionset, sN, section, figure, outM, numArrays, intgroup)
         corres = lapply(1:length(intgroup), function(i) matrix(0,nrow=length(lev[[i]]),ncol=2))
         colourCov = lapply(1:length(intgroup), function(i) brewer.pal(8,rownames(brewer.pal.info[brewer.pal.info$category=="qual",])[i]))
 
+        key = lapply(1:length(intgroup), function(i) list(rect = list(col=unlist(colourCov[i])[as.factor(levels(as.factor(unlist(covar[i]))))]), text = list(levels(as.factor(unlist(covar[i]))))))
+        key = unlist(key, recursive=F)
+        key$rep = FALSE
+      
+        foo = draw.key(key = key)
+
 
         png(file = hpng, w = 8*72, h = 8*72)
+        
         print(levelplot(m[od.row,od.row],
                         scales=list(x=list(rot=90)),
                         legend=list(
@@ -241,21 +248,9 @@ hmap = function(expressionset, sN, section, figure, outM, numArrays, intgroup)
                               type = "rectangle"))),
                         colorkey = list(space ="left"),
                         xlab="",ylab="",
-                        col.regions=colourRange))
+                        col.regions=colourRange,
+                        main = foo))
 
-        x = 0.06
-        y = 0.98
-
-        lapply(1:length(intgroup), function(i)
-               {
-                 for(j in seq_len(length(lev[[i]])))
-                   {
-                     corres[[i]][j,] = c(unique(covar[[i]][covar[[i]] == lev[[i]][j]]),colourCov[[i]][j])
-                     grid.text(corres[[i]][j,1], x = if(i>1)(x+(i/(max(nchar(covar[[i-1]]))*1.5))) else x, y=y, just="left")
-                     grid.rect(gp=gpar(fill=corres[[i]][j,2],col="transparent"), x = if(i>1)(x+(i/(max(nchar(covar[[i-1]]))*1.5))-0.02) else x-0.02, y=y, width=0.02, height=0.02)
-y=y-0.03
-                   }
-               })
         dev.copy(pdf, file = hpdf)
         dev.off()
         dev.off()
