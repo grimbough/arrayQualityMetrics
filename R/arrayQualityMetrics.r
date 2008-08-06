@@ -692,11 +692,50 @@ report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, l
 
 setMethod("arrayQualityMetrics",signature(expressionset = "RGList"), function(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
           {
-            expressionset = try(rg2ncs(expressionset))
+            expressionset = try(as(expressionset, "NChannelSet"))
             if(inherits(expressionset,'try-error'))
               stop("The expressionset is a RGList and cannot be converted automatically in a NChannelSet. Try to convert it manually.\n")
            arrayQualityMetrics(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
           })####end set method RGList
+
+#################################################################
+#################################################################
+######################## marrayRaw Method #######################
+#################################################################
+#################################################################
+setMethod("arrayQualityMetrics",signature(expressionset = "marrayRaw"), function(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
+          {
+            expressionset = try(as(expressionset, "NChannelSet"))
+            if(inherits(expressionset,'try-error'))
+              stop("The expressionset is a marrayRaw and cannot be converted automatically in a NChannelSet. Try to convert it manually.\n")
+           arrayQualityMetrics(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
+          })####end set method marrayRaw
+
+#################################################################
+#################################################################
+######################### MAList Method #########################
+#################################################################
+#################################################################
+setMethod("arrayQualityMetrics",signature(expressionset = "MAList"), function(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
+          {
+            expressionset = try(as(expressionset, "ExpressionSet"))
+            if(inherits(expressionset,'try-error'))
+              stop("The expressionset is a MAList and cannot be converted automatically in a ExpressionSet. Try to convert it manually.\n")
+           arrayQualityMetrics(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
+          })####end set method MAList
+
+#################################################################
+#################################################################
+######################## marrayNorm Method ######################
+#################################################################
+#################################################################
+setMethod("arrayQualityMetrics",signature(expressionset = "marrayNorm"), function(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
+          {
+            expressionset = try(as(expressionset, "ExpressionSet"))
+            if(inherits(expressionset,'try-error'))
+              stop("The expressionset is a marrayNorm and cannot be converted automatically in a ExpressionSet. Try to convert it manually.\n")
+           arrayQualityMetrics(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
+          })####end set method marrayNorm
 
 
 #################################################################
