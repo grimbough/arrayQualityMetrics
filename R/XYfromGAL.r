@@ -3,6 +3,13 @@
 ## nBlocks : number of blocks on the array
 ## skip : number of header lines to skip in the gal.file
 ## require(Biobase)
+makeabscoord = function(a) {
+  sapply(a, function(x) order(unique(a))[unique(a)==x])
+}
+
+makecoordblock = function(a, coo, bcoord) {
+  sapply(1:nrow(coo), function(i) coo[i,a]*bcoord[coo[i,1],a])
+}
 
 addXYfromGAL = function(x, gal.file, nBlocks, skip, ...)
   {
@@ -19,20 +26,14 @@ addXYfromGAL = function(x, gal.file, nBlocks, skip, ...)
     
     block = seq_len(nBlocks)
 
-    Xfac = seq_len(length(levels(as.factor(gal[,2]))))
-    Yfac = seq_len(length(levels(as.factor(gal[,3]))))
+    Xfac = makeabscoord(as.numeric(gal[,2]))
+    Yfac = makeabscoord(as.numeric(gal[,3]))
     bcoord = cbind(block,Xfac,Yfac)
 
-    r = x$Row
-    c = x$Column
-    b = x$Block
+    coo = cbind(x$Block, x$Column, x$Row)
 
-    bc = bcoord[b[],]
-    absr = as.numeric(bc[,2])*r
-    absc = as.numeric(bc[,3])*c
-       
-    x$X = absr
-    x$Y = absc
+    x$X = makecoordblock(2, coo, bcoord)
+    x$Y = makecoordblock(3, coo, bcoord)
     return(x)
   }
 
