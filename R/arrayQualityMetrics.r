@@ -38,7 +38,7 @@ makePlot = function(con, name, w, h, fun, title, text, fig) {
   wd = w*nrppi
   hg = h*nrppi
   
-  png(outf[2], width=wd, height=hg, pointsize=10)
+  png(outf[2], width=wd, height=hg, pointsize=14)
   res <- fun()
   dev.off()
   
@@ -236,38 +236,37 @@ hmap = function(expressionset, sN, section, figure, outM, numArrays, intgroup)
         foo = draw.key(key = key)
 
 
-        png(file = hpng, w = 8*72, h = 8*72)
         
-        print(levelplot(m[od.row,od.row],
-                        scales=list(x=list(rot=90)),
-                        legend=list(
-                          top=list(fun=dendrogramGrob,args=list(x=d.row,side="top")),
-                          right=list(fun=dendrogramGrob,
-                            args=list(x=d.row,side="right", size.add=1, 
-                              add = sapply(1:length(intgroup), function(i) list(rect = list(col="transparent",fill = unlist(colourCov[i])[as.factor(unlist(covar[i]))]))),
-                              type = "rectangle"))),
-                        colorkey = list(space ="left"),
-                        xlab="",ylab="",
-                        col.regions=colourRange,
-                        main = foo))
-
-        dev.copy(pdf, file = hpdf)
-        dev.off()
-        dev.off()
+        hfig = levelplot(m[od.row,od.row],
+          scales=list(x=list(rot=90)),
+          legend=list(
+            top=list(fun=dendrogramGrob,args=list(x=d.row,side="top")),
+            right=list(fun=dendrogramGrob,
+              args=list(x=d.row,side="right", size.add=1, 
+                add = sapply(1:length(intgroup), function(i) list(rect = list(col="transparent",fill = unlist(colourCov[i])[as.factor(unlist(covar[i]))]))),
+                type = "rectangle"))),
+          colorkey = list(space ="left"),
+          xlab="",ylab="",
+          col.regions=colourRange,
+          main = foo)
+        
       } else {
-        png(file = hpng, w = 8*72, h = 8*72)
-        print(levelplot(m[od.row,od.row],
-                        scales=list(x=list(rot=90)),
-                        legend=list(
-                          top=list(fun=dendrogramGrob,args=list(x=d.row,side="top")),
-                          right=list(fun=dendrogramGrob,args=list(x=d.row,side="right"))),
-                        colorkey = list(space ="left"),
-                        xlab="",ylab="",
-                        col.regions=colourRange))
-        dev.copy(pdf, file = hpdf)
-        dev.off()
-        dev.off()
-      }   
+        hfig = levelplot(m[od.row,od.row],
+          scales=list(x=list(rot=90)),
+          legend=list(
+            top=list(fun=dendrogramGrob,args=list(x=d.row,side="top")),
+            right=list(fun=dendrogramGrob,args=list(x=d.row,side="right"))),
+          colorkey = list(space ="left"),
+          xlab="",ylab="",
+          col.regions=colourRange)
+      }
+    png(file = hpng, w = 8*72, h = 8*72)
+    print(hfig)
+    dev.off()
+    pdf(file = hpdf)
+    print(hfig)
+    dev.off()
+    
     htmltext4=sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><A HREF=\"%s\"><center><IMG BORDER = \"0\" SRC=\"%s\"/></A><BR><b>Figure %s</center></b></td></table>\n", title="Heatmap representation of the distance between arrays", basename(hpdf), basename(hpng), fig = figure)
     
     leghmspe = if(is(expressionset, "BeadLevelList")) "the values used are the summarized ones obtained by using the function createBeadSummaryData from the package beadarray." else "without preprocessing." 
@@ -1070,7 +1069,8 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
               {
                 covar = pData(expressionset)[colnames(pData(expressionset))==intgroup[1]][,1]
                 lev = levels(as.factor(covar))
-                colourCovd = brewer.pal(9,"Set1")
+                colourCovd = brewer.pal(8,rownames(brewer.pal.info[brewer.pal.info$category=="qual",])[1])
+
                 
                 mplot2 = makePlot(con=con, name = "boxplot",
                   w=15, h=8, fun = function() {
@@ -1161,15 +1161,15 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                                      c(2.3,2,2), c(2,2), TRUE)
                         par(mar=c(0,5,1,1),xaxt = "n")
                         multi("density",lredc[group==n],xlimr,"Density","","")
-                        legend("topright",legend= sN[group==n],lty=1,col=brewer.pal(9, "Set1"), bty = "n", cex = 0.9)
+                        legend("topright",legend= sN[group==n],lty=1,col=brewer.pal(9, "Set1"), bty = "n", cex = 1.1)
                         par(mar=c(0,2,1,1),xaxt = "n")
                         multi("density",lgreenc[group==n],xlimg,"","","")
-                        legend("topright", legend=sN[group==n],lty=1,col=brewer.pal(9, "Set1"), bty = "n", cex = 0.9)
+                        legend("topright", legend=sN[group==n],lty=1,col=brewer.pal(9, "Set1"), bty = "n", cex = 1.1)
                         if(max(group) !=1)
                           mtext(paste("Group ", n, sep = ""),side = 3,adj = 0.5, padj = -3)
                         par(mar=c(0,2,1,1),xaxt = "n")
                         multi("density",ldat[group==n],xlim,"","","")
-                        legend("topright", legend=sN[group==n],lty=1,col=brewer.pal(9, "Set1"), bty = "n", cex = 0.9)
+                        legend("topright", legend=sN[group==n],lty=1,col=brewer.pal(9, "Set1"), bty = "n", cex = 1.1)
                         par(mar=c(1,5,0,1), xaxt = "s")
                         multi("ecdf",lredc[group==n],xlimr,"ECDF","log(red intensity)","")
                         par(mar=c(1,2,0,1), xaxt = "s")
