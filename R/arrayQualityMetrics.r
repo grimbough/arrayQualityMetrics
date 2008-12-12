@@ -1314,7 +1314,9 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
 #################################################################
 #################################################################
 
-aqm.expressionset = function(expressionset, outdir = getwd(), force = FALSE, do.logtransform = FALSE, split.plots = FALSE, intgroup = "Covariate", arg, grouprep)
+aqm.expressionset = function(expressionset, outdir = getwd(), force =
+  FALSE, do.logtransform = FALSE, split.plots = FALSE,
+    intgroup = "Covariate", arg, grouprep) 
   {
     olddir = getwd()
     on.exit(setwd(olddir))
@@ -1763,7 +1765,10 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
 ##########################
     if(is(expressionset, "ExpressionSet"))
       {
-        sc = scores(expressionset=expressionset,numArrays=numArrays, M=M, ldat=ldat, outM=outM, dat=dat, rc=NULL, gc=NULL, maxc=maxc, maxr=maxr, nuse=NULL, rle=NULL)               
+        sc = scores(expressionset=expressionset,numArrays=numArrays,
+          M=M, ldat=ldat, outM=outM, dat=dat, rc=NULL, gc=NULL,
+          maxc=maxc, maxr=maxr, nuse=NULL, rle=NULL)
+        
         scores = matrix("",ncol=length(sc),nrow=numArrays)
         for( i in seq_len(length(sc)))
           scores[unlist(sc[[i]][seq_len(length(sc[[i]]))]),i]="*"
@@ -1776,13 +1781,35 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
     
     if(is(expressionset, "ExpressionSet"))
       {
-        con = report(expressionset=expressionset, arg=arg, sNt=sNt, sN=sN, sec1text=sec1text, mapdf=mapdf, matext1=matext1, nfig=nfig, legendMA=legendMA,ftext=ftext, pttext=pttext, legendpt=legendpt, nfig3=nfig3, fpng=fpng, legendlocal=legendlocal, sec2text=sec2text, htmltext2=htmltext2, legendhom1=legendhom1, group=group, htmltext3=htmltext3, legendhom2=legendhom2, sec3text=sec3text, gctext=gctext, legendgc=legendgc, gotext=gotext, legendgo=legendgo, sec4text=sec4text, htmltext4=htmltext4, legendheatmap=legendheatmap, sec5text=sec5text, htmltext5=htmltext5, legendsdmean=legendsdmean, scores=scores)
-        l = list(numArrays=numArrays,sN=sN, section=section, figure=figure, con=con, dat=dat, olddir=olddir)
+        con = report(expressionset=expressionset, arg=arg, sNt=sNt,
+          sN=sN, sec1text=sec1text, mapdf=mapdf, matext1=matext1,
+          nfig=nfig, legendMA=legendMA,ftext=ftext, pttext=pttext,
+          legendpt=legendpt, nfig3=nfig3, fpng=fpng,
+          legendlocal=legendlocal, sec2text=sec2text, htmltext2=htmltext2,
+          legendhom1=legendhom1, group=group, htmltext3=htmltext3,
+          legendhom2=legendhom2, sec3text=sec3text, gctext=gctext,
+          legendgc=legendgc, gotext=gotext, legendgo=legendgo,
+          sec4text=sec4text, htmltext4=htmltext4,
+          legendheatmap=legendheatmap, sec5text=sec5text,
+          htmltext5=htmltext5, legendsdmean=legendsdmean, scores=scores)
+        
+        l = list(numArrays=numArrays,sN=sN, section=section,
+          figure=figure, con=con, dat=dat, olddir=olddir) 
       }
     
     if(is(expressionset, "AffyBatch"))
       {
-        l = list(numArrays=numArrays, section=section, figure=figure, dat=dat, olddir=olddir, expressionset=expressionset, arg=arg, sN=sN, sec1text=sec1text, mapdf=mapdf, matext1=matext1, nfig=nfig, legendMA=legendMA, ftext=ftext, nfig3=nfig3, fpng=fpng, legendlocal=legendlocal, sec2text=sec2text, htmltext2=htmltext2, legendhom1=legendhom1, group=group, htmltext3=htmltext3, legendhom2=legendhom2,  sec4text=sec4text, htmltext4=htmltext4, legendheatmap=legendheatmap, sec5text=sec5text, htmltext5=htmltext5, legendsdmean=legendsdmean, M=M, outM=outM, maxc=maxc, maxr=maxr, ldat=ldat)
+        l = list(numArrays=numArrays, section=section, figure=figure,
+          dat=dat, olddir=olddir, expressionset=expressionset, arg=arg,
+          sN=sN, sec1text=sec1text, mapdf=mapdf, matext1=matext1,
+          nfig=nfig, legendMA=legendMA, ftext=ftext, nfig3=nfig3,
+          fpng=fpng, legendlocal=legendlocal, sec2text=sec2text,
+          htmltext2=htmltext2, legendhom1=legendhom1, group=group,
+          htmltext3=htmltext3, legendhom2=legendhom2,  sec4text=sec4text,
+          htmltext4=htmltext4, legendheatmap=legendheatmap,
+          sec5text=sec5text, htmltext5=htmltext5,
+          legendsdmean=legendsdmean, M=M, outM=outM, maxc=maxc, maxr=maxr,
+          ldat=ldat) 
         l$sNt = sNt
         if("GC" %in% rownames(featureData(expressionset)@varMetadata))
           {
@@ -1790,17 +1817,17 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
             l$gctext=gctext
             l$legendgc=legendgc
           }
-          if("hasTarget" %in% rownames(featureData(expressionset)@varMetadata))
-            {
-              l$sec3text=sec3text
-              l$gotext=gotext
-              l$legendgo=legendgo
-            }       
-          if(maxc*maxr < 1000000)
-            {
-              l$pttext=pttext
-              l$legendpt=legendpt
-            }       
+        if("hasTarget" %in% rownames(featureData(expressionset)@varMetadata))
+          {
+            l$sec3text=sec3text
+            l$gotext=gotext
+            l$legendgo=legendgo
+          }       
+        if(maxc*maxr < 1000000)
+          {
+            l$pttext=pttext
+            l$legendpt=legendpt
+          }       
       }
     
     return(l) 
@@ -1813,11 +1840,13 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
 #################################################################
 
 setMethod("arrayQualityMetrics",signature(expressionset="ExpressionSet"),
-          function(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
+          function(expressionset, outdir, force, do.logtransform,
+          split.plots, intgroup, grouprep) 
           {
             arg = as.list(match.call(expand.dots = TRUE))
 
-            l = aqm.expressionset(expressionset, outdir, force, do.logtransform, split.plots, intgroup, arg, grouprep)
+            l = aqm.expressionset(expressionset, outdir, force,
+                do.logtransform, split.plots, intgroup, arg, grouprep) 
             con = l$con
             olddir = l$olddir
             on.exit(setwd(olddir))
@@ -1966,7 +1995,22 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
 #########################
 ### Writing the report###
 #########################
-            con = report(expressionset=expressionset, arg=arg, sNt=sNt, sN=sN, sec1text=l$sec1text, mapdf=l$mapdf, matext1=l$matext1, nfig=l$nfig, legendMA=l$legendMA, batext=l$batext, nfig2=l$nfig2, bapng=l$bapng, ftext=l$ftext, pttext=l$pttext, legendpt=l$legendpt, nfig3=l$nfig3, fpng=l$fpng, legendlocal=l$legendlocal, sec2text=l$sec2text, htmltext2=l$htmltext2, legendhom1=l$legendhom1, group=l$group, htmltext3=l$htmltext3, legendhom2=l$legendhom2, sec3text=l$sec3text, gctext=l$gctext, legendgc=l$legendgc, gotext=l$gotext, legendgo=l$legendgo, sec4text=l$sec4text, htmltext4=l$htmltext4, legendheatmap=l$legendheatmap, sec5text=l$sec5text, htmltext5=l$htmltext5, legendsdmean=l$legendsdmean, scores=scores)
+            con = report(expressionset=expressionset, arg=arg,
+              sNt=sNt, sN=sN, sec1text=l$sec1text, mapdf=l$mapdf,
+              matext1=l$matext1, nfig=l$nfig, legendMA=l$legendMA,
+              batext=l$batext, nfig2=l$nfig2, bapng=l$bapng,
+              ftext=l$ftext, pttext=l$pttext, legendpt=l$legendpt,
+              nfig3=l$nfig3, fpng=l$fpng, legendlocal=l$legendlocal,
+              sec2text=l$sec2text, htmltext2=l$htmltext2,
+              legendhom1=l$legendhom1, group=l$group,
+              htmltext3=l$htmltext3, legendhom2=l$legendhom2,
+              sec3text=l$sec3text, gctext=l$gctext,
+              legendgc=l$legendgc, gotext=l$gotext,
+              legendgo=l$legendgo, sec4text=l$sec4text,
+              htmltext4=l$htmltext4, legendheatmap=l$legendheatmap,
+              sec5text=l$sec5text, htmltext5=l$htmltext5,
+              legendsdmean=l$legendsdmean, scores=scores)
+            
             writeLines(sec6text, con)
             writeLines(affytext, con)
             writeLines(legendaffy, con)
@@ -2387,7 +2431,10 @@ A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
 ##########################
 ### Scores computation ###
 ##########################
-            sc = scores(expressionset=expressionset, numArrays=numArrays, M=M, ldat=NULL, outM=outM, dat=dat, rc=NULL, gc=NULL, maxc=NULL, maxr=NULL, nuse=NULL, rle=NULL)
+            sc = scores(expressionset=expressionset,
+              numArrays=numArrays, M=M, ldat=NULL, outM=outM, dat=dat,
+              rc=NULL, gc=NULL, maxc=NULL, maxr=NULL, nuse=NULL,
+              rle=NULL) 
             
             scores = matrix("",ncol=length(sc),nrow=numArrays)
             for( i in seq_len(length(sc)))
@@ -2400,7 +2447,20 @@ A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
 ##########################
 
             arg = as.list(match.call(expand.dots = TRUE))
-            con = report(expressionset=expressionset, arg=arg, sNt=sNt, sN=sN, sec1text=sec1text, mapdf=mapdf, matext1=matext1, nfig=nfig, legendMA=legendMA, batext=batext, nfig2=nfig2, bapng=bapng, ftext=ftext, pttext=NULL, legendpt=NULL, nfig3=nfig3, fpng=fpng, legendlocal=legendlocal, sec2text=sec2text, htmltext2=htmltext2, legendhom1=legendhom1, group=group, htmltext3=htmltext3, legendhom2=legendhom2, sec3text=sec3text, gctext=gctext, legendgc=legendgc, gotext=gotext, legendgo=legendgo, sec4text=sec4text, htmltext4=htmltext4, legendheatmap=legendheatmap, sec5text=sec5text, htmltext5=htmltext5, legendsdmean=legendsdmean, scores=scores)
+            
+            con = report(expressionset=expressionset, arg=arg,
+            sNt=sNt, sN=sN, sec1text=sec1text, mapdf=mapdf,
+            matext1=matext1, nfig=nfig, legendMA=legendMA,
+            batext=batext, nfig2=nfig2, bapng=bapng, ftext=ftext,
+            pttext=NULL, legendpt=NULL, nfig3=nfig3, fpng=fpng,
+            legendlocal=legendlocal, sec2text=sec2text,
+            htmltext2=htmltext2, legendhom1=legendhom1, group=group,
+            htmltext3=htmltext3, legendhom2=legendhom2,
+            sec3text=sec3text, gctext=gctext, legendgc=legendgc,
+            gotext=gotext, legendgo=legendgo, sec4text=sec4text,
+            htmltext4=htmltext4, legendheatmap=legendheatmap,
+            sec5text=sec5text, htmltext5=htmltext5,
+            legendsdmean=legendsdmean, scores=scores) 
             writeLines("</table>", con)
 
             z=sessionInfo("arrayQualityMetrics")
