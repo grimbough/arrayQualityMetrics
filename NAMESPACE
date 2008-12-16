@@ -1,4 +1,5 @@
-import(marray, grid, vsn, beadarray)
+import("methods")
+import("marray", "grid", "vsn", "beadarray")
 importFrom("RColorBrewer","brewer.pal")
 importFrom("geneplotter", "multiecdf",
                           "multidensity",
@@ -7,6 +8,5 @@ importFrom("geneplotter", "multiecdf",
                           "closeHtmlPage",
                           "panel.smoothScatter")
 importFrom("genefilter", "dist2")
-importFrom("simpleaffy", "qc")
 export("arrayQualityMetrics")
 export("addXYfromGAL")

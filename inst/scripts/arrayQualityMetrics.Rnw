@@ -1,9 +1,8 @@
-%\VignetteIndexEntry{arrayQualityMetrics}
-%\VignetteDepends{CCl4}
-%\VignetteKeywords{Quality}
+%\VignetteIndexEntry{Quality assessment with arrayQualityMetrics}
+%\VignetteDepends{CCl4, ALLMLL,vsn}
 %\VignettePackage{arrayQualityMetrics}
 
-\documentclass[a4paper]{article}
+\documentclass[11pt]{article}
 
 \usepackage{times}
 \usepackage{a4wide}
@@ -14,7 +13,6 @@
 \newcommand{\Rpackage}[1]{\textit{#1}}
 \newcommand{\Rclass}[1]{\textit{#1}}
 \newcommand{\Rfunction}[1]{{\small\texttt{#1}}}
-\clearpage
 
 \SweaveOpts{keep.source=TRUE,eps=FALSE,include=FALSE,width=4,height=4.5}
 
@@ -110,6 +108,7 @@ As an instance of a \Rclass{NChannelSet}, we can use the \Rpackage{CCl4} data pa
 
 %
 <<NChannelSet>>=
+library("vsn")
 library("CCl4")
 data("CCl4")
 nCCl4 = justvsn(CCl4, subsample=2000)

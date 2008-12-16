@@ -61,7 +61,7 @@ dircreation = function(outdir = getwd(), force = FALSE)
       if(!force && length(outdirContents)>0)
         stop(sprintf("'%s' is not empty.", outdir))
       if(force || length(outdirContents)==0)
-        message(sprintf("The report will be written in '%s'. ", outdir))
+        message(sprintf("The report will be written in directory '%s'. ", outdir))
         setwd(outdir)
        } else {
         dir.create(outdir, recursive=TRUE)
@@ -299,9 +299,9 @@ msdp = function(expressionset, section, figure, con, dat)
 
     legsdspe = if(is(expressionset, "BeadLevelList")) "For each bead type obtained by createBeadSummaryData from the package beadarray," else "For each feature,"
     
-    legendsdmean = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\">%s the plot on <b>Figure %s</b> shows the empirical standard deviation of the intensities of all the arrays on the <i>y</i>-axis versus the rank of the mean of intensities of the arrays on the <i>x</i>-axis. The red dots, connected by lines, show the running median of the standard deviation. After vsn normalization, this should be approximately horizontal, that is, show no substantial trend.</DIV>", legsdspe, figure)
+    legendsdmean = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\">%s <b>Figure %s</b> shows the standard deviation of the intensities across arrays on the <i>y</i>-axis versus the rank of their mean on the <i>x</i>-axis. The red dots, connected by lines, show the running median of the standard deviation. After normalisation and transformation to a logarithm(-like) scale, one typically expects the red line to be approximately horizontal, that is, show no substantial trend.</DIV>", legsdspe, figure)
     
-     msd = list(section=section, figure=figure, htmltext5=htmltext5,sec5text=sec5text, legendsdmean=legendsdmean)
+    msd = list(section=section, figure=figure, htmltext5=htmltext5,sec5text=sec5text, legendsdmean=legendsdmean)
     return(msd)   
   }
 
@@ -1941,9 +1941,12 @@ setMethod("arrayQualityMetrics",signature(expressionset="AffyBatch"),
             suppressWarnings(dev.copy(pdf, file = affypdf4))
             dev.off()
             dev.off()
-            if(class(p)=='try-error')
-              warning("QCstat plot from the package 'simpleaffy' cannot be produced for this data set.")
-
+            if(is(p,'try-error')){
+              ## browser()
+              warning("'plot(qcStats)' from the package 'simpleaffy' failed for this dataset.")
+              ## fixme: why can this happen? can we give the user a bit more help to figure out exactly what went wrong?
+            }
+            
             
             affytext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><a name = \"S6.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><center><BR><b>Figure %s</b></CENTER></tr></td><tr><td><b>%s</b></td><td><a name = \"S6.2\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><center><BR><b>Figure %s</b></CENTER></tr></td><tr><td><b>%s</b></td><td><a name = \"S6.3\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><center><BR><b>Figure %s</b></CENTER></tr></td><tr><td><b>%s</b></td><td><a name = \"S6.4\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></A></A><center><BR><b>Figure %s</b></CENTER></tr></td></table>\n", "RNA degradation plot", basename(affypdf1), basename(affypng1), figure1, "RLE plot", basename(affypdf2), basename(affypng2), figure2, "NUSE plot", basename(affypdf3), basename(affypng3), figure3, "Diagnostic plot recommended by Affymetrix", basename(affypdf4), basename(affypng4), figure4)
             legendaffy = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\">In this section we present diagnostic plots based on tools provided in the affyPLM package. In <b>Figure %s</b> a RNA digestion plot is computed on normalized data (so that standard deviation is equal to 1). In this plot each array is represented by a single line. It is important to identify any array(s) that has a slope which is very different from the others. The indication is that the RNA used for that array has potentially been handled quite differently from the other arrays.  <b>Figure %s</b> is a Relative Log Expression (RLE) plot and an array that has problems will either have larger spread, or will not be centered at M = 0, or both. <b>Figure %s</b> is a Normalized Unscaled Standard Error (NUSE) plot. Low quality arrays are those that are substantially elevated or more spread out, relative to the other arrays. NUSE values are not comparable across data sets. Both RLE and NUSE are performed on preprocessed data (background correction and quantile normalization). <b>Figure %s</b> represents the diagnostic plot recommended by Affymetrix. It is fully describe in the simpleaffy.pdf vignette of the package simpleaffy. Any metrics that is shown in red is out of the manufacturer's specific boundaries and suggests a potential problem, any metrics shown in blue is fine.</DIV>", figure1, figure2, figure3, figure4)            

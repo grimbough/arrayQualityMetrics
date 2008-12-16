@@ -1,6 +1,5 @@
-%\VignetteIndexEntry{arrayQualityMetrics}
-%\VignetteDepends{CCl4}
-%\VignetteKeywords{Quality}
+%\VignetteIndexEntry{Quality assessment with arrayQualityMetrics}
+%\VignetteDepends{}
 %\VignettePackage{arrayQualityMetrics}
 
 % ---- This is just a stub. -----

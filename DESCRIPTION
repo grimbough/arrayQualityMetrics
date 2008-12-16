@@ -1,15 +1,11 @@
 Package: arrayQualityMetrics
 Title: Quality metrics on microarray data sets
-Version: 1.9.4
+Version: 1.9.5
 Author: Audrey Kauffmann, Wolfgang Huber
 Maintainer: Audrey Kauffmann <audrey@ebi.ac.uk>
-Depends: Biobase, lattice, latticeExtra, methods, affyPLM
-Suggests: CCl4 (>= 1.0.7), ALLMLL
+Depends: Biobase, lattice, latticeExtra, methods, affyPLM, simpleaffy
+Suggests: 
 Imports: marray, grid, geneplotter, genefilter, vsn, RColorBrewer, simpleaffy, beadarray, marray
-Description: This package performs quality metrics on expressionSet,
-	 NChannelSet or affyBatch objects containing microarray data, 
-	one or two channels. 
-	The results are designated to allow the user to rapidly assess the
-	quality of a set of arrays.
+Description: This package generates a quality metrics report on ExpressionSet, NChannelSet or AffyBatch objects containing microarray data with one or two channels. 
 License: LGPL version 2 or newer
 biocViews: Microarray, QualityControl, OneChannel, TwoChannel, ReportWriting
