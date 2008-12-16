@@ -272,7 +272,7 @@ hmap = function(expressionset, sN, section, figure, outM, numArrays, intgroup)
     
     leghmspe = if(is(expressionset, "BeadLevelList")) "the values used are the summarized ones obtained by using the function createBeadSummaryData from the package beadarray." else "without preprocessing." 
 
-    legendheatmap = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows a false color heatmap of between arrays distances, computed as the median absolute difference of the M-value for each pair of arrays. <br><center><i>d<sub>xy</sub> = median|M<sub>xi</sub>-M<sub>yi</sub>|</i></center><br><br> Here, <i>M<sub>xi</sub></i> is the M-value of the <i>i</i>-th probe on the <i>x</i>-th array, %s <br>This plot can serve to detect outlier arrays. <br>Consider the following decomposition of <i>M<sub>xi</sub>: M<sub>xi</sub> = z<sub>i</sub> + &beta;<sub>xi</sub> + &epsilon;<sub>xi</sub></i>, where <i>z<sub>i</sub></i> is the probe effect for probe <i>i</i> (the same across all arrays), <i>&epsilon;<sub>xi</sub></i> are i.i.d. random variables with mean zero and <i>&beta;<sub>xi</sub></i> is such that for any array <i>x</i>, the majority of values <i>&beta;<sub>xi</sub></i> are negligibly small (i. e. close to zero). <i>&beta;<sub>xi</sub></i> represents differential expression effects. In this model, all values <i>d<sub>xy</sub></i> are (in expectation) the same, namely <sqrt>2</sqrt> times the standard deviation of <i>&epsilon;<sub>xi</i></sub> . Arrays whose distance matrix entries are way different give cause for suspicion. The dendrogram on this plot also can serve to check if, without any probe filtering, the arrays cluster accordingly to a biological meaning. The colour scale is chosen to cover the range of L1-distances encountered in the dataset.</DIV></table>",  figure, leghmspe)
+    legendheatmap = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows a false color heatmap of between arrays distances, computed as the mean absolute difference (L<sub>1</sub>-distance) of the vector of M-values for each pair of arrays. <br><center><i>d<sub>xy</sub> = mean|M<sub>xi</sub>-M<sub>yi</sub>|</i></center><br><br> Here, <i>M<sub>xi</sub></i> is the M-value of the <i>i</i>-th probe on the <i>x</i>-th array, %s <br>This plot can serve to detect outlier arrays. <br>Consider the following decomposition of <i>M<sub>xi</sub>: M<sub>xi</sub> = z<sub>i</sub> + &beta;<sub>xi</sub> + &epsilon;<sub>xi</sub></i>, where <i>z<sub>i</sub></i> is the probe effect for probe <i>i</i> (the same across all arrays), <i>&epsilon;<sub>xi</sub></i> are i.i.d. random variables with mean zero and <i>&beta;<sub>xi</sub></i> is such that for any array <i>x</i>, the majority of values <i>&beta;<sub>xi</sub></i> are negligibly small (i. e. close to zero). <i>&beta;<sub>xi</sub></i> represents differential expression effects. In this model, all values <i>d<sub>xy</sub></i> are (in expectation) the same, namely <sqrt>2</sqrt> times the standard deviation of <i>&epsilon;<sub>xi</i></sub> . Arrays whose distance matrix entries are way different give cause for suspicion. The dendrogram on this plot also can serve to check if, without any probe filtering, the arrays cluster accordingly to a biological meaning. The colour scale is chosen to cover the range of L1-distances encountered in the dataset.</DIV></table>",  figure, leghmspe)
     
     if(all(intgroup %in% names(phenoData(expressionset)@data)))
       {
@@ -287,7 +287,7 @@ hmap = function(expressionset, sN, section, figure, outM, numArrays, intgroup)
 msdp = function(expressionset, section, figure, con, dat)
   {
     section = section + 1
-    sec5text = sprintf("<hr><h2><a name = \"S5\">Section %s: Variance mean dependency</a></h2>", section)
+    sec5text = sprintf("<hr><h2><a name = \"S5\">Section %s: Variance mean dependence</a></h2>", section)
     figure = figure + 1
       
     mplot5 = makePlot(con=con, name = "meanSd",
@@ -327,7 +327,8 @@ pmmm = function(x, xlim, title1, title2, title3, ...)
     mtext(title3, side = 3, adj = 0.5, padj = -1 , cex = 0.7)
   }
 
-##boxplot.stats2 is the same as boxplot.stats except that the boxes that are les wide than the others are not detected as outliers
+##boxplot.stats2 is the same as boxplot.stats except that the boxes that are less wide than the others are not detected as outliers
+##  FIXME - unclear what "boxes ... are not detected as outliers" means. 
 boxplot.stats2 = function (x, coef = 1.5, do.conf = TRUE, do.out = TRUE) 
 {
   if (coef < 0) 
@@ -510,13 +511,13 @@ report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, l
         if("Rb" %in% colnames(dims(expressionset)) && "Gb" %in% colnames(dims(expressionset)))
           writeLines("<LI><a href=\"#S1.2\">Spatial distribution of local background intensites</b></a>", con)
         
-        writeLines("<LI><a href=\"#S1.3\">Spatial distribution of features intensites</b></a>", con)
+        writeLines("<LI><a href=\"#S1.3\">Spatial distribution of feature intensites</b></a>", con)
         writeLines("<LI><a href=\"#S1.4\">Row-Column effect</b></a>", con)
       }
     
     if(is(expressionset, "AffyBatch"))
       {
-        writeLines("<LI><a href=\"#S1.2\">Spatial distribution of features intensites</b></a>", con)
+        writeLines("<LI><a href=\"#S1.2\">Spatial distribution of feature intensites</b></a>", con)
         maxc = ncol(expressionset)
         maxr = nrow(expressionset)       
         if(maxr*maxc < 1000000)
@@ -526,7 +527,7 @@ report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, l
     if(is(expressionset, "BeadLevelList"))
       {
         writeLines("<LI><a href=\"#S1.2\">Spatial distribution of local background intensites</b></a>", con)
-        writeLines("<LI><a href=\"#S1.3\">Spatial distribution of features intensites</b></a>", con)
+        writeLines("<LI><a href=\"#S1.3\">Spatial distribution of feature intensites</b></a>", con)
       }
 
     writeLines("</UL>", con)
@@ -545,7 +546,7 @@ report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, l
       }
             
     writeLines("<LI><b><a href=\"#S4\">Between array comparison</b></a>" , con)
-    writeLines("<LI><b><a href=\"#S5\">Variance mean dependency</b></a>" , con)
+    writeLines("<LI><b><a href=\"#S5\">Variance mean dependence</b></a>" , con)
 
     if(is(expressionset, "AffyBatch"))
       writeLines("<LI><b><a href=\"#S6\">Affymetrix specific plots</b></a><UL><LI><a href=\"#S6.1\">RNA degradation plot</b></a><LI><a href=\"#S6.2\">RLE</b></a><LI><a href=\"#S6.3\">NUSE</b></a><LI><a href=\"#S6.4\">Affymetrix QC stats</b></a><LI><a href=\"#S6.5\">PM MM plot</b></a></UL>" , con)
@@ -818,11 +819,7 @@ setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"), functi
             nfig = as.numeric(MAplot$nfig)
             mapdf = as.character(MAplot$mapdf)
            
-            legendMA = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> represents MA plot for each array. M and A are defined as :<br>
-M = log<sub>2</sub>(I<sub>1</sub>) - log<sub>2</sub>(I<sub>2</sub>)<br>
-A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
-where I<sub>1</sub> and I<sub>2</sub> are the vectors of intensities of the two channels. Typically, we expect the mass of the distribution in an MA plot to be concentrated along the M = 0 axis, and there should be no trend in the mean of M as a function of A.
-Note that a bigger width of the plot of the M-distribution at the lower end of the A scale does not necessarily imply that the variance of the M-distribution is larger at the lower end of the A scale: the visual impression might simply be caused by the fact that there is more data at the lower end of the A scale. To visualize whether there is a trend in the variance of M as a function of A, consider plotting M versus rank(A).</DIV>", figure)          
+            legendMA = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows the MA plot for each array. M and A are defined as:<br>M = log<sub>2</sub>(I<sub>1</sub>) - log<sub>2</sub>(I<sub>2</sub>)<br>A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>)),<br>where I<sub>1</sub> and I<sub>2</sub> are the vectors of intensities of the two channels. Typically, we expect the mass of the distribution in an MA plot to be concentrated along the M = 0 axis, and there should be no trend in the mean of M as a function of A. Note that a bigger width of the plot of the M-distribution at the lower end of the A scale does not necessarily imply that the variance of the M-distribution is larger at the lower end of the A scale: the visual impression might simply be caused by the fact that there is more data at the lower end of the A scale. To visualize whether there is a trend in the variance of M as a function of A, consider plotting M versus rank(A).</DIV>", figure)          
             
 #################################
 ###Section 1.2 : Spatial plots###
@@ -967,9 +964,9 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                 axis(2, label= as.list(pretty(mrf,9)),at=seq(0,1,by=(1/(length(pretty(mrf,9))-1))), cex.axis = 0.7, padj = 1)
                 dev.off()
                 
-                ftext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><a name = \"S1.3\"><A HREF=\"%s\"><IMG border = \"0\" SRC=\"%s\"/></a></A><center><b>Figure %s</b></center></td><td><IMG BORDER = \"0\" SRC=\"%s\"/></td><td>\n", "Spatial distribution of features intensites", basename(fpng[1]), basename(fpng[1]), figure, basename(llfpng))
+                ftext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><a name = \"S1.3\"><A HREF=\"%s\"><IMG border = \"0\" SRC=\"%s\"/></a></A><center><b>Figure %s</b></center></td><td><IMG BORDER = \"0\" SRC=\"%s\"/></td><td>\n", "Spatial distribution of feature intensites", basename(fpng[1]), basename(fpng[1]), figure, basename(llfpng))
 
-                legendlocal = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s:</b> False color representations of the arrays' spatial distributions of feature intensities and, if available, local background estimates. The color scale is shown in the panel on the right, and it is proportional to the ranks of the probe intensities. This has indeed the potential to detect patterns that are small in amplitude, but systematic within array. These may not be consequential for the downstream data analysis, but if properly interpreted, could e.g. still be useful for technology and experimental protocol optimisation as it helps in identifying patterns that may be caused, for example, spatial gradients in the hybridization chamber, air bubbles, spotting or plating problems.</DIV>", figure)          
+                legendlocal = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s:</b> False color representations of the arrays' spatial distributions of feature intensities and, if available, local background estimates. The color scale is shown in the panel on the right, and it is proportional to the ranks of the probe intensities. This has indeed the potential to detect patterns that are small in amplitude, but systematic within array. These may not be consequential for the downstream data analysis, but if properly interpreted, could e.g. still be useful for technology and experimental protocol optimisation as it helps in identifying patterns that may be caused by, for example, spatial gradients in the hybridization chamber, air bubbles, spotting or plating problems.</DIV>", figure)          
               
 ###############################
 ###Section 1.4 : R/C effect ###
@@ -1031,7 +1028,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                  
                 pttext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S1.4\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></center></td></table>\n", "Row-Column effect", basename(ptpdf), basename(ptpng), figure)
 
-                legendpt = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows the boxplots of the log<sub>2</sub> intensities grouped by row (left panel) and column (right panel) of the array. From the top to the bottom, red channel, green channel and log(ratio) are represented. If there is no spatial effect, the boxes should be homogeneous in wide and y position.</DIV>",  figure)
+                legendpt = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows the boxplots of the log<sub>2</sub> intensities grouped by row (left panel) and column (right panel) of the array. From the top to the bottom, red channel, green channel and log(ratio) are represented. If there is no spatial effect, the boxes should be homogeneous in size (IQR) and y position (median).</DIV>",  figure)
               }
 
 ############################################
@@ -1110,7 +1107,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
                   }, text="<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S2.1\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><br><b>Figure %s</center></b></td></table>\n", title="Boxplots", fig = figure)
               }
             htmltext2 = mplot2[[2]]
-            legendhom1 = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> presents boxplots of the log<sub>2</sub>(Intensities). Each box corresponds to one array. The left panel corresponds to the red channel. The middle panel shows the green channel. The right panel shows the boxplots of log<sub>2</sub>(ratio). If the arrays are homogeneous, the boxes should have similar wides and y position.</DIV>", figure)          
+            legendhom1 = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> presents boxplots of the log<sub>2</sub>(Intensities). Each box corresponds to one array. The left panel corresponds to the red channel. The middle panel shows the green channel. The right panel shows the boxplots of log<sub>2</sub>(ratio). Typically, one expects the boxes to have similar size (IQR) and y position (median).</DIV>", figure)          
 
       
 ############################
@@ -1268,7 +1265,7 @@ Note that a bigger width of the plot of the M-distribution at the lower end of t
             legendheatmap = hmap$legendheatmap
             
 ##########################################
-###Section 5 : Variance Mean Dependency###
+###Section 5 : Variance Mean Dependence###
 ##########################################
             
             ##meanSdplot
@@ -1368,10 +1365,7 @@ aqm.expressionset = function(expressionset, outdir = getwd(), force =
     nfig = as.numeric(MAplot$nfig)
     mapdf = as.character(MAplot$mapdf)   
     
-    legendMA = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> represents MA plot for each array. M and A are defined as :<br>
-M = log<sub>2</sub>(I<sub>1</sub>) - log<sub>2</sub>(I<sub>2</sub>)<br>
-A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
-where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is the intensity of a \"pseudo\"-array, which have the median values of all the arrays. Typically, we expect the mass of the distribution in an MA plot to be concentrated along the M = 0 axis, and there should be no trend in the mean of M as a function of A. Note that a bigger width of the plot of the M-distribution at the lower end of the A scale does not necessarily imply that the variance of the M-distribution is larger at the lower end of the A scale: the visual impression might simply be caused by the fact that there is more data at the lower end of the A scale. To visualize whether there is a trend in the variance of M as a function of A, consider plotting M versus rank(A).</DIV>", figure)     
+    legendMA = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows the MA plot for each array. M and A are defined as:<br>M = log<sub>2</sub>(I<sub>1</sub>) - log<sub>2</sub>(I<sub>2</sub>)<br>A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>)),<br>where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is the intensity of a \"pseudo\"-array, which contains for each probe the median of that probe's values over all arrays. Typically, we expect the mass of the distribution in an MA plot to be concentrated along the M = 0 axis, and there should be no trend in the mean of M as a function of A. Note that a bigger width of the plot of the M-distribution at the lower end of the A scale does not necessarily imply that the variance of the M-distribution is larger at the lower end of the A scale: the visual impression might simply be caused by the fact that there is more data at the lower end of the A scale. To visualize whether there is a trend in the variance of M as a function of A, consider plotting M versus rank(A).</DIV>", figure)     
 
 #########################################
 ###Section 1.2 : Spatial Plots aBatch ###
@@ -1432,9 +1426,9 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
         axis(2, label= as.list(pretty(mrfi,9)),at=seq(0,1,by=(1/(length(pretty(mrfi,9))-1))), cex.axis = 0.7, padj = 1)
         dev.off()
            
-        ftext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><a name=\"S1.2\"><A HREF=\"%s\"><IMG border = \"0\" SRC=\"%s\"/></a></A><center><b>Figure %s</b></center></td><td><IMG BORDER = \"0\" SRC=\"%s\"/></td><td>\n", "Spatial distribution of features intensities", basename(fpng[1]), basename(fpng[1]), figure, basename(llpng))
+        ftext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><a name=\"S1.2\"><A HREF=\"%s\"><IMG border = \"0\" SRC=\"%s\"/></a></A><center><b>Figure %s</b></center></td><td><IMG BORDER = \"0\" SRC=\"%s\"/></td><td>\n", "Spatial distribution of feature intensities", basename(fpng[1]), basename(fpng[1]), figure, basename(llpng))
 
-        legendlocal = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s:</b> False color representations of the arrays' spatial distributions of feature intensities. The color scale is shown in the panel on the right, and it is proportional to the ranks of the probe intensities. This has indeed the potential to detect patterns that are small in amplitude, but systematic within array. These may not be consequential for the downstream data analysis, but if properly interpreted, could e.g. still be useful for technology and experimental protocol optimisation as it helps in identifying patterns that may be caused, for example, spatial gradients in the hybridization chamber, air bubbles, spotting or plating problems.</DIV>", figure)
+        legendlocal = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s:</b> False color representations of the arrays' spatial distributions of feature intensities. The color scale is shown in the panel on the right, and it is proportional to the ranks of the probe intensities. This has indeed the potential to detect patterns that are small in amplitude, but systematic within array. These may not be consequential for the downstream data analysis, but if properly interpreted, could e.g. still be useful for technology and experimental protocol optimisation as it helps in identifying patterns that may be caused by, for example, spatial gradients in the hybridization chamber, air bubbles, spotting or plating problems.</DIV>", figure)
 
 ######################################
 ###Section 1.4 : R/C effect aBatch ###
@@ -1477,7 +1471,7 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
         
             pttext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S1.4\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></center></td></table>\n", "Row-Column effect", basename(ptpdf), basename(ptpng), figure)
         
-            legendpt = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows the boxplots of the log<sub>2</sub> intensities grouped by row (left panel) and column (right panel) of the array. If there is no spatial effect, the boxes should be homogeneous in wide and y position.</DIV>",  figure)
+            legendpt = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows the boxplots of the log<sub>2</sub> intensities grouped by row (left panel) and column (right panel) of the array. Typically, one expects the boxes to have similar size (IQR) and y position (median).</DIV>",  figure)
           }      
       }
 
@@ -1543,9 +1537,9 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
             axis(2, label= as.list(pretty(mfg,9)),at=seq(0,1,by=(1/(length(pretty(mfg,9))-1))), cex.axis = 0.7, padj = 1)
             dev.off()
                 
-            ftext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><a name = \"S1.3\"><A HREF=\"%s\"><IMG border = \"0\" SRC=\"%s\"/></a></A><center><b>Figure %s</b></center></td><td><IMG BORDER = \"0\" SRC=\"%s\"/></td><td>\n", "Spatial distribution of features intensites", basename(fpng[1]), basename(fpng[1]), figure, basename(llfpng))
+            ftext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><a name = \"S1.3\"><A HREF=\"%s\"><IMG border = \"0\" SRC=\"%s\"/></a></A><center><b>Figure %s</b></center></td><td><IMG BORDER = \"0\" SRC=\"%s\"/></td><td>\n", "Spatial distribution of feature intensites", basename(fpng[1]), basename(fpng[1]), figure, basename(llfpng))
 
-            legendlocal = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s:</b> False color representations of the arrays' spatial distributions of feature intensities. The color scale is shown in the panel on the right, and it is proportional to the ranks of the probe intensities. This has indeed the potential to detect patterns that are small in amplitude, but systematic within array. These may not be consequential for the downstream data analysis, but if properly interpreted, could e.g. still be useful for technology and experimental protocol optimisation as it helps in identifying patterns that may be caused, for example, spatial gradients in the hybridization chamber, air bubbles, spotting or plating problems.</DIV>", figure)
+            legendlocal = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s:</b> False color representations of the arrays' spatial distributions of feature intensities. The color scale is shown in the panel on the right, and it is proportional to the ranks of the probe intensities. This has indeed the potential to detect patterns that are small in amplitude, but systematic within array. These may not be consequential for the downstream data analysis, but if properly interpreted, could e.g. still be useful for technology and experimental protocol optimisation as it helps in identifying patterns that may be caused by, for example, spatial gradients in the hybridization chamber, air bubbles, spotting or plating problems.</DIV>", figure)
 
 #####################################
 ###Section 1.4 : R/C effect  Eset ###
@@ -1586,7 +1580,7 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
             
             pttext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><center><a name = \"S1.4\"><A HREF=\"%s\"><IMG BORDER = \"0\" SRC=\"%s\"/></a></A><center><br><b>Figure %s</b></center></td></table>\n", "Row-Column effect", basename(ptpdf), basename(ptpng), figure)
 
-            legendpt = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows the boxplots of the log<sub>2</sub> intensities grouped by row (left panel) and column (right panel) of the array. If there is no spatial effect, the boxes should be homogeneous in wide and y position.</DIV>",  figure)
+            legendpt = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows the boxplots of the log<sub>2</sub> intensities grouped by row (left panel) and column (right panel) of the array.  Typically, one expects the boxes to have similar size (IQR) and y position (median).</DIV>",  figure)
           }
       }
 
@@ -1633,7 +1627,7 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
       }
     
     htmltext2 = mplot2[[2]]
-    legendhom1 = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> presents boxplots of the log<sub>2</sub>(Intensities). Each box corresponds to one array. If the arrays are homogeneous, the boxes should have similar wides and y position.</DIV>", figure)          
+    legendhom1 = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> presents boxplots of the log<sub>2</sub>(Intensities). Each box corresponds to one array. Typically, one expects the boxes to have similar size (IQR) and y position (median).</DIV>", figure)          
     
 ############################
 ###Section 2.2 : Density ###
@@ -1749,7 +1743,7 @@ where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is t
     legendheatmap = hmap$legendheatmap
 
 ##########################################
-###Section 5 : Variance Mean Dependency###
+###Section 5 : Variance Mean Dependence###
 ##########################################
     
     ##meanSdplot
@@ -2122,10 +2116,11 @@ setMethod("arrayQualityMetrics",signature(expressionset = "BeadLevelList"),
             mapdf = as.character(MAplot$mapdf)
 
             if(expressionset@arrayInfo$channels == "single")
-              legspe = "where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is the intensity of a \"pseudo\"-array, which have the median values of all the arrays."
+              legspe = "where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is the intensity of a \"pseudo\"-array, which contains for each probe the median of that probe's values over all arrays."
             if(expressionset@arrayInfo$channels == "two")
               legspe = "where I<sub>1</sub> and I<sub>2</sub> are the vectors of intensities of the two channels."
-           
+            ## fixme: consider using 'switch' in such situations
+            
             legendMA = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> represents MA plot for each array. M and A are defined as :<br>
 M = log<sub>2</sub>(I<sub>1</sub>) - log<sub>2</sub>(I<sub>2</sub>)<br>
 A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
@@ -2216,9 +2211,9 @@ A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
                   }
               }
                         
-            ftext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><a name=\"S1.3\"><A HREF=\"%s\"><IMG border = \"0\" SRC=\"%s\"/></a></A><center><b>Figure %s</b></center></td><td>\n", "Spatial distribution of features intensities", basename(fpng[1]), basename(fpng[1]), figure)
+            ftext = sprintf("<table cellspacing = 5 cellpadding = 2><tr><td><b>%s</b></td><td><a name=\"S1.3\"><A HREF=\"%s\"><IMG border = \"0\" SRC=\"%s\"/></a></A><center><b>Figure %s</b></center></td><td>\n", "Spatial distribution of feature intensities", basename(fpng[1]), basename(fpng[1]), figure)
             
-            legendlocal = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s:</b> False color representations of the arrays' spatial distributions of feature intensities and, if available, local background estimates. These plots may help in identifying patterns that may be caused, for example, spatial gradients in the hybridization chamber, air bubbles, spotting or plating problems.</DIV>", figure)          
+            legendlocal = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s:</b> False color representations of the arrays' spatial distributions of feature intensities and, if available, local background estimates. These plots may help in identifying patterns that may be caused by, for example, spatial gradients in the hybridization chamber, air bubbles, spotting or plating problems.</DIV>", figure)          
 
 
 ############################################
@@ -2296,7 +2291,7 @@ A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
               boxspe = " The left panel corresponds to the red channel. The middle panel shows the green channel. The right panel shows the boxplots of log<sub>2</sub>(ratio)."
            
 
-            legendhom1 = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> presents boxplots of the log<sub>2</sub>(Intensities). Each box corresponds to one array. %s If the arrays are homogeneous, the boxes should have similar wides and y position.</DIV>", figure, boxspe)          
+            legendhom1 = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> presents boxplots of the log<sub>2</sub>(Intensities). Each box corresponds to one array. %s Typically, one expects the boxes to have similar size (IQR) and y position (median).</DIV>", figure, boxspe)          
       
 ############################
 ###Section 2.2 : Density ###
@@ -2417,7 +2412,7 @@ A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
             legendheatmap = hmap$legendheatmap
             
 ##########################################
-###Section 5 : Variance Mean Dependency###
+###Section 5 : Variance Mean Dependence###
 ##########################################
             
             ##meanSdplot
@@ -2457,8 +2452,7 @@ A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>))<br>
             legendlocal=legendlocal, sec2text=sec2text,
             htmltext2=htmltext2, legendhom1=legendhom1, group=group,
             htmltext3=htmltext3, legendhom2=legendhom2,
-            sec3text=sec3text, gctext=gctext, legendgc=legendgc,
-            gotext=gotext, legendgo=legendgo, sec4text=sec4text,
+            sec4text=sec4text,
             htmltext4=htmltext4, legendheatmap=legendheatmap,
             sec5text=sec5text, htmltext5=htmltext5,
             legendsdmean=legendsdmean, scores=scores) 
