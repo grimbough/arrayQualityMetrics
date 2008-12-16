@@ -85,7 +85,7 @@ Here is the simplest way of calling the function. We give a name to the director
 If you are working on one colour non Affymetrix chips, you can load your data in Bioconductor as an \Rclass{ExpressionSet} object. Please see the documentation of the \Rpackage{Biobase} package to do so. The \Rclass{ExpressionSet} is made to contain one colour data set. Here, as an example, we can simulate this by using a preprocessed object from \emph{MLL.A} which contains one value for each gene.
 
 %
-<<Normalisation>>=
+<<Normalisation,results=hide>>=
 rMLL = rma(MLL.A)
 @ 
 %
@@ -107,7 +107,7 @@ If you are working on two colour chips, you can create a \Rclass{NChannelSet} to
 As an instance of a \Rclass{NChannelSet}, we can use the \Rpackage{CCl4} data package and normalize it using the variance stabilization method available in the package \Rpackage{vsn}.
 
 %
-<<NChannelSet>>=
+<<NChannelSet,results=hide>>=
 library("vsn")
 library("CCl4")
 data("CCl4")
