@@ -20,11 +20,12 @@ mat2list = function(x)
 
 ##log
 logtransform = function(x)
-  {
-    xl = log2(x)
-    xl[xl == "-Inf"] = NA
-    return(xl)
-  }
+  ifelse(x>0, suppressWarnings(log2(x)), rep(NA_real_, length(x)))
+##  {
+##    xl = log2(x)
+##    xl[xl == "-Inf"] = NA
+##    return(xl)
+##  }
 
 ##makePlot
 makePlot = function(con, name, w, h, fun, title, text, fig) {
