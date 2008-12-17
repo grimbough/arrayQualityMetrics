@@ -173,10 +173,16 @@ multi = function(type, x, xlim, title1, title2, title3, ...)
            })
   }
 
+
+###a helper function to test whether the expression set e has GC info
+hasGCinfo = function(e)
+  "GC" %in% rownames(featureData(e)@varMetadata)
+
+
 ##Mapping of probes
 probesmap = function(expressionset, numArrays, section, figure, dat, sN, xlim, type,con)
   {
-    if(!"GC" %in% rownames(featureData(expressionset)@varMetadata))
+    if(!hasGCinfo(expressionset))
       {
         section = section + 1
         sec3text = sprintf("<hr><h2><a name = \"S3\">Section %s: Array platform quality</a></h2>", section)          
@@ -202,7 +208,10 @@ probesmap = function(expressionset, numArrays, section, figure, dat, sN, xlim, t
 
     gotext = mplot6[[2]]
 
-    promap = if(!"GC" %in% rownames(featureData(expressionset)@varMetadata)) list(section=section, figure=figure, gotext=gotext, sec3text=sec3text) else list(section=section, figure=figure, gotext=gotext) 
+    promap = if(!hasGCinfo(expressionset))
+      list(section=section, figure=figure, gotext=gotext,
+      sec3text=sec3text) else list(section=section, figure=figure,
+      gotext=gotext)  
     return(promap)   
   }
 
@@ -452,7 +461,12 @@ scores = function(expressionset, numArrays, M, ldat, outM, dat, rc, gc, maxc, ma
   }
 
 ##writing the report
-report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, legendMA, batext, nfig2, bapng, ftext, pttext, legendpt, nfig3, fpng, legendlocal, sec2text, htmltext2, legendhom1, group, htmltext3, legendhom2, sec3text, gctext, legendgc, gotext, legendgo, sec4text, htmltext4, legendheatmap, sec5text, htmltext5, legendsdmean, scores)
+report = function(expressionset, arg, sNt, sN, sec1text, mapdf,
+  matext1, nfig, legendMA, batext, nfig2, bapng, ftext, pttext,
+  legendpt, nfig3, fpng, legendlocal, sec2text, htmltext2, legendhom1,
+  group, htmltext3, legendhom2, sec3text, gctext, legendgc, gotext,
+  legendgo, sec4text, htmltext4, legendheatmap, sec5text, htmltext5,
+  legendsdmean, scores) 
   {
 ### Title
         argum = arg$expressionset
@@ -663,7 +677,8 @@ report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, l
         writeLines(gctext, con)
         writeLines(legendgc, con)
       }
-    if((!is(expressionset, "BeadLevelList")) && ("hasTarget" %in% rownames(featureData(expressionset)@varMetadata)))
+    if((!is(expressionset, "BeadLevelList")) && ("hasTarget" %in%
+        rownames(featureData(expressionset)@varMetadata))) 
       {
         if(!"GC" %in% rownames(featureData(expressionset)@varMetadata))
           writeLines(sec3text, con)
@@ -691,12 +706,15 @@ report = function(expressionset, arg, sNt, sN, sec1text, mapdf, matext1, nfig, l
 #################################################################
 #################################################################
 
-setMethod("arrayQualityMetrics",signature(expressionset = "RGList"), function(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
+setMethod("arrayQualityMetrics",signature(expressionset = "RGList"),
+          function(expressionset, outdir, force, do.logtransform,
+          split.plots, intgroup, grouprep) 
           {
             expressionset = try(as(expressionset, "NChannelSet"))
             if(inherits(expressionset,'try-error'))
               stop("The expressionset is a RGList and cannot be converted automatically in a NChannelSet. Try to convert it manually.\n")
-           arrayQualityMetrics(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
+           arrayQualityMetrics(expressionset, outdir, force,
+          do.logtransform, split.plots, intgroup, grouprep) 
           })####end set method RGList
 
 #################################################################
@@ -717,12 +735,16 @@ setMethod("arrayQualityMetrics",signature(expressionset = "marrayRaw"), function
 ######################### MAList Method #########################
 #################################################################
 #################################################################
-setMethod("arrayQualityMetrics",signature(expressionset = "MAList"), function(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
+setMethod("arrayQualityMetrics",signature(expressionset = "MAList"),
+          function(expressionset, outdir, force, do.logtransform,
+                   split.plots, intgroup, grouprep) 
           {
             expressionset = try(as(expressionset, "ExpressionSet"))
             if(inherits(expressionset,'try-error'))
               stop("The expressionset is a MAList and cannot be converted automatically in a ExpressionSet. Try to convert it manually.\n")
-           arrayQualityMetrics(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
+           arrayQualityMetrics(expressionset, outdir, force,
+                               do.logtransform, split.plots, intgroup,
+                               grouprep) 
           })####end set method MAList
 
 #################################################################
@@ -730,12 +752,17 @@ setMethod("arrayQualityMetrics",signature(expressionset = "MAList"), function(ex
 ######################## marrayNorm Method ######################
 #################################################################
 #################################################################
-setMethod("arrayQualityMetrics",signature(expressionset = "marrayNorm"), function(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
+setMethod("arrayQualityMetrics",signature(expressionset =
+                                          "marrayNorm"),
+          function(expressionset, outdir, force, do.logtransform,
+                   split.plots, intgroup, grouprep) 
           {
             expressionset = try(as(expressionset, "ExpressionSet"))
             if(inherits(expressionset,'try-error'))
               stop("The expressionset is a marrayNorm and cannot be converted automatically in a ExpressionSet. Try to convert it manually.\n")
-           arrayQualityMetrics(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
+           arrayQualityMetrics(expressionset, outdir, force,
+                               do.logtransform, split.plots, intgroup,
+                               grouprep) 
           })####end set method marrayNorm
 
 
@@ -1318,7 +1345,7 @@ aqm.expressionset = function(expressionset, outdir = getwd(), force =
   {
     olddir = getwd()
     on.exit(setwd(olddir))
-
+    
     ##data preparation
     if(do.logtransform)
       {
@@ -1326,7 +1353,7 @@ aqm.expressionset = function(expressionset, outdir = getwd(), force =
       } else dat = exprs(expressionset)
     
     dircreation(outdir, force)
-   
+    
     sN = sampleNames(expressionset)
     ##list to use multidensity, multiecdf and boxplot
     ldat = mat2list(dat)
@@ -1335,13 +1362,13 @@ aqm.expressionset = function(expressionset, outdir = getwd(), force =
     
     ##second part of data preparation
     dprep = prepdata(sN, dat, numArrays, split.plots)
-            
+    
     long = dprep$long
     sN = dprep$sN
     sNt = dprep$sNt
     outM = dprep$outM
     group = dprep$group
-      
+    
 ####################################
 ###Section 1 : Per array quality ###
 ####################################
