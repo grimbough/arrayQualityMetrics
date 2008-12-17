@@ -180,7 +180,8 @@ hasGCinfo = function(e)
 
 
 ##Mapping of probes
-probesmap = function(expressionset, numArrays, section, figure, dat, sN, xlim, type,con)
+probesmap = function(expressionset, numArrays, section, figure, dat,
+  sN, xlim, type,con) 
   {
     if(!hasGCinfo(expressionset))
       {
@@ -548,10 +549,12 @@ report = function(expressionset, arg, sNt, sN, sec1text, mapdf,
 
     writeLines( "<LI><b><a href=\"#S2\">Homogeneity between arrays</b></a><UL><LI><a href=\"#S2.1\">Boxplots</b></a><LI><a href=\"#S2.2\">Density plots</b></a></UL>", con)
             
-    if((!is(expressionset, "BeadLevelList")) && ("GC" %in% rownames(featureData(expressionset)@varMetadata) || "hasTarget" %in% rownames(featureData(expressionset)@varMetadata)))
+    if((!is(expressionset, "BeadLevelList")) &&
+      (hasGCinfo(expressionset) || "hasTarget" %in%
+       rownames(featureData(expressionset)@varMetadata))) 
       {
         writeLines("<LI><b><a href=\"#S3\">Array platform quality</b></a><UL>", con)
-        if("GC" %in% rownames(featureData(expressionset)@varMetadata))
+        if(hasGCinfo(expressionset))
           writeLines("<LI><a href=\"#S3.1\">GC content effect</b></a>", con)
         if("hasTarget" %in% rownames(featureData(expressionset)@varMetadata))
           writeLines("<LI><a href=\"#S3.2\">Gene mapping</b></a>", con)
@@ -671,7 +674,7 @@ report = function(expressionset, arg, sNt, sN, sec1text, mapdf,
     writeLines(legendhom2, con)
     
  ### Section 3
-    if((!is(expressionset, "BeadLevelList")) && ("GC" %in% rownames(featureData(expressionset)@varMetadata)))
+    if((!is(expressionset, "BeadLevelList")) && hasGCinfo(expressionset))
       {
         writeLines(sec3text, con)
         writeLines(gctext, con)
@@ -680,7 +683,7 @@ report = function(expressionset, arg, sNt, sN, sec1text, mapdf,
     if((!is(expressionset, "BeadLevelList")) && ("hasTarget" %in%
         rownames(featureData(expressionset)@varMetadata))) 
       {
-        if(!"GC" %in% rownames(featureData(expressionset)@varMetadata))
+        if(!hasGCinfo(expressionset))
           writeLines(sec3text, con)
         
         writeLines(gotext, con)
@@ -1215,7 +1218,7 @@ setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"), functi
 #######################
 ###Section 3.1 : GC ###
 #######################
-            if("GC" %in% rownames(featureData(expressionset)@varMetadata))
+            if(hasGCinfo(expressionset))
               {
                 section = section + 1
                 sec3text = sprintf("<hr><h2><a name = \"S3\">Section %s: Array platform quality</a></h2>", section)    
@@ -1274,7 +1277,8 @@ setMethod("arrayQualityMetrics",signature(expressionset = "NChannelSet"), functi
                 section = pmap$section
                 figure = pmap$figure
                 gotext = pmap$gotext
-                if(!"GC" %in% rownames(featureData(expressionset)@varMetadata)) sec3text = as.character(pmap$sec3text)                
+                if(!hasGCinfo(expressionset))
+                  sec3text = as.character(pmap$sec3text)                
                 legendgo = sprintf("<DIV style=\"font-size: 13; font-family: Lucida Grande; text-align:justify\"><b>Figure %s</b> shows the density distributions of the log<sub>2</sub> ratios grouped by the mapping of the probes. Blue, density estimate of log<sub>2</sub> ratios of probes annotated \"TRUE\" in the <b>\"hasTarget\"</b> slot. Gray, probes annotated \"FALSE\" in the <b>\"hasTarget\"</b> slot.</DIV>",  figure)    
               }
             
@@ -1709,7 +1713,7 @@ aqm.expressionset = function(expressionset, outdir = getwd(), force =
 ###Section 3.1 : GC ###
 #######################
     
-    if("GC" %in% rownames(featureData(expressionset)@varMetadata))
+    if(hasGCinfo(expressionset))
       {
         section = section + 1
         sec3text = sprintf("<hr><h2><a name = \"S3\">Section %s: Array platform quality</h2></a>", section)    
@@ -1833,7 +1837,7 @@ aqm.expressionset = function(expressionset, outdir = getwd(), force =
           legendsdmean=legendsdmean, M=M, outM=outM, maxc=maxc, maxr=maxr,
           ldat=ldat) 
         l$sNt = sNt
-        if("GC" %in% rownames(featureData(expressionset)@varMetadata))
+        if(hasGCinfo(expressionset))
           {
             l$sec3text=sec3text
             l$gctext=gctext
