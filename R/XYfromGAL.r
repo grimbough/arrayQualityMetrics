@@ -8,7 +8,7 @@ makeabscoord = function(a) {
 }
 
 makecoordblock = function(a, coo, bcoord) {
-  sapply(1:nrow(coo), function(i) coo[i,a]*bcoord[coo[i,1],a])
+  sapply(seq_len(nrow(coo)), function(i) coo[i,a]*bcoord[coo[i,1],a])
 }
 
 addXYfromGAL = function(x, gal.file, nBlocks, skip, ...)
@@ -19,7 +19,7 @@ addXYfromGAL = function(x, gal.file, nBlocks, skip, ...)
     gal = read.table(gal.file, skip = skip, sep = sep, nrows = nBlocks, quote="", as.is = T, ...)
     
     if(length(grep(",",galtype[skip+1])) == 1)
-      gal = sapply(1:ncol(gal),function(i) gsub(",","",gal[,i]))
+      gal = sapply(seq_len(ncol(gal)),function(i) gsub(",","",gal[,i]))
 
     if(length(grep("=$",gal[,1])) == 0)
       gal = cbind(matrix(unlist(strsplit(gal[,1],"=")),ncol=2,byrow=T),gal[,2:ncol(gal)])

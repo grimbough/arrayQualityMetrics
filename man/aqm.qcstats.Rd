@@ -1,0 +1,31 @@
+\name{aqm.qcstats}
+\alias{aqm.qcstats}
+
+\title{ Performs QCstats plot on AffyBatch. }
+
+\description{
+  \code{aqm.qcstats} performs QCstats on objects of class
+  \code{\link[affy:class.AffyBatch]{AffyBatch}} and formats the output for
+  \code{aqm.plot} usage.
+}
+
+\usage{ aqm.qcstats(expressionset, ...) }
+
+\arguments{
+  \item{expressionset}{ is an object of
+    class \code{\link[affy:class.AffyBatch]{AffyBatch}} }
+  \item{...}{ Any arguments to \code{\link[simpleaffy:qc]{qc}} }
+ }
+
+\value{ An object of class  \code{\link{aqmobj.qcs}}. }
+
+\author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
+
+\seealso{ \code{\link{aqmobj.qcs}} }
+
+\examples{
+    library(ALLMLL)
+    data(MLL.A)
+    qcs = aqm.qcstats(MLL.A)
+}
+

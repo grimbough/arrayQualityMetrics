@@ -1,0 +1,38 @@
+\name{aqmobj.pmmm-class}
+\docType{class}
+\alias{aqmobj.pmmm-class}
+\alias{aqmobj.pmmm}
+\alias{class.aqmobj.pmmm}
+
+\title{ Class to contain data generated from aqm.pmmm. }
+
+\section{Slots}{
+  \describe{
+    \item{\code{plot}:}{ A list to be represented calling the
+      \code{\link{aqm.plot}} function. }
+        
+    \item{\code{type}:}{ A character string with a name for the section
+      the plot belongs to in the report. }
+    
+    \item{\code{title}:}{ A character string with the title of the plot
+      to be written in the report. }
+    
+    \item{\code{legend}:}{ A character string with the legend of the plot
+      to be written in the report. }
+  }
+}
+    
+
+\author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
+
+\seealso{ \code{aqm.pmmm}, \code{aqm.plot} }
+
+\examples{
+    library(ALLMLL)
+    data(MLL.A)
+    pm = aqm.pmmm(MLL.A)
+    class(pm)
+    show(pm)
+    aqm.plot(pm)
+}
+\keyword{classes}

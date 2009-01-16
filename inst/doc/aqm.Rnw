@@ -1,0 +1,123 @@
+%\VignetteIndexEntry{arrayQualityMetrics modules}
+%\VignetteDepends{CCl4, ALLMLL, vsn}
+
+\documentclass[11pt]{article}
+
+\usepackage{times}
+\usepackage{a4wide}
+\usepackage{verbatim}
+\usepackage[pdftex,linktocpage]{hyperref}
+
+\newcommand{\Robject}[1]{\texttt{#1}}
+\newcommand{\Rpackage}[1]{\textit{#1}}
+\newcommand{\Rclass}[1]{\textit{#1}}
+\newcommand{\Rfunction}[1]{{\small\texttt{#1}}}
+
+\SweaveOpts{keep.source=TRUE,eps=FALSE,include=FALSE,width=4,height=4.5}
+
+\begin{document}
+
+\title{Calling individual modules of arrayQualityMetrics}
+\author{Audrey Kauffmann}
+\maketitle
+\tableofcontents
+\pagebreak
+
+\section{Functionalities}
+
+\section{Usage}
+
+\section{How to add your own modules}
+Here is an example of a function, studying the GC content effects, that can be added to the report. 
+%
+<<options,echo=FALSE>>=
+
+#setClassUnion("aqmOneCol", c("ExpressionSet", "AffyBatch"))
+# 
+#setGeneric("gcplot",
+#           function(expressionset, dataprep, ngc, colb, colg, colr, fac, ...)
+#           standardGeneric("gcplot"))
+# 
+#setMethod("gcplot",signature(expressionset = "NChannelSet"), function(expressionset, dataprep, ngc, colb, colg, colr, fac, ...)
+#          {
+#            df = data.frame(rep(fac, ncol(dataprep$dat)), as.numeric(dataprep$rc), as.numeric(dataprep$gc), as.numeric(dataprep$dat))
+#            colnames(df) = c("GC","rc","gc","dat")
+#            
+#            den1 = densityplot( ~ rc, data = df, groups = GC, plot.points = FALSE, xlab = "", ylab = "Density", col = colr[ngc])      
+#            den2 = densityplot( ~ gc, data = df, groups = GC, plot.points = FALSE, xlab = "", ylab = "", col = colg[ngc])
+#            den3 = densityplot( ~ dat, data = df, groups = GC, plot.points = FALSE, xlab ="", ylab = "", col = colb[ngc])            
+#            
+#            box1 = bwplot(rc ~ GC, data = df, fill = colr[ngc], pch = "|", do.out = FALSE, box.ratio = 2, xlab = "Red Intensity", ylab = "GC content", horizontal = FALSE)
+#            box2 = bwplot(gc ~ GC, data = df, fill = colg[ngc], pch = "|", do.out = FALSE, box.ratio = 2, xlab = "Green Intensity", ylab = "", horizontal = FALSE)
+#            box3 = bwplot(dat ~ GC, data = df, fill = colb[ngc], pch = "|", do.out = FALSE, box.ratio = 2, xlab = "Log(ratio)", ylab = "", horizontal = FALSE)
+# 
+#            denbox = list("den1" = den1, "den2" = den2, "den3" = den3, "box1" =  box1, "box2" = box2, "box3" = box3)
+#          })
+# 
+#setMethod("gcplot",signature(expressionset = "aqmOneCol"), function(expressionset, dataprep, ngc, colb, colg, colr, fac, ...)
+#          {
+#            df = data.frame(rep(fac, ncol(dataprep$dat)), as.numeric(dataprep$dat))
+#            colnames(df) = c("GC","dat")
+#            
+#            den = densityplot(~ dat, data = df, groups = GC, col = colb[ngc], plot.points = FALSE, xlab = "", ylab = "Density")            
+#            box = bwplot(dat ~ GC, data = df, fill = colb[ngc], pch = "|", do.out = FALSE, horizontal = FALSE, box.ratio = 2, xlab = "Intensity", ylab = "GC content", horizontal = FALSE)            
+#            denbox = list(den, box)
+#          })
+# 
+# 
+#aqm.gc = function(expressionset, dataprep, ...)
+#{  
+#  colb = brewer.pal(9, "Blues")
+#  colg = brewer.pal(9, "Greens")
+#  colr = brewer.pal(9, "OrRd")         
+#  fac = round(as.numeric(as.matrix(featureData(expressionset)$GC)),-1)      
+#  maxcol = length(unique(fac[!is.na(fac)]))
+#  ngc = 1:maxcol
+# 
+#  plotgc = gcplot(expressionset = expressionset, dataprep = dataprep, ngc = ngc, colb = colb, colg = colg, colr = colr, fac = fac, ...)
+#  
+#  title = "GC content effect"
+#  
+#  type = "Platform quality assessment"
+#  
+#  legend = "<b>Figure FIG</b> shows the distributions of the log<sub>2</sub> intensities grouped by the percentage of cytosines (C) and guanines (G) among the nucleotides in each probe. From the top to the bottom, kernel density estimates, empirical cumulative distribution functions (ECDF) and boxplots are represented. Box and line colors in the three panels correspond to the same groups, the darker is the colour, the higher is the GC content. Cytosine and guanine are able to form three hydrogen bonds, while adenine (A) and thymine (T) only form two, hence oligonucleotides with a higher proportion of C and G can form more stable hybridization bindings. This should result in higher intensities measured on the array, regardless of the abundance of target molecules.</DIV>"
+#    
+#  out = list("plot" = plotgc, "type" = type, "title" = title, "legend" = legend)
+#  class(out) = "aqmobj.gc"
+#  return(out)   
+#setMethod("aqm.plot",signature(obj = "aqmobj.gc"), function(obj){
+#  box.rectangle <- trellis.par.get("box.rectangle")
+#  box.rectangle$col = "black"
+#  trellis.par.set("box.rectangle",box.rectangle)
+#  box.umbrella <- trellis.par.get("box.umbrella")
+#  box.umbrella$col = "black"
+#  trellis.par.set("box.umbrella",box.umbrella)
+#  if(length(obj$plot) == 6)
+#    {
+#      print(obj$plot$den1, split = c(1,1,3,2), newpage = FALSE)
+#      print(obj$plot$den2, split = c(2,1,3,2), newpage = FALSE)
+#      print(obj$plot$den3, split = c(3,1,3,2), newpage = FALSE)
+#      print(obj$plot$box1, split = c(1,2,3,2), newpage = FALSE)
+#      print(obj$plot$box2, split = c(2,2,3,2), newpage = FALSE)
+#      print(obj$plot$box3, split = c(3,2,3,2), newpage = FALSE)
+#    }
+#  if(length(obj$plot) == 2)
+#    {
+#      print(obj$plot$den, split = c(1,1,1,2), newpage = FALSE)
+#      print(obj$plot$box, split = c(1,2,1,2), newpage = FALSE)
+#    }
+#})
+
+#}
+@
+%
+
+
+\subsection*{Session Info}
+%
+<<pkgs, results=tex>>=
+toLatex(sessionInfo())
+@
+%
+
+\end{document}
