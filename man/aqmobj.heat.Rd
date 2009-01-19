@@ -6,6 +6,8 @@
 
 \title{ Class to contain data generated from aqm.heatmap. }
 
+\description{ Class to contain data generated from aqm.heatmap. }
+
 \section{Slots}{
   \describe{
     \item{\code{plot}:}{ An object of class

@@ -6,6 +6,8 @@
 
 \title{ Class to contain data generated from aqm.nuse. }
 
+\description{ Class to contain data generated from aqm.nuse. }
+
 \section{Slots}{
   \describe{
     \item{\code{plot}:}{ A matrix to be represented calling the

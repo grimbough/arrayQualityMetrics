@@ -1,5 +1,5 @@
 %\VignetteIndexEntry{arrayQualityMetrics modules}
-%\VignetteDepends{CCl4, ALLMLL, vsn}
+%\VignetteDepends{}
 
 \documentclass[11pt]{article}
 

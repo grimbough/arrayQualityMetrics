@@ -6,6 +6,8 @@
 
 \title{ Class to contain data generated from aqm.density. }
 
+\description{ Class to contain data generated from aqm.density. }
+
 \section{Slots}{
   \describe{
     \item{\code{plot}:}{ An object of class

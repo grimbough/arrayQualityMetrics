@@ -11,9 +11,7 @@
 \alias{arrayQualityMetrics,marrayNorm-method}
 \alias{arrayQualityMetrics,aqmInputObj-method}
 
-\title{
-  Quality metrics on microarray experiments
-}
+\title{ Quality metrics on microarray experiments }
 
 \description{
   \code{arrayQualityMetrics} performs quality metrics on

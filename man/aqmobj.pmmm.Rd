@@ -6,6 +6,8 @@
 
 \title{ Class to contain data generated from aqm.pmmm. }
 
+\description{ Class to contain data generated from aqm.pmmm. }
+
 \section{Slots}{
   \describe{
     \item{\code{plot}:}{ A list to be represented calling the

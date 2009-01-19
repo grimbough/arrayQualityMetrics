@@ -6,6 +6,8 @@
 
 \title{ Class to contain data generated from aqm.rnadegplot. }
 
+\description{ Class to contain data generated from aqm.rnadegplot. }
+
 \section{Slots}{
   \describe{
     \item{\code{plot}:}{ A list to be represented calling the

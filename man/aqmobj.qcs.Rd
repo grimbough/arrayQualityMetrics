@@ -6,6 +6,8 @@
 
 \title{ Class to contain data generated from aqm.qcs. }
 
+\description{ Class to contain data generated from aqm.qcs. }
+
 \section{Slots}{
   \describe{
     \item{\code{plot}:}{ An object of class

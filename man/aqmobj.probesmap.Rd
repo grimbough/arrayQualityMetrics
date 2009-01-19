@@ -6,6 +6,7 @@
 
 \title{ Class to contain data generated from aqm.probesmap. }
 
+\description{ Class to contain data generated from aqm.probesmap. }
 
 \section{Slots}{
   \describe{
