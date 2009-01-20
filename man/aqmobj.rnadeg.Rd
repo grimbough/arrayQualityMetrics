@@ -21,6 +21,9 @@
     
     \item{\code{legend}:}{ A character string with the legend of the plot
       to be written in the report. }
+    
+    \item{\code{shape}:}{ A character "square" or "rect" depending on
+    the aspect ratio desired in the report. }
   }
 }
 

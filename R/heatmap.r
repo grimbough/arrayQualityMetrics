@@ -57,7 +57,7 @@ hmap = function(expressionset, sN, outM, numArrays, intgroup, ...)
     madstat = boxplot.stats(madsum)
     madout = sapply(seq_len(length(madstat$out)), function(x) which(madsum == madstat$out[x]))
 
-     out = list("plot" = hfig, "type" = type,  "title" = title, "legend" = legend, "scores" = madsum, "outliers" = madout)
+     out = list("plot" = hfig, "type" = type,  "title" = title, "legend" = legend, "scores" = madsum, "outliers" = madout, "shape" = "square")
     class(out) = "aqmobj.heat"
     return(out) 
   }

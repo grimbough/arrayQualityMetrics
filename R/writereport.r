@@ -129,10 +129,10 @@ aqm.make.index = function(obj, p)
           if(s != 1)
             hwrite("</UL>", p)
 
-          hwrite(paste("<LI>Section ", s,": ", obj[[i]]$type,"<UL>",sep=""), p, link=paste("#S",s,sep=""))
+          hwrite(paste("<br><LI>Section ", s,": ", obj[[i]]$type,"<UL>",sep=""), p, link=paste("#S",s,sep=""), style= 'font-weight:bold;font-family:helvetica;font-size:12pt')
           s = s+1
         }
-      hwrite(paste("<LI>",obj[[i]]$title,sep=""), p)
+      hwrite(paste("<LI>",obj[[i]]$title,sep=""), p, style= 'font-weight:normal;font-family:helvetica;font-size:11pt')
       lasttype = obj[[i]]$type
     }
   hwrite("</UL></UL>", p)
@@ -142,8 +142,18 @@ aqm.make.index = function(obj, p)
 ##To create a part of report with figures and legend
 aqm.report.qm = function(p, qm, f, name)
   {
-    h = 5
-    w = 8
+    if(qm$shape == "rect")
+      {
+        h = 5
+        w = 15
+      }
+    if(qm$shape == "square")
+      {
+        h = 7
+        w = 7
+      }
+
+    
     dpi = 72
 
     namepdf = paste(name, ".pdf", sep = "")
@@ -159,7 +169,7 @@ aqm.report.qm = function(p, qm, f, name)
     dev.off()   
   
     img = hwriteImage(namepng)
-    hwrite(c(qm$title, "", img,  paste("Figure",f)), p, dim=c(2,2), style='font-weight:bold;text-align:center;font-family:Lucida Grande', border=0, link=list(NA,NA,namepdf,namepdf))
+    hwrite(c(qm$title, "", img,  paste("Figure",f)), p, dim=c(2,2), style='font-weight:bold;text-align:center;font-family:helvetica', border=0, link=list(NA,NA,namepdf,namepdf))
     hwrite(qm$legend, p, style='text-align:justify;font-family:Lucida Grande;font-size:10pt')
   }
 

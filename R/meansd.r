@@ -8,7 +8,7 @@ aqm.meansd = function(dataprep, ...)
 
     title = "Standard deviation versus rank of the mean"
     type = "Variance mean dependence"
-    msd = list("plot" = dataprep$dat, "type" = type, "title" = title, "legend" = legend)
+    msd = list("plot" = dataprep$dat, "type" = type, "title" = title, "legend" = legend, "shape" = "square")
     class(msd) = "aqmobj.msd"
     return(msd)   
   }

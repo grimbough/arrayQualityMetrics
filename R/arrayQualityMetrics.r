@@ -139,11 +139,15 @@ setMethod("arrayQualityMetrics",signature(expressionset = "aqmInputObj"), functi
             col = rep(c("#d0d0ff","#e0e0f0"), (ceiling((nrow(sc)+1)/2)))
 
             if(nrow(sc) < length(col))  
-              col = col[seq_len((length(col)-(abs((nrow(sc)+1) - length(col)))))]      
+              col = col[seq_len((length(col)-(abs((nrow(sc)+1) - length(col)))))]
+
+            boldset = 'font-weight:bold;text-align:center;font-family:Lucida Grande;font-size:10pt'
+            normset = 'text-align:center;font-family:Lucida Grande;font-size:10pt'
 
             hwrite("Summary",p, heading=2, style='font-family:helvetica,arial,sans-serif')
-            hwrite(sc, p, style='font-weight:bold;text-align:center;font-family:Lucida Grande;font-size:10pt', border=0, bgcolor = matrix(col, ncol=ncol(sc), nrow=(nrow(sc)+1)), cellpadding = 2, cellspacing = 5)
-            hwrite("*array identified as having a potential problem or as being an outlier.",p)
+            hwrite(sc, p, border=0, bgcolor = matrix(col, ncol=ncol(sc), nrow=(nrow(sc)+1)), cellpadding = 2, cellspacing = 5, style=matrix(c(rep(boldset, ncol(sc)), rep(c(boldset, rep(normset, ncol(sc)-1)), nrow(sc))), ncol=ncol(sc), nrow=(nrow(sc)+1), byrow=TRUE))
+          
+            hwrite("*array identified as having a potential problem or as being an outlier.",style=normset,p)
 
             aqm.make.index(obj, p)
 

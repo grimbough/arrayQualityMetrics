@@ -209,7 +209,7 @@ aqm.spatialbg = function(expressionset, dataprep)
   
   legend = sprintf("<b>Figure FIG:</b> False color representations of the arrays' spatial distributions of feature local background estimates. The color scale is shown in the panel on the right, and it is proportional to the ranks of the probe background intensities.")
 
-  out = list("plot" = bg, "type" = type, "title" = title, "legend" = legend)
+  out = list("plot" = bg, "type" = type, "title" = title, "legend" = legend, "shape" = "square")
   class(out) = "aqmobj.spatialbg"
   return(out)
 }
@@ -251,7 +251,7 @@ aqm.spatial = function(expressionset, dataprep)
   if(is(expressionset, "BeadLevelList"))
     loc = scoresspatbll(expressionset, dataprep, dataprep$logtransformed)
 
-  out = list("plot" = fore, "type" = type, "title" = title, "legend" = legend, "scores" = loc, "outliers" = locout)
+  out = list("plot" = fore, "type" = type, "title" = title, "legend" = legend, "scores" = loc, "outliers" = locout, "shape" = "square")
   class(out) = "aqmobj.spatial"
   return(out)
 }

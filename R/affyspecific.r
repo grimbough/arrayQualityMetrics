@@ -29,7 +29,7 @@ aqm.rle = function(affyproc, ...)
     rlemed = rle$stats[3,]
     rleout = which(abs(rlemed) > 0.1)
 
-    out = list("plot" = rle, "type" = type, "title" = title, "legend" = legend, "scores" = rlemed, "outliers" = rleout)
+    out = list("plot" = rle, "type" = type, "title" = title, "legend" = legend, "scores" = rlemed, "outliers" = rleout, shape = "square")
     class(out) = "aqmobj.rle"
     return(out)
   }
@@ -54,7 +54,7 @@ aqm.nuse = function(affyproc, ...)
   nuseiqrstat = boxplot.stats(nuseiqr)
   nuseiqrout = sapply(seq_len(length(nuseiqrstat$out)), function(x) which(nuseiqr == nuseiqrstat$out[x]))
   
-  out = list("plot" = nuse, "type" = type, "title" = title, "legend" = legend, "scores" = list(mean = nusemean, iqr = nuseiqr), "outliers" = list(mean = nusemeanout, iqr = nuseiqrout))
+  out = list("plot" = nuse, "type" = type, "title" = title, "legend" = legend, "scores" = list(mean = nusemean, iqr = nuseiqr), "outliers" = list(mean = nusemeanout, iqr = nuseiqrout), shape = "square")
   class(out) = "aqmobj.nuse"
   return(out) 
 }
@@ -74,7 +74,7 @@ aqm.rnadeg =function(expressionset, ...)
     title = "RNA degradation plot"
     type = "Affymetrix specific plots"
     
-    out = list("plot" = rnaDeg, "type" = type, "title" = title, "legend" = legend)
+    out = list("plot" = rnaDeg, "type" = type, "title" = title, "legend" = legend, shape = "square")
     class(out) = "aqmobj.rnadeg"
     return(out)
   }
@@ -93,7 +93,7 @@ aqm.qcstats = function(expressionset, ...)
     title = "Diagnostic plot recommended by Affymetrix"
     type = "Affymetrix specific plots"
 
-    out = list("plot" = qcStats, "type" = type, "title" = title, "legend" = legend)
+    out = list("plot" = qcStats, "type" = type, "title" = title, "legend" = legend, shape = "square")
     class(out) = "aqmobj.qcs"
     return(out)    
   }
@@ -109,7 +109,7 @@ aqm.pmmm = function(expressionset, ...)
 
   title = "Perfect matchs and mismatchs"
   type = "Affymetrix specific plots"
-  out = list("plot" = PMMM, "type" = type, "title" = title, "legend" = legend)
+  out = list("plot" = PMMM, "type" = type, "title" = title, "legend" = legend, shape = "square")
   class(out) = "aqmobj.pmmm"
   return(out)    
 }

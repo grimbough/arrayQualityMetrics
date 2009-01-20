@@ -27,6 +27,9 @@
     
     \item{\code{outliers}:}{ List or integer of the arrays that are
       outliers using boxplot.stats on the scores. }
+    
+    \item{\code{shape}:}{ A character "square" or "rect" depending on
+    the aspect ratio desired in the report. }
     }
 }
 
