@@ -7,6 +7,7 @@
 \alias{aqm.plot,aqmobj.msd-method}
 \alias{aqm.plot,aqmobj.nuse-method}
 \alias{aqm.plot,aqmobj.pmmm-method}
+\alias{aqm.plot,aqmobj.qcs-method}
 \alias{aqm.plot,aqmobj.rle-method}
 \alias{aqm.plot,aqmobj.rnadeg-method}
 
@@ -24,6 +25,7 @@ aqm.plot(obj)
 \S4method{aqm.plot}{aqmobj.msd}(obj)
 \S4method{aqm.plot}{aqmobj.nuse}(obj)
 \S4method{aqm.plot}{aqmobj.pmmm}(obj)
+\S4method{aqm.plot}{aqmobj.qcs}(obj)
 \S4method{aqm.plot}{aqmobj.rle}(obj)
 }
 

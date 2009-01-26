@@ -1,4 +1,4 @@
-setClassUnion("aqmTrellis", c("aqmobj.ma", "aqmobj.heat", "aqmobj.qcs", "aqmobj.probesmap", "aqmobj.spatial", "aqmobj.spatialbg"))
+setClassUnion("aqmTrellis", c("aqmobj.ma", "aqmobj.heat", "aqmobj.probesmap", "aqmobj.spatial", "aqmobj.spatialbg"))
 
 ##Creation of the outdir
 dircreation = function(outdir = getwd(), force = FALSE)
@@ -72,7 +72,7 @@ setMethod("aqm.plot",signature(obj = "aqmobj.rle"), function(obj){
   box.umbrella <- trellis.par.get("box.umbrella")
   box.umbrella$col = "transparent"
   trellis.par.set("box.umbrella",box.umbrella)
-  bwplot(obj$plot$stats ~ as.vector(col(obj$plot$stats)), pch = "|", col = "black", do.out = FALSE, fill = "#1F78B4", horizontal = FALSE, box.ratio = 2, ylim = c(-1,1), ylab="RLE", xlab = "")
+  print(bwplot(obj$plot$stats ~ as.vector(col(obj$plot$stats)), pch = "|", col = "black", do.out = FALSE, fill = "#1F78B4", horizontal = FALSE, box.ratio = 2, ylim = c(-1,1), ylab="RLE", xlab = ""))
 })
 
 setMethod("aqm.plot",signature(obj = "aqmobj.nuse"), function(obj){
@@ -82,13 +82,16 @@ setMethod("aqm.plot",signature(obj = "aqmobj.nuse"), function(obj){
   box.umbrella <- trellis.par.get("box.umbrella")
   box.umbrella$col = "black"
   trellis.par.set("box.umbrella",box.umbrella)
-  bwplot(obj$plot$stats ~ as.vector(col(obj$plot$stats)), pch = "|", col = "black", do.out = FALSE, fill = "#1F78B4", horizontal = FALSE, box.ratio = 2, ylim = c(0.9,1.5), ylab="NUSE", xlab = "")  
+  print(bwplot(obj$plot$stats ~ as.vector(col(obj$plot$stats)), pch = "|", col = "black", do.out = FALSE, fill = "#1F78B4", horizontal = FALSE, box.ratio = 2, ylim = c(0.9,1.5), ylab="NUSE", xlab = ""))  
 })
 
 setMethod("aqm.plot",signature(obj = "aqmobj.rnadeg"), function(obj){
   acol = sample(brewer.pal(8, "Dark2"), length(obj$plot$sample.names), replace = (8<length(obj$plot$sample.names)))
-  plotAffyRNAdeg(obj$plot, lwd = 2, col =acol)})
+  print(plotAffyRNAdeg(obj$plot, lwd = 2, col =acol))})
 
+setMethod("aqm.plot",signature(obj = "aqmobj.qcs"), function(obj){
+  plot.qc.stats(obj$plot)})
+  
 setMethod("aqm.plot",signature(obj = "aqmobj.msd"), function(obj){
   meanSdPlot(obj$plot)})
   

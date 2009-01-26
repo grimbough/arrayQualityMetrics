@@ -7,7 +7,7 @@ spatialplot = function(expressionset, dataprep, channel, label, imageMat = NULL)
       }                        
     
     colourRamp = colorRampPalette(rgb(seq(0,1,l=256),seq(0,1,l=256),seq(1,0,l=256)))
-    if(dataprep$classori != "AffyBatch")
+    if(dataprep$classori == "ExpressionSet" || dataprep$classori == "NChannelSet")
       {
         r = featureData(expressionset)$X
         c = featureData(expressionset)$Y
@@ -176,10 +176,10 @@ setMethod("spatialbg",signature(expressionset = "BeadLevelList"), function(expre
             if(expressionset@arrayInfo$channels == "two")
               imageMatrb = lapply(seq_len(dataprep$numArrays), function(i) imageplotBLL(expressionset, array = i, whatToPlot="Rb", log = dataprep$logtransformed))
             
-            spgb = spatialplot(expressionset, dataprep, channel, label, imageMatgb)
+            spgb = spatialplot(expressionset, dataprep,dataprep$gcb,"Rank(green background intensity)", imageMatgb)
             sprb = NULL
             if(expressionset@arrayInfo$channels == "two")
-              sprb = spatialplot(expressionset, dataprep, channel, label, imageMatrb)
+              sprb = spatialplot(expressionset, dataprep,dataprep$rcb,"Rank(red background intensity)", imageMatrb)
             
             return(list(sprb, spgb))
           })
@@ -190,10 +190,10 @@ setMethod("spatial",signature(expressionset = "BeadLevelList"), function(express
             if(expressionset@arrayInfo$channels == "two")
               imageMatr = lapply(seq_len(dataprep$numArrays), function(i) imageplotBLL(expressionset, array = i, whatToPlot="R", log = dataprep$logtransformed))
             
-            spg = spatialplot(expressionset, dataprep, channel, label, imageMatg)
+            spg = spatialplot(expressionset, dataprep,dataprep$gc,"Rank(green intensity)", imageMatg)
             spr = NULL
             if(expressionset@arrayInfo$channels == "two")
-              spr = spatialplot(expressionset, dataprep, channel, label, imageMatr)
+              spr = spatialplot(expressionset, dataprep,dataprep$rc,"Rank(red intensity)", imageMatr)
             
             return(list(spr, spg))
           })
@@ -223,33 +223,31 @@ aqm.spatial = function(expressionset, dataprep)
 
   legend = sprintf("<b>Figure FIG:</b> False color representations of the arrays' spatial distributions of feature intensities. The color scale is shown in the panel on the right, and it is proportional to the ranks of the probe intensities. This has indeed the potential to detect patterns that are small in amplitude, but systematic within array. These may not be consequential for the downstream data analysis, but if properly interpreted, could e.g. still be useful for technology and experimental protocol optimisation as it helps in identifying patterns that may be caused by, for example, spatial gradients in the hybridization chamber, air bubbles, spotting or plating problems.")          
 
-  if(!is(expressionset, "BeadLevelList"))
-    {
-      loc = scoresspat(expressionset, dataprep, dataprep$dat)
+  if(!inherits(expressionset, "BeadLevelList"))
+    loc = scoresspat(expressionset, dataprep, dataprep$dat)
   
-      if(is(expressionset, "NChannelSet"))
-        {
-          locr = scoresspat(expressionset, dataprep, dataprep$rc)
-          locg = scoresspat(expressionset, dataprep, dataprep$gc)
-          loc = list("LogRatio"=loc, "Red"=locr, "Green"=locg)
-        }
-
-      if(is(loc,"numeric"))
-        {
-          locstat = boxplot.stats(loc)
-          locout = sapply(seq_len(length(locstat$out)), function(x) which(loc == locstat$out[x]))
-        }
- 
-      if(is(loc,"list"))
-        {
-          locstat = lapply(seq_len(length(loc)), function(i) boxplot.stats(loc[[i]]))
-          locout = lapply(seq_len(length(loc)), function(j) sapply(seq_len(length(locstat[[j]]$out)), function(x) which(loc[[j]] == locstat[[j]]$out[x])))
-          names(locout) = c("LR","Red","Green")
-        }
+  if(inherits(expressionset, "NChannelSet"))
+    {
+      locr = scoresspat(expressionset, dataprep, dataprep$rc)
+      locg = scoresspat(expressionset, dataprep, dataprep$gc)
+      loc = list("LogRatio"=loc, "Red"=locr, "Green"=locg)
     }
-
-  if(is(expressionset, "BeadLevelList"))
+ 
+  if(inherits(expressionset, "BeadLevelList"))
     loc = scoresspatbll(expressionset, dataprep, dataprep$logtransformed)
+
+  if(is(loc,"numeric"))
+    {
+      locstat = boxplot.stats(loc)
+      locout = sapply(seq_len(length(locstat$out)), function(x) which(loc == locstat$out[x]))
+    }
+ 
+  if(is(loc,"list"))
+    {
+      locstat = lapply(seq_len(length(loc)), function(i) boxplot.stats(loc[[i]]))
+      locout = lapply(seq_len(length(loc)), function(j) sapply(seq_len(length(locstat[[j]]$out)), function(x) which(loc[[j]] == locstat[[j]]$out[x])))
+      names(locout) = if(length(locout) == 3) c("LR","Red","Green") else c("Red","Green")
+    }
 
   out = list("plot" = fore, "type" = type, "title" = title, "legend" = legend, "scores" = loc, "outliers" = locout, "shape" = "square")
   class(out) = "aqmobj.spatial"

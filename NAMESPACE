@@ -1,20 +1,92 @@
-import("methods")
-import("marray", "grid", "vsn", "beadarray")
-importFrom("RColorBrewer","brewer.pal")
-importFrom("geneplotter", "multiecdf",
-                          "multidensity",
-                          "smoothScatter",
-                          "openHtmlPage",
-                          "closeHtmlPage",
-                          "panel.smoothScatter")
-importFrom("genefilter", "dist2")
+#Imports: Biobase, RColorBrewer, affy, affyPLM, beadarray, genefilter,
+#         geneplotter, grDevices, graphics, hwriter, lattice,
+#         latticeExtra, limma, marray, methods, simpleaffy, stats,
+#         stats4, utils, vsn
+
+importClassesFrom(affy, AffyBatch)
+
+importClassesFrom(Biobase, NChannelSet)
+
+importClassesFrom(Biobase, ExpressionSet)
+
+importClassesFrom(beadarray, BeadLevelList)
+
+importClassesFrom(limma, MAList, RGList)
+
+importClassesFrom(marray, marrayNorm, marrayRaw)
+
+importClassesFrom(methods, ANY, character, list, logical, matrix,
+                  numeric)
+
+importMethodsFrom(Biobase, assayData, channel, dims, exprs,
+                  featureData, pData, phenoData, rowMedians,
+                  sampleNames)
+
+importMethodsFrom(affy, Mbox, mm, pm)
+
+importMethodsFrom(beadarray, arrayNames, getArrayData)
+
+importMethodsFrom(genefilter, plot)
+
+importMethodsFrom(marray, boxplot, lines)
+
+importMethodsFrom(simpleaffy, qc)
+
+importMethodsFrom(stats4, update)
+
+importMethodsFrom(vsn, meanSdPlot)
+
+importFrom(RColorBrewer, brewer.pal)
+
+importFrom(affy, AffyRNAdeg, plotAffyRNAdeg)
+
+importFrom(beadarray, createBeadSummaryData)
+
+importFrom(genefilter, dist2)
+
+importFrom(geneplotter, panel.smoothScatter)
+
+importFrom(grDevices, boxplot.stats, colorRampPalette, dev.off, pdf,
+           png, rgb)
+
+importFrom(graphics, legend)
+
+importFrom(hwriter, closePage, hwrite, hwriteImage, openPage)
+
+importFrom(lattice, bwplot, densityplot, draw.key, levelplot,
+           make.groups, strip.default, trellis.par.get,
+           trellis.par.set, xyplot)
+
+importFrom(latticeExtra, dendrogramGrob)
+
+importFrom(methods, as, is)
+
+importFrom(simpleaffy, plot.qc.stats)
+
+importFrom(stats, as.dendrogram, as.dist, density, fft, hclust,
+           order.dendrogram, quantile)
+
+importFrom(utils, read.table, sessionInfo)
+
+importFrom(RColorBrewer, brewer.pal.info)
+
 export("arrayQualityMetrics")
 export("addXYfromGAL")
-importFrom("simpleaffy", "qc")
-importClassesFrom("Biobase", "ExpressionSet")
-importClassesFrom("Biobase", "NChannelSet")
-importClassesFrom("affy", "AffyBatch")
-exportClasses("aqmobj.box", "aqmobj.pmmm", "aqmobj.rnadeg", "aqmobj.dens", "aqmobj.prepaffy", "aqmobj.spatial", "aqmobj.heat", "aqmobj.prepdata", "aqmobj.spatialbg", "aqmobj.ma", "aqmobj.probesmap", "aqmobj.msd", "aqmobj.qcs", "aqmobj.nuse", "aqmobj.rle")
+exportClasses("aqmobj.box",
+              "aqmobj.pmmm",
+              "aqmobj.rnadeg",
+              "aqmobj.dens",
+              "aqmobj.prepaffy",
+              "aqmobj.spatial",
+              "aqmobj.heat",
+              "aqmobj.prepdata",
+              "aqmobj.spatialbg",
+              "aqmobj.ma",
+              "aqmobj.probesmap",
+              "aqmobj.msd",
+              "aqmobj.qcs",
+              "aqmobj.nuse",
+              "aqmobj.rle")
 export("aqm.plot")
 export("aqm.boxplot")
 export("aqm.maplot")

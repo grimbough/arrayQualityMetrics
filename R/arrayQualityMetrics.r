@@ -32,7 +32,7 @@ setMethod("arrayQualityMetrics",signature(expressionset = "aqmInputObj"), functi
                 f = f+1
               }
 
-            if("X" %in% rownames(featureData(expressionset)@varMetadata) && "Y" %in% rownames(featureData(expressionset)@varMetadata))
+            if(inherits(expressionset, 'BeadLevelList') || ("X" %in% rownames(featureData(expressionset)@varMetadata) && "Y" %in% rownames(featureData(expressionset)@varMetadata)))
               {            
                 obj$spatial =  try(aqm.spatial(expressionset = expressionset, dataprep = datap))
                 if(inherits(obj$spatial,"try-error"))
@@ -80,18 +80,21 @@ setMethod("arrayQualityMetrics",signature(expressionset = "aqmInputObj"), functi
                 f = f+1
               }
 
-            if(("hasTarget" %in% rownames(featureData(expressionset)@varMetadata)) && inherits(expressionset,'BeadLevelList'))
+            if(inherits(expressionset,'BeadLevelList'))
               warning("Cannot plot the probes mapping densities on a BeadLevelList object.")
-            if(("hasTarget" %in% rownames(featureData(expressionset)@varMetadata)) && (!inherits(expressionset,'BeadLevelList')))
+            if(!inherits(expressionset,'BeadLevelList'))
               {
-                obj$probesmap = try(aqm.probesmap(expressionset = expressionset, dataprep = datap))
-                if(inherits(obj$probesmap,"try-error"))
-                  warning("Cannot draw probes mapping plot \n") else {
-                    obj$probesmap$legend = gsub("FIG",f,obj$probesmap$legend)
-                    f = f+1
-                  }
+                if("hasTarget" %in% rownames(featureData(expressionset)@varMetadata))
+                {
+                  obj$probesmap = try(aqm.probesmap(expressionset = expressionset, dataprep = datap))
+                  if(inherits(obj$probesmap,"try-error"))
+                    warning("Cannot draw probes mapping plot \n") else {
+                      obj$probesmap$legend = gsub("FIG",f,obj$probesmap$legend)
+                      f = f+1
+                    }
+                }
               }
-
+            
 
             if(inherits(expressionset, "AffyBatch"))
               {
