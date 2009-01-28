@@ -23,14 +23,80 @@
 \tableofcontents
 \pagebreak
 
-\section{Functionalities}
+\section*{Introduction}
+In the vignette arrayQualityMetrics.pdf, you can learn how to use the arrayQualityMetrics function to create a full report. In this vignette, we show how to only run one or several of the metrics and how to add your own modules to customize the report.
 
-\section{Usage}
+\section{Metrics available in the report}
 
-\section{How to add your own modules}
+There are two functions to prepare the data:
+\begin{itemize}
+\item \Rfunction{aqm.prepdata}: generates a \Rclass{aqmobj.prepdata} object which is the needed input of all the \Rfunction{aqm.xxx} functions.
+\item \Rfunction{aqm.prepaffy}: generates a \Rclass{aqmobj.prepaffy} object which is needed for some of the Affymetrix specific functions.
+\end{itemize}
+
+The functions to compute quality metrics are the following, the output objects contain the plot, the legend, the title, the name of the section it belongs to in the report, the scores per array that are used to perform the outlier detection and the array names that are detected as outliers:
+\begin{itemize}
+\item \Rfunction{aqm.maplot}: draws the M versus A plot and generates an object \Rclass{aqmobj.ma}.
+\item \Rfunction{aqm.spatial}: represents the spatial distribution of the rank foreground intensities and generates an object \Rclass{aqmobj.spatial}.
+\item \Rfunction{aqm.boxplot}: performs the boxplots of the intensities and generates an object \Rclass{aqmobj.box}.
+\item \Rfunction{aqm.heatmap}: computes the heatmap of the array-distances and generates an object \Rclass{aqmobj.heatmap}.
+\end{itemize}
+
+The following functions also compute quality metrics with the same output as before but without the outlier detection:
+\begin{itemize}
+\item \Rfunction{aqm.spatialbg}: represents the spatial distribution of the rank background intensities and generates an object \Rclass{aqmobj.spatialbg}.
+\item \Rfunction{aqm.density}: performs the density plots of the intensities and generates an object \Rclass{aqmobj.dens}.
+\item \Rfunction{aqm.meansd}: compares the mean of the intensities to their standard deviation and generates an object \Rclass{aqmobj.msd}.
+\item \Rfunction{aqm.probesmap}: draws density plots of two classes of probes as annotated in the "hasTarget" column of the \Rclass{featureData} and generates an object \Rclass{aqmobj.probesmap}.
+\end{itemize}
+
+The functions available for Affymetrix datasets:
+\begin{itemize}
+\item \Rfunction{aqm.rnadeg}: is used to represent the RNA degradation plot and creates the object \Rclass{aqmobj.rnadeg}.
+\item \Rfunction{aqm.rle}: performs Relative Log Expression boxplots and formats the output with outliers in the \Rclass{aqmobj.rle} object.
+\item \Rfunction{aqm.nuse}: computes Normalised Unscaled Standard Error boxplots and outlier detection on it and formats the output as an object \Rclass{aqmobj.nuse}.
+\item \Rfunction{aqm.qcstats}: draws the QCStats plot from the \Rpackage{simpleaffy} package and creates an object of class \Rclass{aqmobj.qcs}.
+\item \Rfunction{aqm.pmmm}:  draws density plots of the Perfect Matches probes and the MisMatch probes and generates an object\Rclass{aqmobj.pmmm}.
+\end{itemize}
+
+The functions available to render the output:
+\begin{itemize}
+\item \Rfunction{aqm.plot}: allows to plot in a R device any object of class \Rclass{aqmobj.xxx} which contain a slot plot.
+\item \Rfunction{aqm.qm.report}: write
+\end{itemize}
+
+\section{Example of a customized report}
+
+We will create a report with only 2 quality metrics, the boxplots and the density plots.
+First we need to load the needed packages and the data.
+
+<<loading>>=
+library("arrayQualityMetrics")
+library("ALLMLL")
+data(MLL.A) 
+@
+
+We need to create an object \Rclass{aqmobj.prepdata} to be able to call the quality metrics functions.
+<<DataPreparation>>=
+dataprep = aqm.prepdata(MLL.A, TRUE)
+@ 
+
+We compute the boxplot and density plots metrics and then create a list containing both of them.
+<<metrics>>=
+bo = aqm.boxplot(dataprep)
+de = aqm.density(dataprep)
+obj = list("Boxplot" = bo, "Density" = de)
+@ 
+
+We now can write a small report containing those two metrics.
+<<shortReport>>=
+aqm.writereport("Customized example", MLL.A, obj)
+@ 
+
+\section{How to add your own metrics}
 Here is an example of a function, studying the GC content effects, that can be added to the report. 
 %
-<<options,echo=FALSE>>=
+<<options>>=
 
 #setClassUnion("aqmOneCol", c("ExpressionSet", "AffyBatch"))
 # 

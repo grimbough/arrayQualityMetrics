@@ -96,12 +96,11 @@ setMethod("aqm.plot",signature(obj = "aqmobj.msd"), function(obj){
   meanSdPlot(obj$plot)})
   
 ##To create the title
-aqm.make.title = function(arg)
+aqm.make.title = function(name)
   {
-    argum = arg$expressionset
     p = openPage('QMreport.html')
     hwrite("<hr>", p)
-    title = paste(deparse(substitute(argum)), " quality metrics report", sep="")
+    title = if(!is.character(name)) paste(deparse(substitute(name)), " quality metrics report", sep="") else paste(name, " quality metrics report", sep="")
     hwrite(title, p, heading=1, style='text-align:center;font-family:helvetica,arial,sans-serif')
     hwrite("<hr>", p)
     return(p)
@@ -119,11 +118,11 @@ aqm.make.section = function(p, s, qm)
 ##To create the index
 aqm.make.index = function(obj, p)
 {
+  s = 1
   hwrite("<hr>", p)
   hwrite("Index",p, heading=2, style='font-family:helvetica,arial,sans-serif')
 
   hwrite("<UL>", p)
-  s = 1
   lasttype = "FAKE"
   for(i in seq_len(length(obj)))
     {
@@ -202,32 +201,34 @@ scores = function(expressionset, obj)
     nscores = 0
     namesm = c()
 
-    if(length(obj$maplot) != 0)
+    classes = sapply(seq(along = obj), function(i) class(obj[[i]]))
+
+    if(length(grep("aqmobj.ma",classes)) != 0)
       {
         nscores = nscores +1
         namesm = c(namesm, "MA plots")
       }
-    if(length(obj$spatial) != 0)
+    if(length(grep("aqmobj.spatial",classes)) != 0)
       {
         nscores = nscores +1
         namesm = c(namesm, "Spatial distribution")
       }
-    if(length(obj$boxplot) != 0)
+    if(length(grep("aqmobj.box",classes)) != 0)
       {
         nscores = nscores +1
         namesm = c(namesm, "Boxplots")
       }
-    if(length(obj$heatmap) != 0)
+    if(length(grep("aqmobj.heat",classes)) != 0)
       {
         nscores = nscores +1
         namesm = c(namesm, "Heatmap")
       }
-    if(length(obj$rle) != 0)
+    if(length(grep("aqmobj.rle",classes)) != 0)
       {
         nscores = nscores +1
         namesm = c(namesm, "RLE")
       }
-    if(length(obj$nuse) != 0)
+    if(length(grep("aqmobj.nuse",classes)) != 0)
       {
         nscores = nscores +1
         namesm = c(namesm, "NUSE")
@@ -255,3 +256,40 @@ scores = function(expressionset, obj)
   }
 
 
+
+aqm.writereport = function(name, expressionset, obj)
+  {
+    sec = 1
+    p = aqm.make.title(name)
+  
+    sc = scores(expressionset, obj)
+    col = rep(c("#d0d0ff","#e0e0f0"), (ceiling((nrow(sc)+1)/2))) #
+
+    if(nrow(sc) < length(col))  
+      col = col[seq_len((length(col)-(abs((nrow(sc)+1) - length(col)))))]
+
+    boldset = 'font-weight:bold;text-align:center;font-family:Lucida Grande;font-size:10pt'
+    normset = 'text-align:center;font-family:Lucida Grande;font-size:10pt'
+
+    hwrite("Summary",p, heading=2, style='font-family:helvetica,arial,sans-serif')
+    hwrite(sc, p, border=0, bgcolor = matrix(col, ncol=ncol(sc), nrow=(nrow(sc)+1)), cellpadding = 2, cellspacing = 5, style=matrix(c(rep(boldset, ncol(sc)), rep(c(boldset, rep(normset, ncol(sc)-1)), nrow(sc))), ncol=ncol(sc), nrow=(nrow(sc)+1), byrow=TRUE))
+          
+    hwrite("*array identified as having a potential problem or as being an outlier.",style=normset,p)
+
+    aqm.make.index(obj, p)
+
+    lasttype = "FAKE"
+    
+    for(i in seq(along = obj))
+      {
+        if(obj[[i]]$type != lasttype)
+          {
+            aqm.make.section(p, s = sec, qm = obj[[i]])
+            sec = sec+1
+          }
+        aqm.report.qm(p, obj[[i]], i, names(obj)[i])
+        lasttype = obj[[i]]$type
+      }
+    
+    aqm.make.ending(p)
+  }

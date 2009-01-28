@@ -1,29 +1,3 @@
-1. Spatial plots
------------------
-c. Layout of the PNGs (array 1) and links (to arrays 2...n) on the main page is irregular - clean up. Use table environment?
-d. For each of the additional PNGs (2...n), link could go not directly to the PNG but to a short HTML wrapper that gives a caption with array name (number as well as full name) at the bottom.
-
-2. Design
----------
-Use lattice throughout 
-
-4.) Rendering of the output
-----------------------------
-Abstract the output from HTML, writeReport should internally use a
-suitable meta-language that then can be easily rendered into HTML and
-Latex/PDF.
-
-7.) Assessment
----------------
-Develop criteria for identifying "outlier" arrays. This could be done
-(a) on the box-plots/intensity distributions (Section 3) and (b) the
-clustering that underlies the heatmap (Section 4).
-
-Section 2, spatial plots: we could develop a measure of homogeneity to
-flag arrays with gross features (perhaps based on Fourier or Wavelet
-spectra). Need to check literature, I would expect that this has been
-descrined.
-
 9.) Duplicate correlation
 -------------------------
 If featureData contains a factor that identifies features containing 
