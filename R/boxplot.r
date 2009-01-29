@@ -11,9 +11,9 @@ aqm.boxplot = function(dataprep, ...)
       box = bwplot(dataprep$dat ~ as.vector(col(dataprep$dat)), pch = "|", col = "black", do.out = FALSE, fill = "#1F78B4", horizontal = FALSE, box.ratio = 2, xlab = "", ylab = "Intensities", asp = "iso", ...)
       shape = "square"
     }
-  legspe = if(dataprep$nchannels == 2) "The left panel corresponds to the red channel. The middle panel shows the green channel. The right panel shows the boxplots of log2(ratio)." else ""
+  legspe = if(dataprep$nchannels == 2) "The left panel corresponds to the red channel. The middle panel shows the green channel. The right panel shows the boxplots of log<sub>2</sub>(ratio)." else ""
   
-  legend = sprintf("<b>Figure FIG</b> presents boxplots of the log<sub>2</sub>(Intensities). Each box corresponds to one array. %s Typically, one expects the boxes to have similar size (IQR) and y position (median).", legspe)
+  legend = sprintf("The <b>figure <!-- FIG --></b> presents boxplots of the log<sub>2</sub>(Intensities). Each box corresponds to one array. %s Typically, one expects the boxes to have similar size (IQR) and y position (median).", legspe)
 
   title = "Boxplots"
   type = "Homogeneity between arrays"

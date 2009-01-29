@@ -171,8 +171,8 @@ aqm.report.qm = function(p, qm, f, name)
     dev.off()   
   
     img = hwriteImage(namepng)
-    hwrite(c(qm$title, "", img,  paste("Figure",f)), p, dim=c(2,2), style='font-weight:bold;text-align:center;font-family:helvetica', border=0, link=list(NA,NA,namepdf,namepdf))
-    hwrite(qm$legend, p, style='text-align:justify;font-family:Lucida Grande;font-size:10pt')
+    hwrite(c(img,  paste("Figure ",f,": ",qm$title, sep="")), p, dim=c(2,1), style='font-weight:bold;text-align:center;font-family:helvetica', border=0, link=list(namepdf,NA))
+    hwrite(paste("<br>",qm$legend), p, style='text-align:justify;font-family:Lucida Grande;font-size:10pt')
   }
 
 ##To end the report

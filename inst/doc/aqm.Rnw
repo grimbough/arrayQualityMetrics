@@ -26,7 +26,7 @@
 \section*{Introduction}
 In the vignette arrayQualityMetrics.pdf, you can learn how to use the arrayQualityMetrics function to create a full report. In this vignette, we show how to only run one or several of the metrics and how to add your own modules to customize the report.
 
-\section{Metrics available in the report}
+\section{Functions to format the data for aqm functions usage}
 
 There are two functions to prepare the data:
 \begin{itemize}
@@ -34,6 +34,8 @@ There are two functions to prepare the data:
 \item \Rfunction{aqm.prepaffy}: generates a \Rclass{aqmobj.prepaffy} object which is needed for some of the Affymetrix specific functions.
 \end{itemize}
 
+\section{Metrics available in the report}
+\subsection{Functions with outlier detection}
 The functions to compute quality metrics are the following, the output objects contain the plot, the legend, the title, the name of the section it belongs to in the report, the scores per array that are used to perform the outlier detection and the array names that are detected as outliers:
 \begin{itemize}
 \item \Rfunction{aqm.maplot}: draws the M versus A plot and generates an object \Rclass{aqmobj.ma}.
@@ -42,6 +44,7 @@ The functions to compute quality metrics are the following, the output objects c
 \item \Rfunction{aqm.heatmap}: computes the heatmap of the array-distances and generates an object \Rclass{aqmobj.heatmap}.
 \end{itemize}
 
+\subsection{Functions without outlier detection}
 The following functions also compute quality metrics with the same output as before but without the outlier detection:
 \begin{itemize}
 \item \Rfunction{aqm.spatialbg}: represents the spatial distribution of the rank background intensities and generates an object \Rclass{aqmobj.spatialbg}.
@@ -50,6 +53,7 @@ The following functions also compute quality metrics with the same output as bef
 \item \Rfunction{aqm.probesmap}: draws density plots of two classes of probes as annotated in the "hasTarget" column of the \Rclass{featureData} and generates an object \Rclass{aqmobj.probesmap}.
 \end{itemize}
 
+\subsection{Functions for Affymetrix data}
 The functions available for Affymetrix datasets:
 \begin{itemize}
 \item \Rfunction{aqm.rnadeg}: is used to represent the RNA degradation plot and creates the object \Rclass{aqmobj.rnadeg}.
@@ -59,6 +63,7 @@ The functions available for Affymetrix datasets:
 \item \Rfunction{aqm.pmmm}:  draws density plots of the Perfect Matches probes and the MisMatch probes and generates an object\Rclass{aqmobj.pmmm}.
 \end{itemize}
 
+\section{Formatting of the output in a report}
 The functions available to render the output:
 \begin{itemize}
 \item \Rfunction{aqm.plot}: allows to plot in a R device any object of class \Rclass{aqmobj.xxx} which contain a slot plot.
@@ -72,13 +77,15 @@ First we need to load the needed packages and the data.
 
 <<loading>>=
 library("arrayQualityMetrics")
-library("ALLMLL")
-data(MLL.A) 
+library("CCl4")
+library("vsn")
+data(CCl4)
+nCCl4 = justvsn(CCl4,subsample=2200)
 @
 
 We need to create an object \Rclass{aqmobj.prepdata} to be able to call the quality metrics functions.
 <<DataPreparation>>=
-dataprep = aqm.prepdata(MLL.A, TRUE)
+dataprep = aqm.prepdata(nCCl4, FALSE)
 @ 
 
 We compute the boxplot and density plots metrics and then create a list containing both of them.
@@ -90,94 +97,83 @@ obj = list("Boxplot" = bo, "Density" = de)
 
 We now can write a small report containing those two metrics.
 <<shortReport>>=
-aqm.writereport("Customized example", MLL.A, obj)
+aqm.writereport("Customized example", nCCl4, obj)
 @ 
 
 \section{How to add your own metrics}
-Here is an example of a function, studying the GC content effects, that can be added to the report. 
+Here is an example of a function, studying the GC content effects, that can be added to the report.
+
+In this example, we are writing the function \Rfunction{aqm.gc} to represent boxplots by GC content of the probes.
+
+\subsection{Creating the aqm function and aqmobj class}
+The first step is to write the function. For the example, we will only make it work for \Rclass{NChannelSet}.
 %
-<<options>>=
+<<aqm.gc>>=
+setClass("aqmobj.gc", representation(plot="list", type="character", title="character", legend="character", shape="character"))
 
-#setClassUnion("aqmOneCol", c("ExpressionSet", "AffyBatch"))
-# 
-#setGeneric("gcplot",
-#           function(expressionset, dataprep, ngc, colb, colg, colr, fac, ...)
-#           standardGeneric("gcplot"))
-# 
-#setMethod("gcplot",signature(expressionset = "NChannelSet"), function(expressionset, dataprep, ngc, colb, colg, colr, fac, ...)
-#          {
-#            df = data.frame(rep(fac, ncol(dataprep$dat)), as.numeric(dataprep$rc), as.numeric(dataprep$gc), as.numeric(dataprep$dat))
-#            colnames(df) = c("GC","rc","gc","dat")
-#            
-#            den1 = densityplot( ~ rc, data = df, groups = GC, plot.points = FALSE, xlab = "", ylab = "Density", col = colr[ngc])      
-#            den2 = densityplot( ~ gc, data = df, groups = GC, plot.points = FALSE, xlab = "", ylab = "", col = colg[ngc])
-#            den3 = densityplot( ~ dat, data = df, groups = GC, plot.points = FALSE, xlab ="", ylab = "", col = colb[ngc])            
-#            
-#            box1 = bwplot(rc ~ GC, data = df, fill = colr[ngc], pch = "|", do.out = FALSE, box.ratio = 2, xlab = "Red Intensity", ylab = "GC content", horizontal = FALSE)
-#            box2 = bwplot(gc ~ GC, data = df, fill = colg[ngc], pch = "|", do.out = FALSE, box.ratio = 2, xlab = "Green Intensity", ylab = "", horizontal = FALSE)
-#            box3 = bwplot(dat ~ GC, data = df, fill = colb[ngc], pch = "|", do.out = FALSE, box.ratio = 2, xlab = "Log(ratio)", ylab = "", horizontal = FALSE)
-# 
-#            denbox = list("den1" = den1, "den2" = den2, "den3" = den3, "box1" =  box1, "box2" = box2, "box3" = box3)
-#          })
-# 
-#setMethod("gcplot",signature(expressionset = "aqmOneCol"), function(expressionset, dataprep, ngc, colb, colg, colr, fac, ...)
-#          {
-#            df = data.frame(rep(fac, ncol(dataprep$dat)), as.numeric(dataprep$dat))
-#            colnames(df) = c("GC","dat")
-#            
-#            den = densityplot(~ dat, data = df, groups = GC, col = colb[ngc], plot.points = FALSE, xlab = "", ylab = "Density")            
-#            box = bwplot(dat ~ GC, data = df, fill = colb[ngc], pch = "|", do.out = FALSE, horizontal = FALSE, box.ratio = 2, xlab = "Intensity", ylab = "GC content", horizontal = FALSE)            
-#            denbox = list(den, box)
-#          })
-# 
-# 
-#aqm.gc = function(expressionset, dataprep, ...)
-#{  
-#  colb = brewer.pal(9, "Blues")
-#  colg = brewer.pal(9, "Greens")
-#  colr = brewer.pal(9, "OrRd")         
-#  fac = round(as.numeric(as.matrix(featureData(expressionset)$GC)),-1)      
-#  maxcol = length(unique(fac[!is.na(fac)]))
-#  ngc = 1:maxcol
-# 
-#  plotgc = gcplot(expressionset = expressionset, dataprep = dataprep, ngc = ngc, colb = colb, colg = colg, colr = colr, fac = fac, ...)
-#  
-#  title = "GC content effect"
-#  
-#  type = "Platform quality assessment"
-#  
-#  legend = "<b>Figure FIG</b> shows the distributions of the log<sub>2</sub> intensities grouped by the percentage of cytosines (C) and guanines (G) among the nucleotides in each probe. From the top to the bottom, kernel density estimates, empirical cumulative distribution functions (ECDF) and boxplots are represented. Box and line colors in the three panels correspond to the same groups, the darker is the colour, the higher is the GC content. Cytosine and guanine are able to form three hydrogen bonds, while adenine (A) and thymine (T) only form two, hence oligonucleotides with a higher proportion of C and G can form more stable hybridization bindings. This should result in higher intensities measured on the array, regardless of the abundance of target molecules.</DIV>"
-#    
-#  out = list("plot" = plotgc, "type" = type, "title" = title, "legend" = legend)
-#  class(out) = "aqmobj.gc"
-#  return(out)   
-#setMethod("aqm.plot",signature(obj = "aqmobj.gc"), function(obj){
-#  box.rectangle <- trellis.par.get("box.rectangle")
-#  box.rectangle$col = "black"
-#  trellis.par.set("box.rectangle",box.rectangle)
-#  box.umbrella <- trellis.par.get("box.umbrella")
-#  box.umbrella$col = "black"
-#  trellis.par.set("box.umbrella",box.umbrella)
-#  if(length(obj$plot) == 6)
-#    {
-#      print(obj$plot$den1, split = c(1,1,3,2), newpage = FALSE)
-#      print(obj$plot$den2, split = c(2,1,3,2), newpage = FALSE)
-#      print(obj$plot$den3, split = c(3,1,3,2), newpage = FALSE)
-#      print(obj$plot$box1, split = c(1,2,3,2), newpage = FALSE)
-#      print(obj$plot$box2, split = c(2,2,3,2), newpage = FALSE)
-#      print(obj$plot$box3, split = c(3,2,3,2), newpage = FALSE)
-#    }
-#  if(length(obj$plot) == 2)
-#    {
-#      print(obj$plot$den, split = c(1,1,1,2), newpage = FALSE)
-#      print(obj$plot$box, split = c(1,2,1,2), newpage = FALSE)
-#    }
-#})
+setGeneric("aqm.gc",
+           function(expressionset, dataprep, ...)
+           standardGeneric("aqm.gc"))
+ 
+setMethod("aqm.gc",signature(expressionset = "NChannelSet"), function(expressionset, dataprep, ...)
+          {
+            fac = round(as.numeric(as.matrix(featureData(expressionset)$GC)),-1)      
+            df = data.frame(rep(fac, ncol(dataprep$dat)), as.numeric(dataprep$rc), as.numeric(dataprep$gc), as.numeric(dataprep$dat))
+            colnames(df) = c("GC","rc","gc","dat")
+  
+            box1 = bwplot(rc ~ GC, data = df, pch = "|", do.out = FALSE, box.ratio = 2, xlab = "Red Intensity", ylab = "GC content", horizontal = FALSE, fill="red")
+            box2 = bwplot(gc ~ GC, data = df, pch = "|", do.out = FALSE, box.ratio = 2, xlab = "Green Intensity", ylab = "", horizontal = FALSE, fill="green")
+            box3 = bwplot(dat ~ GC, data = df, pch = "|", do.out = FALSE, box.ratio = 2, xlab = "Log(ratio)", ylab = "", horizontal = FALSE, fill="blue")
+              
+            plotgc = list("box1" =  box1, "box2" = box2, "box3" = box3)
+  
+            title = "GC content effect"
+  
+            type = "Platform quality assessment"
+  
+            legend = "<b>Figure FIG</b> shows the distributions of the log<sub>2</sub> intensities grouped by the percentage of cytosines (C) and guanines (G) among the nucleotides in each probe. From the top to the bottom, kernel density estimates, empirical cumulative distribution functions (ECDF) and boxplots are represented. Box and line colors in the three panels correspond to the same groups, the darker is the colour, the higher is the GC content. Cytosine and guanine are able to form three hydrogen bonds, while adenine (A) and thymine (T) only form two, hence oligonucleotides with a higher proportion of C and G can form more stable hybridization bindings. This should result in higher intensities measured on the array, regardless of the abundance of target molecules.</DIV>"
+              
+            out = list("plot" = plotgc, "type" = type, "title" = title, "legend" = legend, "shape" = "rect")
+            class(out) = "aqmobj.gc"
+            return(out)   
+          })
+@ 
 
-#}
-@
+\subsection{Creating a method for aqm.plot}
+Once the \Rfunction{aqm.gc} is written, we need to write a \Rfunction{aqm.plot} method for it, to be able to draw the plot with the desired settings.
+
 %
+<<aqm.plot.aqm.gc>>=
+setMethod("aqm.plot",signature(obj = "aqmobj.gc"), function(obj){
+  print(obj$plot$box1, split = c(1,1,3,1), newpage = FALSE)
+  print(obj$plot$box2, split = c(2,1,3,1), newpage = FALSE)
+  print(obj$plot$box3, split = c(3,1,3,1), newpage = FALSE)
+})
+@ 
 
+\subsection{Example of application}
+We can call the function on an example dataset. We first create a column "GC" in the \Rclass{featureData} of the object \Robject{nCCl4}.
+
+<<createGC>>=
+datapath = system.file("extdata", package="CCl4")
+seq = read.AnnotatedDataFrame("013162_D_SequenceList_20060815.txt", path=datapath)
+if(any(duplicated(featureNames(seq))))
+  cat("IDs of the sequence file are not unique \n")
+bc = basecontent(seq$Sequence)
+GC = ((bc[,"C"]+bc[,"G"])/rowSums(bc))*100
+mt = match(featureNames(seq), fData(nCCl4)$ID)
+stopifnot(!any(is.na(mt)))
+fData(nCCl4)$GC = "NA"
+fData(nCCl4)$GC[mt] = GC
+@ 
+
+Now, we can run the GC content study on this object.
+<<aqm.plot.aqm.gc>>=
+library(lattice)
+dataprep = aqm.prepdata(nCCl4, FALSE)
+testgc = aqm.gc(nCCl4,dataprep)
+aqm.plot(testgc)
+@ 
 
 \subsection*{Session Info}
 %

@@ -207,7 +207,7 @@ aqm.spatialbg = function(expressionset, dataprep)
   title = "Spatial distribution of local background intensities"
   type = "Individual array quality"
   
-  legend = sprintf("<b>Figure FIG:</b> False color representations of the arrays' spatial distributions of feature local background estimates. The color scale is shown in the panel on the right, and it is proportional to the ranks of the probe background intensities.")
+  legend = sprintf("The <b>figure <!-- FIG --> </b> shows false color representations of the arrays' spatial distributions of feature local background estimates. The color scale is shown in the panel on the right, and it is proportional to the ranks of the probe background intensities.")
 
   out = list("plot" = bg, "type" = type, "title" = title, "legend" = legend, "shape" = "square")
   class(out) = "aqmobj.spatialbg"
@@ -221,7 +221,7 @@ aqm.spatial = function(expressionset, dataprep)
   title = "Spatial distribution of feature intensities"
   type = "Individual array quality"
 
-  legend = sprintf("<b>Figure FIG:</b> False color representations of the arrays' spatial distributions of feature intensities. The color scale is shown in the panel on the right, and it is proportional to the ranks of the probe intensities. This has indeed the potential to detect patterns that are small in amplitude, but systematic within array. These may not be consequential for the downstream data analysis, but if properly interpreted, could e.g. still be useful for technology and experimental protocol optimisation as it helps in identifying patterns that may be caused by, for example, spatial gradients in the hybridization chamber, air bubbles, spotting or plating problems.")          
+  legend = sprintf("The<b>figure <!-- FIG --></b> False color representations of the arrays' spatial distributions of feature intensities. The color scale is shown in the panel on the right, and it is proportional to the ranks of the probe intensities. This has indeed the potential to detect patterns that are small in amplitude, but systematic within array. These may not be consequential for the downstream data analysis, but if properly interpreted, could e.g. still be useful for technology and experimental protocol optimisation as it helps in identifying patterns that may be caused by, for example, spatial gradients in the hybridization chamber, air bubbles, spotting or plating problems.")          
 
   if(!inherits(expressionset, "BeadLevelList"))
     loc = scoresspat(expressionset, dataprep, dataprep$dat)
