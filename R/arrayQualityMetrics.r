@@ -20,6 +20,7 @@ setMethod("arrayQualityMetrics",signature(expressionset = "aqmInputObj"), functi
                 
             arg = as.list(match.call(expand.dots = TRUE))
             name = arg$expressionset
+            name = deparse(substitute(name))
             f = 1
             obj = list()
     

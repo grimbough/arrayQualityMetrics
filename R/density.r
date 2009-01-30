@@ -21,7 +21,7 @@ aqm.density = function(dataprep, ...)
       shape = "square"
     }
       
-  legend = "The <b>figure <!-- FIG --></b> shows density estimates (histograms) of the data. Arrays whose distributions are very different from the others should be considered for possible problems."
+  legend = "The <b>figure <!-- FIG --></b> shows density estimates (histograms) of the data. We expect arrays to have similar trend and range to be comparable with each other. Arrays whose distributions are very different from the others should be considered for possible problems. On raw data, a bimodal distribution can be indicative of an array containing a spatial artifact and an array shifted to the right of an array with abnormal higher background intensities.  The purpose of normalization is to adjust the data for unwanted imbalances, drifts or biases."
   
   title = "Density plots"
   type = "Homogeneity between arrays"

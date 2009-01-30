@@ -25,6 +25,12 @@
 
 \section*{Introduction}
 In the vignette arrayQualityMetrics.pdf, you can learn how to use the arrayQualityMetrics function to create a full report. In this vignette, we show how to only run one or several of the metrics and how to add your own modules to customize the report.
+%
+<<options,echo=FALSE>>=
+if (Sys.info()["sysname"] == "Darwin")
+  options(bitmapType = "cairo")
+@
+%
 
 \section{Functions to format the data for aqm functions usage}
 
@@ -109,34 +115,51 @@ In this example, we are writing the function \Rfunction{aqm.gc} to represent box
 The first step is to write the function. For the example, we will only make it work for \Rclass{NChannelSet}.
 %
 <<aqm.gc>>=
-setClass("aqmobj.gc", representation(plot="list", type="character", title="character", legend="character", shape="character"))
+ setClass("aqmobj.gc", representation(plot="list",
+                                     type="character",
+                                     title="character",
+                                     legend="character",
+                                     shape="character"))
 
 setGeneric("aqm.gc",
            function(expressionset, dataprep, ...)
            standardGeneric("aqm.gc"))
- 
-setMethod("aqm.gc",signature(expressionset = "NChannelSet"), function(expressionset, dataprep, ...)
-          {
-            fac = round(as.numeric(as.matrix(featureData(expressionset)$GC)),-1)      
-            df = data.frame(rep(fac, ncol(dataprep$dat)), as.numeric(dataprep$rc), as.numeric(dataprep$gc), as.numeric(dataprep$dat))
-            colnames(df) = c("GC","rc","gc","dat")
+        
+setMethod("aqm.gc",signature(expressionset = "NChannelSet"), 
+          function(expressionset, dataprep, ...) {
+  fac = round(as.numeric(as.matrix(featureData(expressionset)$GC)),-1)      
+  df = data.frame(rep(fac, ncol(dataprep$dat)), as.numeric(dataprep$rc), 
+    as.numeric(dataprep$gc), as.numeric(dataprep$dat))
+  colnames(df) = c("GC","rc","gc","dat")
   
-            box1 = bwplot(rc ~ GC, data = df, pch = "|", do.out = FALSE, box.ratio = 2, xlab = "Red Intensity", ylab = "GC content", horizontal = FALSE, fill="red")
-            box2 = bwplot(gc ~ GC, data = df, pch = "|", do.out = FALSE, box.ratio = 2, xlab = "Green Intensity", ylab = "", horizontal = FALSE, fill="green")
-            box3 = bwplot(dat ~ GC, data = df, pch = "|", do.out = FALSE, box.ratio = 2, xlab = "Log(ratio)", ylab = "", horizontal = FALSE, fill="blue")
+  box1 = bwplot(rc ~ GC, data = df, pch = "|", do.out = FALSE,
+    box.ratio = 2, xlab = "Red Intensity", ylab = "GC content", 
+    horizontal = FALSE, fill="red")
+  box2 = bwplot(gc ~ GC, data = df, pch = "|", do.out = FALSE, 
+    box.ratio = 2, xlab = "Green Intensity", ylab = "", 
+    horizontal = FALSE, fill="green")
+  box3 = bwplot(dat ~ GC, data = df, pch = "|", do.out = FALSE, 
+    box.ratio = 2, xlab = "Log(ratio)", ylab = "", 
+    horizontal = FALSE, fill="blue")
               
-            plotgc = list("box1" =  box1, "box2" = box2, "box3" = box3)
+  plotgc = list("box1" =  box1, "box2" = box2, "box3" = box3)
   
-            title = "GC content effect"
+  title = "GC content effect"
   
-            type = "Platform quality assessment"
+  type = "Platform quality assessment"
   
-            legend = "<b>Figure FIG</b> shows the distributions of the log<sub>2</sub> intensities grouped by the percentage of cytosines (C) and guanines (G) among the nucleotides in each probe. From the top to the bottom, kernel density estimates, empirical cumulative distribution functions (ECDF) and boxplots are represented. Box and line colors in the three panels correspond to the same groups, the darker is the colour, the higher is the GC content. Cytosine and guanine are able to form three hydrogen bonds, while adenine (A) and thymine (T) only form two, hence oligonucleotides with a higher proportion of C and G can form more stable hybridization bindings. This should result in higher intensities measured on the array, regardless of the abundance of target molecules.</DIV>"
+  legend = "<b>Figure FIG</b> shows the boxplots of the log<sub>2</sub> intensities 
+grouped by the percentage of cytosines (C) and guanines (G) among the nucleotides in 
+each probe. Cytosine and guanine are able to form three hydrogen bonds, while adenine 
+(A) and thymine (T) only form two, hence oligonucleotides with a higher proportion of 
+C and G can form more stable hybridization bindings. This should result in higher 
+intensities measured on the array, regardless of the abundance of target molecules."
               
-            out = list("plot" = plotgc, "type" = type, "title" = title, "legend" = legend, "shape" = "rect")
-            class(out) = "aqmobj.gc"
-            return(out)   
-          })
+  out = list("plot" = plotgc, "type" = type, "title" = title, 
+             "legend" = legend, "shape" = "rect")
+  class(out) = "aqmobj.gc"
+  return(out)   
+})      
 @ 
 
 \subsection{Creating a method for aqm.plot}

@@ -100,7 +100,7 @@ aqm.make.title = function(name)
   {
     p = openPage('QMreport.html')
     hwrite("<hr>", p)
-    title = if(!is.character(name)) paste(deparse(substitute(name)), " quality metrics report", sep="") else paste(name, " quality metrics report", sep="")
+    title = paste(name, " quality metrics report", sep="")
     hwrite(title, p, heading=1, style='text-align:center;font-family:helvetica,arial,sans-serif')
     hwrite("<hr>", p)
     return(p)
