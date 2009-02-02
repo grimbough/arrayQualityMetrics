@@ -74,6 +74,16 @@ setMethod("arrayQualityMetrics",signature(expressionset = "aqmInputObj"), functi
                 f = f+1
               }
 
+	     if(all(intgroup %in% names(phenoData(expressionset)@data)))
+		{
+                    obj$pca = try(aqm.pca(expressionset = expressionset, dataprep = datap, intgroup))
+                    if(inherits(obj$pca,"try-error"))
+                      warning("Cannot draw PCA \n") else {
+                     obj$pca$legend = gsub("<!-- FIG -->",f,obj$pca$legend)
+                     f = f+1
+                     }
+                }
+
             obj$meansd = try(aqm.meansd(dataprep = datap))
             if(inherits(obj$meansd,"try-error"))
               warning("Cannot draw Mean vs Standard Deviation \n") else {

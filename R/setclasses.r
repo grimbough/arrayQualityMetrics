@@ -16,6 +16,8 @@ setClass("aqmobj.dens", representation(plot="ANY", type="character", title="char
 
 setClass("aqmobj.heat", representation(plot="ANY", type="character", title="character", legend="character", scores="numeric", outliers="ANY", shape = "character"))
 
+setClass("aqmobj.pca", representation(plot="ANY", type="character", title="character", legend="character", shape = "character"))
+
 setClass("aqmobj.ma", representation(plot="ANY", type="character", title="character", legend="character", scores="numeric", outliers="ANY", shape = "character"))
 
 setClass("aqmobj.spatial", representation(plot="ANY", type="character", title="character", legend="character", scores="numeric", outliers="ANY", shape = "character"))

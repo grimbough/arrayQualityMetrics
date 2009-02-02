@@ -25,7 +25,7 @@ hmap = function(expressionset, sN, outM, numArrays, intgroup, ...)
         covar = lapply(seq(along = intgroup), function(i) pData(expressionset)[colnames(pData(expressionset))==intgroup[i]][,1])
         lev = lapply(seq(along = intgroup), function(i) levels(as.factor(unlist(covar[i]))))
         corres = lapply(seq(along = intgroup), function(i) matrix(0,nrow=length(lev[[i]]),ncol=2))
-        colourCov = lapply(seq(along = intgroup), function(i) brewer.pal(8,rownames(brewer.pal.info[brewer.pal.info$category=="qual",])[i]))
+        colourCov = lapply(seq(along = intgroup), function(i) brewer.pal(8,rownames(brewer.pal.info[brewer.pal.info$category=="qual",])[7-i]))
 
         key = lapply(seq(along = intgroup), function(i) list(rect = list(col=unlist(colourCov[i])[as.factor(levels(as.factor(unlist(covar[i]))))]), text = list(levels(as.factor(unlist(covar[i]))))))
         key = unlist(key, recursive=F)

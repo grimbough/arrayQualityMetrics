@@ -1,4 +1,4 @@
-setClassUnion("aqmTrellis", c("aqmobj.ma", "aqmobj.heat", "aqmobj.probesmap", "aqmobj.spatial", "aqmobj.spatialbg"))
+setClassUnion("aqmTrellis", c("aqmobj.ma", "aqmobj.heat", "aqmobj.pca", "aqmobj.probesmap", "aqmobj.spatial", "aqmobj.spatialbg"))
 
 ##Creation of the outdir
 dircreation = function(outdir = getwd(), force = FALSE)
