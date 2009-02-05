@@ -1,0 +1,36 @@
+\name{aqmobj.pca-class}
+\docType{class}
+\alias{aqmobj.pca-class}
+\alias{aqmobj.pca}
+\alias{class.aqmobj.pca}
+
+\title{ Class to contain data generated from aqm.pca. }
+
+\description{ Class to contain data generated from aqm.pca. }
+
+\section{Slots}{
+  \describe{
+    \item{\code{plot}:}{ An object of class
+      \code{\link[lattice:trellis.object]{trellis.object}}. }
+
+    \item{\code{type}:}{ A character string with a name for the section
+      the plot belongs to in the report. }
+    
+    \item{\code{title}:}{ A character string with the title of the plot
+      to be written in the report. }
+    
+    \item{\code{legend}:}{ A character string with the legend of the plot
+      to be written in the report. }
+        
+    \item{\code{shape}:}{ A character "square" or "rect" depending on
+    the aspect ratio desired in the report. }
+  }
+}
+
+\author{Audrey Kauffmann <audrey@ebi.ac.uk>}
+
+\seealso{ \code{aqm.pca}, \code{aqm.plot}. }
+
+\examples{
+}
+\keyword{classes}
