@@ -22,10 +22,7 @@
 \author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
 
 \examples{
-  \dontrun{
-    library(CCl4)
-    data(CCl4)
-    dataprep = aqm.prepdata(CCl4, TRUE)
-    pm = aqm.probesmap(dataprep, CCl4)
-    }
+    data(CCl4norm)
+    data(CCl4prep)
+    pm = aqm.probesmap(CCl4norm, CCl4prep)
 }

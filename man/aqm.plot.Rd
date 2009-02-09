@@ -41,11 +41,7 @@ aqm.plot(obj)
 }
 
 \examples{
-  \dontrun{
-    library(ALLMLL)
-    data(MLL.A)
-    dataprep = aqm.prepdata(MLL.A, TRUE)
-    ma = aqm.maplot(dataprep)
+    data(CCl4prep)
+    ma = aqm.maplot(CCl4prep)
     aqm.plot(ma)
-    }
 }

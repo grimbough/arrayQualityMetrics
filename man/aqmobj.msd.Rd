@@ -32,10 +32,8 @@
 \seealso{ \code{aqm.meansd}, \code{aqm.plot} }
 
 \examples{
-    library(CCl4)
-    data(CCl4)
-    dataprep = aqm.prepdata(CCl4, TRUE)
-    sd = aqm.meansd(dataprep)
+    data(CCl4prep)
+    sd = aqm.meansd(CCl4prep)
     class(sd)
     show(sd)
     aqm.plot(sd)

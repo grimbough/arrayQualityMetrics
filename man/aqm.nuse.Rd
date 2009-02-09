@@ -23,8 +23,6 @@
   \code{\link{aqmobj.nuse}} }
 
 \examples{
-    library(ALLMLL)
-    data(MLL.A)
-    pa = aqm.prepaffy(MLL.A, sampleNames(MLL.A))
-    nuse = aqm.nuse(pa)
+    data(MLLaffyprep)
+    nuse = aqm.nuse(MLLaffyprep)
 }

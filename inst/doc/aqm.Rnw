@@ -34,24 +34,27 @@ if (Sys.info()["sysname"] == "Darwin")
 
 \section{Functions to format the data for aqm functions usage}
 
-There are two functions to prepare the data:
+There are two functions to prepare the data. They compute intermediate results that are then processed by the \Rfunction{aqm.xxx} functions. They are greedy and slow but as they only are ran once, it allows a better computational efficiency.
+
 \begin{itemize}
-\item \Rfunction{aqm.prepdata}: generates a \Rclass{aqmobj.prepdata} object which is the needed input of all the \Rfunction{aqm.xxx} functions.
-\item \Rfunction{aqm.prepaffy}: generates a \Rclass{aqmobj.prepaffy} object which is needed for some of the Affymetrix specific functions.
+\item \Rfunction{aqm.prepdata}: generates a \Rclass{aqmobj.prepdata} object which can be the input of all the \Rfunction{aqm.xxx} functions.
+\item \Rfunction{aqm.prepaffy}: generates a \Rclass{aqmobj.prepaffy} object which is the input for some of the Affymetrix specific functions.
 \end{itemize}
 
 \section{Metrics available in the report}
 \subsection{Functions with outlier detection}
-The functions to compute quality metrics are the following, the output objects contain the plot, the legend, the title, the name of the section it belongs to in the report, the scores per array that are used to perform the outlier detection and the array names that are detected as outliers:
+The functions to compute quality metrics are the following:
 \begin{itemize}
-\item \Rfunction{aqm.maplot}: draws the M versus A plot and generates an object \Rclass{aqmobj.ma}.
-\item \Rfunction{aqm.spatial}: represents the spatial distribution of the rank foreground intensities and generates an object \Rclass{aqmobj.spatial}.
-\item \Rfunction{aqm.boxplot}: performs the boxplots of the intensities and generates an object \Rclass{aqmobj.box}.
-\item \Rfunction{aqm.heatmap}: computes the heatmap of the array-distances and generates an object \Rclass{aqmobj.heatmap}.
+\item \Rfunction{aqm.maplot}: computes the M versus A plot and generates an object \Rclass{aqmobj.ma}.
+\item \Rfunction{aqm.spatial}: computes the spatial distribution of the ranks for the foreground intensities and generates an object \Rclass{aqmobj.spatial}.
+\item \Rfunction{aqm.boxplot}: computes the boxplots of the intensities and generates an object \Rclass{aqmobj.box}.
+\item \Rfunction{aqm.heatmap}: computes the heatmap of the between-array distances and generates an object \Rclass{aqmobj.heatmap}.
 \end{itemize}
 
+The output objects contain the plot, the legend, the title, the name of the section it belongs to in the report, the scores per array that are used to perform the outlier detection and the array names that are detected as outliers.
+
 \subsection{Functions without outlier detection}
-The following functions also compute quality metrics with the same output as before but without the outlier detection:
+The following functions also compute quality metrics: 
 \begin{itemize}
 \item \Rfunction{aqm.spatialbg}: represents the spatial distribution of the rank background intensities and generates an object \Rclass{aqmobj.spatialbg}.
 \item \Rfunction{aqm.density}: performs the density plots of the intensities and generates an object \Rclass{aqmobj.dens}.
@@ -59,21 +62,24 @@ The following functions also compute quality metrics with the same output as bef
 \item \Rfunction{aqm.probesmap}: draws density plots of two classes of probes as annotated in the "hasTarget" column of the \Rclass{featureData} and generates an object \Rclass{aqmobj.probesmap}.
 \end{itemize}
 
+The output objects contain the plot, the legend, the title and the name of the section it belongs to in the report. No outlier detection is computed for those metrics.
+
 \subsection{Functions for Affymetrix data}
-The functions available for Affymetrix datasets:
+The functions available for Affymetrix datasets are:
 \begin{itemize}
 \item \Rfunction{aqm.rnadeg}: is used to represent the RNA degradation plot and creates the object \Rclass{aqmobj.rnadeg}.
 \item \Rfunction{aqm.rle}: performs Relative Log Expression boxplots and formats the output with outliers in the \Rclass{aqmobj.rle} object.
 \item \Rfunction{aqm.nuse}: computes Normalised Unscaled Standard Error boxplots and outlier detection on it and formats the output as an object \Rclass{aqmobj.nuse}.
 \item \Rfunction{aqm.qcstats}: draws the QCStats plot from the \Rpackage{simpleaffy} package and creates an object of class \Rclass{aqmobj.qcs}.
-\item \Rfunction{aqm.pmmm}:  draws density plots of the Perfect Matches probes and the MisMatch probes and generates an object\Rclass{aqmobj.pmmm}.
+\item \Rfunction{aqm.pmmm}:  draws density plots of the perfect match probes and the mismatch probes and generates an object\Rclass{aqmobj.pmmm}.
 \end{itemize}
 
-\section{Formatting of the output in a report}
+\section{Rendering of the output in a report}
 The functions available to render the output:
 \begin{itemize}
-\item \Rfunction{aqm.plot}: allows to plot in a R device any object of class \Rclass{aqmobj.xxx} which contain a slot plot.
-\item \Rfunction{aqm.qm.report}: write
+\item \Rfunction{aqm.plot}: allows to plot in a R device any object of class \Rclass{aqmobj.xxx} which contains a slot names \texttt{"plot"}.
+\item \Rfunction{aqm.writereport}: writes a html report containing the input metrics.
+
 \end{itemize}
 
 \section{Example of a customized report}
@@ -86,48 +92,52 @@ library("arrayQualityMetrics")
 library("CCl4")
 library("vsn")
 data(CCl4)
-nCCl4 = justvsn(CCl4,subsample=2200)
+nCCl4 = justvsn(CCl4, subsample=2200)
 @
 
 We need to create an object \Rclass{aqmobj.prepdata} to be able to call the quality metrics functions.
 <<DataPreparation>>=
-dataprep = aqm.prepdata(nCCl4, FALSE)
+dataprep = aqm.prepdata(expressionset = nCCl4, do.logtransform = FALSE)
 @ 
 
 We compute the boxplot and density plots metrics and then create a list containing both of them.
 <<metrics>>=
 bo = aqm.boxplot(dataprep)
 de = aqm.density(dataprep)
-obj = list("Boxplot" = bo, "Density" = de)
+qm = list("Boxplot" = bo, "Density" = de)
 @ 
 
 We now can write a small report containing those two metrics.
 <<shortReport>>=
-aqm.writereport("Customized example", nCCl4, obj)
+aqm.writereport(name = "Customized example", expressionset = nCCl4, obj = qm)
 @ 
 
 \section{How to add your own metrics}
 Here is an example of a function, studying the GC content effects, that can be added to the report.
 
-In this example, we are writing the function \Rfunction{aqm.gc} to represent boxplots by GC content of the probes.
+We are writing the function \Rfunction{aqm.GC} to compute boxplots grouped by GC content of the probes.
 
 \subsection{Creating the aqm function and aqmobj class}
-The first step is to write the function. For the example, we will only make it work for \Rclass{NChannelSet}.
-%
-<<aqm.gc>>=
- setClass("aqmobj.gc", representation(plot="list",
-                                     type="character",
+The first step is to create a class for the output object. 
+
+<<aqmobj.GC>>=
+ setClass("aqmobj.GC", representation(plot="list",
+                                     section="character",
                                      title="character",
                                      legend="character",
                                      shape="character"))
+@ 
+Then, we can write the function. For the example, we will only make it work for \Rclass{NChannelSet}.
+'GC' refers to the GC content whereas 'gc' stands for 'green channel' in the data set (with 'rc' being 'red channel' and 'dat' the log(ratio)).
 
-setGeneric("aqm.gc",
+<<aqm.GC>>=
+setGeneric("aqm.GC",
            function(expressionset, dataprep, ...)
-           standardGeneric("aqm.gc"))
+           standardGeneric("aqm.GC"))
         
-setMethod("aqm.gc",signature(expressionset = "NChannelSet"), 
+setMethod("aqm.GC",signature(expressionset = "NChannelSet"), 
           function(expressionset, dataprep, ...) {
-  fac = round(as.numeric(as.matrix(featureData(expressionset)$GC)),-1)      
+  fac = round(featureData(expressionset)$GC,-1)      
   df = data.frame(rep(fac, ncol(dataprep$dat)), as.numeric(dataprep$rc), 
     as.numeric(dataprep$gc), as.numeric(dataprep$dat))
   colnames(df) = c("GC","rc","gc","dat")
@@ -142,22 +152,23 @@ setMethod("aqm.gc",signature(expressionset = "NChannelSet"),
     box.ratio = 2, xlab = "Log(ratio)", ylab = "", 
     horizontal = FALSE, fill="blue")
               
-  plotgc = list("box1" =  box1, "box2" = box2, "box3" = box3)
+  plotGC = list("box1" =  box1, "box2" = box2, "box3" = box3)
   
   title = "GC content effect"
   
-  type = "Platform quality assessment"
+  section = "Probe stratification"
   
-  legend = "<b>Figure FIG</b> shows the boxplots of the log<sub>2</sub> intensities 
-grouped by the percentage of cytosines (C) and guanines (G) among the nucleotides in 
-each probe. Cytosine and guanine are able to form three hydrogen bonds, while adenine 
-(A) and thymine (T) only form two, hence oligonucleotides with a higher proportion of 
-C and G can form more stable hybridization bindings. This should result in higher 
-intensities measured on the array, regardless of the abundance of target molecules."
+  legend = "<b>Figure <!-- FIG --></b> shows the boxplots of the log<sub>2</sub> 
+intensities grouped by the percentage of cytosines (C) and guanines (G) among the 
+nucleotides in each probe. Cytosine and guanine are able to form three hydrogen bonds, 
+while adenine (A) and thymine (T) only form two, hence oligonucleotides with a higher 
+proportion of C and G can form more stable hybridization bindings. 
+This tends to result in higher intensities measured on the array, regardless of the 
+abundance of target molecules."
               
-  out = list("plot" = plotgc, "type" = type, "title" = title, 
+  out = list("plot" = plotGC, "section" = section, "title" = title, 
              "legend" = legend, "shape" = "rect")
-  class(out) = "aqmobj.gc"
+  class(out) = "aqmobj.GC"
   return(out)   
 })      
 @ 
@@ -186,16 +197,17 @@ bc = basecontent(seq$Sequence)
 GC = ((bc[,"C"]+bc[,"G"])/rowSums(bc))*100
 mt = match(featureNames(seq), fData(nCCl4)$ID)
 stopifnot(!any(is.na(mt)))
-fData(nCCl4)$GC = "NA"
+fData(nCCl4)$GC = NA_real_
 fData(nCCl4)$GC[mt] = GC
 @ 
 
-Now, we can run the GC content study on this object.
+Now, we can call the \Rfunction{aqm.GC} function and create a small html report with its output.
 <<aqm.plot.aqm.gc>>=
-library(lattice)
+library("lattice")
 dataprep = aqm.prepdata(nCCl4, FALSE)
 testgc = aqm.gc(nCCl4,dataprep)
 aqm.plot(testgc)
+aqm.writereport("GC Study", nCCl4, testgc)
 @ 
 
 \subsection*{Session Info}

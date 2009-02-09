@@ -39,14 +39,11 @@
 \seealso{ \code{aqm.spatial}, \code{aqm.plot} }
 
 \examples{
-\dontrun{
-    library(CCl4)
-    data(CCl4)
-    dataprep = aqm.prepdata(CCl4, TRUE)
-    sp = aqm.spatial(CCl4, dataprep)
+    data(CCl4norm)
+    data(CCl4prep)
+    sp = aqm.spatial(CCl4norm, CCl4prep, "Log")
     class(sp)
     show(sp)
     aqm.plot(sp)
-}
 }
 \keyword{classes}

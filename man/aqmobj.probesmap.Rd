@@ -32,14 +32,11 @@
 \seealso{ \code{aqm.probesmap}, \code{aqm.plot} }
 
 \examples{
-      \dontrun{
-         library(CCl4)
-         data(CCl4)
-         dataprep = aqm.prepdata(CCl4, TRUE)
-         pm = aqm.probesmap(CCl4, dataprep)
-         class(pm)
-         show(pm)
-         aqm.plot(pm)
-         }
+    data(CCl4norm)
+    data(CCl4prep)
+    pm = aqm.probesmap(CCl4norm, CCl4prep)
+    class(pm)
+    show(pm)
+    aqm.plot(pm)
 }
 \keyword{classes}

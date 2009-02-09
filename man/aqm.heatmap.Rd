@@ -28,8 +28,7 @@
   \code{\link{aqmobj.heat}} }
 
 \examples{
-    library(CCl4)
-    data(CCl4)
-    dataprep = aqm.prepdata(CCl4, TRUE)
-    he = aqm.heatmap(CCl4, dataprep)
+    data(CCl4norm)
+    data(CCl4prep)
+    he = aqm.heatmap(CCl4norm, CCl4prep, intgroup = "RNAintegrity")
 }

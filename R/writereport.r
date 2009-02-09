@@ -110,7 +110,7 @@ aqm.make.title = function(name)
 aqm.make.section = function(p, s, qm)
   {
     hwrite("<hr>", p)
-    sec = paste("<a name= 'S",s,"'>Section ", s, ": ", qm$type,"</a>", sep = "")
+    sec = paste("<a name= 'S",s,"'>Section ", s, ": ", qm$section,"</a>", sep = "")
     hwrite(sec, p, heading=2, style='font-family:helvetica,arial,sans-serif')
   }
 
@@ -126,16 +126,16 @@ aqm.make.index = function(obj, p)
   lasttype = "FAKE"
   for(i in seq_len(length(obj)))
     {
-      if(obj[[i]]$type != lasttype)
+      if(obj[[i]]$section != lasttype)
         {
           if(s != 1)
             hwrite("</UL>", p)
 
-          hwrite(paste("<br><LI>Section ", s,": ", obj[[i]]$type,"<UL>",sep=""), p, link=paste("#S",s,sep=""), style= 'font-weight:bold;font-family:helvetica;font-size:12pt')
+          hwrite(paste("<br><LI>Section ", s,": ", obj[[i]]$section,"<UL>",sep=""), p, link=paste("#S",s,sep=""), style= 'font-weight:bold;font-family:helvetica;font-size:12pt')
           s = s+1
         }
       hwrite(paste("<LI>",obj[[i]]$title,sep=""), p, style= 'font-weight:normal;font-family:helvetica;font-size:11pt')
-      lasttype = obj[[i]]$type
+      lasttype = obj[[i]]$section
     }
   hwrite("</UL></UL>", p)
 }
@@ -274,21 +274,28 @@ aqm.writereport = function(name, expressionset, obj)
     hwrite("Summary",p, heading=2, style='font-family:helvetica,arial,sans-serif')
     hwrite(sc, p, border=0, bgcolor = matrix(col, ncol=ncol(sc), nrow=(nrow(sc)+1)), cellpadding = 2, cellspacing = 5, style=matrix(c(rep(boldset, ncol(sc)), rep(c(boldset, rep(normset, ncol(sc)-1)), nrow(sc))), ncol=ncol(sc), nrow=(nrow(sc)+1), byrow=TRUE))
           
-    hwrite("*array identified as having a potential problem or as being an outlier.",style=normset,p)
+    hwrite("*outlier array",style=normset,p)
 
-    aqm.make.index(obj, p)
-
-    lasttype = "FAKE"
-    
-    for(i in seq(along = obj))
+    if(class(obj) != "list")
       {
-        if(obj[[i]]$type != lasttype)
+        aqm.make.section(p, s = sec, qm = obj)
+        aqm.report.qm(p, obj, 1, "fig")
+      } else {
+
+        aqm.make.index(obj, p)
+
+        lasttype = "FAKE"
+    
+        for(i in seq(along = obj))
           {
-            aqm.make.section(p, s = sec, qm = obj[[i]])
-            sec = sec+1
+            if(obj[[i]]$section != lasttype)
+              {
+                aqm.make.section(p, s = sec, qm = obj[[i]])
+                sec = sec+1
+              }
+            aqm.report.qm(p, obj[[i]], i, names(obj)[i])
+            lasttype = obj[[i]]$section
           }
-        aqm.report.qm(p, obj[[i]], i, names(obj)[i])
-        lasttype = obj[[i]]$type
       }
     
     aqm.make.ending(p)

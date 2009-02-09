@@ -60,7 +60,7 @@
 \examples{
     library(ALLMLL)
     data(MLL.A)
-    dataprep = aqm.prepdata(MLL.A, TRUE)
-    class(dataprep)
+    MLLprep = aqm.prepdata(MLL.A, TRUE)
+    class(MLLprep)
 }
 \keyword{classes}

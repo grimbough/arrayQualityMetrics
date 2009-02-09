@@ -47,7 +47,7 @@ aqm.prepdata(expressionset, do.logtransform = TRUE)
 \seealso{\code{\link{aqmobj.prepdata}}, \code{\link{aqm.boxplot}}, \code{\link{aqm.density}}, \code{\link{aqm.heatmap}}, \code{\link{aqm.maplot}}, \code{\link{aqm.meansd}}, \code{\link{aqm.probesmap}}, \code{\link{aqm.spatial}}, \code{\link{aqm.spatialbg}}}
 
 \examples{
-    library(CCl4)
-    data(CCl4)
-    dataprep = aqm.prepdata(CCl4, TRUE)
+    data(CCl4norm)
+    ## Prepare the data for aqm.xxx calls
+    CCl4prep = aqm.prepdata(CCl4norm, do.logtransform = FALSE)
 }

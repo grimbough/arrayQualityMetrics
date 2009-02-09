@@ -14,9 +14,9 @@ aqm.pca = function(expressionset, dataprep, intgroup = "Covariate", ...)
 
     legend = "Figure <!-- FIG --> represents the Principal Component Analysis of the arrays. The colours correspond to the group of interest given."
     title = "Principal Component Analysis of the arrays"
-    type = "Between array comparison"
+    section = "Between array comparison"
    
-    out = list("plot" = pcafig, "type" = type,  "title" = title, "legend" = legend, "shape" = "square")
+    out = list("plot" = pcafig, "section" = section,  "title" = title, "legend" = legend, "shape" = "square")
     class(out) = "aqmobj.pca"
     return(out) 
 }

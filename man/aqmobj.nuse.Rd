@@ -38,10 +38,8 @@
 \seealso{ \code{aqm.nuse}, \code{aqm.plot} }
 
 \examples{
-    library(ALLMLL)
-    data(MLL.A)
-    pa = aqm.prepaffy(MLL.A, sampleNames(MLL.A))
-    nuse = aqm.nuse(pa)
+    data(MLLaffyprep)
+    nuse = aqm.nuse(MLLaffyprep)
     class(nuse)
     show(nuse)
     aqm.plot(nuse)

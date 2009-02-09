@@ -1,4 +1,4 @@
-\name{aqm.nuse}
+\name{aqm.rle}
 \alias{aqm.rle}
 
 \title{ Performs RLE plot on aqmobj.prepaffy objects. }
@@ -23,8 +23,6 @@
   \code{\link{aqmobj.rle}} }
 
 \examples{
-    library(ALLMLL)
-    data(MLL.A)
-    pa = aqm.prepaffy(MLL.A, sampleNames(MLL.A))
-    rle = aqm.rle(pa)
+    data(MLLaffyprep)
+    rle = aqm.rle(MLLaffyprep)
 }

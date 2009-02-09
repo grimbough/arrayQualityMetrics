@@ -34,10 +34,8 @@
 \seealso{ \code{aqm.density}, \code{aqm.plot} }
 
 \examples{
-    library(CCl4)
-    data(CCl4)
-    dataprep = aqm.prepdata(CCl4, TRUE)
-    de = aqm.density(dataprep)
+    data(CCl4prep)
+    de = aqm.density(CCl4prep)
     class(de)
     show(de)
     aqm.plot(de)

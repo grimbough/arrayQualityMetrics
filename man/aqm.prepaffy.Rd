@@ -27,5 +27,5 @@
 \examples{
     library(ALLMLL)
     data(MLL.A)
-    pa = aqm.prepaffy(MLL.A, sampleNames(MLL.A))
+    MLLaffyprep = aqm.prepaffy(MLL.A, sampleNames(MLL.A))
 }

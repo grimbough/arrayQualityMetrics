@@ -38,10 +38,8 @@
 \seealso{ \code{aqm.rle}, \code{aqm.plot} }
 
 \examples{
-    library(ALLMLL)
-    data(MLL.A)
-    pa = aqm.prepaffy(MLL.A, sampleNames(MLL.A))
-    rle = aqm.rle(pa)
+    data(MLLaffyprep)
+    rle = aqm.rle(MLLaffyprep)
     class(rle)
     show(rle)
     aqm.plot(rle)

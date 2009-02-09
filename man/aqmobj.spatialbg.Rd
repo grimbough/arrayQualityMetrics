@@ -33,14 +33,6 @@
 \seealso{ \code{aqm.spatialbg}, \code{aqm.plot} }
 
 \examples{
-\dontrun{
-    library(CCl4)
-    data(CCl4)
-    dataprep = aqm.prepdata(CCl4, TRUE)
-    spb = aqm.spatialbg(CCl4, dataprep)
-    class(spb)
-    show(spb)
-    aqm.plot(spb)
-}
+   ## See aqmobj.spatial help
 }
 \keyword{classes}

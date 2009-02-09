@@ -39,10 +39,8 @@
 \seealso{ \code{aqm.boxplot}, \code{aqm.plot} }
 
 \examples{
-    library(CCl4)
-    data(CCl4)
-    dataprep = aqm.prepdata(CCl4, TRUE)
-    bo = aqm.boxplot(dataprep)
+    data(CCl4prep)
+    bo = aqm.boxplot(CCl4prep)
     class(bo)
     show(bo)
     aqm.plot(bo)

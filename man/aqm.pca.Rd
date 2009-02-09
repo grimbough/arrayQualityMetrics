@@ -27,4 +27,7 @@
   \code{\link{aqmobj.pca}} }
 
 \examples{
-   }
+    data(CCl4norm)
+    data(CCl4prep)
+    pca = aqm.pca(CCl4norm, CCl4prep, intgroup = "RNAintegrity")
+}

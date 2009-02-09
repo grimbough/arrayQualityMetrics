@@ -10,12 +10,15 @@
   output for \code{aqm.plot} usage.
 }
 
-\usage{ aqm.spatial(expressionset, dataprep) }
+\usage{ aqm.spatial(expressionset, dataprep, scale) }
 
 \arguments{
   \item{expressionset}{ Same input as for the function
     \code{\link{arrayQualityMetrics}} }
   \item{dataprep}{ An object of class \code{\link{aqmobj.prepdata}} }
+  \item{scale}{ The spatial distribution can be represented on the rank
+  of the intensities or on the logarithm scale. Possible options are
+  thus 'Rank' and 'Log'. }
  }
 
 \value{ An object of class \code{\link{aqmobj.spatial}}. }
@@ -26,10 +29,7 @@
   \code{\link{aqmobj.spatial}} }
 
 \examples{
-  \dontrun{
-    library(CCl4)
-    data(CCl4)
-    dataprep = aqm.prepdata(CCl4, TRUE)
-    sd = aqm.spatial(CCl4, dataprep, TRUE)
-    }
+    data(CCl4norm)
+    data(CCl4prep)
+    sd = aqm.spatial(CCl4norm, CCl4prep, scale = "Log")
 }

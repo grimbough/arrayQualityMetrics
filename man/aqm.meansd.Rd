@@ -23,8 +23,6 @@
   \code{\link{aqmobj.msd}} }
 
 \examples{
-    library(CCl4)
-    data(CCl4)
-    dataprep = aqm.prepdata(CCl4, TRUE)
-    sd = aqm.meansd(dataprep)
+    data(CCl4prep)
+    sd = aqm.meansd(CCl4prep)
 }

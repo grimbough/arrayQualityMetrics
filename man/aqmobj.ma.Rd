@@ -38,10 +38,8 @@
 \seealso{ \code{aqm.maplot}, \code{aqm.plot} }
 
 \examples{
-    library(CCl4)
-    data(CCl4)
-    dataprep = aqm.prepdata(CCl4, TRUE)
-    ma = aqm.maplot(dataprep)
+    data(CCl4prep)
+    ma = aqm.maplot(CCl4prep)
     class(ma)
     show(ma)
     aqm.plot(ma)

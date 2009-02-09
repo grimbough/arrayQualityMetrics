@@ -1,5 +1,5 @@
 ## Spatial plot representation
-spatialplot = function(expressionset, dataprep, channel, label, imageMat = NULL)
+spatialplot = function(expressionset, dataprep, channel, label, scale, imageMat = NULL)
   {
     noaxis = function (...) 
       {     
@@ -28,8 +28,22 @@ spatialplot = function(expressionset, dataprep, channel, label, imageMat = NULL)
         r = rep(seq_len(maxr), maxc)
         c = rep(seq_len(maxc), each = maxr)
       }
-    df = if(dataprep$classori == "BeadLevelList") data.frame("Array" = rep(seq_len(dataprep$numArrays), each=maxr*maxc), "ch" = unlist(imageMat), "row" = r, "column" = c) else data.frame("Array" = as.factor(col(dataprep$dat)),  "ch" = unlist(lapply(seq_len(dataprep$numArrays), function(i) rank(channel[,i]))), "row" = r,  "column" = c)
-    levelplot(ch ~ column*row | Array, data=df, axis = noaxis, asp = "iso", col.regions = colourRamp, as.table=TRUE, strip = function(..., bg) strip.default(..., bg ="#cce6ff"), xlab = label, ylab = "") #
+    
+      if(dataprep$classori == "BeadLevelList")
+        {
+          if(scale == "Rank")
+            imageMat = lapply(seq_len(dataprep$numArrays), function(i) rank(imageMat[[i]], na.last = "keep"))         
+          df = data.frame("Array" = rep(seq_len(dataprep$numArrays), each=maxr*maxc), "ch" = unlist(imageMat), "row" = r, "column" = c)
+        }
+
+      if(dataprep$classori != "BeadLevelList")
+        {
+          df = switch(scale,
+            "Rank" = data.frame("Array" = as.factor(col(dataprep$dat)), "ch" = unlist(lapply(seq_len(dataprep$numArrays), function(i) rank(channel[,i]))), "row" = r,  "column" = c),
+            "Log" = data.frame("Array" = as.factor(col(dataprep$dat)),  "ch" = unlist(lapply(seq_len(dataprep$numArrays), function(i) channel[,i])), "row" = r,  "column" = c))
+        }
+    
+    levelplot(ch ~ column*row | Array, data=df, axis = noaxis, asp = "iso", col.regions = colourRamp, as.table=TRUE, strip = function(..., bg) strip.default(..., bg ="#cce6ff"), xlab = label, ylab = "")
   }
 
 ## Scores computation
@@ -91,36 +105,39 @@ scoresspatbll = function(expressionset, dataprep, log)
 
 ## set Generics  
 setGeneric("spatialbg",
-           function(expressionset, dataprep)
+           function(expressionset, dataprep, scale)
            standardGeneric("spatialbg"))
 setGeneric("spatial",
-           function(expressionset, dataprep)
+           function(expressionset, dataprep, scale)
            standardGeneric("spatial"))
 
 ## NCS
 ##Background rank representation
-setMethod("spatialbg",signature(expressionset = "NChannelSet"), function(expressionset, dataprep)
+setMethod("spatialbg",signature(expressionset = "NChannelSet"), function(expressionset, dataprep, scale)
           {
-                sprb = spatialplot(expressionset, dataprep,dataprep$rcb,"Rank(red background intensity)")
-                spgb = spatialplot(expressionset, dataprep,dataprep$gcb,"Rank(green background intensity)")
-                return(list(sprb, spgb))
+            sprb = spatialplot(expressionset, dataprep,dataprep$rcb, paste(scale,"(red background intensity)"), scale)
+            spgb = spatialplot(expressionset, dataprep,dataprep$gcb, paste(scale,"(green background intensity)"), scale)
+            return(list(sprb, spgb))
           })
             
 ## NCS
 ##Foreground rank representation
-setMethod("spatial",signature(expressionset = "NChannelSet"), function(expressionset, dataprep)
+setMethod("spatial",signature(expressionset = "NChannelSet"), function(expressionset, dataprep, scale)
           {
-            spr = spatialplot(expressionset, dataprep,dataprep$rc,"Rank(red intensity)")
-            spg = spatialplot(expressionset, dataprep,dataprep$gc,"Rank(green intensity)")
-            splr = spatialplot(expressionset, dataprep,dataprep$dat,"Rank(log(ratio))")
+            spr = spatialplot(expressionset, dataprep,dataprep$rc, paste(scale,"(red intensity)"), scale)
+            spg = spatialplot(expressionset, dataprep,dataprep$gc, paste(scale,"(green intensity)"), scale)
+            splr = spatialplot(expressionset, dataprep,dataprep$dat, paste(scale,"(ratio)"), scale)
             return(list(spr, spg, splr))
           })
               
 ## ES-AB
 ## Foreground rank representation
-setMethod("spatial",signature(expressionset = "aqmOneCol"), function(expressionset, dataprep)
+setMethod("spatial",signature(expressionset = "aqmOneCol"), function(expressionset, dataprep, scale)
           {
-            spi = spatialplot(expressionset, dataprep,dataprep$dat,"Rank(intensity)")
+            lgl = switch(scale,
+              "Rank" = "Rank(intensity)",
+              "Log" = "Log(intensity)")
+            spi = spatialplot(expressionset, dataprep,dataprep$dat, lgl, scale)
             return(spi)
           })
             
@@ -170,58 +187,64 @@ imageplotBLL = function(BLData, array = 1, nrow = 100, ncol = 100,
 }
 
 ## BLL
-setMethod("spatialbg",signature(expressionset = "BeadLevelList"), function(expressionset, dataprep)
+setMethod("spatialbg",signature(expressionset = "BeadLevelList"), function(expressionset, dataprep, scale)
           {
             imageMatgb = lapply(seq_len(dataprep$numArrays), function(i) imageplotBLL(expressionset, array = i, whatToPlot="Gb", log = dataprep$logtransformed))
             if(expressionset@arrayInfo$channels == "two")
               imageMatrb = lapply(seq_len(dataprep$numArrays), function(i) imageplotBLL(expressionset, array = i, whatToPlot="Rb", log = dataprep$logtransformed))
             
-            spgb = spatialplot(expressionset, dataprep,dataprep$gcb,"Rank(green background intensity)", imageMatgb)
+            spgb = spatialplot(expressionset, dataprep,dataprep$gcb, paste(scale, "(green background intensity)"), scale, imageMatgb)
             sprb = NULL
             if(expressionset@arrayInfo$channels == "two")
-              sprb = spatialplot(expressionset, dataprep,dataprep$rcb,"Rank(red background intensity)", imageMatrb)
+              sprb = spatialplot(expressionset, dataprep,dataprep$rcb, paste(scale, "(red background intensity)"), scale,  imageMatrb)
             
             return(list(sprb, spgb))
           })
             
-setMethod("spatial",signature(expressionset = "BeadLevelList"), function(expressionset, dataprep)
+setMethod("spatial",signature(expressionset = "BeadLevelList"), function(expressionset, dataprep, scale)
           {
             imageMatg = lapply(seq_len(dataprep$numArrays), function(i) imageplotBLL(expressionset, array = i, whatToPlot="G", log = dataprep$logtransformed))
             if(expressionset@arrayInfo$channels == "two")
               imageMatr = lapply(seq_len(dataprep$numArrays), function(i) imageplotBLL(expressionset, array = i, whatToPlot="R", log = dataprep$logtransformed))
             
-            spg = spatialplot(expressionset, dataprep,dataprep$gc,"Rank(green intensity)", imageMatg)
+            spg = spatialplot(expressionset, dataprep,dataprep$gc, paste(scale, "(green intensity)"), scale, imageMatg)
             spr = NULL
             if(expressionset@arrayInfo$channels == "two")
-              spr = spatialplot(expressionset, dataprep,dataprep$rc,"Rank(red intensity)", imageMatr)
+              spr = spatialplot(expressionset, dataprep,dataprep$rc, paste(scale, "(red intensity)"), scale, imageMatr)
             
             return(list(spr, spg))
           })
 
 ## BACKGROUND
-aqm.spatialbg = function(expressionset, dataprep)
+aqm.spatialbg = function(expressionset, dataprep, scale)
 {
+  if(scale != "Log" && scale != "Rank")
+    stop("The argument scale must be 'Log' or 'Rank'\n")
 
-  bg = spatialbg(expressionset, dataprep)
+  bg = spatialbg(expressionset, dataprep, scale)
   
   title = "Spatial distribution of local background intensities"
-  type = "Individual array quality"
+  section = "Individual array quality"
   
-  legend = sprintf("The <b>figure <!-- FIG --> </b> shows false color representations of the arrays' spatial distributions of feature local background estimates. The color scale is shown in the panel on the right, and it is proportional to the ranks of the probe background intensities.")
+  legend = sprintf("The figure <!-- FIG --> shows false color representations of the arrays' spatial distributions of feature local background estimates. The color scale is shown in the panel on the right, and it is proportional to the ranks of the probe background intensities.")
 
-  out = list("plot" = bg, "type" = type, "title" = title, "legend" = legend, "shape" = "square")
+  out = list("plot" = bg, "section" = section, "title" = title, "legend" = legend, "shape" = "square")
   class(out) = "aqmobj.spatialbg"
   return(out)
 }
 
 ## FOREGROUND
-aqm.spatial = function(expressionset, dataprep)
+aqm.spatial = function(expressionset, dataprep, scale)
 {
-  fore = spatial(expressionset, dataprep)
-  title = "Spatial distribution of feature intensities"
-  type = "Individual array quality"
+  if(scale != "Log" && scale != "Rank")
+    stop("The argument scale must be 'Log' or 'Rank'\n")
 
-  legend = sprintf("The <b>figure <!-- FIG --></b> shows false color representations of the arrays' spatial distributions of feature intensities. The color scale is shown in the panel on the right, and it is proportional to the ranks of the probe intensities. This has indeed the potential to detect patterns that are small in amplitude, but systematic within array. These may not be consequential for the downstream data analysis, but if properly interpreted, could e.g. still be useful for technology and experimental protocol optimisation as it helps in identifying patterns that may be caused by, for example, spatial gradients in the hybridization chamber, air bubbles, spotting or plating problems. The rank scale is often more sensitive for the detection of patterns than the logarithmic or untransformed scales.")          
+  fore = spatial(expressionset, dataprep, scale)
+  
+  title = "Spatial distribution of feature intensities"
+  section = "Individual array quality"
+
+  legend = sprintf("The figure <!-- FIG --> shows false color representations of the arrays' spatial distributions of feature intensities. The color scale is shown in the panel on the right, and it is proportional to the ranks of the probe intensities. Normally, when the features are distributed randomly on the arrays, one expects to see a uniform distribution; sets of control features with particularily high or low intensities may stand out. Note that the rank scale has the potential to amplify patterns that are small in amplitude but systematic within an array. It is possible to create plots that are not in rank scale but log-transformed scale, calling the aqm.spatial function and modifying the argument 'scale'.")          
 
   if(!inherits(expressionset, "BeadLevelList"))
     loc = scoresspat(expressionset, dataprep, dataprep$dat)
@@ -249,7 +272,7 @@ aqm.spatial = function(expressionset, dataprep)
       names(locout) = if(length(locout) == 3) c("LR","Red","Green") else c("Red","Green")
     }
 
-  out = list("plot" = fore, "type" = type, "title" = title, "legend" = legend, "scores" = loc, "outliers" = locout, "shape" = "square")
+  out = list("plot" = fore, "section" = section, "title" = title, "legend" = legend, "scores" = loc, "outliers" = locout, "shape" = "square")
   class(out) = "aqmobj.spatial"
   return(out)
 }

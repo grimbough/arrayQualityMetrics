@@ -38,10 +38,9 @@
 \seealso{ \code{aqm.heatmap}, \code{aqm.plot}. }
 
 \examples{
-    library(CCl4)
-    data(CCl4)
-    dataprep = aqm.prepdata(CCl4, TRUE)
-    he = aqm.heatmap(CCl4, dataprep)
+    data(CCl4norm)
+    data(CCl4prep)
+    he = aqm.heatmap(CCl4norm, CCl4prep)
     class(he)
     show(he)
     aqm.plot(he)
