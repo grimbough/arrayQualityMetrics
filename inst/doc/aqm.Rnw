@@ -174,11 +174,11 @@ abundance of target molecules."
 @ 
 
 \subsection{Creating a method for aqm.plot}
-Once the \Rfunction{aqm.gc} is written, we need to write a \Rfunction{aqm.plot} method for it, to be able to draw the plot with the desired settings.
+Once the \Rfunction{aqm.GC} is written, we need to write a \Rfunction{aqm.plot} method for it, to be able to draw the plot with the desired settings.
 
 %
-<<aqm.plot.aqm.gc>>=
-setMethod("aqm.plot",signature(obj = "aqmobj.gc"), function(obj){
+<<aqm.plot.aqm.GC>>=
+setMethod("aqm.plot",signature(obj = "aqmobj.GC"), function(obj){
   print(obj$plot$box1, split = c(1,1,3,1), newpage = FALSE)
   print(obj$plot$box2, split = c(2,1,3,1), newpage = FALSE)
   print(obj$plot$box3, split = c(3,1,3,1), newpage = FALSE)
@@ -193,7 +193,7 @@ datapath = system.file("extdata", package="CCl4")
 seq = read.AnnotatedDataFrame("013162_D_SequenceList_20060815.txt", path=datapath)
 if(any(duplicated(featureNames(seq))))
   cat("IDs of the sequence file are not unique \n")
-bc = basecontent(seq$Sequence)
+bc = alphabetFrequency(DNAStringSet(seq$Sequence), baseOnly=TRUE)
 GC = ((bc[,"C"]+bc[,"G"])/rowSums(bc))*100
 mt = match(featureNames(seq), fData(nCCl4)$ID)
 stopifnot(!any(is.na(mt)))
@@ -202,10 +202,10 @@ fData(nCCl4)$GC[mt] = GC
 @ 
 
 Now, we can call the \Rfunction{aqm.GC} function and create a small html report with its output.
-<<aqm.plot.aqm.gc>>=
+<<aqm.plot.aqm.GC>>=
 library("lattice")
 dataprep = aqm.prepdata(nCCl4, FALSE)
-testgc = aqm.gc(nCCl4,dataprep)
+testgc = aqm.GC(nCCl4,dataprep)
 aqm.plot(testgc)
 aqm.writereport("GC Study", nCCl4, testgc)
 @ 

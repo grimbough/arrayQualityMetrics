@@ -1,6 +1,6 @@
 Package: arrayQualityMetrics
 Title: Quality metrics on microarray data sets
-Version: 2.0.10
+Version: 2.0.11
 Author: Audrey Kauffmann, Wolfgang Huber
 Maintainer: Audrey Kauffmann <audrey@ebi.ac.uk>
 Depends: affyPLM
