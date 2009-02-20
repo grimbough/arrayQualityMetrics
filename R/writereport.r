@@ -147,12 +147,12 @@ aqm.report.qm = function(p, qm, f, name)
     if(qm$shape == "rect")
       {
         h = 5
-        w = 15
+        w = 10
       }
     if(qm$shape == "square")
       {
-        h = 7
-        w = 7
+        h = 6
+        w = 6
       }
 
     

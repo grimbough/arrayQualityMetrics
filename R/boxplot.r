@@ -16,7 +16,7 @@ aqm.boxplot = function(dataprep, ...)
   legend = sprintf("The figure <!-- FIG --> presents boxplots of the log<sub>2</sub>(Intensities). Each box corresponds to one array. %s It gives a simple summary of the distribution of probe intensities accross all arrays. Typically, one expects the boxes to have similar size (IQR) and y position (median). If the distribution of an individual array is very different from the others, this may indicate an experimental problem. After normalisation, the distributions should be similar.", legspe)
 
   title = "Boxplots"
-  section = "Array intensities distributions"
+  section = "Array intensity distributions"
 
   b = boxplot(dataprep$dat, plot=F, range=0)  
   bmeanstat = boxplot.stats(b$stat[3,])
