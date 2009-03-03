@@ -26,17 +26,13 @@
     the aspect ratio desired in the report. }
   }
 }
+  
+\details{
+See the aqm.prepdata help or the aqm Vignette for example of this object.
+}
 
 \author{Audrey Kauffmann <audrey@ebi.ac.uk>}
 
 \seealso{ \code{aqm.pca}, \code{aqm.plot}. }
 
-\examples{
-    data(CCl4norm)
-    data(CCl4prep)
-    pca = aqm.pca(CCl4norm, CCl4prep, intgroup = "RNAintegrity")
-    class(pca)
-    show(pca)
-    aqm.plot(pca)
-}
 \keyword{classes}

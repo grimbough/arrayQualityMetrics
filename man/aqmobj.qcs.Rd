@@ -31,12 +31,4 @@
 \author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
 
 \seealso{ \code{aqm.qcstats}, \code{aqm.plot} }
-\examples{
-    library(ALLMLL)
-    data(MLL.A)
-    qc = aqm.qcstats(MLL.A)
-    class(qc)
-    show(qc)
-    aqm.plot(qc)
-}
 \keyword{classes}

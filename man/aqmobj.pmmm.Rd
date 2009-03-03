@@ -26,18 +26,13 @@
     the aspect ratio desired in the report. }
   }
 }
-    
+
+\details{
+See the aqm.pmmm help or the aqm Vignette for example of this object.
+}
 
 \author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
 
 \seealso{ \code{aqm.pmmm}, \code{aqm.plot} }
 
-\examples{
-    library(ALLMLL)
-    data(MLL.A)
-    pm = aqm.pmmm(MLL.A)
-    class(pm)
-    show(pm)
-    aqm.plot(pm)
-}
 \keyword{classes}

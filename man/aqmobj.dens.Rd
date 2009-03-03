@@ -29,15 +29,12 @@
     }  
 }
 
+\details{
+See the aqm.prepdata help or the aqm Vignette for example of this object.
+}
+
 \author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
 
 \seealso{ \code{aqm.density}, \code{aqm.plot} }
 
-\examples{
-    data(CCl4prep)
-    de = aqm.density(CCl4prep)
-    class(de)
-    show(de)
-    aqm.plot(de)
-}
 \keyword{classes}

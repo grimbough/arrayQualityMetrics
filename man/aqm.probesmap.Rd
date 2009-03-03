@@ -17,12 +17,10 @@
   \item{...}{ Any arguments to \code{\link[lattice:densityplot]{densityplot}} }
  }
 
+\details{
+See the aqm.prepdata help or the aqm Vignette for example of this object.
+}
+
 \value{ An object of class \code{\link{aqmobj.probesmap}} }
 
 \author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
-
-\examples{
-    data(CCl4norm)
-    data(CCl4prep)
-    pm = aqm.probesmap(CCl4norm, CCl4prep)
-}

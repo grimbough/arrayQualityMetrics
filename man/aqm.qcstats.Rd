@@ -22,10 +22,3 @@
 \author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
 
 \seealso{ \code{\link{aqmobj.qcs}} }
-
-\examples{
-    library(ALLMLL)
-    data(MLL.A)
-    qcs = aqm.qcstats(MLL.A)
-}
-

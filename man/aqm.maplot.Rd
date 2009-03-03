@@ -18,12 +18,11 @@
 
 \value{ An object of class \code{\link{aqmobj.ma}}. }
 
+\details{
+See the aqm.prepdata help or the aqm Vignette for example of this object.
+}
+
 \author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
 
 \seealso{ \code{\link{aqm.prepdata}}, \code{\link{aqmobj.prepdata}},
   \code{\link{aqmobj.ma}} }
-
-\examples{
-    data(CCl4prep)
-    ma = aqm.maplot(CCl4prep)
-}

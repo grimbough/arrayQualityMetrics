@@ -19,12 +19,10 @@
 
 \value{ An object of class \code{\link{aqmobj.rnadeg}}. }
 
+\details{
+See the aqm.prepdata help or the aqm Vignette for example of this object.
+}
+
 \author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
 
 \seealso{ \code{\link{aqmobj.rnadeg}} }
-
-\examples{
-    library(ALLMLL)
-    data(MLL.A)
-    rdeg = aqm.rnadeg(MLL.A)
-}

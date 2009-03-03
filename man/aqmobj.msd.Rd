@@ -27,15 +27,12 @@
     }
 }
 
+\details{
+See the aqm.prepdata help or the aqm Vignette for example of this object.
+}
+
 \author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
 
 \seealso{ \code{aqm.meansd}, \code{aqm.plot} }
 
-\examples{
-    data(CCl4prep)
-    sd = aqm.meansd(CCl4prep)
-    class(sd)
-    show(sd)
-    aqm.plot(sd)
-}
 \keyword{classes}

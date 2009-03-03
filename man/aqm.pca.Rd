@@ -21,13 +21,11 @@
 
 \value{ An object of class \code{\link{aqmobj.pca}}. }
 
+\details{
+See the aqm.prepdata help or the aqm Vignette for example of this object.
+}
+
 \author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
 
 \seealso{ \code{\link{aqm.prepdata}}, \code{\link{aqmobj.prepdata}},
   \code{\link{aqmobj.pca}} }
-
-\examples{
-    data(CCl4norm)
-    data(CCl4prep)
-    pca = aqm.pca(CCl4norm, CCl4prep, intgroup = "RNAintegrity")
-}

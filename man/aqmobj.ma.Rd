@@ -33,15 +33,12 @@
     }
 }
 
+\details{
+See the aqm.prepdata help or the aqm Vignette for example of this object.
+}
+
 \author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
 
 \seealso{ \code{aqm.maplot}, \code{aqm.plot} }
 
-\examples{
-    data(CCl4prep)
-    ma = aqm.maplot(CCl4prep)
-    class(ma)
-    show(ma)
-    aqm.plot(ma)
-}
 \keyword{classes}

@@ -28,11 +28,12 @@
   }
 }
 
+\details{
+See the aqm.prepdata help or the aqm Vignette for example of this object.
+}
+
 \author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
 
 \seealso{ \code{aqm.spatialbg}, \code{aqm.plot} }
 
-\examples{
-   ## See aqmobj.spatial help
-}
 \keyword{classes}

@@ -93,6 +93,10 @@ force, do.logtransform, split.plots, intgroup, grouprep)
   represented function of the groups of 'intgroup'.}
 }
 
+\details{
+See the arrayQualityMetrics Vignette for examples of this function.
+}
+
 \value{
   A directory \code{outdir} containing a HTML report named QMreport.html and all the PNG and PDF plots is created.
 }
@@ -100,18 +104,6 @@ force, do.logtransform, split.plots, intgroup, grouprep)
 \author{
   Audrey Kauffmann, Wolfgang Huber. 
   Maintainer: <audrey@ebi.ac.uk>  
-}
-
-\examples{
-  \dontrun{
-    library(ALLMLL)
-    data(MLL.A)
-    arrayQualityMetrics(expressionset = MLL.A,
-                        outdir ="MLL",
-                        do.logtransform = TRUE)
-    # "QMreport.html" is a report created in the "MLL" directory
-    # on the logarithm expression data of the MLL.A AffyBatch.
-    }
 }
 
 \keyword{hplot}

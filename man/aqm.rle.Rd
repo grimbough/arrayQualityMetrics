@@ -17,12 +17,11 @@
 
 \value{ An object of class  \code{\link{aqmobj.rle}} }
 
+\details{
+See the aqm.prepaffy help or the aqm Vignette for example of this object.
+}
+
 \author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
 
 \seealso{ \code{\link{aqm.prepaffy}}, \code{\link{aqmobj.prepaffy}},
   \code{\link{aqmobj.rle}} }
-
-\examples{
-    data(MLLaffyprep)
-    rle = aqm.rle(MLLaffyprep)
-}

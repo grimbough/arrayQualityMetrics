@@ -31,17 +31,14 @@
     \item{\code{shape}:}{ A character "square" or "rect" depending on
     the aspect ratio desired in the report. }
     }
+  }
+  
+\details{
+See the aqm.prepaffy help or the aqm Vignette for example of this object.
 }
 
 \author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
 
 \seealso{ \code{aqm.rle}, \code{aqm.plot} }
 
-\examples{
-    data(MLLaffyprep)
-    rle = aqm.rle(MLLaffyprep)
-    class(rle)
-    show(rle)
-    aqm.plot(rle)
-}
 \keyword{classes}

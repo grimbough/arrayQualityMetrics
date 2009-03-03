@@ -52,15 +52,13 @@
       object that was given as an input of the aqm.prepdata function.}
     }
 }
+  
+\details{
+See the aqm.prepdata help or the aqm Vignette for example of this object.
+}
 
 \author{Audrey Kauffmann <audrey@ebi.ac.uk>}
 
 \seealso{\code{\link{aqm.prepdata}}, \code{\link{aqm.boxplot}}, \code{\link{aqm.density}}, \code{\link{aqm.heatmap}}, \code{\link{aqm.maplot}}, \code{\link{aqm.meansd}}, \code{\link{aqm.probesmap}}, \code{\link{aqm.spatial}}, \code{\link{aqm.spatialbg}}}
 
-\examples{
-    library(ALLMLL)
-    data(MLL.A)
-    MLLprep = aqm.prepdata(MLL.A, TRUE)
-    class(MLLprep)
-}
 \keyword{classes}

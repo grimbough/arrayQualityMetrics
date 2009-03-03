@@ -27,16 +27,12 @@
   }
 }
 
+\details{
+See the aqm.prepdata help or the aqm Vignette for example of this object.
+}
+
 \author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
 
 \seealso{ \code{aqm.rnadeg}, \code{aqm.plot} }
 
-\examples{
-    library(ALLMLL)
-    data(MLL.A)
-    rd = aqm.rnadeg(MLL.A)
-    class(rd)
-    show(rd)
-    aqm.plot(rd)
-}
 \keyword{classes}

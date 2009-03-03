@@ -23,13 +23,12 @@
 
 \value{ An object of class \code{\link{aqmobj.spatial}}. }
 
+\details{
+See the aqm.prepdata help or the aqm Vignette for example of this object.
+}
+
 \author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
 
 \seealso{ \code{\link{aqm.prepdata}}, \code{\link{aqmobj.prepdata}},
   \code{\link{aqmobj.spatial}} }
 
-\examples{
-    data(CCl4norm)
-    data(CCl4prep)
-    sd = aqm.spatial(CCl4norm, CCl4prep, scale = "Log")
-}

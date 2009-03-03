@@ -32,18 +32,14 @@
     \item{\code{shape}:}{ A character "square" or "rect" depending on
     the aspect ratio desired in the report. }
     }
+  }
+  
+\details{
+See the aqm.prepdata help or the aqm Vignette for example of this object.
 }
 
 \author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
 
 \seealso{ \code{aqm.spatial}, \code{aqm.plot} }
 
-\examples{
-    data(CCl4norm)
-    data(CCl4prep)
-    sp = aqm.spatial(CCl4norm, CCl4prep, "Log")
-    class(sp)
-    show(sp)
-    aqm.plot(sp)
-}
 \keyword{classes}

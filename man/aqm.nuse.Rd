@@ -17,12 +17,12 @@
 
 \value{ An object of class  \code{\link{aqmobj.nuse}} }
 
+\details{
+See the aqm.prepaffy help or the aqm Vignette for example of this object.
+}
+
 \author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
 
 \seealso{ \code{\link{aqm.prepaffy}}, \code{\link{aqmobj.prepaffy}},
   \code{\link{aqmobj.nuse}} }
 
-\examples{
-    data(MLLaffyprep)
-    nuse = aqm.nuse(MLLaffyprep)
-}

@@ -23,11 +23,12 @@
 
 \value{ An object of class \code{\link{aqmobj.spatialbg}}. }
 
+\details{
+See the aqm.prepdata help or the aqm Vignette for example of this object.
+}
+
 \author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
 
 \seealso{ \code{\link{aqm.prepdata}}, \code{\link{aqmobj.prepdata}},
   \code{\link{aqmobj.spatialbg}} }
 
-\examples{
-  ## See aqm.spatial help
-}

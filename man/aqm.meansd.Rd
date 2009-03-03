@@ -17,12 +17,12 @@
 
 \value{ An object of class \code{\link{aqmobj.msd}}. }
 
+\details{
+See the aqm.prepdata help or the aqm Vignette for example of this object.
+}
+
 \author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
 
 \seealso{ \code{\link{aqm.prepdata}}, \code{\link{aqmobj.prepdata}},
   \code{\link{aqmobj.msd}} }
 
-\examples{
-    data(CCl4prep)
-    sd = aqm.meansd(CCl4prep)
-}

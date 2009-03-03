@@ -32,16 +32,15 @@ aqm.plot(obj)
 \arguments{
   \item{obj}{ an object of class \code{\link[arrayQualityMetrics:class.aqmobj]{aqmobj}}}
  }
+ 
+\details{
+See the aqm.prepdata help or the aqm Vignette for example of this object.
+}
 
-\value{ A plot. }
+\value{ A plot in the x11 device. }
 
 \author{
   Audrey Kauffmann. 
   Maintainer: <audrey@ebi.ac.uk>  
 }
 
-\examples{
-    data(CCl4prep)
-    ma = aqm.maplot(CCl4prep)
-    aqm.plot(ma)
-}

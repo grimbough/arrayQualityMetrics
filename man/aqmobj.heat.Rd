@@ -33,16 +33,11 @@
   }
 }
 
+\details{
+See the aqm.prepdata help or the aqm Vignette for example of this object.
+}
+
 \author{Audrey Kauffmann <audrey@ebi.ac.uk>}
 
 \seealso{ \code{aqm.heatmap}, \code{aqm.plot}. }
-
-\examples{
-    data(CCl4norm)
-    data(CCl4prep)
-    he = aqm.heatmap(CCl4norm, CCl4prep)
-    class(he)
-    show(he)
-    aqm.plot(he)
-}
 \keyword{classes}

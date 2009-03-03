@@ -27,16 +27,12 @@
   }
 }
 
+\details{
+See the aqm.prepdata help or the aqm Vignette for example of this object.
+}
+
 \author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
 
 \seealso{ \code{aqm.probesmap}, \code{aqm.plot} }
 
-\examples{
-    data(CCl4norm)
-    data(CCl4prep)
-    pm = aqm.probesmap(CCl4norm, CCl4prep)
-    class(pm)
-    show(pm)
-    aqm.plot(pm)
-}
 \keyword{classes}

@@ -22,10 +22,13 @@
 
 \author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
 
-\seealso{ \code{\link{aqm.rle}}, \code{\link{aqmobj.nuse}} }
+\seealso{ \code{\link{aqm.rle}}, \code{\link{aqm.nuse}} }
 
 \examples{
     library(ALLMLL)
     data(MLL.A)
     MLLaffyprep = aqm.prepaffy(MLL.A, sampleNames(MLL.A))
+    nuse = aqm.nuse(MLLaffyprep)
+    class(nuse)
+    aqm.plot(nuse)
 }

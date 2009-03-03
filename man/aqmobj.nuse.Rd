@@ -33,15 +33,12 @@
     }
 }
 
+\details{
+See the aqm.prepaffy help or the aqm Vignette for example of this object.
+}
+
 \author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
 
 \seealso{ \code{aqm.nuse}, \code{aqm.plot} }
 
-\examples{
-    data(MLLaffyprep)
-    nuse = aqm.nuse(MLLaffyprep)
-    class(nuse)
-    show(nuse)
-    aqm.plot(nuse)
-}
 \keyword{classes}

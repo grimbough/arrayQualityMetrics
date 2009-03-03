@@ -34,16 +34,12 @@
     }
 }
 
+\details{
+See the aqm.prepdata help or the aqm Vignette for example of this object.
+}
+
 \author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
 
 \seealso{ \code{aqm.boxplot}, \code{aqm.plot} }
-
-\examples{
-    data(CCl4prep)
-    bo = aqm.boxplot(CCl4prep)
-    class(bo)
-    show(bo)
-    aqm.plot(bo)
-}
 
 \keyword{classes}

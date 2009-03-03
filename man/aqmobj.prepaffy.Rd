@@ -16,14 +16,12 @@
     \item{\code{sN}:}{ Integers numbering the arrays to be used to label
       the plots. }
     }
+  }
+  
+\details{
+See the aqm.prepaffy help or the aqm Vignette for example of this object.
 }
 
 \author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
 
-\examples{
-    library(ALLMLL)
-    data(MLL.A)
-    MLLaffyprep = aqm.prepaffy(MLL.A, sampleNames(MLL.A))
-    class(MLLaffyprep)
-}
 \keyword{classes}
