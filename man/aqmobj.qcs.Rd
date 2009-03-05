@@ -27,6 +27,9 @@
 
     }  
 }
+\details{
+See the aqm.qcstats help or the aqm Vignette for example of this object.
+}
 
 \author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
 
