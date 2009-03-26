@@ -259,6 +259,8 @@ scores = function(expressionset, obj)
 
 aqm.writereport = function(name, expressionset, obj)
   {
+    if (Sys.info()["sysname"] == "Darwin")
+      options(bitmapType = "cairo")
     sec = 1
     p = aqm.make.title(name)
   

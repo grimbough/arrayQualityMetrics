@@ -102,7 +102,7 @@ dataprep = aqm.prepdata(expressionset = nCCl4, do.logtransform = FALSE)
 
 We compute the boxplot and density plots metrics and then create a list containing both of them.
 <<metrics>>=
-bo = aqm.boxplot(dataprep)
+bo = aqm.boxplot(nCCl4, dataprep)
 de = aqm.density(dataprep)
 qm = list("Boxplot" = bo, "Density" = de)
 @ 

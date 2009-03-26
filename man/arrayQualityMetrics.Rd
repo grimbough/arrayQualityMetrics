@@ -31,32 +31,31 @@
 
 \usage{
 \S4method{arrayQualityMetrics}{ExpressionSet}(expressionset, outdir,
-force, do.logtransform, split.plots, intgroup, grouprep)
+force, do.logtransform, intgroup, grouprep)
 
 arrayQualityMetrics(expressionset,
                     outdir = getwd(),
                     force = FALSE,
                     do.logtransform = FALSE,
-                    split.plots = FALSE,
                     intgroup = "Covariate",
                     grouprep = FALSE)
 
 \S4method{arrayQualityMetrics}{AffyBatch}(expressionset, outdir, force,
-do.logtransform, split.plots, intgroup, grouprep)
+do.logtransform, intgroup, grouprep)
 \S4method{arrayQualityMetrics}{NChannelSet}(expressionset, outdir,
-force, do.logtransform, split.plots, intgroup, grouprep)
+force, do.logtransform, intgroup, grouprep)
 \S4method{arrayQualityMetrics}{BeadLevelList}(expressionset, outdir,
-force, do.logtransform, split.plots, intgroup, grouprep)
+force, do.logtransform, intgroup, grouprep)
 \S4method{arrayQualityMetrics}{RGList}(expressionset, outdir,
-force, do.logtransform, split.plots, intgroup, grouprep)
+force, do.logtransform, intgroup, grouprep)
 \S4method{arrayQualityMetrics}{MAList}(expressionset, outdir,
-force, do.logtransform, split.plots, intgroup, grouprep)
+force, do.logtransform, intgroup, grouprep)
 \S4method{arrayQualityMetrics}{aqmInputObj}(expressionset, outdir,
-force, do.logtransform, split.plots, intgroup, grouprep)
+force, do.logtransform, intgroup, grouprep)
 \S4method{arrayQualityMetrics}{marrayRaw}(expressionset, outdir,
-force, do.logtransform, split.plots, intgroup, grouprep)
+force, do.logtransform, intgroup, grouprep)
 \S4method{arrayQualityMetrics}{marrayNorm}(expressionset, outdir,
-force, do.logtransform, split.plots, intgroup, grouprep)
+force, do.logtransform, intgroup, grouprep)
 }
 
 \arguments{
@@ -80,10 +79,6 @@ force, do.logtransform, split.plots, intgroup, grouprep)
 \item{do.logtransform}{ If TRUE, the data are log transformed before
   the analysis. }
   
-\item{split.plots}{ If the number of studied array
-  is more than 50 it is adviced to define a number of experiments to
-  represent on the density plots. }
-
 \item{intgroup}{ Name of the column of the phenoData to be used to draw
   a color side bar next to the heatmap. }
 

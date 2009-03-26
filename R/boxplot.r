@@ -1,16 +1,39 @@
-aqm.boxplot = function(dataprep, ...)
+mybwplot = function(a, intgroupcont = NULL, ylab, colsb, ...)
+  {
+    if(!is.null(intgroupcont)) bwplot(a ~ as.vector(col(a)), groups = intgroupcont[as.vector(col(a))], pch = "|",  col = "black", do.out = FALSE,  horizontal = FALSE, box.ratio = 2, xlab = "", ylab = ylab, asp = "iso", fill = colsb, panel = panel.superpose, panel.groups = panel.bwplot, ...) else bwplot(a ~ as.vector(col(a)), pch = "|",  col = "black", do.out = FALSE,  horizontal = FALSE, box.ratio = 2, xlab = "", ylab = ylab, asp = "iso", fill = colsb, ...)
+  }
+
+aqm.boxplot = function(expressionset, dataprep, intgroup = "Covariate", grouprep = FALSE, ...)
 {
+  if(all(intgroup %in% names(phenoData(expressionset)@data)) && grouprep == TRUE)
+    {
+      gp = intgroup[1]
+      gpcont = pData(expressionset)[colnames(pData(expressionset))==gp]
+      coloursb = brewer.pal(8,rownames(brewer.pal.info[brewer.pal.info$category=="qual",])[6])
+      intgroupcont = gpcont[,gp]
+      colsb = coloursb[as.factor(intgroupcont)]
+          
+      if(dataprep$nchannels == 2)
+        {
+          boxred = mybwplot(dataprep$rc, intgroupcont = intgroupcont, ylab = "Red Intensities", colsb = colsb, ...)
+          boxgreen = mybwplot(dataprep$gc, intgroupcont = intgroupcont, ylab = "Green intensities", colsb = colsb, ...)
+          boxblue = mybwplot(dataprep$dat, intgroupcont = intgroupcont, ylab = "Log(Ratio)", colsb = colsb, ...) 
+        }
+      else box = mybwplot(dataprep$dat, intgroupcont = intgroupcont, ylab = "Intensities", colsb = colsb, ...)
+    } else {
+      if(dataprep$nchannels == 2)
+        {
+          boxred = mybwplot(dataprep$rc, ylab = "Red intensities", colsb = "#E31A1C", ...) 
+          boxgreen = mybwplot(dataprep$gc, ylab = "Green intensities", colsb = "#33A02C", ...) 
+          boxblue = mybwplot(dataprep$dat, ylab = "Log(Ratio)",  colsb = "#1F78B4", ...) 
+        } else box = mybwplot(dataprep$dat, ylab = "Intensities",  colsb = "#1F78B4", ...) 
+    }
+
   if(dataprep$nchannels == 2)
     {
-      boxred = bwplot(dataprep$rc ~ as.vector(col(dataprep$rc)),pch = "|", col = "black", do.out = FALSE, fill = "#E31A1C", horizontal = FALSE, box.ratio = 2, xlab = "", ylab = "Red intensities", asp = "iso", ...)
-      boxgreen = bwplot(dataprep$gc ~ as.vector(col(dataprep$gc)), pch = "|", col = "black", do.out = FALSE, fill = "#33A02C", horizontal = FALSE, box.ratio = 2,  xlab = "", ylab = "Green intensities", asp = "iso", ...)
-      boxblue = bwplot(dataprep$dat ~ as.vector(col(dataprep$dat)), pch = "|", col = "black", do.out = FALSE, fill = "#1F78B4", horizontal = FALSE, box.ratio = 2,  xlab = "", ylab = "Log(Ratio)", asp = "iso", ...)
       box = list("boxred" = boxred, "boxgreen" = boxgreen, "boxblue" = boxblue)
-      shape = "rect"
-    } else  {
-      box = bwplot(dataprep$dat ~ as.vector(col(dataprep$dat)), pch = "|", col = "black", do.out = FALSE, fill = "#1F78B4", horizontal = FALSE, box.ratio = 2, xlab = "", ylab = "Intensities", ...)
-      shape = "square"
-    }
+      shape = "rect"} else shape = "square"
+  
   legspe = if(dataprep$nchannels == 2) "The left panel corresponds to the red channel. The middle to the green channel. The right panel shows the boxplots of log<sub>2</sub>(ratio)." else ""
   
   legend = sprintf("The figure <!-- FIG --> presents boxplots of the log<sub>2</sub>(Intensities). Each box corresponds to one array. %s It gives a simple summary of the distribution of probe intensities accross all arrays. Typically, one expects the boxes to have similar size (IQR) and y position (median). If the distribution of an individual array is very different from the others, this may indicate an experimental problem. After normalisation, the distributions should be similar.", legspe)

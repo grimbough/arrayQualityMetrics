@@ -8,12 +8,18 @@
   formats the output for \code{aqm.plot} usage.
 }
 
-\usage{ aqm.boxplot(dataprep, ...) }
+\usage{ aqm.boxplot(expressionset, dataprep, intgroup = "Covariate", grouprep = FALSE, ...) }
 
 \arguments{
+  \item{expressionset}{ Same input as for the function
+    \code{\link{arrayQualityMetrics}} }
   \item{dataprep}{ An object of class
-  \code{\link[arrayQualityMetrics:class.aqmobj.prepdata]{aqmobj.prepdata}} }
-   \item{...}{ Any arguments to \code{\link[lattice:bwplot]{bwplot}} }
+    \code{\link[arrayQualityMetrics:class.aqmobj.prepdata]{aqmobj.prepdata}} }
+  \item{intgroup}{ Same input as for the function
+    \code{\link{arrayQualityMetrics}} }
+  \item{grouprep}{ Same input as for the function
+    \code{\link{arrayQualityMetrics}} }
+  \item{...}{ Any arguments to \code{\link[lattice:bwplot]{bwplot}} }
 }
 
 \value{ An object of class \code{\link{aqmobj.box}}. }

@@ -6,13 +6,12 @@ setGeneric("arrayQualityMetrics",
                     outdir = getwd(),
                     force = FALSE,
                     do.logtransform = FALSE,
-                    split.plots = FALSE,
                     intgroup = "Covariate",
                     grouprep = FALSE)
            standardGeneric("arrayQualityMetrics"))
 
 ## aqmInputObj
-setMethod("arrayQualityMetrics",signature(expressionset = "aqmInputObj"), function(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
+setMethod("arrayQualityMetrics",signature(expressionset = "aqmInputObj"), function(expressionset, outdir, force, do.logtransform, intgroup, grouprep)
           {
             olddir = getwd()
             on.exit(setwd(olddir))
@@ -43,7 +42,7 @@ setMethod("arrayQualityMetrics",signature(expressionset = "aqmInputObj"), functi
                   }                
               }
                         
-            obj$boxplot = try(aqm.boxplot(dataprep = datap))
+            obj$boxplot = try(aqm.boxplot(expressionset = expressionset, dataprep = datap, intgroup, grouprep))
             if(inherits(obj$boxplot,"try-error"))
               warning("Cannot draw boxplots \n")
 
@@ -114,38 +113,38 @@ setMethod("arrayQualityMetrics",signature(expressionset = "aqmInputObj"), functi
 
 
 ## RGList
-setMethod("arrayQualityMetrics",signature(expressionset = "RGList"), function(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
+setMethod("arrayQualityMetrics",signature(expressionset = "RGList"), function(expressionset, outdir, force, do.logtransform, intgroup, grouprep)
           {
             expressionset = try(as(expressionset, "NChannelSet"))
             if(inherits(expressionset,'try-error'))
               stop("The expressionset is a RGList and cannot be converted automatically in a NChannelSet. Try to convert it manually.\n")
-           arrayQualityMetrics(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
+           arrayQualityMetrics(expressionset, outdir, force, do.logtransform, intgroup, grouprep)
           })####end set method RGList
 
 ## marrayRaw
-setMethod("arrayQualityMetrics",signature(expressionset = "marrayRaw"), function(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
+setMethod("arrayQualityMetrics",signature(expressionset = "marrayRaw"), function(expressionset, outdir, force, do.logtransform, intgroup, grouprep)
           {
             expressionset = try(as(expressionset, "NChannelSet"))
             if(inherits(expressionset,'try-error'))
               stop("The expressionset is a marrayRaw and cannot be converted automatically in a NChannelSet. Try to convert it manually.\n")
-           arrayQualityMetrics(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
+           arrayQualityMetrics(expressionset, outdir, force, do.logtransform, intgroup, grouprep)
           })####end set method marrayRaw
 
 ## MAlist
-setMethod("arrayQualityMetrics",signature(expressionset = "MAList"), function(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
+setMethod("arrayQualityMetrics",signature(expressionset = "MAList"), function(expressionset, outdir, force, do.logtransform, intgroup, grouprep)
           {
             expressionset = try(as(expressionset, "ExpressionSet"))
             if(inherits(expressionset,'try-error'))
               stop("The expressionset is a MAList and cannot be converted automatically in a ExpressionSet. Try to convert it manually.\n")
-           arrayQualityMetrics(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
+           arrayQualityMetrics(expressionset, outdir, force, do.logtransform, intgroup, grouprep)
           })####end set method MAList
 
 ## marrayNorm
-setMethod("arrayQualityMetrics",signature(expressionset = "marrayNorm"), function(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
+setMethod("arrayQualityMetrics",signature(expressionset = "marrayNorm"), function(expressionset, outdir, force, do.logtransform, intgroup, grouprep)
           {
             expressionset = try(as(expressionset, "ExpressionSet"))
             if(inherits(expressionset,'try-error'))
               stop("The expressionset is a marrayNorm and cannot be converted automatically in a ExpressionSet. Try to convert it manually.\n")
-           arrayQualityMetrics(expressionset, outdir, force, do.logtransform, split.plots, intgroup, grouprep)
+           arrayQualityMetrics(expressionset, outdir, force, do.logtransform, intgroup, grouprep)
           })####end set method marrayNorm
 

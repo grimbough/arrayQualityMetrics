@@ -38,8 +38,6 @@ The function \Rfunction{arrayQualityMetrics} is called with the following argume
     are created. The default is the current directory.
 \item \emph{force}: if TRUE, if outdir already exists, it will be overwritten. The default is FALSE.
 \item \emph{do.logtransform}: if TRUE, the data are log transformed before the analysis. The default is FALSE.
-\item \emph{split.plots}: if the number of studied arrays is more than 50 it is 
-advised to define a number of experiments to represent on the density plots. The default is FALSE, meaning that all the density curves are represented on the same plot.
 \item \emph{intgroup}: is the name of the column in the \Rclass{phenoData} that contains the information about a covariate of interest to be shown as a side bar on the heatmap. The default name of this column is "Covariate".
 \item \emph{grouprep}: define if yes or no (TRUE or FALSE) you want the boxplots and density plots to be coloured according to the groups set in 'intgroup'. The default is FALSE.
 
@@ -161,19 +159,6 @@ arrayQualityMetrics(expressionset = rMLL,
 @
 %
 In that case, there will be two colour side bars on the heatmap. The argument 'grouprep' being TRUE, the colours used on the boxplot and density plots are the ones corresponding to the first factor of interest given in the vector 'intgroup'.
-
-\subsection{Splitting the plots}
-If we have a large number of arrays, the density plots are not readable. We thus can set the argument 'split.plots' to a number of density curves to be shown on one plot.
-
-%
-<<ExpressionSet with 1 intgroup>>=
-arrayQualityMetrics(expressionset = rMLL,
-                    outdir = "rMLLsp",
-                    force = TRUE,
-                    split.plots = 10)
-@ 
-%
-This argument can be set together with 'intgroup' and 'grouprep'.
 
 \section{Extended use}
 \label{ext}
