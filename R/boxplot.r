@@ -6,20 +6,26 @@ mybwplot = function(a, intgroupcont = NULL, ylab, colsb, ...)
 aqm.boxplot = function(expressionset, dataprep, intgroup = "Covariate", grouprep = FALSE, ...)
 {
   if(all(intgroup %in% names(phenoData(expressionset)@data)) && grouprep == TRUE)
-    {
+      {
+
       gp = intgroup[1]
       gpcont = pData(expressionset)[colnames(pData(expressionset))==gp]
       coloursb = brewer.pal(8,rownames(brewer.pal.info[brewer.pal.info$category=="qual",])[6])
       intgroupcont = gpcont[,gp]
       colsb = coloursb[as.factor(intgroupcont)]
-          
+     
+      key = list(rect = list(col=colsb[as.factor(levels(as.factor(unlist(intgroupcont))))]), text = list(levels(as.factor(unlist(intgroupcont)))))
+      key$rep = FALSE
+       
+      foo = draw.key(key = key)
+
       if(dataprep$nchannels == 2)
         {
-          boxred = mybwplot(dataprep$rc, intgroupcont = intgroupcont, ylab = "Red Intensities", colsb = colsb, ...)
-          boxgreen = mybwplot(dataprep$gc, intgroupcont = intgroupcont, ylab = "Green intensities", colsb = colsb, ...)
-          boxblue = mybwplot(dataprep$dat, intgroupcont = intgroupcont, ylab = "Log(Ratio)", colsb = colsb, ...) 
+          boxred = mybwplot(dataprep$rc, intgroupcont = intgroupcont, ylab = "Red Intensities", colsb = colsb, main = foo, ...)
+          boxgreen = mybwplot(dataprep$gc, intgroupcont = intgroupcont, ylab = "Green intensities", colsb = colsb, main = foo, ...)
+          boxblue = mybwplot(dataprep$dat, intgroupcont = intgroupcont, ylab = "Log(Ratio)", colsb = colsb, main = foo, ...) 
         }
-      else box = mybwplot(dataprep$dat, intgroupcont = intgroupcont, ylab = "Intensities", colsb = colsb, ...)
+      else box = mybwplot(dataprep$dat, intgroupcont = intgroupcont, ylab = "Intensities", colsb = colsb, main = foo, ...)
     } else {
       if(dataprep$nchannels == 2)
         {
