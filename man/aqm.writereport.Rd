@@ -23,8 +23,8 @@
        library("ALLMLL")
        data(MLL.A) 
        MLLprep = aqm.prepdata(MLL.A, TRUE)
-       bo = aqm.boxplot(MLLprep)
-       de = aqm.density(MLLprep)
+       bo = aqm.boxplot(MLL.A, MLLprep)
+       de = aqm.density(MLL.A, MLLprep)
        obj = list("Boxplot" = bo, "Density" = de)
        aqm.writereport("Test", MLL.A, obj)
 }
