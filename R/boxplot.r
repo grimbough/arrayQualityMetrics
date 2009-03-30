@@ -1,13 +1,26 @@
-mybwplot = function(a, intgroupcont = NULL, ylab, colsb, ...)
-  {
-    if(!is.null(intgroupcont)) bwplot(a ~ as.vector(col(a)), groups = intgroupcont[as.vector(col(a))], pch = "|",  col = "black", do.out = FALSE,  horizontal = FALSE, box.ratio = 2, xlab = "", ylab = ylab, asp = "iso", fill = colsb, panel = panel.superpose, panel.groups = panel.bwplot, ...) else bwplot(a ~ as.vector(col(a)), pch = "|",  col = "black", do.out = FALSE,  horizontal = FALSE, box.ratio = 2, xlab = "", ylab = ylab, asp = "iso", fill = colsb, ...)
-  }
-
 aqm.boxplot = function(expressionset, dataprep, intgroup = "Covariate", grouprep = FALSE, ...)
 {
-  if(all(intgroup %in% names(phenoData(expressionset)@data)) && grouprep == TRUE)
-      {
 
+  if(dataprep$nchannels == 2)
+    {
+      bsrc = boxplot(dataprep$rc, plot=F)
+      bsgc = boxplot(dataprep$gc, plot=F)
+      bsdat = boxplot(dataprep$dat, plot=F)
+          
+      bigdat = c(as.numeric(bsrc$stats), as.numeric(bsgc$stats), as.numeric(bsdat$stats))
+      colbigd = c(as.vector(col(bsrc$stat)), as.vector(col(bsgc$stats)), as.vector(col(bsdat$stats)))
+      fac = c(rep("a. Red Channel",dim(bsrc$stats)[1]*dim(bsrc$stats)[2]), rep("b. Green Channel",dim(bsgc$stats)[1]*dim(bsgc$stats)[2]), rep("c. Log(Ratio)",dim(bsdat$stats)[1]*dim(bsdat$stats)[2]))
+
+    }
+  else {
+    bsdat = boxplot(dataprep$dat, plot=F)
+    bigdat = as.numeric(bsdat$stats)
+    colbigd = as.vector(col(bsdat$stats))
+  }
+
+  
+  if(all(intgroup %in% names(phenoData(expressionset)@data)) && grouprep == TRUE)
+    {
       gp = intgroup[1]
       gpcont = pData(expressionset)[colnames(pData(expressionset))==gp]
       coloursb = brewer.pal(8,rownames(brewer.pal.info[brewer.pal.info$category=="qual",])[6])
@@ -21,24 +34,26 @@ aqm.boxplot = function(expressionset, dataprep, intgroup = "Covariate", grouprep
 
       if(dataprep$nchannels == 2)
         {
-          boxred = mybwplot(dataprep$rc, intgroupcont = intgroupcont, ylab = "Red Intensities", colsb = colsb, main = foo, ...)
-          boxgreen = mybwplot(dataprep$gc, intgroupcont = intgroupcont, ylab = "Green intensities", colsb = colsb, main = foo, ...)
-          boxblue = mybwplot(dataprep$dat, intgroupcont = intgroupcont, ylab = "Log(Ratio)", colsb = colsb, main = foo, ...) 
+          igcbd = intgroupcont[colbigd]
+          box = bwplot(bigdat ~ colbigd | factor(fac), horizontal=F, groups = igcbd, layout=c(3,1), as.table=T, strip = function(..., bg) strip.default(..., bg ="#cce6ff"), pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = colsb, panel = panel.superpose, panel.groups = panel.bwplot, main=foo)
         }
-      else box = mybwplot(dataprep$dat, intgroupcont = intgroupcont, ylab = "Intensities", colsb = colsb, main = foo, ...)
+      else {
+        igcbd = intgroupcont[colbigd]
+        box = bwplot(bigdat ~ colbigd, horizontal=F, groups = igcbd, pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = colsb, panel = panel.superpose, panel.groups = panel.bwplot, main=foo)
+      }
     } else {
       if(dataprep$nchannels == 2)
         {
-          boxred = mybwplot(dataprep$rc, ylab = "Red intensities", colsb = "#E31A1C", ...) 
-          boxgreen = mybwplot(dataprep$gc, ylab = "Green intensities", colsb = "#33A02C", ...) 
-          boxblue = mybwplot(dataprep$dat, ylab = "Log(Ratio)",  colsb = "#1F78B4", ...) 
-        } else box = mybwplot(dataprep$dat, ylab = "Intensities",  colsb = "#1F78B4", ...) 
+         box = bwplot(bigdat ~ colbigd | factor(fac), groups = which, horizontal=F, layout=c(3,1), as.table=T, strip = function(..., bg) strip.default(..., bg ="#cce6ff"), pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = c("#E31A1C", "#33A02C", "#1F78B4"))
+         ## Need to find a way to have the colours on the plot
+         ##E31A1C red
+         ##33A02C green
+         ##1F78B4 blue
+        } else box = bwplot(bigdat ~ colbigd, horizontal=F, pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = "#1F78B4")
     }
 
   if(dataprep$nchannels == 2)
-    {
-      box = list("boxred" = boxred, "boxgreen" = boxgreen, "boxblue" = boxblue)
-      shape = "rect"} else shape = "square"
+    shape = "rect" else shape = "square"
   
   legspe = if(dataprep$nchannels == 2) "The left panel corresponds to the red channel. The middle to the green channel. The right panel shows the boxplots of log<sub>2</sub>(ratio)." else ""
   

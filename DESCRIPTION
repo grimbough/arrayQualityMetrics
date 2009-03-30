@@ -1,13 +1,13 @@
 Package: arrayQualityMetrics
 Title: Quality metrics on microarray data sets
-Version: 2.0.19
+Version: 2.0.20
 Author: Audrey Kauffmann, Wolfgang Huber
 Maintainer: Audrey Kauffmann <audrey@ebi.ac.uk>
 Depends: affyPLM
 Suggests: 
 Imports: Biobase, RColorBrewer, affy, beadarray, genefilter,
          geneplotter, grDevices, graphics, hwriter, lattice,
-         latticeExtra, limma, marray, methods, simpleaffy, stats,
+	 latticeExtra, limma, marray, methods, simpleaffy, stats,
          stats4, utils, vsn
 Description: This package generates a quality metrics report on ExpressionSet, NChannelSet, AffyBatch or BeadLevelList objects containing microarray data with one or two channels. 
 License: LGPL version 2 or newer

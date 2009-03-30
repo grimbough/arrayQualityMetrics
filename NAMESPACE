@@ -53,9 +53,9 @@ importFrom(graphics, legend)
 
 importFrom(hwriter, closePage, hwrite, hwriteImage, openPage)
 
-importFrom(lattice, bwplot, densityplot, draw.key, levelplot,
-           make.groups, strip.default, trellis.par.get,
-           trellis.par.set, xyplot)
+importFrom(lattice, bwplot, panel.bwplot, densityplot, panel.superpose,
+           draw.key, levelplot, make.groups, strip.default,
+           trellis.par.get, trellis.par.set, xyplot)
 
 importFrom(latticeExtra, dendrogramGrob)
 

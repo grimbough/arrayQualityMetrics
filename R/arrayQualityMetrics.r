@@ -46,7 +46,7 @@ setMethod("arrayQualityMetrics",signature(expressionset = "aqmInputObj"), functi
             if(inherits(obj$boxplot,"try-error"))
               warning("Cannot draw boxplots \n")
 
-            obj$density = try(aqm.density(dataprep = datap))
+            obj$density = try(aqm.density(expressionset = expressionset, dataprep = datap, intgroup, grouprep))
             if(inherits(obj$density,"try-error"))
               warning("Cannot draw density plots \n")
 

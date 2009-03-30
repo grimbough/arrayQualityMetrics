@@ -1,4 +1,4 @@
-setClassUnion("aqmTrellis", c("aqmobj.ma", "aqmobj.heat", "aqmobj.pca", "aqmobj.probesmap", "aqmobj.spatial", "aqmobj.spatialbg"))
+setClassUnion("aqmTrellis", c("aqmobj.ma", "aqmobj.heat", "aqmobj.pca", "aqmobj.probesmap", "aqmobj.spatial", "aqmobj.spatialbg", "aqmobj.dens"))
 
 ##Creation of the outdir
 dircreation = function(outdir = getwd(), force = FALSE)
@@ -44,25 +44,7 @@ setMethod("aqm.plot",signature(obj = "aqmobj.box"), function(obj){
   box.umbrella <- trellis.par.get("box.umbrella")
   box.umbrella$col = "black"
   trellis.par.set("box.umbrella",box.umbrella)
-  if(class(obj$plot) == "trellis")
-    print(obj$plot)
-  if(class(obj$plot) == "list")
-    {
-      print(obj$plot$boxred, split = c(1,1,3,1), newpage = FALSE)
-      print(obj$plot$boxgreen, split = c(2,1,3,1), newpage = FALSE)
-      print(obj$plot$boxblue, split = c(3,1,3,1), newpage = FALSE)
-    }
-})
-
-setMethod("aqm.plot",signature(obj = "aqmobj.dens"), function(obj){
-  if(class(obj$plot) == "trellis")
-    print(obj$plot)
-  if(class(obj$plot) == "list")
-  {
-    print(obj$plot$den1, split = c(1,1,3,1), newpage = FALSE)
-    print(obj$plot$den2, split = c(2,1,3,1), newpage = FALSE)
-    print(obj$plot$den3, split = c(3,1,3,1), newpage = FALSE)
-  }
+  print(obj$plot)
 })
 
 setMethod("aqm.plot",signature(obj = "aqmobj.rle"), function(obj){
@@ -146,7 +128,7 @@ aqm.report.qm = function(p, qm, f, name)
   {
     if(qm$shape == "rect")
       {
-        h = 5
+        h = 6
         w = 10
       }
     if(qm$shape == "square")
@@ -154,7 +136,6 @@ aqm.report.qm = function(p, qm, f, name)
         h = 6
         w = 6
       }
-
     
     dpi = 72
 
