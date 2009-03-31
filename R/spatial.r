@@ -226,7 +226,7 @@ aqm.spatialbg = function(expressionset, dataprep, scale)
   title = "Spatial distribution of local background intensities"
   section = "Individual array quality"
   
-  legend = sprintf("The figure <!-- FIG --> shows false color representations of the arrays' spatial distributions of feature local background estimates. The color scale is shown in the panel on the right, and it is proportional to the ranks of the probe background intensities.")
+  legend = sprintf("The figure <!-- FIG --> shows false colour representations of the arrays' spatial distributions of feature local background estimates. The colour scale is shown in the panel on the right, and it is proportional to the ranks of the probe background intensities.")
 
   out = list("plot" = bg, "section" = section, "title" = title, "legend" = legend, "shape" = "square")
   class(out) = "aqmobj.spatialbg"
@@ -244,7 +244,7 @@ aqm.spatial = function(expressionset, dataprep, scale)
   title = "Spatial distribution of feature intensities"
   section = "Individual array quality"
 
-  legend = sprintf("The figure <!-- FIG --> shows false color representations of the arrays' spatial distributions of feature intensities. The color scale is shown in the panel on the right, and it is proportional to the ranks of the probe intensities. Normally, when the features are distributed randomly on the arrays, one expects to see a uniform distribution; sets of control features with particularily high or low intensities may stand out. Note that the rank scale has the potential to amplify patterns that are small in amplitude but systematic within an array. It is possible to create plots that are not in rank scale but log-transformed scale, calling the aqm.spatial function and modifying the argument 'scale'.")          
+  legend = sprintf("The figure <!-- FIG --> shows false colour representations of the arrays' spatial distributions of feature intensities. The colour scale is shown in the panel on the right, and it is proportional to the ranks of the probe intensities. Normally, when the features are distributed randomly on the arrays, one expects to see a uniform distribution; sets of control features with particularly high or low intensities may stand out. Note that the rank scale has the potential to amplify patterns that are small in amplitude but systematic within an array. It is possible to create plots that are not in rank scale but log-transformed scale, calling the aqm.spatial function and modifying the argument 'scale'.")          
 
   if(!inherits(expressionset, "BeadLevelList"))
     loc = scoresspat(expressionset, dataprep, dataprep$dat)

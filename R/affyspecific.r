@@ -21,7 +21,7 @@ aqm.rnadeg =function(expressionset, ...)
     if(class(rnaDeg)=='try-error')
       warning("RNA degradation plot from the package 'affy' cannot be produced for this data set.")
 
-    legend = "In the figure <!-- FIG -->, a RNA digestion plot is computed on normalized data (so that standard deviation is equal to 1). In this plot each array is represented by a single line. It is important to identify any array(s) that has a slope which is very different from the others. The indication is that the RNA used for that array has potentially been handled quite differently from the other arrays. This diagnostic plot is based on tools provided in the <b>affy</b> package."
+    legend = "In the figure <!-- FIG -->, a RNA digestion plot is computed on normalised data (so that standard deviation is equal to 1). In this plot each array is represented by a single line. It is important to identify any array(s) that has a slope which is very different from the others. The indication is that the RNA used for that array has potentially been handled quite differently from the other arrays. This diagnostic plot is based on tools provided in the <b>affy</b> package."
 
     title = "RNA degradation plot"
     section = "Affymetrix specific plots"
@@ -40,7 +40,7 @@ aqm.rle = function(affyproc, ...)
       whisklty = 0, staplelty = 0,
       main = "RLE", las = 3, cex.axis = 0.8, plot = FALSE, ...))
 
-    legend = "The figure <!-- FIG --> is a Relative Log Expression (RLE) plot. RLE are performed on preprocessed data (background correction and quantile normalization). An array that has problems will either have larger spread, or will not be centered at M = 0, or both. This diagnostic plot is based on tools provided in the <b>affyPLM</b> package."
+    legend = "The figure <!-- FIG --> is a Relative Log Expression (RLE) plot. RLE are performed on preprocessed data (background correction and quantile normalisation). An array that has problems will either have larger spread, or will not be centred at M = 0, or both. This diagnostic plot is based on tools provided in the <b>affyPLM</b> package."
 
     title = "Relative Log Expression plot"
 
@@ -61,7 +61,7 @@ aqm.nuse = function(affyproc, ...)
     outline = FALSE, col =  brewer.pal(9, "Set1")[2], main = "NUSE",
     las = 2, cex.axis = 0.8), ...)
 
-  legend = "The figure <!-- FIG --> is a Normalized Unscaled Standard Error (NUSE) plot. NUSE are performed on preprocessed data (background correction and quantile normalization). Low quality arrays are those that are substantially elevated or more spread out, relative to the other arrays. NUSE values are not comparable across data sets. This diagnostic plot is based on tools provided in the <b>affyPLM</b> package."
+  legend = "The figure <!-- FIG --> is a Normalized Unscaled Standard Error (NUSE) plot. NUSE are performed on preprocessed data (background correction and quantile normalisation). Low quality arrays are those that are substantially elevated or more spread out, relative to the other arrays. NUSE values are not comparable across data sets. This diagnostic plot is based on tools provided in the <b>affyPLM</b> package."
 
   title = "Normalized Unscaled Standard Error plot"
   section = "Affymetrix specific plots"
@@ -106,9 +106,9 @@ aqm.pmmm = function(expressionset, ...)
   MM = density(as.matrix(log2(mm(expressionset))), ...)
   PMMM = list(PM = PM, MM = MM)
 
-  legend = "The figure <!-- FIG --> shows the density distributions of the log<sub>2</sub> intensities grouped by the matching of the probes. Blue, density estimate of intensities of perfect match probes (PM) and gray the mismatch probes (MM). We expect that, MM probes having poorer hybridization than PM probes, the PM curve should be shifted to the right of the MM curve."
+  legend = "The figure <!-- FIG --> shows the density distributions of the log<sub>2</sub> intensities grouped by the matching of the probes. Blue, density estimate of intensities of perfect match probes (PM) and grey the mismatch probes (MM). We expect that, MM probes having poorer hybridization than PM probes, the PM curve should be shifted to the right of the MM curve."
 
-  title = "Perfect matchs and mismatchs"
+  title = "Perfect matches and mismatches"
   section = "Affymetrix specific plots"
   out = list("plot" = PMMM, "section" = section, "title" = title, "legend" = legend, shape = "square")
   class(out) = "aqmobj.pmmm"

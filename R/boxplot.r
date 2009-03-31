@@ -39,7 +39,7 @@ aqm.boxplot = function(expressionset, dataprep, intgroup = "Covariate", grouprep
         }
       else {
         igcbd = intgroupcont[colbigd]
-        box = bwplot(bigdat ~ colbigd, horizontal=F, groups = igcbd, pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = colsb, panel = panel.superpose, panel.groups = panel.bwplot, main=foo)
+        box = bwplot(bigdat ~ colbigd, horizontal=F, groups = igcbd, pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = colsb, panel = panel.superpose, panel.groups = panel.bwplot, main=foo, ylab = "")
       }
     } else {
       if(dataprep$nchannels == 2)
@@ -49,7 +49,7 @@ aqm.boxplot = function(expressionset, dataprep, intgroup = "Covariate", grouprep
          ##E31A1C red
          ##33A02C green
          ##1F78B4 blue
-        } else box = bwplot(bigdat ~ colbigd, horizontal=F, pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = "#1F78B4")
+        } else box = bwplot(bigdat ~ colbigd, horizontal=F, pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", ylab= "",  fill = "#1F78B4")
     }
 
   if(dataprep$nchannels == 2)
@@ -57,7 +57,7 @@ aqm.boxplot = function(expressionset, dataprep, intgroup = "Covariate", grouprep
   
   legspe = if(dataprep$nchannels == 2) "The left panel corresponds to the red channel. The middle to the green channel. The right panel shows the boxplots of log<sub>2</sub>(ratio)." else ""
   
-  legend = sprintf("The figure <!-- FIG --> presents boxplots of the log<sub>2</sub>(Intensities). Each box corresponds to one array. %s It gives a simple summary of the distribution of probe intensities accross all arrays. Typically, one expects the boxes to have similar size (IQR) and y position (median). If the distribution of an individual array is very different from the others, this may indicate an experimental problem. After normalisation, the distributions should be similar.", legspe)
+  legend = sprintf("The figure <!-- FIG --> presents boxplots of the log<sub>2</sub>(Intensities). Each box corresponds to one array. %s It gives a simple summary of the distribution of probe intensities across all arrays. Typically, one expects the boxes to have similar size (IQR) and y position (median). If the distribution of an individual array is very different from the others, this may indicate an experimental problem. After normalisation, the distributions should be similar.", legspe)
 
   title = "Boxplots"
   section = "Array intensity distributions"

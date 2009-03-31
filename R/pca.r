@@ -12,7 +12,7 @@ aqm.pca = function(expressionset, dataprep, intgroup = "Covariate", ...)
     key$space = "top"
     pcafig = xyplot(PC2 ~ PC1 , as.data.frame(pca$x), pch=19, col=cols, key = key)
 
-    legend = "The figure <!-- FIG --> represents a biplot for the first two principal components from the dataset. The colours correspond to the group of interest given. We expect the arrays to cluster accordingly to a relevant experimental factor. The principal components transformation of a data matrix reexpresses the features using linear combination of the original variables. The first principal component is the linear combination chosen to possess maximal variance, the second is the linear combination orthogonal to the first possessing maximal variance among all orthogonal combination."
+    legend = "The figure <!-- FIG --> represents a biplot for the first two principal components from the dataset. The colours correspond to the group of interest given. We expect the arrays to cluster accordingly to a relevant experimental factor. The principal components transformation of a data matrix re-expresses the features using linear combination of the original variables. The first principal component is the linear combination chosen to possess maximal variance, the second is the linear combination orthogonal to the first possessing maximal variance among all orthogonal combination."
     title = "Principal Component Analysis"
     section = "Between array comparison"
    
