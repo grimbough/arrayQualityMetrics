@@ -80,7 +80,7 @@ force, do.logtransform, intgroup, grouprep)
   the analysis. }
   
 \item{intgroup}{ Name of the column of the phenoData to be used to draw
-  a color side bar next to the heatmap. }
+  a colour side bar next to the heatmap. }
 
 \item{grouprep}{ Decide if you want the boxplots and density plots to be
   coloured function of the groups set by 'intgroup'. The default

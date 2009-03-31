@@ -44,11 +44,7 @@ aqm.boxplot = function(expressionset, dataprep, intgroup = "Covariate", grouprep
     } else {
       if(dataprep$nchannels == 2)
         {
-         box = bwplot(bigdat ~ colbigd | factor(fac), groups = which, horizontal=F, layout=c(3,1), as.table=T, strip = function(..., bg) strip.default(..., bg ="#cce6ff"), pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = c("#E31A1C", "#33A02C", "#1F78B4"))
-         ## Need to find a way to have the colours on the plot
-         ##E31A1C red
-         ##33A02C green
-         ##1F78B4 blue
+         box = bwplot(bigdat ~ colbigd | factor(fac), groups = which, horizontal=F, layout=c(3,1), as.table=T, strip = function(..., bg) strip.default(..., bg ="#cce6ff"), pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = "#1F78B4")
         } else box = bwplot(bigdat ~ colbigd, horizontal=F, pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", ylab= "",  fill = "#1F78B4")
     }
 
