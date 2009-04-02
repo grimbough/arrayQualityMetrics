@@ -28,7 +28,7 @@ setMethod("arrayQualityMetrics",signature(expressionset = "aqmInputObj"), functi
             if(inherits(obj$maplot,"try-error"))
               warning("Cannot draw MA plots \n")
 
-            if(inherits(expressionset, 'BeadLevelList') || ("X" %in% rownames(featureData(expressionset)@varMetadata) && "Y" %in% rownames(featureData(expressionset)@varMetadata)))
+            if(inherits(expressionset, 'BeadLevelList') || inherits(expressionset, 'AffyBatch') || ("X" %in% rownames(featureData(expressionset)@varMetadata) && "Y" %in% rownames(featureData(expressionset)@varMetadata)))
               {            
                 obj$spatial =  try(aqm.spatial(expressionset = expressionset, dataprep = datap, scale = "Rank"))
                 if(inherits(obj$spatial,"try-error"))
