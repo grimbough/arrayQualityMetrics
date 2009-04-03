@@ -67,7 +67,7 @@ data("MLL.A")
 Now that the data are loaded, we can call \Rfunction{arrayQualityMetrics}.
 
 %
-<<AffyBatch QM>>=
+<<AffyBatch QM,results=hide>>=
 library("arrayQualityMetrics")
 arrayQualityMetrics(expressionset = MLL.A,
                     outdir = "MLL",
@@ -91,7 +91,7 @@ rMLL = rma(MLL.A)
 We can then call the \Rfunction{arrayQualityMetrics} function the standard way:
 
 %
-<<ExpressionSet>>=
+<<ExpressionSet,results=hide>>=
 arrayQualityMetrics(expressionset = rMLL,
                     outdir = "rMLL",
                     force = TRUE)
@@ -137,7 +137,7 @@ pData(rMLL)$fakefac = rep(letters[1:4],5)
 Here we have created fake phenoData (sample annotation) because we do not know anything about the samples, but this can be your factor of interest (time, mutant, concentration, clinical state etc...). Then we can set the 'intgroup' argument as the name of the column containing the information we want to show on the report.
 
 %
-<<ExpressionSet with 1 intgroup>>=
+<<ExpressionSet with 1 intgroup,results=hide>>=
 arrayQualityMetrics(expressionset = rMLL,
                     outdir = "rMLL1fac",
                     force = TRUE,
@@ -149,7 +149,7 @@ With 'grouprep' being TRUE, we have the colour side bar on the heatmap and the b
 \\
 If we have several factors of interest, we can set 'intgroup' as a vector of column names.
 %
-<<ExpressionSet with 2 intgroup>>=
+<<ExpressionSet with 2 intgroup,results=hide>>=
 pData(rMLL)$fakefac2 = c(rep(LETTERS[1],10), rep(LETTERS[2],10))
 arrayQualityMetrics(expressionset = rMLL,
                     outdir = "rMLL2fac",
@@ -221,7 +221,7 @@ phenoData(nCCl4)$RNAintegrity = cov
 \subsection{Report production}
 
 %
-<<NChannelSet>>=
+<<NChannelSet,results=hide>>=
 arrayQualityMetrics(expressionset = nCCl4,
                     outdir = "CCl4complete",
                     force = TRUE,
