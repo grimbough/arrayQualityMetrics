@@ -4,7 +4,7 @@ Version: 2.0.26
 Author: Audrey Kauffmann, Wolfgang Huber
 Maintainer: Audrey Kauffmann <audrey@ebi.ac.uk>
 Depends: affyPLM
-Suggests: ALLMLL
+Suggests: ALLMLL, CCl4
 Imports: Biobase, RColorBrewer, affy, beadarray, genefilter,
          grDevices, graphics, hwriter, lattice, latticeExtra,
          limma, marray, methods, simpleaffy, stats, stats4,
