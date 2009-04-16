@@ -35,8 +35,8 @@
       intensities if two channels arrays and if available.}
     
     \item{\code{outM}:}{ The distance between each pairs of arrays,
-      computed using \code{\link[geneplotter:dist2]{dist2}} from the
-      \code{\link[geneplotter:dist2]{geneplotter}} package.}
+      computed using \code{\link[genefilter:dist2]{dist2}} from the
+      \code{\link[genefilter:dist2]{genefilter}} package.}
        
     \item{\code{sN}:}{ Integers numbering the arrays to be used to label
       the plots.}

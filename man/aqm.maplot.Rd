@@ -13,7 +13,7 @@
 \arguments{
   \item{dataprep}{ An object of class \code{\link{aqmobj.prepdata}}}
   \item{...}{ Any arguments to
-  \code{\link[geneplotter:panel.smoothScatter]{panel.smoothScatter}} }
+  \code{\link[lattice:panel.smoothScatter]{panel.smoothScatter}} }
 }
 
 \value{ An object of class \code{\link{aqmobj.ma}}. }

@@ -1,7 +1,6 @@
 #Imports: Biobase, RColorBrewer, affy, affyPLM, beadarray, genefilter,
-#         geneplotter, grDevices, graphics, hwriter, lattice,
-#         latticeExtra, limma, marray, methods, simpleaffy, stats,
-#         stats4, utils, vsn
+#         grDevices, graphics, hwriter, lattice, latticeExtra, limma,
+#         marray, methods, simpleaffy, stats, stats4, utils, vsn
 
 importClassesFrom(affy, AffyBatch)
 
@@ -43,8 +42,6 @@ importFrom(affy, AffyRNAdeg, plotAffyRNAdeg)
 importFrom(beadarray, createBeadSummaryData)
 
 importFrom(genefilter, dist2)
-
-importFrom(geneplotter, panel.smoothScatter)
 
 importFrom(grDevices, boxplot.stats, colorRampPalette, dev.off, pdf,
            png, rgb)
