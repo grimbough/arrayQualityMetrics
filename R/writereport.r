@@ -172,13 +172,7 @@ aqm.make.ending = function(p)
 ##Score table formatting
 scores = function(expressionset, obj)
   {
-    if(inherits(expressionset, "BeadLevelList"))
-      sN = arrayNames(expressionset)
-    if(inherits(expressionset, "NChannelSet"))
-      sN = sampleNames(expressionset)$R
-    if(inherits(expressionset, "ExpressionSet") || inherits(expressionset, "AffyBatch"))
-      sN = sampleNames(expressionset)
-
+    sN = sampleNames(expressionset)
     nscores = 0
     namesm = c()
 

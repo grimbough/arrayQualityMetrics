@@ -28,7 +28,7 @@ setMethod("aqm.prepdata",signature(expressionset = "NChannelSet"), function(expr
 
   M = dat = rc - gc
   A = 0.5*(rc+gc)
-  sN = seq_len(length(sampleNames(expressionset)$R))
+  sN = seq_len(length(sampleNames(expressionset)))
   numArrays = ncol(rc)
   colnames(dat) = sN
   if("dyeswap" %in% names(phenoData(expressionset)@data))
