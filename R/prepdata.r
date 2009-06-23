@@ -61,7 +61,7 @@ setMethod("aqm.prepdata",signature(expressionset = "aqmOneCol"), function(expres
   numArrays = ncol(dat)
   outM = as.dist(dist2(dat))
   
-  object = list("M" = M, "A" = A, "dat" = dat, "outM" = outM, "sN" = sN, "numArrays" = numArrays, "nchannels" = 1, "logtransformed" = do.logtransform, "classori" = class(expressionset)[1])
+  object = list("rc" = NULL, "gc" = NULL,  "rcb" = NULL, "gcb" = NULL,"M" = M, "A" = A, "dat" = dat, "outM" = outM, "sN" = sN, "numArrays" = numArrays, "nchannels" = 1, "logtransformed" = do.logtransform, "classori" = class(expressionset)[1])
   class(object) = "aqmobj.prepdata"
   return(object)
 })
@@ -102,7 +102,7 @@ setMethod("aqm.prepdata",signature(expressionset = "BeadLevelList"), function(ex
       A = 0.5*(rc +gc)
     }
   
-  object = list("rc" = rc, "gc" = gc, "M" = M, "A" = A, "dat" = dat, "outM" = outM, "sN" = sN, "numArrays" = numArrays, "nchannels" = nch, "logtransformed" = do.logtransform, "classori" = class(expressionset)[1])
+  object = list("rc" = rc, "gc" = gc, "rcb" = NULL, "gcb" = NULL, "M" = M, "A" = A, "dat" = dat, "outM" = outM, "sN" = sN, "numArrays" = numArrays, "nchannels" = nch, "logtransformed" = do.logtransform, "classori" = class(expressionset)[1])
   class(object) = "aqmobj.prepdata"
   return(object)
 })

@@ -23,16 +23,16 @@
       the intensities if one channel.}
     
     \item{\code{rc}:}{ A matrix with the red channel intensities in the
-      case of two channels arrays.}
+      case of two channels arrays. NULL if one colour arrays.}
     
     \item{\code{gc}:}{ A matrix with the green channel intensities in the
-      case of two channels arrays.}
+      case of two channels arrays. NULL if one colour arrays.}
  
     \item{\code{rcb}:}{ A matrix with the red channel background
-      intensities if two channels arrays and if available.}
+      intensities if two channels arrays and if available. NULL if one colour arrays.}
     
     \item{\code{gcb}:}{ A matrix with the green channel background
-      intensities if two channels arrays and if available.}
+      intensities if two channels arrays and if available. NULL if one colour arrays.}
     
     \item{\code{outM}:}{ The distance between each pairs of arrays,
       computed using \code{\link[genefilter:dist2]{dist2}} from the

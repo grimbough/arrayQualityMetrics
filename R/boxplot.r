@@ -27,19 +27,19 @@ aqm.boxplot = function(expressionset, dataprep, intgroup = "Covariate", grouprep
       intgroupcont = gpcont[,gp]
       colsb = coloursb[as.factor(intgroupcont)]
      
-      key = list(rect = list(col=colsb[as.factor(levels(as.factor(unlist(intgroupcont))))]), text = list(levels(as.factor(unlist(intgroupcont)))))
+      key = list(rect = list(col=unlist(coloursb)[as.factor(levels(as.factor(unlist(gpcont[,1]))))]), text = list(levels(as.factor(unlist(gpcont[,1])))))
       key$rep = FALSE
-       
+  
       foo = draw.key(key = key)
 
       if(dataprep$nchannels == 2)
         {
           igcbd = intgroupcont[colbigd]
-          box = bwplot(bigdat ~ colbigd | factor(fac), horizontal=F, groups = igcbd, layout=c(3,1), as.table=T, strip = function(..., bg) strip.default(..., bg ="#cce6ff"), pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = colsb, panel = panel.superpose, panel.groups = panel.bwplot, main=foo)
+          box = bwplot(bigdat ~ colbigd | factor(fac), horizontal=F, groups = igcbd, layout=c(3,1), as.table=T, strip = function(..., bg) strip.default(..., bg ="#cce6ff"), pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = unique(colsb), panel = panel.superpose, panel.groups = panel.bwplot, main=foo)
         }
       else {
         igcbd = intgroupcont[colbigd]
-        box = bwplot(bigdat ~ colbigd, horizontal=F, groups = igcbd, pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = colsb, panel = panel.superpose, panel.groups = panel.bwplot, main=foo, ylab = "")
+        box = bwplot(bigdat ~ colbigd, horizontal=F, groups = igcbd, pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = unique(colsb), panel = panel.superpose, panel.groups = panel.bwplot, main=foo, ylab = "")
       }
     } else {
       if(dataprep$nchannels == 2)

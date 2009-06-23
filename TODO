@@ -1,5 +1,12 @@
-9.) Duplicate correlation
+1.) Duplicate correlation
 -------------------------
 If featureData contains a factor that identifies features containing 
 the same reporter sequence, we can check for that (scatterplots, 
 standard deviation)
+
+2.) Outlier detection
+---------------------
+Use outliers package and mvoutlier package as alternatives to boxplot.stats. See flowQ as a model.
+outliers: chisq.out.test - reject extreme outliers, if no known variance is specified.
+outliers: dixon.test
+outliers: grubbs.test - small sample?

@@ -29,9 +29,9 @@ aqm.density = function(expressionset, dataprep, intgroup = "Covariate", grouprep
       intgroupcont = gpcont[,gp]
       colsb = coloursb[as.factor(intgroupcont)]
      
-      key = list(rect = list(col=colsb[as.factor(levels(as.factor(unlist(intgroupcont))))]), text = list(levels(as.factor(unlist(intgroupcont)))))
+      key = list(rect = list(col=unlist(coloursb)[as.factor(levels(as.factor(unlist(gpcont[,1]))))]), text = list(levels(as.factor(unlist(gpcont[,1])))))
       key$rep = FALSE
-       
+  
       foo = draw.key(key = key)
 
       if(dataprep$nchannels == 2)

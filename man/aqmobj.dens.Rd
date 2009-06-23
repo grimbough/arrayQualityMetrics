@@ -14,7 +14,7 @@
       \code{\link[lattice:trellis.object]{trellis.object}} if one
       channel arrays and a list of trellis.object if several channels arrays. }
     
-    \item{\code{type}:}{ A character string with a name for the section
+    \item{\code{section}:}{ A character string with a name for the section
       the plot belongs to in the report. }
     
     \item{\code{title}:}{ A character string with the title of the plot

@@ -13,7 +13,7 @@
     \item{\code{plot}:}{ An object of class
       \code{\link[lattice:trellis.object]{trellis.object}}. }
     
-    \item{\code{type}:}{ A character string with a name for the section
+    \item{\code{section}:}{ A character string with a name for the section
       the plot belongs to in the report. }
     
     \item{\code{title}:}{ A character string with the title of the plot

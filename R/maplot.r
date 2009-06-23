@@ -20,7 +20,7 @@ maplotdraw = function(M, A, sN, numArrays, nchannels, class, ...)
       panel = function(x, y, ...) {
         x <- A[, x]
         y <- M[, y]
-        panel.smoothScatter(x, y ,...)
+        panel.smoothScatter(x, y , nbin=128,...)
       },
       as.table=TRUE,      
       layout = c(app/2, 2, 1),

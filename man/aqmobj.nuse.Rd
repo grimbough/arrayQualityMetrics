@@ -13,7 +13,7 @@
     \item{\code{plot}:}{ A matrix to be represented calling the
       \code{\link{aqm.plot}} function. }
 
-    \item{\code{type}:}{ A character string with a name for the section
+    \item{\code{section}:}{ A character string with a name for the section
       the plot belongs to in the report. }
     
     \item{\code{title}:}{ A character string with the title of the plot
