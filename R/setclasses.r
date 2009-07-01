@@ -22,10 +22,10 @@ setClass("aqmobj.ma", representation(plot="ANY", section="character", title="cha
 
 setClass("aqmobj.spatial", representation(plot="ANY", section="character", title="character", legend="character", scores="numeric", outliers="ANY", shape = "character"))
 
-setClass("aqmobj.spatialbg", representation(plot="ANY", section="character", title="character", legend="character", scores="numeric", outliers="ANY", shape = "character"))
+setClass("aqmobj.spatialbg", representation(plot="ANY", section="character", title="character", legend="character", shape = "character"))
 
 setClass("aqmobj.msd", representation(plot="ANY", section="character", title="character", legend="character", shape = "character"))
 
-setClass("aqmobj.prepdata", representation(M = "matrix", A = "matrix", dat = "matrix", outM = "ANY", sN = "ANY", numArrays = "numeric", nchannels = "numeric", logtransformed = "logical", classori = "character"))
+setClass("aqmobj.prepdata", representation(rc = "matrix", gc = "matrix", rcb = "matrix", gcb = "matrix", M = "matrix", A = "matrix", dat = "matrix", outM = "ANY", sN = "ANY", numArrays = "numeric", nchannels = "numeric", logtransformed = "logical", classori = "character"))
 
 setClass("aqmobj.prepaffy", representation(dataPLM = "PLMset", sN = "character"))

@@ -56,6 +56,8 @@ importFrom(lattice, bwplot, panel.bwplot, densityplot, panel.smoothScatter,
 
 importFrom(latticeExtra, dendrogramGrob)
 
+importFrom(outliers, chisq.out.test, dixon.test, grubbs.test)
+
 importFrom(methods, as, is)
 
 importFrom(simpleaffy, plot.qc.stats)
