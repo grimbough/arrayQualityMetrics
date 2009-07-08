@@ -59,7 +59,7 @@ aqm.nuse = function(affyproc, ...)
 { 
   nuse = try(boxplot(affyproc$dataPLM, ylim = c(0.95, 1.5), names = affyproc$sN,
     outline = FALSE, col =  brewer.pal(9, "Set1")[2], main = "NUSE",
-    las = 2, cex.axis = 0.8), ...)
+    las = 2, cex.axis = 0.8, plot=FALSE,...))
 
   legend = "The figure <!-- FIG --> is a Normalized Unscaled Standard Error (NUSE) plot. NUSE are performed on preprocessed data (background correction and quantile normalisation). Low quality arrays are those that are substantially elevated or more spread out, relative to the other arrays. NUSE values are not comparable across data sets. This diagnostic plot is based on tools provided in the <b>affyPLM</b> package."
 
