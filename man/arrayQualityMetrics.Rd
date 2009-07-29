@@ -30,9 +30,6 @@
 }
 
 \usage{
-\S4method{arrayQualityMetrics}{ExpressionSet}(expressionset, outdir,
-force, do.logtransform, intgroup, grouprep)
-
 arrayQualityMetrics(expressionset,
                     outdir = getwd(),
                     force = FALSE,
@@ -40,22 +37,6 @@ arrayQualityMetrics(expressionset,
                     intgroup = "Covariate",
                     grouprep = FALSE)
 
-\S4method{arrayQualityMetrics}{AffyBatch}(expressionset, outdir, force,
-do.logtransform, intgroup, grouprep)
-\S4method{arrayQualityMetrics}{NChannelSet}(expressionset, outdir,
-force, do.logtransform, intgroup, grouprep)
-\S4method{arrayQualityMetrics}{BeadLevelList}(expressionset, outdir,
-force, do.logtransform, intgroup, grouprep)
-\S4method{arrayQualityMetrics}{RGList}(expressionset, outdir,
-force, do.logtransform, intgroup, grouprep)
-\S4method{arrayQualityMetrics}{MAList}(expressionset, outdir,
-force, do.logtransform, intgroup, grouprep)
-\S4method{arrayQualityMetrics}{aqmInputObj}(expressionset, outdir,
-force, do.logtransform, intgroup, grouprep)
-\S4method{arrayQualityMetrics}{marrayRaw}(expressionset, outdir,
-force, do.logtransform, intgroup, grouprep)
-\S4method{arrayQualityMetrics}{marrayNorm}(expressionset, outdir,
-force, do.logtransform, intgroup, grouprep)
 }
 
 \arguments{

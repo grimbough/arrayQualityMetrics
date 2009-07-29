@@ -16,17 +16,7 @@
 \description{ \code{aqm.plot} performs plots. }
 
 \usage{
-\S4method{aqm.plot}{aqmTrellis}(obj)
-
 aqm.plot(obj)
-
-\S4method{aqm.plot}{aqmobj.box}(obj)
-\S4method{aqm.plot}{aqmobj.dens}(obj)
-\S4method{aqm.plot}{aqmobj.msd}(obj)
-\S4method{aqm.plot}{aqmobj.nuse}(obj)
-\S4method{aqm.plot}{aqmobj.pmmm}(obj)
-\S4method{aqm.plot}{aqmobj.qcs}(obj)
-\S4method{aqm.plot}{aqmobj.rle}(obj)
 }
 
 \arguments{

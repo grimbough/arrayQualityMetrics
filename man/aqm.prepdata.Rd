@@ -17,14 +17,7 @@
   the aqm functions.}
 
 \usage{
-\S4method{aqm.prepdata}{ExpressionSet}(expressionset, do.logtransform)
-
 aqm.prepdata(expressionset, do.logtransform = TRUE)
-
-\S4method{aqm.prepdata}{AffyBatch}(expressionset, do.logtransform)
-\S4method{aqm.prepdata}{NChannelSet}(expressionset, do.logtransform)
-\S4method{aqm.prepdata}{BeadLevelList}(expressionset, do.logtransform)
-\S4method{aqm.prepdata}{aqmOneCol}(expressionset, do.logtransform)
 }
 
 \arguments{
@@ -50,7 +43,6 @@ aqm.prepdata(expressionset, do.logtransform = TRUE)
     ## Load an example of a NChannelSet
     library(CCl4)
     data(CCl4)
-    scanDates(CCl4) = rep("2006/07/19", ncol(CCl4)) # temporary fix
 
     ## Normalization of CCl4 using vsn
     library(vsn)

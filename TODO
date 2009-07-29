@@ -1,3 +1,9 @@
+0.) scanDates handling for next release
+---------------------------------------
+In aqm.prepdata help:
+protocolData(CCl4)$scanDates = rep("2006/07/19", ncol(CCl4)) # to add soon
+
+
 1.) Duplicate correlation
 -------------------------
 If featureData contains a factor that identifies features containing 
@@ -7,6 +13,3 @@ standard deviation)
 2.) Outlier detection
 ---------------------
 Use outliers package and mvoutlier package as alternatives to boxplot.stats. See flowQ as a model.
-outliers: chisq.out.test - reject extreme outliers, if no known variance is specified.
-outliers: dixon.test
-outliers: grubbs.test - small sample?
