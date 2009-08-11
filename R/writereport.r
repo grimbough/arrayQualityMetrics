@@ -103,6 +103,7 @@ aqm.make.index = function(obj, p)
   s = 1
   hwrite("<hr>", p)
   hwrite("Index",p, heading=2, style='font-family:helvetica,arial,sans-serif')
+  hwrite("PLEASE NOTE:<br>All figures below are links to PDF files: these contain images for every array in the report.  The PDF files may be several pages long, this HTML report presents only the first page.", p, style='font-weight:bold;font-family:helvetica;font-size:11pt;color:#FF0000')
 
   hwrite("<UL>", p)
   lasttype = "FAKE"
