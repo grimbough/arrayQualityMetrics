@@ -35,7 +35,8 @@ arrayQualityMetrics(expressionset,
                     force = FALSE,
                     do.logtransform = FALSE,
                     intgroup = "Covariate",
-                    grouprep = FALSE)
+                    grouprep = FALSE,
+		    spatial = TRUE)
 
 }
 
@@ -67,6 +68,8 @@ arrayQualityMetrics(expressionset,
   coloured function of the groups set by 'intgroup'. The default
   is FALSE meaning that the boxplot and density plots will not be
   represented function of the groups of 'intgroup'.}
+
+\item{spatial}{ If FALSE, the spatial representations are not performed. This is useful for large arrays(like Affymetrix hgu133Plus2) when these figures are slow to be drawn and can cause machines with low memory to fail to perform the report. }
 }
 
 \details{

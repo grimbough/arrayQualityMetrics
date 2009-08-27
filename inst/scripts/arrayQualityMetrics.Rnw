@@ -40,6 +40,7 @@ The function \Rfunction{arrayQualityMetrics} is called with the following argume
 \item \emph{do.logtransform}: if TRUE, the data are log transformed before the analysis. The default is FALSE.
 \item \emph{intgroup}: is the name of the column in the \Rclass{phenoData} that contains the information about a covariate of interest to be shown as a side bar on the heatmap. The default name of this column is "Covariate".
 \item \emph{grouprep}: define if yes or no (TRUE or FALSE) you want the boxplots and density plots to be coloured according to the groups set in 'intgroup'. The default is FALSE.
+\item \emph{spatial}: inactivates the drawing of spatial representation if FALSE. This is useful for large arrays such as Affymetrix hgu133Plus2 to produce the report faster.
 
 \end{itemize}
 
