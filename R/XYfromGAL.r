@@ -16,13 +16,13 @@ addXYfromGAL = function(x, gal.file, nBlocks, skip, ...)
     galtype = readLines(gal.file,n=(skip+1))
     sep = if(length(grep("\t",galtype[skip+1])) == 1) "\t" else " "
     
-    gal = read.table(gal.file, skip = skip, sep = sep, nrows = nBlocks, quote="", as.is = T, ...)
+    gal = read.table(gal.file, skip = skip, sep = sep, nrows = nBlocks, quote="", as.is = TRUE, ...)
     
     if(length(grep(",",galtype[skip+1])) == 1)
       gal = sapply(seq_len(ncol(gal)),function(i) gsub(",","",gal[,i]))
 
     if(length(grep("=$",gal[,1])) == 0)
-      gal = cbind(matrix(unlist(strsplit(gal[,1],"=")),ncol=2,byrow=T),gal[,2:ncol(gal)])
+      gal = cbind(matrix(unlist(strsplit(gal[,1],"=")),ncol=2,byrow=TRUE),gal[,2:ncol(gal)])
     
     block = seq_len(nBlocks)
 

@@ -1,4 +1,4 @@
-##Function to perform the heatmap
+#Function to perform the heatmap
 hmap = function(expressionset, sN, outM, numArrays, intgroup, ...)
   {
     colourRange = rgb(seq(0,1,l=256),seq(0,1,l=256),seq(1,0,l=256))
@@ -28,7 +28,7 @@ hmap = function(expressionset, sN, outM, numArrays, intgroup, ...)
         colourCov = lapply(seq(along = intgroup), function(i) brewer.pal(8,rownames(brewer.pal.info[brewer.pal.info$category=="qual",])[7-i]))
 
         key = lapply(seq(along = intgroup), function(i) list(rect = list(col=unlist(colourCov[i])[as.factor(levels(as.factor(unlist(covar[i]))))]), text = list(levels(as.factor(unlist(covar[i]))))))
-        key = unlist(key, recursive=F)
+        key = unlist(key, recursive=FALSE)
         key$rep = FALSE
       
         foo = draw.key(key = key)

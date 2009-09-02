@@ -3,9 +3,9 @@ aqm.boxplot = function(expressionset, dataprep, intgroup = "Covariate", grouprep
 
   if(dataprep$nchannels == 2)
     {
-      bsrc = boxplot(dataprep$rc, plot=F)
-      bsgc = boxplot(dataprep$gc, plot=F)
-      bsdat = boxplot(dataprep$dat, plot=F)
+      bsrc = boxplot(dataprep$rc, plot=FALSE)
+      bsgc = boxplot(dataprep$gc, plot=FALSE)
+      bsdat = boxplot(dataprep$dat, plot=FALSE)
           
       bigdat = c(as.numeric(bsrc$stats), as.numeric(bsgc$stats), as.numeric(bsdat$stats))
       colbigd = c(as.vector(col(bsrc$stat)), as.vector(col(bsgc$stats)), as.vector(col(bsdat$stats)))
@@ -13,7 +13,7 @@ aqm.boxplot = function(expressionset, dataprep, intgroup = "Covariate", grouprep
 
     }
   else {
-    bsdat = boxplot(dataprep$dat, plot=F)
+    bsdat = boxplot(dataprep$dat, plot=FALSE)
     bigdat = as.numeric(bsdat$stats)
     colbigd = as.vector(col(bsdat$stats))
   }
@@ -35,17 +35,17 @@ aqm.boxplot = function(expressionset, dataprep, intgroup = "Covariate", grouprep
       if(dataprep$nchannels == 2)
         {
           igcbd = intgroupcont[colbigd]
-          box = bwplot(bigdat ~ colbigd | factor(fac), horizontal=F, groups = igcbd, layout=c(3,1), as.table=T, strip = function(..., bg) strip.default(..., bg ="#cce6ff"), pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = unique(colsb), panel = panel.superpose, panel.groups = panel.bwplot, main=foo)
+          box = bwplot(bigdat ~ colbigd | factor(fac), horizontal=FALSE, groups = igcbd, layout=c(3,1), as.table=TRUE, strip = function(..., bg) strip.default(..., bg ="#cce6ff"), pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = unique(colsb), panel = panel.superpose, panel.groups = panel.bwplot, main=foo)
         }
       else {
         igcbd = intgroupcont[colbigd]
-        box = bwplot(bigdat ~ colbigd, horizontal=F, groups = igcbd, pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = unique(colsb), panel = panel.superpose, panel.groups = panel.bwplot, main=foo, ylab = "")
+        box = bwplot(bigdat ~ colbigd, horizontal=FALSE, groups = igcbd, pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = unique(colsb), panel = panel.superpose, panel.groups = panel.bwplot, main=foo, ylab = "")
       }
     } else {
       if(dataprep$nchannels == 2)
         {
-         box = bwplot(bigdat ~ colbigd | factor(fac), groups = which, horizontal=F, layout=c(3,1), as.table=T, strip = function(..., bg) strip.default(..., bg ="#cce6ff"), pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = "#1F78B4")
-        } else box = bwplot(bigdat ~ colbigd, horizontal=F, pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", ylab= "",  fill = "#1F78B4")
+         box = bwplot(bigdat ~ colbigd | factor(fac), groups = which, horizontal=FALSE, layout=c(3,1), as.table=TRUE, strip = function(..., bg) strip.default(..., bg ="#cce6ff"), pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = "#1F78B4")
+        } else box = bwplot(bigdat ~ colbigd, horizontal=FALSE, pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", ylab= "",  fill = "#1F78B4")
     }
 
   if(dataprep$nchannels == 2)
@@ -58,7 +58,7 @@ aqm.boxplot = function(expressionset, dataprep, intgroup = "Covariate", grouprep
   title = "Boxplots"
   section = "Array intensity distributions"
 
-  b = boxplot(dataprep$dat, plot=F, range=0)  
+  b = boxplot(dataprep$dat, plot=FALSE, range=0)  
   bmeanstat = boxplot.stats(b$stat[3,])
   bmeanout = sapply(seq_len(length(bmeanstat$out)), function(x) which(b$stat[3,] == bmeanstat$out[x]))
   
