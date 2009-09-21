@@ -11,7 +11,7 @@
 \section{Slots}{
   \describe{
     \item{\code{plot}:}{ A list to be represented calling the
-      \code{\link[affy:plotAffyRNAdeg]{plotAffyRNAdeg}} function. }
+      \code{\link[affy:AffyRNAdeg]{plotAffyRNAdeg}} function. }
         
     \item{\code{section}:}{ A character string with a name for the section
       the plot belongs to in the report. }

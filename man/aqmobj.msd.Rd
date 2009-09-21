@@ -11,7 +11,7 @@
 \section{Slots}{
   \describe{
     \item{\code{plot}:}{ A matrix to be represented calling the
-      \code{\link[vsn:MeanSdPlot]{MeanSdPlot}} function. }
+      \code{\link[vsn]{meanSdPlot}} function. }
     
     \item{\code{section}:}{ A character string with a name for the section
       the plot belongs to in the report. }

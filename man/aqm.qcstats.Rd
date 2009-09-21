@@ -5,7 +5,7 @@
 
 \description{
   \code{aqm.qcstats} performs QCstats on objects of class
-  \code{\link[affy:class.AffyBatch]{AffyBatch}} and formats the output for
+  \code{\link[affy:AffyBatch-class]{AffyBatch}} and formats the output for
   \code{aqm.plot} usage.
 }
 
@@ -13,7 +13,7 @@
 
 \arguments{
   \item{expressionset}{ is an object of
-    class \code{\link[affy:class.AffyBatch]{AffyBatch}} }
+    class \code{\link[affy:AffyBatch-class]{AffyBatch}} }
   \item{...}{ Any arguments to \code{\link[simpleaffy:qc]{qc}} }
  }
 

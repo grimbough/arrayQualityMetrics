@@ -15,19 +15,16 @@
 
 \description{ \code{aqm.plot} performs plots. }
 
-\usage{
-aqm.plot(obj)
-}
+\usage{ aqm.plot(obj) }
 
 \arguments{
-  \item{obj}{ an object of class \code{\link[arrayQualityMetrics:class.aqmobj]{aqmobj}}}
+  \item{obj}{ an object of class \code{aqmobj} }
  }
  
-\details{
-See the aqm.prepdata help or the aqm Vignette for example of this object.
-}
+\details{ See the aqm.prepdata help or the aqm Vignette 
+  for example of this object.  }
 
-\value{ A plot in the x11 device. }
+\value{ A plot in the x11 device. } 
 
 \author{
   Audrey Kauffmann. 

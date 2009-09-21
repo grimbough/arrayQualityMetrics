@@ -5,7 +5,7 @@
 
 \description{
   \code{aqm.prepaffy} performs data preprocessing on
-  \code{\link[affy:class.AffyBatch]{AffyBatch}} and formats the output
+  \code{\link[affy:AffyBatch-class]{AffyBatch}} and formats the output
   for \code{aqm.rle} and \code{aqm.nuse} usage.
 }
 
@@ -13,7 +13,7 @@
 
 \arguments{
   \item{expressionset}{ is an object of
-    class \code{\link[affy:class.AffyBatch]{AffyBatch}} }
+    class \code{\link[affy:AffyBatch-class]{AffyBatch}} }
   \item{sN}{ are the sample names to be written on the plots }
 }
 

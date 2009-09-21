@@ -12,7 +12,7 @@
 
 \arguments{
   \item{affyproc}{ An object of class \code{\link{aqmobj.prepaffy}} }
-  \item{...}{ Any arguments to \code{\link[affyPLM:Mbox]{Mbox}} }
+  \item{...}{ Any arguments to \code{\link[affyPLM:PLMset-class]{Mbox}} }
 }
 
 \value{ An object of class  \code{\link{aqmobj.rle}} }

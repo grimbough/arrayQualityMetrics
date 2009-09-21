@@ -14,7 +14,7 @@
   \item{expressionset}{ Same input as for the function
     \code{\link{arrayQualityMetrics}} }
   \item{dataprep}{ An object of class
-    \code{\link[arrayQualityMetrics:class.aqmobj.prepdata]{aqmobj.prepdata}} }
+    \code{\link[arrayQualityMetrics]{aqmobj.prepdata}} }
   \item{intgroup}{ Same input as for the function
     \code{\link{arrayQualityMetrics}} }
   \item{grouprep}{ Same input as for the function

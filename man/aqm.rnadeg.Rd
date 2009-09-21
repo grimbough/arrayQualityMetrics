@@ -5,16 +5,16 @@
 
 \description{
   \code{aqm.rnadeg} performs RNA degradation on objects of class
-  \code{\link[affy:class.AffyBatch]{AffyBatch}} and formats the output for
+  \code{\link[affy:AffyBatch-class]{AffyBatch}} and formats the output for
   \code{aqm.plot} usage.
 }
 
 \usage{ aqm.rnadeg(expressionset, ...) }
 
 \arguments{
-  \item{expressionset}{ is an object of
-    class \code{\link[affy:class.AffyBatch]{AffyBatch}} }
-  \item{...}{ Any arguments to \code{\link[affy:AffyRNAdeg]{AffyRNAdeg}} }
+  \item{expressionset}{ An object of
+    class \code{\link[affy:AffyBatch-class]{AffyBatch}}}
+  \item{...}{ Any arguments to \code{\link[affy]{AffyRNAdeg}} }
 }
 
 \value{ An object of class \code{\link{aqmobj.rnadeg}}. }

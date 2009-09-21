@@ -14,7 +14,7 @@
   \item{expressionset}{ Same input as for the function
     \code{\link{arrayQualityMetrics}} }
   \item{dataprep}{ An object of class \code{\link{aqmobj.prepdata}} }
-  \item{...}{ Any arguments to \code{\link[lattice:densityplot]{densityplot}} }
+  \item{...}{ Any arguments to \code{\link[lattice:histogram]{densityplot}} }
  }
 
 \details{

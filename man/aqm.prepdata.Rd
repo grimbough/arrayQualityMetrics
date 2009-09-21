@@ -10,10 +10,10 @@
 
 \description{ \code{aqm.prepdata} formats an
   \code{\link[Biobase:class.ExpressionSet]{ExpressionSet}}, an
-  \code{\link[affy:class.AffyBatch]{AffyBatch}}, a
+  \code{\link[affy:AffyBatch-class]{AffyBatch}}, a
   \code{\link[Biobase:class.NChannelSet]{NChannelSet}}, or a
-  \code{\link[beadarray:class.BeadLevelList]{BeadLevelList}} into a
-  \code{\link{aqmobj.prepdata}} object which can be used as an input of
+  \code{\link[beadarray:class-BeadLevelList]{BeadLevelList}} into a
+  \code{\link{aqmobj.prepdata}} object which can be used as an input of 
   the aqm functions.}
 
 \usage{
@@ -23,10 +23,10 @@ aqm.prepdata(expressionset, do.logtransform = TRUE)
 \arguments{
   \item{expressionset}{ An object of class
   \code{\link[Biobase:class.ExpressionSet]{ExpressionSet}} for one colour
-  non Affymetrix data, \code{\link[affy:class.AffyBatch]{AffyBatch}} for
+  non Affymetrix data, \code{\link[affy:AffyBatch-class]{AffyBatch}} for
   Affymetrix data, \code{\link[Biobase:class.NChannelSet]{NChannelSet}}
   for two colour arrays, or
-  \code{\link[beadarray:class.BeadLevelList]{BeadLevelList}} for Illumina
+  \code{\link[beadarray:class-BeadLevelList]{BeadLevelList}} for Illumina
   bead arrays.
  }
   \item{do.logtransform}{ TRUE or FALSE whether or not you want to log
@@ -37,7 +37,15 @@ aqm.prepdata(expressionset, do.logtransform = TRUE)
 
 \author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
 
-\seealso{\code{\link{aqmobj.prepdata}}, \code{\link{aqm.boxplot}}, \code{\link{aqm.density}}, \code{\link{aqm.heatmap}}, \code{\link{aqm.maplot}}, \code{\link{aqm.meansd}}, \code{\link{aqm.probesmap}}, \code{\link{aqm.spatial}}, \code{\link{aqm.spatialbg}}}
+\seealso{\code{\link{aqmobj.prepdata}}, 
+\code{\link{aqm.boxplot}}, 
+\code{\link{aqm.density}}, 
+\code{\link{aqm.heatmap}}, 
+\code{\link{aqm.maplot}}, 
+\code{\link{aqm.meansd}}, 
+\code{\link{aqm.probesmap}}, 
+\code{\link{aqm.spatial}}, 
+\code{\link{aqm.spatialbg}}}
 
 \examples{
     ## Load an example of a NChannelSet

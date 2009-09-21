@@ -16,14 +16,14 @@
 \description{
   \code{arrayQualityMetrics} performs quality metrics on
   \code{\link[Biobase:class.ExpressionSet]{ExpressionSet}},
-  \code{\link[affy:class.AffyBatch]{AffyBatch}} ,
+  \code{\link[affy:AffyBatch-class]{AffyBatch}} ,
   \code{\link[Biobase:class.NChannelSet]{NChannelSet}},
-  \code{\link[beadarray:class.BeadLevelList]{BeadLevelList}},
-  \code{\link[limma:class.RGList]{RGList}},
-  \code{\link[limma:class.MAList]{MAList}},
-  \code{\link[limma:class.aqmInputObj]{aqmInputObj}},
-  \code{\link[marray:class.marrayRaw]{marrayRaw}} or
-  \code{\link[marray:class.marrayNorm]{marrayNorm}} containing
+  \code{\link[beadarray:class-BeadLevelList]{BeadLevelList}},
+  \code{\link[limma:rglist]{RGList}},
+  \code{\link[limma:malist]{MAList}},
+  \code{aqmInputObj},
+  \code{\link[marray:marrayRaw-class]{marrayRaw}} or
+  \code{\link[marray:marrayNorm-class]{marrayNorm}} containing
   microarray data from any platforms, one or two channels. The results,
   presented in a HTML report, are designated to allow the user
   to rapidly assess the quality of a set of arrays.
@@ -43,14 +43,14 @@ arrayQualityMetrics(expressionset,
 \arguments{
   \item{expressionset}{ is an object of
     class \code{\link[Biobase:class.ExpressionSet]{ExpressionSet}},
-    \code{\link[Biobase:class.AffyBatch]{AffyBatch}} ,
+    \code{\link[affy:AffyBatch-class]{AffyBatch}} ,
     \code{\link[Biobase:class.NChannelSet]{NChannelSet}} ,
-    \code{\link[Biobase:class.BeadLevelList]{BeadLevelList}} ,
-    \code{\link[Biobase:class.RGList]{RGList}} ,
-    \code{\link[Biobase:class.MAList]{MAList}} ,
-    \code{\link[Biobase:class.aqmInputObj]{aqmInputObj}} ,
-    \code{\link[Biobase:class.marrayRaw]{marrayRaw}} or
-    \code{\link[Biobase:class.marrayNorm]{marrayNorm}} .}
+    \code{\link[beadarray:class-BeadLevelList]{BeadLevelList}} ,
+    \code{\link[limma:rglist]{RGList}} ,
+    \code{\link[limma:malist]{MAList}} ,
+    \code{aqmInputObj} ,
+    \code{\link[marray:marrayRaw-class]{marrayRaw}} or
+    \code{\link[marray:marrayNorm-class]{marrayNorm}} .}
 
 \item{outdir}{ is the name of the directory in which the results are
   created. }
@@ -69,7 +69,10 @@ arrayQualityMetrics(expressionset,
   is FALSE meaning that the boxplot and density plots will not be
   represented function of the groups of 'intgroup'.}
 
-\item{spatial}{ If FALSE, the spatial representations are not performed. This is useful for large arrays(like Affymetrix hgu133Plus2) when these figures are slow to be drawn and can cause machines with low memory to fail to perform the report. }
+\item{spatial}{ If FALSE, the spatial representations are not
+  performed. This is useful for large arrays(like Affymetrix
+  hgu133Plus2) when these figures are slow to be drawn and can cause
+  machines with low memory to fail to perform the report. } 
 }
 
 \details{
@@ -77,7 +80,8 @@ See the arrayQualityMetrics Vignette for examples of this function.
 }
 
 \value{
-  A directory \code{outdir} containing a HTML report named QMreport.html and all the PNG and PDF plots is created.
+  A directory \code{outdir} containing a HTML report named QMreport.html
+  and all the PNG and PDF plots is created. 
 }
 
 \author{

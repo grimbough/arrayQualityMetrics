@@ -12,7 +12,7 @@
 
 \section{Slots}{
   \describe{
-    \item{\code{dataPLM}:}{ A \code{\link[affyPLM:PLMset]{PLMset}}. }
+    \item{\code{dataPLM}:}{ A \code{\link[affyPLM:PLMset-class]{PLMset}}. }
     \item{\code{sN}:}{ Integers numbering the arrays to be used to label
       the plots. }
     }
