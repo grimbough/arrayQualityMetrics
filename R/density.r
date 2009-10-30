@@ -1,6 +1,6 @@
 dens = function(obj, ...)
   {
-    dlist <- apply(obj, 2, density)
+    dlist <- apply(obj, 2, density, na.rm = TRUE)
     names(dlist) <- seq_along(dlist)
     ddf <- do.call(make.groups, lapply(dlist, function(l) with(l, data.frame(x = x, y = y))))
     return(ddf)
