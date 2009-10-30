@@ -36,7 +36,8 @@ arrayQualityMetrics(expressionset,
                     do.logtransform = FALSE,
                     intgroup = "Covariate",
                     grouprep = FALSE,
-		    spatial = TRUE)
+		    spatial = TRUE,
+		    sN = NULL)
 
 }
 
@@ -72,7 +73,13 @@ arrayQualityMetrics(expressionset,
 \item{spatial}{ If FALSE, the spatial representations are not
   performed. This is useful for large arrays(like Affymetrix
   hgu133Plus2) when these figures are slow to be drawn and can cause
-  machines with low memory to fail to perform the report. } 
+  machines with low memory to fail to perform the report. }
+
+
+\item{sN}{ are the sample names to be written on the plots. By
+  default, using NULL (recommanded), numbers will be assigned for each
+  array and the correspondence is given in the report.}
+
 }
 
 \details{

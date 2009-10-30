@@ -7,7 +7,7 @@ aqm.pca = function(expressionset, dataprep, intgroup = "Covariate", ...)
 
     pca = prcomp(t(dataprep$dat))
  
-    key = list(points = list(pch = 19, col=unique(cols)), text = list(levels(as.factor(unlist(covar)))))
+    key = list(points = list(pch = 19, col=unlist(colourCovd)[as.factor(levels(as.factor(covar)))]), text = list(levels(as.factor(covar))))
     key$rep = FALSE
     key$space = "top"
     pcafig = xyplot(PC2 ~ PC1 , as.data.frame(pca$x), pch=19, col=cols, key = key)

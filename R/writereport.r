@@ -69,7 +69,11 @@ setMethod("aqm.plot",signature(obj = "aqmobj.nuse"), function(obj){
 
 setMethod("aqm.plot",signature(obj = "aqmobj.rnadeg"), function(obj){
   acol = sample(brewer.pal(8, "Dark2"), length(obj$plot$sample.names), replace = (8<length(obj$plot$sample.names)))
-  print(plotAffyRNAdeg(obj$plot, lwd = 2, col =acol))})
+  print(plotAffyRNAdeg(obj$plot, lwd = 2, col =acol))
+  legend("topright",lty=1,lwd=2,col=acol,legend = obj$plot$sample.names)
+
+
+})
 
 setMethod("aqm.plot",signature(obj = "aqmobj.qcs"), function(obj){
   plot.qc.stats(obj$plot)})

@@ -9,11 +9,12 @@
   \code{aqm.plot} usage.
 }
 
-\usage{ aqm.rnadeg(expressionset, ...) }
+\usage{ aqm.rnadeg(expressionset, sN, ...) }
 
 \arguments{
   \item{expressionset}{ An object of
     class \code{\link[affy:AffyBatch-class]{AffyBatch}}}
+  \item{sN}{ are the sample names to be written on the plot }
   \item{...}{ Any arguments to \code{\link[affy]{AffyRNAdeg}} }
 }
 

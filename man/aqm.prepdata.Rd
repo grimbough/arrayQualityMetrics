@@ -17,7 +17,7 @@
   the aqm functions.}
 
 \usage{
-aqm.prepdata(expressionset, do.logtransform = TRUE)
+aqm.prepdata(expressionset, do.logtransform = TRUE, sN = NULL)
 }
 
 \arguments{
@@ -31,6 +31,9 @@ aqm.prepdata(expressionset, do.logtransform = TRUE)
  }
   \item{do.logtransform}{ TRUE or FALSE whether or not you want to log
   transform the data.}
+  \item{sN}{ are the sample names to be written on the plots. By
+  default, using NULL (recommanded), numbers will be assigned for each
+  array and the correspondence is given in the report.}
  }
 
 \value{ An object of class  \code{\link{aqmobj.prepdata}}. }

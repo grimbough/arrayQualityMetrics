@@ -34,12 +34,10 @@ aqm.boxplot = function(expressionset, dataprep, intgroup = "Covariate", grouprep
 
       if(dataprep$nchannels == 2)
         {
-          igcbd = intgroupcont[colbigd]
-          box = bwplot(bigdat ~ colbigd | factor(fac), horizontal=FALSE, groups = igcbd, layout=c(3,1), as.table=TRUE, strip = function(..., bg) strip.default(..., bg ="#cce6ff"), pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = unique(colsb), panel = panel.superpose, panel.groups = panel.bwplot, main=foo)
+          box = bwplot(bigdat ~ colbigd | factor(fac), horizontal=FALSE, groups = colbigd, layout=c(3,1), as.table=TRUE, strip = function(..., bg) strip.default(..., bg ="#cce6ff"), pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = colsb, panel = panel.superpose, panel.groups = panel.bwplot, main=foo)
         }
       else {
-        igcbd = intgroupcont[colbigd]
-        box = bwplot(bigdat ~ colbigd, horizontal=FALSE, groups = igcbd, pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = unique(colsb), panel = panel.superpose, panel.groups = panel.bwplot, main=foo, ylab = "")
+        box = bwplot(bigdat ~ colbigd, horizontal=FALSE, groups = colbigd, pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = colsb, panel = panel.superpose, panel.groups = panel.bwplot, main=foo, ylab = "")
       }
     } else {
       if(dataprep$nchannels == 2)

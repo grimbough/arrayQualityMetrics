@@ -12,9 +12,10 @@ aqm.prepaffy = function(expressionset, sN)
 }
 
 ##RNA Degradation
-aqm.rnadeg =function(expressionset, ...)
+aqm.rnadeg =function(expressionset, sN, ...)
   {
     numArrays = dim(exprs(expressionset))[2]
+    sampleNames(expressionset) = sN
     
     acol = sample(brewer.pal(8, "Dark2"), numArrays, replace = (8<numArrays))
     rnaDeg = try(AffyRNAdeg(expressionset, log.it = TRUE, ...))
