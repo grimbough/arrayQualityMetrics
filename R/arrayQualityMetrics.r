@@ -96,10 +96,13 @@ setMethod("arrayQualityMetrics",signature(expressionset = "aqmInputObj"), functi
                 if(inherits(obj$nuse,"try-error"))
                   warning("Cannot draw the NUSE plot \n") 
         
-                obj$qcstats =  try(aqm.qcstats(expressionset))
+		if(length(grep("exon", cdfName(expressionset), ignore.case=TRUE)) == 0)
+		{
+		obj$qcstats =  try(aqm.qcstats(expressionset))
                 if(inherits(obj$qcstats,"try-error"))
                   warning("Cannot draw the QCStats plot \n")
-                
+		}
+	                
                 obj$pmmm = try(aqm.pmmm(expressionset))
                 if(inherits(obj$pmmm,"try-error"))
                   warning("Cannot draw the Perfect Match versus MisMatch plot \n") 
