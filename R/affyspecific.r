@@ -15,7 +15,7 @@ aqm.prepaffy = function(expressionset, sN)
 aqm.rnadeg =function(expressionset, sN, ...)
   {
     numArrays = dim(exprs(expressionset))[2]
-    sampleNames(expressionset) = sN
+    sampleNames(expressionset) = if(is.null(sN))  seq_len(length(sampleNames(expressionset))) else  sN
     
     acol = sample(brewer.pal(8, "Dark2"), numArrays, replace = (8<numArrays))
     rnaDeg = try(AffyRNAdeg(expressionset, log.it = TRUE, ...))
