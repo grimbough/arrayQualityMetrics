@@ -1,6 +1,16 @@
 aqm.boxplot = function(expressionset, dataprep, intgroup = "Covariate", grouprep = FALSE, ...)
 {
 
+  b = boxplot(dataprep$dat, plot=FALSE, range=0)  
+  bmeanstat = boxplot.stats(b$stat[3,])
+  bmeanout = sapply(seq_len(length(bmeanstat$out)), function(x) which(b$stat[3,] == bmeanstat$out[x]))
+  
+  biqr = b$stat[4,] -  b$stat[2,] 
+  biqrstat = boxplot.stats(biqr)
+  biqrout = sapply(seq_len(length(biqrstat$out)), function(x) which(biqr == biqrstat$out[x]))
+
+  outliers = unlist(c(bmeanout, biqrout))
+  
   if(dataprep$nchannels == 2)
     {
       bsrc = boxplot(dataprep$rc, plot=FALSE)
@@ -17,7 +27,6 @@ aqm.boxplot = function(expressionset, dataprep, intgroup = "Covariate", grouprep
     bigdat = as.numeric(bsdat$stats)
     colbigd = as.vector(col(bsdat$stats))
   }
-
   
   if(all(intgroup %in% names(phenoData(expressionset)@data)) && grouprep == TRUE)
     {
@@ -26,6 +35,8 @@ aqm.boxplot = function(expressionset, dataprep, intgroup = "Covariate", grouprep
       coloursb = brewer.pal(8,rownames(brewer.pal.info[brewer.pal.info$category=="qual",])[6])
       intgroupcont = gpcont[,gp]
       colsb = coloursb[as.factor(intgroupcont)]
+      if(length(outliers) != 0)
+        colsb[outliers] = "grey"
      
       key = list(rect = list(col=unlist(coloursb)[as.factor(levels(as.factor(unlist(gpcont[,1]))))]), text = list(levels(as.factor(unlist(gpcont[,1])))))
       key$rep = FALSE
@@ -40,10 +51,10 @@ aqm.boxplot = function(expressionset, dataprep, intgroup = "Covariate", grouprep
         box = bwplot(bigdat ~ colbigd, horizontal=FALSE, groups = colbigd, pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = colsb, panel = panel.superpose, panel.groups = panel.bwplot, main=foo, ylab = "")
       }
     } else {
-      if(dataprep$nchannels == 2)
-        {
-         box = bwplot(bigdat ~ colbigd | factor(fac), groups = which, horizontal=FALSE, layout=c(3,1), as.table=TRUE, strip = function(..., bg) strip.default(..., bg ="#cce6ff"), pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = "#1F78B4")
-        } else box = bwplot(bigdat ~ colbigd, horizontal=FALSE, pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", ylab= "",  fill = "#1F78B4")
+      colsb = rep("#1F78B4",dataprep$numArrays)
+      if(length(outliers) != 0)
+         colsb[outliers] = "grey"
+      box = if(dataprep$nchannels == 2) bwplot(bigdat ~ colbigd | factor(fac), horizontal=FALSE, groups = colbigd, layout=c(3,1), as.table=TRUE, strip = function(..., bg) strip.default(..., bg ="#cce6ff"), pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = colsb, panel = panel.superpose, panel.groups = panel.bwplot) else bwplot(bigdat ~ colbigd, horizontal=FALSE, groups = colbigd, pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = colsb, panel = panel.superpose, panel.groups = panel.bwplot, ylab = "")
     }
 
   if(dataprep$nchannels == 2)
@@ -56,14 +67,6 @@ aqm.boxplot = function(expressionset, dataprep, intgroup = "Covariate", grouprep
   title = "Boxplots"
   section = "Array intensity distributions"
 
-  b = boxplot(dataprep$dat, plot=FALSE, range=0)  
-  bmeanstat = boxplot.stats(b$stat[3,])
-  bmeanout = sapply(seq_len(length(bmeanstat$out)), function(x) which(b$stat[3,] == bmeanstat$out[x]))
-  
-  biqr = b$stat[4,] -  b$stat[2,] 
-  biqrstat = boxplot.stats(biqr)
-  biqrout = sapply(seq_len(length(biqrstat$out)), function(x) which(biqr == biqrstat$out[x]))
-  
   out = list("plot" = box, "section" = section, "title" = title, "legend" = legend, "scores" = list("mean" = b$stat[3,], "IQR" = biqr), "outliers" = list("mean" = bmeanout, "IQR" = biqrout), "shape" = shape)
   class(out) = "aqmobj.box"
   return(out)   

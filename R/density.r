@@ -6,7 +6,7 @@ dens = function(obj, ...)
     return(ddf)
   }
 
-aqm.density = function(expressionset, dataprep, intgroup = "Covariate", grouprep = FALSE, ...)
+aqm.density = function(expressionset, dataprep, intgroup = "Covariate", grouprep = FALSE, outliers = NULL...)
 { 
 
   if(dataprep$nchannels == 2)
@@ -28,6 +28,13 @@ aqm.density = function(expressionset, dataprep, intgroup = "Covariate", grouprep
       coloursb = brewer.pal(8,rownames(brewer.pal.info[brewer.pal.info$category=="qual",])[6])
       intgroupcont = gpcont[,gp]
       colsb = coloursb[as.factor(intgroupcont)]
+      lwd = rep(1,dataprep$numArrays)
+      lty = rep(1,dataprep$numArrays)
+      if(length(outliers) != 0)
+      {
+         lwd[outliers] = 3
+         lty[outliers] = 2
+      }
      
       key = list(rect = list(col=unlist(coloursb)[as.factor(levels(as.factor(unlist(gpcont[,1]))))]), text = list(levels(as.factor(unlist(gpcont[,1])))))
       key$rep = FALSE
@@ -36,19 +43,27 @@ aqm.density = function(expressionset, dataprep, intgroup = "Covariate", grouprep
 
       if(dataprep$nchannels == 2)
         {  
-          den = xyplot(y ~ x | factor(fac), ddf, groups = rep(which,3), type = "l", ylab = "Density", xlab="", layout=c(3,1), strip = function(..., bg) strip.default(..., bg ="#cce6ff"), col = colsb, main=foo) #
+          den = xyplot(y ~ x | factor(fac), ddf, groups = rep(which,3), type = "l", ylab = "Density", xlab="", layout=c(3,1), strip = function(..., bg) strip.default(..., bg ="#cce6ff"), col = colsb, main=foo, lwd = lwd, lty = lty) 
           shape = "rect"
         } else {
-          den = xyplot(y ~ x, ddf, groups = which, type = "l", ylab = "Density", xlab="", col = colsb, main=foo)
+          den = xyplot(y ~ x, ddf, groups = which, type = "l", ylab = "Density", xlab="", col = colsb, main=foo, lwd = lwd, lty = lty)
           shape = "square"
         }
     } else {  
+          lwd = rep(1,dataprep$numArrays)
+	  lty = rep(1,dataprep$numArrays)
+          if(length(outliers) != 0)
+	  {
+	  lwd[outliers] = 3
+	  lty[outliers] = 2
+	  }
+
       if(dataprep$nchannels == 2)
         {  
-          den = xyplot(y ~ x | factor(fac), ddf, groups = rep(which,3), type = "l", ylab = "Density", xlab="", layout=c(3,1), strip = function(..., bg) strip.default(..., bg ="#cce6ff"), auto.key = list(lines=TRUE, points=FALSE, x=1, y=0.96, corner=c(1,1))) 
+          den = xyplot(y ~ x | factor(fac), ddf, groups = rep(which,3), type = "l", ylab = "Density", xlab="", layout=c(3,1), strip = function(..., bg) strip.default(..., bg ="#cce6ff"), auto.key = list(lines=TRUE, points=FALSE, x=1, y=0.96, corner=c(1,1)), lwd=lwd, lty=lty) 
           shape = "rect"
         } else {
-          den = xyplot(y ~ x, ddf, groups = which, type = "l", ylab = "Density", xlab="", auto.key = list(lines=TRUE, points=FALSE, x=1, y=0.99, corner=c(1,1)))      
+          den = xyplot(y ~ x, ddf, groups = which, type = "l", ylab = "Density", xlab="", auto.key = list(lines=TRUE, points=FALSE, x=1, y=0.99, corner=c(1,1), lty=lty, lwd=lwd), lwd=lwd, lty=lty) 
           shape = "square"
         }
     }
@@ -62,3 +77,4 @@ aqm.density = function(expressionset, dataprep, intgroup = "Covariate", grouprep
   class(out) = "aqmobj.dens"
   return(out)   
 }
+## TODO: fix legend
