@@ -5,7 +5,7 @@ aqm.pca = function(expressionset, dataprep, intgroup = "Covariate", ...)
 
     cols = colourCovd[as.factor(covar)]
 
-    pca = prcomp(t(dataprep$dat))
+    pca = prcomp(t(na.omit(dataprep$dat)))
  
     key = list(points = list(pch = 19, col=unlist(colourCovd)[as.factor(levels(as.factor(covar)))]), text = list(levels(as.factor(covar))))
     key$rep = FALSE
