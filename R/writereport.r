@@ -214,11 +214,19 @@ scores = function(expressionset, obj)
         namesm = c(namesm, "NUSE")
       }
   
+    if(is.null(protocolData(expressionset)$ScanDate))
+    {
+    m = matrix("",nrow = length(sN), ncol = nscores+2)
+    colnames(m) = c("Array #", "Array Name", namesm)
+    m[,1] = seq_len(length(sN))
+    m[,2] = sN    
+    } else {
     m = matrix("",nrow = length(sN), ncol = nscores+3)
     colnames(m) = c("Array #", "Array Name", "Scan Dates", namesm)
     m[,1] = seq_len(length(sN))
     m[,2] = sN
-    m[,3] = protocolData(expressionset)$ScanDate
+    m[,3] = protocolData(expressionset)$ScanDate    
+    }
     
     if(length(obj$maplot$outliers) != 0)
       m[obj$maplot$outliers,"MA plots"] = "*"    
