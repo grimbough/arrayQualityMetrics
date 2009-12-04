@@ -5,10 +5,10 @@
 
 \description{
   \code{aqm.density} performs density curves, outlier detection from it and
-  formats the output for \code{aqm.plot} usage.
-}
+  formats the output for \code{aqm.plot} usage. }
 
-\usage{ aqm.density(expressionset, dataprep, intgroup = "Covariate", grouprep = FALSE, ...) }
+\usage{ aqm.density(expressionset, dataprep, intgroup = "Covariate",
+grouprep = FALSE, outliers = NULL, ...) }
 
 \arguments{
   \item{expressionset}{ Same input as for the function
@@ -19,6 +19,8 @@
     \code{\link{arrayQualityMetrics}} }
   \item{grouprep}{ Same input as for the function
     \code{\link{arrayQualityMetrics}} }
+  \item{outliers}{ Vector of numbers identifying arrays to be highlighted
+ on the plot }
   \item{...}{ Any arguments to \code{\link[lattice:xyplot]{xyplot}} }
 }
 

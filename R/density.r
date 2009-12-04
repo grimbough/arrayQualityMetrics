@@ -6,7 +6,7 @@ dens = function(obj, ...)
     return(ddf)
   }
 
-aqm.density = function(expressionset, dataprep, intgroup = "Covariate", grouprep = FALSE, outliers = NULL...)
+aqm.density = function(expressionset, dataprep, intgroup = "Covariate", grouprep = FALSE, outliers = NULL, ...)
 { 
 
   if(dataprep$nchannels == 2)
