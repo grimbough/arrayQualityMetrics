@@ -1,0 +1,17 @@
+citEntry(entry="article",
+    title = "arrayQualityMetrics--a bioconductor package for quality assessment of microarray data",
+    author = "Audrey Kauffmann and Robert Gentleman and Wolfgang Huber",
+    journal = "Bioinformatics",
+    year = "2009",
+    volume  = "25",
+    number =  "3",
+    pages ="415--6",
+    textVersion = paste("Kauffmann, A., Gentleman, R.,, Huber, W. (2009)",
+        "arrayQualityMetrics--a bioconductor package for quality assessment of microarray data.",
+        "Bioinformatics, 25(3):415-6.")
+    )
+
+citFooter("This free open-source software implements academic
+research by the authors and co-workers. If you use it,
+please support the project by citing the appropriate
+journal articles.")

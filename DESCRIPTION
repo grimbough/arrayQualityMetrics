@@ -1,8 +1,8 @@
 Package: arrayQualityMetrics
 Title: Quality metrics on microarray data sets
-Version: 2.5.9
+Version: 2.5.10
 Author: Audrey Kauffmann, Wolfgang Huber
-Maintainer: Audrey Kauffmann <audrey@ebi.ac.uk>
+Maintainer: Audrey Kauffmann <kauffmann@bergonie.org>
 Depends: affyPLM
 Suggests: ALLMLL, CCl4
 Imports: Biobase, RColorBrewer, affy, beadarray, genefilter,
