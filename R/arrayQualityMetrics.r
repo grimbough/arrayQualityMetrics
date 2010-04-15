@@ -138,7 +138,7 @@ setMethod("arrayQualityMetrics",signature(expressionset = "marrayRaw"), function
 ## MAlist
 setMethod("arrayQualityMetrics",signature(expressionset = "MAList"), function(expressionset, outdir, force, do.logtransform, intgroup, grouprep, spatial, sN)
           {
-            expressionset = try(as(expressionset, "ExpressionSet"))
+            expressionset = try(new("ExpressionSet", exprs = expressionset$M, phenoData=new("AnnotatedDataFrame",expressionset$targets), featureData=new("AnnotatedDataFrame",expressionset$genes)))
             if(inherits(expressionset,'try-error'))
               stop("The expressionset is a MAList and cannot be converted automatically in a ExpressionSet. Try to convert it manually.\n")
            arrayQualityMetrics(expressionset, outdir, force, do.logtransform, intgroup, grouprep, spatial, sN)
