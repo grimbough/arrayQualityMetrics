@@ -27,7 +27,7 @@
 \value{ A plot in the x11 device. } 
 
 \author{
-  Audrey Kauffmann. 
-  Maintainer: <audrey@ebi.ac.uk>  
+  Audrey Kauffmann 
+  Maintainer: <kauffmann@bergonie.org>  
 }
 

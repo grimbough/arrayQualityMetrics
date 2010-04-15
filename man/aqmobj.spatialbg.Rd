@@ -32,7 +32,7 @@
 See the aqm.prepdata help or the aqm Vignette for example of this object.
 }
 
-\author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
+\author{ Audrey Kauffmann <kauffmann@bergonie.org> }
 
 \seealso{ \code{aqm.spatialbg}, \code{aqm.plot} }
 

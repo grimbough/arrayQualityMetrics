@@ -19,7 +19,7 @@
 
 \value{ An object of class  \code{\link{aqmobj.qcs}}. }
 
-\author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
+\author{ Audrey Kauffmann <kauffmann@bergonie.org> }
 
 \seealso{ \code{\link{aqmobj.qcs}} }
 

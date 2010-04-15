@@ -21,4 +21,4 @@
 See the aqm Vignette for example of this object.
 }
 
-\author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
+\author{ Audrey Kauffmann <kauffmann@bergonie.org> }

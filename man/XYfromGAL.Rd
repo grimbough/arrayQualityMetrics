@@ -39,7 +39,7 @@ addXYfromGAL(x, gal.file, nBlocks, skip, ...)
 
 \author{
 Audrey Kauffmann, Wolfgang Huber.
-Maintainer: <audrey@ebi.ac.uk>
+Maintainer: <kauffmann@bergonie.org>
 }
 \keyword{file}
 \keyword{manip}

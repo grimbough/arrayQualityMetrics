@@ -23,4 +23,4 @@ See the aqm.prepdata help or the aqm Vignette for example of this object.
 
 \value{ An object of class \code{\link{aqmobj.probesmap}} }
 
-\author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
+\author{ Audrey Kauffmann <kauffmann@bergonie.org> }

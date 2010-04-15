@@ -57,7 +57,7 @@
 See the aqm.prepdata help or the aqm Vignette for example of this object.
 }
 
-\author{Audrey Kauffmann <audrey@ebi.ac.uk>}
+\author{Audrey Kauffmann <kauffmann@bergonie.org>}
 
 \seealso{\code{\link{aqm.prepdata}}, \code{\link{aqm.boxplot}}, \code{\link{aqm.density}}, \code{\link{aqm.heatmap}}, \code{\link{aqm.maplot}}, \code{\link{aqm.meansd}}, \code{\link{aqm.probesmap}}, \code{\link{aqm.spatial}}, \code{\link{aqm.spatialbg}}}
 

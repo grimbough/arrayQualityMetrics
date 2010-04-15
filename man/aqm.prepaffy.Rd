@@ -20,7 +20,7 @@
 \value{ A preprocessed affy object of class
   \code{\link{aqmobj.prepaffy}}. }
 
-\author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
+\author{ Audrey Kauffmann <kauffmann@bergonie.org> }
 
 \seealso{ \code{\link{aqm.rle}}, \code{\link{aqm.nuse}} }
 

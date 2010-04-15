@@ -38,7 +38,7 @@ aqm.prepdata(expressionset, do.logtransform = TRUE, sN = NULL)
 
 \value{ An object of class  \code{\link{aqmobj.prepdata}}. }
 
-\author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
+\author{ Audrey Kauffmann <kauffmann@bergonie.org> }
 
 \seealso{\code{\link{aqmobj.prepdata}}, 
 \code{\link{aqm.boxplot}}, 

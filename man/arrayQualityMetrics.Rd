@@ -93,7 +93,7 @@ See the arrayQualityMetrics Vignette for examples of this function.
 
 \author{
   Audrey Kauffmann, Wolfgang Huber. 
-  Maintainer: <audrey@ebi.ac.uk>  
+  Maintainer: <kauffmann@bergonie.org>  
 }
 
 \keyword{hplot}

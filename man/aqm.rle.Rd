@@ -21,7 +21,7 @@
 See the aqm.prepaffy help or the aqm Vignette for example of this object.
 }
 
-\author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
+\author{ Audrey Kauffmann <kauffmann@bergonie.org> }
 
 \seealso{ \code{\link{aqm.prepaffy}}, \code{\link{aqmobj.prepaffy}},
   \code{\link{aqmobj.rle}} }

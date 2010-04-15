@@ -22,7 +22,7 @@
 See the aqm.prepdata help or the aqm Vignette for example of this object.
 }
 
-\author{ Audrey Kauffmann <audrey@ebi.ac.uk> }
+\author{ Audrey Kauffmann <kauffmann@bergonie.org> }
 
 \seealso{ \code{\link{aqm.prepdata}}, \code{\link{aqmobj.prepdata}},
   \code{\link{aqmobj.ma}} }
