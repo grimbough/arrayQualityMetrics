@@ -11,15 +11,20 @@ aqm.density = function(expressionset, dataprep, intgroup = "Covariate", grouprep
 
   if(dataprep$nchannels == 2)
     {  
-
       den1 = dens(dataprep$rc)
       den2 = dens(dataprep$gc)
       den3 = dens(dataprep$dat)
       ddf = rbind(den1,den2,den3)
       fac = rep(c("a. Red Channel","b. Green Channel","c. Log(Ratio)"), each=nrow(den3))
-    } else{
-      ddf = dens(dataprep$dat)
-    }
+    } else ddf = dens(dataprep$dat)      
+  ##if(length(outliers) != 0)
+  ##{
+  ##ddfo = dens(dataprep$dat[,outliers])
+  ##dlistno <- density(rowMeans(dataprep$dat[,-outliers]), na.rm = TRUE)
+  ##ddfno <- data.frame(x=dlistno$x, y=dlistno$y, which="no")
+  ##ddf = rbind(ddfno,ddfo)
+  ##}
+
 
   if(all(intgroup %in% names(phenoData(expressionset)@data)) && grouprep == TRUE)
     {
@@ -33,8 +38,10 @@ aqm.density = function(expressionset, dataprep, intgroup = "Covariate", grouprep
       if(length(outliers) != 0)
       {
          lwd[outliers] = 3
-         lty[outliers] = 2
-      }
+         colsb[-outliers]="grey"
+         key2 = list(lines=list(col=colsb[outliers]), text = list(as.character(dataprep$sN)[outliers]), points=FALSE, corner=c(1,1), x=1, y =0.94)
+         key2$rep = FALSE
+      } else key2 = NULL
      
       key = list(rect = list(col=unlist(coloursb)[as.factor(levels(as.factor(unlist(gpcont[,1]))))]), text = list(levels(as.factor(unlist(gpcont[,1])))))
       key$rep = FALSE
@@ -43,7 +50,7 @@ aqm.density = function(expressionset, dataprep, intgroup = "Covariate", grouprep
 
       if(dataprep$nchannels == 2)
         {  
-          den = xyplot(y ~ x | factor(fac), ddf, groups = rep(which,3), type = "l", ylab = "Density", xlab="", layout=c(3,1), strip = function(..., bg) strip.default(..., bg ="#cce6ff"), col = colsb, main=foo, lwd = lwd, lty = lty) 
+          den = xyplot(y ~ x | factor(fac), ddf, groups = rep(which,3), type = "l", ylab = "Density", xlab="", layout=c(3,1), strip = function(..., bg) strip.default(..., bg ="#cce6ff"), col = colsb, main=foo, lwd = lwd, lty = lty, key=key2) 
           shape = "rect"
         } else {
           den = xyplot(y ~ x, ddf, groups = which, type = "l", ylab = "Density", xlab="", col = colsb, main=foo, lwd = lwd, lty = lty)
@@ -51,19 +58,26 @@ aqm.density = function(expressionset, dataprep, intgroup = "Covariate", grouprep
         }
     } else {  
           lwd = rep(1,dataprep$numArrays)
-	  lty = rep(1,dataprep$numArrays)
-          if(length(outliers) != 0)
+	      lty = rep(1,dataprep$numArrays)
+      if(length(outliers) != 0)
 	  {
 	  lwd[outliers] = 3
-	  lty[outliers] = 2
-	  }
-
+	  colo = rep("grey", dataprep$numArrays)
+	  colo[outliers] = brewer.pal(8,"Set1")[seq_len(length(outliers))]	  
+	  key = list(lines=list(col=colo[outliers]), text = list(as.character(dataprep$sN)[outliers]), points=FALSE, corner=c(1,1), x=1, y =0.94)
+      key$rep = FALSE
+      } else {
+      colo = rep(brewer.pal(8,"Set1"), signif(dataprep$numArrays/8,0))[seq_len(dataprep$numArrays)]
+	  key = list(lines=list(col=colo), text = list(as.character(dataprep$sN)), points=FALSE, corner=c(1,1), x=1, y =0.94)
+      key$rep = FALSE
+      }
+      
       if(dataprep$nchannels == 2)
         {  
-          den = xyplot(y ~ x | factor(fac), ddf, groups = rep(which,3), type = "l", ylab = "Density", xlab="", layout=c(3,1), strip = function(..., bg) strip.default(..., bg ="#cce6ff"), auto.key = list(lines=TRUE, points=FALSE, x=1, y=0.96, corner=c(1,1)), lwd=lwd, lty=lty) 
+          den = xyplot(y ~ x | factor(fac), ddf, groups = rep(which,3), type = "l", ylab = "Density", xlab="", layout=c(3,1), strip = function(..., bg) strip.default(..., bg ="#cce6ff"),  lwd=lwd, lty=lty, col=colo, key=key) 
           shape = "rect"
         } else {
-          den = xyplot(y ~ x, ddf, groups = which, type = "l", ylab = "Density", xlab="", auto.key = list(lines=TRUE, points=FALSE, x=1, y=0.99, corner=c(1,1), lty=lty, lwd=lwd), lwd=lwd, lty=lty) 
+          den = xyplot(y ~ x, ddf, groups = which, type = "l", ylab = "Density", xlab="", lwd=lwd, lty=lty, col=colo, key=key) 
           shape = "square"
         }
     }
@@ -77,4 +91,3 @@ aqm.density = function(expressionset, dataprep, intgroup = "Covariate", grouprep
   class(out) = "aqmobj.dens"
   return(out)   
 }
-## TODO: fix legend

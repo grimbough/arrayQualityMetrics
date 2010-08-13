@@ -10,7 +10,7 @@ setClass("aqmobj.qcs", representation(plot="ANY", section="character", title="ch
 
 setClass("aqmobj.pmmm", representation(plot="list", section="character", title="character", legend="character", shape = "character"))
 
-setClass("aqmobj.box", representation(plot="ANY", section="character", title="character", legend="character", scores="numeric", outliers="ANY", shape = "character"))
+setClass("aqmobj.box", representation(plot="ANY", section="character", title="character", legend="character", scores="numeric", outliers="ANY", shape = "list"))
 
 setClass("aqmobj.dens", representation(plot="ANY", section="character", title="character", legend="character", shape = "character"))
 

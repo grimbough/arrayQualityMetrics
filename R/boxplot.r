@@ -45,20 +45,19 @@ aqm.boxplot = function(expressionset, dataprep, intgroup = "Covariate", grouprep
 
       if(dataprep$nchannels == 2)
         {
-          box = bwplot(bigdat ~ colbigd | factor(fac), horizontal=FALSE, groups = colbigd, layout=c(3,1), as.table=TRUE, strip = function(..., bg) strip.default(..., bg ="#cce6ff"), pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = colsb, panel = panel.superpose, panel.groups = panel.bwplot, main=foo)
+          box = bwplot(colbigd ~ bigdat | factor(fac),  horizontal=TRUE, groups = colbigd, layout=c(3,1), as.table=TRUE, strip = function(..., bg) strip.default(..., bg ="#cce6ff"), pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = colsb, panel = panel.superpose, panel.groups = panel.bwplot, main=foo) #
         }
       else {
-        box = bwplot(bigdat ~ colbigd, horizontal=FALSE, groups = colbigd, pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = colsb, panel = panel.superpose, panel.groups = panel.bwplot, main=foo, ylab = "")
+        box = bwplot(colbigd ~ bigdat, horizontal=TRUE,  groups = colbigd, pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = colsb, panel = panel.superpose, panel.groups = panel.bwplot, main=foo, ylab = "")
       }
     } else {
-      colsb = rep("#1F78B4",dataprep$numArrays)
+      colsb = rep("#1F78B4",dataprep$numArrays) #
       if(length(outliers) != 0)
-         colsb[outliers] = "grey"
-      box = if(dataprep$nchannels == 2) bwplot(bigdat ~ colbigd | factor(fac), horizontal=FALSE, groups = colbigd, layout=c(3,1), as.table=TRUE, strip = function(..., bg) strip.default(..., bg ="#cce6ff"), pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = colsb, panel = panel.superpose, panel.groups = panel.bwplot) else bwplot(bigdat ~ colbigd, horizontal=FALSE, groups = colbigd, pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = colsb, panel = panel.superpose, panel.groups = panel.bwplot, ylab = "")
+        colsb[outliers] = "grey"
+      box = if(dataprep$nchannels == 2) bwplot(colbigd ~ bigdat | factor(fac),  horizontal=TRUE, groups = colbigd, layout=c(3,1), as.table=TRUE, strip = function(..., bg) strip.default(..., bg ="#cce6ff"), pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = colsb, panel = panel.superpose, panel.groups = panel.bwplot) else bwplot(colbigd ~ bigdat,  horizontal=TRUE, groups = colbigd, pch = "|",  col = "black", do.out = FALSE, box.ratio = 2, xlab = "", fill = colsb, panel = panel.superpose, panel.groups = panel.bwplot, ylab = "") #
     }
 
-  if(dataprep$nchannels == 2)
-    shape = "rect" else shape = "square"
+  shape = list("h" = if(dataprep$numArrays > 50) (dataprep$numArrays/8) else 10, "w" = 10) 
   
   legspe = if(dataprep$nchannels == 2) "The left panel corresponds to the red channel. The middle to the green channel. The right panel shows the boxplots of log<sub>2</sub>(ratio)." else ""
   
