@@ -18,8 +18,7 @@ aqm.boxplot = function(expressionset, dataprep, intgroup = "Covariate", grouprep
 
   bmedianout = !within(bmedian, bmedianstat$stats[c(1,5)])
   biqrout    = !within(biqr,    biqrstat$stats[c(1,5)])
-  outliers   = bmedianout | biqrout
-
+  outlier    = (bmedianout | biqrout)
   
   bsdat   = boxplot(dataprep$dat, plot=FALSE)
 
@@ -38,23 +37,25 @@ aqm.boxplot = function(expressionset, dataprep, intgroup = "Covariate", grouprep
     colbigd = as.vector(col(bsdat$stats))
   }
   
-  if(all(intgroup %in% names(phenoData(expressionset)@data)) && grouprep) {
-    gp = intgroup[1]
-    gpcont = pData(expressionset)[colnames(pData(expressionset))==gp,]
-    coloursb = brewer.pal(8, rownames(brewer.pal.info[brewer.pal.info$category=="qual",])[6])
-    intgroupcont = gpcont[,gp]
-    colsb = coloursb[as.factor(intgroupcont)]
-    colsb[outliers] = "grey"
-     
-    key = list(rect = list(col=unlist(coloursb)[as.factor(levels(as.factor(unlist(gpcont[,1]))))]),
-               text = list(levels(as.factor(unlist(gpcont[,1])))))
-    key$rep = FALSE
-    foo = draw.key(key = key)
+  if (grouprep) {
+    sampleGroups = as.factor(pData(expressionset)[, intgroup])
+    isampleGroups = as.integer(sampleGroups)
+    colours = brewer.pal(9, "Set1")
+    if(nlevels(sampleGroups) > length(colours)) {
+      warning(sprintf("'intgroup' has %d levels, but only the first 9 are used for colouring.", nlevels(sampleGroups)))
+      isampleGroups[isampleGroups > length(colours)] = length(colours)+1
+      colours = c(colours, "#101010")
+    } else {
+      colours = colours[1:nlevels(sampleGroups)]
+    }
+    colsb = ifelse(outlier, "grey", colours[isampleGroups])
+    foo = draw.key(key = list(
+      rect = list(col = colours),
+      text = list(levels(sampleGroups)),
+      rep = FALSE))
     
   } else {
-    colsb = rep("#1F78B4", dataprep$numArrays) 
-    colsb[outliers] = "grey"
-    
+    colsb = ifelse(outlier, "grey", rep("#1F78B4", dataprep$numArrays))
     foo = NULL
   }
     

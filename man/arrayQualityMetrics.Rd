@@ -53,37 +53,36 @@ arrayQualityMetrics(expressionset,
     \code{\link[marray:marrayRaw-class]{marrayRaw}} or
     \code{\link[marray:marrayNorm-class]{marrayNorm}} .}
 
-\item{outdir}{ is the name of the directory in which the results are
-  created. }
+\item{outdir}{the name of the directory in which the results are
+  created; a character of length 1.}
   
-\item{force}{ if TRUE, \code{outdir} will be overwritten if it
-  already exists. }
+\item{force}{indicates whether \code{outdir} should be overwritten if it
+  already exists; a logical of length 1.}
   
-\item{do.logtransform}{ If TRUE, the data are log transformed before
-  the analysis. }
+\item{do.logtransform}{indicates whether the data should be logarithm transformed before
+  the analysis; a logical of length 1.}
   
-\item{intgroup}{ Name of the column of the phenoData to be used to draw
-  a colour side bar next to the heatmap. }
+\item{intgroup}{the name of the sample covariate used to draw
+  a colour side bar next to the heatmap, and to define sample groups in
+  other plots (boxplots, densities). This should be a character
+  vector of length 1, ans its value needs to match one of the column
+  names of the \code{phenoData(expressionset)}.}
 
-\item{grouprep}{ Decide if you want the boxplots and density plots to be
-  coloured function of the groups set by 'intgroup'. The default
-  is FALSE meaning that the boxplot and density plots will not be
-  represented function of the groups of 'intgroup'.}
+\item{grouprep}{indicates whether the boxplots and
+  density plots should be coloured according to \code{intgroup}; a logical of length 1.}
 
-\item{spatial}{ If FALSE, the spatial representations are not
-  performed. This is useful for large arrays(like Affymetrix
-  hgu133Plus2) when these figures are slow to be drawn and can cause
-  machines with low memory to fail to perform the report. }
+\item{spatial}{indicates whether spatial plots
+  should be made; a logical of length 1. This useful can be useful for large arrays (like Affymetrix
+  hgu133Plus2) when CPU time and RAM resources of the machine running
+  this function may be limiting. }
 
-
-\item{sN}{ are the sample names to be written on the plots. By
-  default, using NULL (recommanded), numbers will be assigned for each
-  array and the correspondence is given in the report.}
-
+\item{sN}{Should the sample names be written on the plots? If
+  \code{NULL}, samples will be labeled by numbers 1, 2, .... on the
+  plots, and a table is produced to map these numbers back to the names.}
 }
 
 \details{
-See the arrayQualityMetrics Vignette for examples of this function.
+See the arrayQualityMetrics vignette for examples of this function.
 }
 
 \value{
