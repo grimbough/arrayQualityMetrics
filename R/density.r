@@ -6,7 +6,7 @@ dens = function(obj, ...)
     return(ddf)
   }
 
-aqm.density = function(expressionset, dataprep, intgroup, outliers = NULL, ...)
+aqm.density = function(expressionset, dataprep, intgroup, outliers = c(), ...)
 { 
 
   if(dataprep$nchannels == 2)

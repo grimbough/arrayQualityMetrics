@@ -41,7 +41,7 @@ arrayQualityMetrics(expressionset,
 }
 
 \arguments{
-  \item{expressionset}{ is an object of
+  \item{expressionset}{an object of
     class \code{\link[Biobase:class.ExpressionSet]{ExpressionSet}},
     \code{\link[affy:AffyBatch-class]{AffyBatch}} ,
     \code{\link[Biobase:class.NChannelSet]{NChannelSet}} ,
@@ -64,13 +64,12 @@ arrayQualityMetrics(expressionset,
 \item{intgroup}{(optional) the name of the sample covariate used to draw
   a colour side bar next to the heatmap, and to define sample groups in
   other plots (boxplots, densities). This should be a character
-  vector of length 1, ans its value needs to match one of the column
+  vector of length 1, and its value needs to match one of the column
   names of the \code{phenoData(expressionset)}.}
 
 \item{spatial}{indicates whether spatial plots
-  should be made; a logical of length 1. This useful can be useful for large arrays (like Affymetrix
-  hgu133Plus2) when CPU time and RAM resources of the machine running
-  this function may be limiting. }
+  should be made; a logical of length 1. This can be useful for large arrays (like Affymetrix
+  hgu133Plus2) when CPU time and RAM resources of the machine would be limiting. }
 
 \item{sN}{Should the sample names be written on the plots? If
   \code{NULL}, samples will be labeled by numbers 1, 2, .... on the

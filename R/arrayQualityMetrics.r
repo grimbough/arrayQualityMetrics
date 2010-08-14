@@ -44,6 +44,8 @@ setMethod("arrayQualityMetrics", signature(expressionset = "aqmInputObj"),
     
     dataprep = aqm.prepdata(expressionset, do.logtransform, sN)
 
+    distributionOutliers = ksOutliers(dataprep$dat)
+    
     obj$maplot = try(aqm.maplot(dataprep = dataprep))
     if(inherits(obj$maplot, "try-error"))
       warning("Could not draw MA plots \n")

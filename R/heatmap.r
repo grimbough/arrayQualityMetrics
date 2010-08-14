@@ -9,7 +9,7 @@ hmap = function(expressionset, sN, outM, numArrays, intgroup, ...)
     colnames(m) = sN
     rownames(m) = sN
     
-    if(!missing(intgroup))      {
+    if(!missing(intgroup)) {
       hfig = levelplot(m[od.row,od.row],
         scales=list(x=list(rot=90)),
         legend=list(
@@ -29,6 +29,7 @@ hmap = function(expressionset, sN, outM, numArrays, intgroup, ...)
         key$rep = FALSE
       
         foo = draw.key(key = key)
+    } else {
         hfig = levelplot(m[od.row,od.row],
           scales=list(x=list(rot=90)),
           legend=list(
@@ -41,7 +42,6 @@ hmap = function(expressionset, sN, outM, numArrays, intgroup, ...)
           xlab="",ylab="",
           col.regions=colourRange,
           main = foo)
-        dev.off()
     }
       
     leghmspe = if(is(expressionset, "BeadLevelList")) "the values used are the summarized ones obtained by using the function createBeadSummaryData from the package beadarray." else "without preprocessing." 

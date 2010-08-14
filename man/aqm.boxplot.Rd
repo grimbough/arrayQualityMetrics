@@ -11,15 +11,18 @@
 }
 
 \usage{
-aqm.boxplot(expressionset, dataprep, intgroup, ...)
-aqm.density(expressionset, dataprep, intgroup, outliers = NULL, ...)
+aqm.boxplot(expressionset, dataprep, intgroup, outliers, subsample = 10000, ...)
+aqm.density(expressionset, dataprep, intgroup, outliers, ...)
 aqm.heatmap(expressionset, dataprep, intgroup, ...)
 }
 \arguments{
   \item{expressionset, dataprep, intgroup}{ Same as for the function
     \code{\link{arrayQualityMetrics}} }
-  \item{outliers}{Indicates arrays to be highlighted on the plot.}
-
+  \item{outliers}{Indicates arrays to be highlighted as potential
+    outliers in the plots.}
+  \item{subsample}{For the boxplot computations, if the arrays have more
+    features than indicates by this number, then randomly subsample that
+    number of them. }
   \item{...}{These arguments get passed on to
     \code{\link[lattice:xyplot]{bwplot}} (in the case of
     \code{aqm.boxplot}),

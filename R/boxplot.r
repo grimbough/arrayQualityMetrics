@@ -1,76 +1,74 @@
-within = function(x, range) {
-  stopifnot(length(range)==2)
-  return((x >= range[1]) & (x <= range[2]))
+ksOutliers = function(x, subsamp = 300, theta = 2){
+  if (nrow(x)>subsamp)
+    x = x[sample(nrow(x), subsamp), ] 
+  s = apply(x, 2, function(v)
+    suppressWarnings(ks.test(v, x, alternative="two.sided")$statistic))
+  which( (s-mean(s)) / sd(s) > theta )
 }
 
-aqm.boxplot = function(expressionset, dataprep, intgroup, ...) {
 
-  b = boxplot(dataprep$dat, plot=FALSE, range=0)
+aqm.boxplot = function(expressionset, dataprep, intgroup, outliers, subsample = 10000, ...) {
+
+  if (nrow(dataprep$dat)>subsample) {
+    ss = sample(nrow(dataprep$dat), subsample)
+    nr = length(ss)
+  } else {
+    ss = TRUE
+    nr = nrow(dataprep$dat)
+  }
   
-  ## Outlier detection, applied to the boxplot statistics: to the medians (i.e. box positions),
-  ## and differences between upper hinge and lower hinge (i.e. box sizes)
-  bmedian = b$stat[3,]
-  bmedianstat = boxplot.stats(bmedian)
-  biqr = b$stat[4,] -  b$stat[2,] 
-  biqrstat = boxplot.stats(biqr)
-
-  bmedianout = !within(bmedian, bmedianstat$stats[c(1,5)])
-  biqrout    = !within(biqr,    biqrstat$stats[c(1,5)])
-  outlier    = (bmedianout | biqrout)
+  sample_id = rep( seq_len(dataprep$numArrays), each = nr )
   
-  bsdat   = boxplot(dataprep$dat, plot=FALSE)
-
-  stopifnot( dataprep$nchannels %in% c(1,2) )
   if(dataprep$nchannels == 2)  {
-    bsrc = boxplot(dataprep$rc, plot=FALSE)
-    bsgc = boxplot(dataprep$gc, plot=FALSE)
-    
-    bigdat  = c(as.numeric(bsrc$stats), as.numeric(bsgc$stats), as.numeric(bsdat$stats))
-    sample_id = c(as.vector(col(bsrc$stat)), as.vector(col(bsgc$stats)), as.vector(col(bsdat$stats)))
-    fac = c(rep("a. Red Channel",   prod(dim(bsrc$stats ))),
-            rep("b. Green Channel", prod(dim(bsgc$stats ))),
-            rep("c. Log(Ratio)",    prod(dim(bsdat$stats))))
-  } else {
-    bigdat  = as.numeric(bsdat$stats)
-    sample_id = as.vector(col(bsdat$stats))
-  }
-  
-  if (!missing(intgroup)) {
-    sampleGroups = as.factor(pData(expressionset)[, intgroup])
-    isampleGroups = as.integer(sampleGroups)
-    colours = brewer.pal(9, "Set1")
-    if(nlevels(sampleGroups) > length(colours)) {
-      warning(sprintf("'intgroup' has %d levels, but only the first 9 are used for colouring.", nlevels(sampleGroups)))
-      isampleGroups[isampleGroups > length(colours)] = length(colours)+1
-      colours = c(colours, "#101010")
-    } else {
-      colours = colours[1:nlevels(sampleGroups)]
-    }
-    colsb = ifelse(outlier, "grey", colours[isampleGroups])
-    foo = draw.key(key = list(
-      rect = list(col = colours),
-      text = list(levels(sampleGroups)),
-      rep = FALSE))
-    
-  } else {
-    colsb = ifelse(outlier, "grey", rep("#1F78B4", dataprep$numArrays))
-    foo = NULL
-  }
-    
-  if(dataprep$nchannels == 2) {
-    formula = sample_id ~ bigdat | factor(fac)
+    values    = with(dataprep, c(rc[ss,], gc[ss,], dat[ss,]))
+    sample_id = rep(sample_id, times = 3)
+    panels    = factor(rep(1:3, each = nr * dataprep$numArrays),
+                   levels = 1:3,
+                   labels = c("a. Red Channel", "b. Green Channel", "c. Log(Ratio)"))
+    formula = sample_id ~ values | panels
     lay = c(3,1)
   } else {
-    formula = sample_id ~ bigdat
+    values    = with(dataprep, dat[ss, ])
+    formula = sample_id ~ values
     lay = c(1,1)
-  }  
+  }
 
-  box = bwplot(formula, layout=lay, as.table=TRUE,
+  if (!missing(intgroup)) {
+    groups  = as.factor(pData(expressionset)[, intgroup])
+    igroups = as.integer(groups)
+    colours = brewer.pal(9, "Set1")
+    if(nlevels(groups) > length(colours)) {
+      warning(sprintf("'intgroup' has %d levels, but only the first 9 are used for colouring.", nlevels(groups)))
+      igroups[igroups > length(colours)] = length(colours)+1
+      colours = c(colours, "#101010")
+    } else {
+      colours = colours[1:nlevels(groups)]
+    }
+    colsb = colours[igroups]
+    foo = draw.key(key = list(
+                     rect = list(col = colours),
+                     text = list(levels(groups)),
+                     rep = FALSE))
+    
+  } else {
+    colsb = rep("#1F78B4", dataprep$numArrays)
+    foo = NULL
+  }
+
+  if(!missing(outliers))
+    colsb[outliers] = "grey"
+
+  box = bwplot(formula, groups = sample_id, layout=lay, as.table=TRUE,
         strip = function(..., bg) strip.default(..., bg ="#cce6ff"),
-        horizontal = TRUE, groups = sample_id, 
+        horizontal = TRUE, 
         pch = "|",  col = "black", do.out = FALSE, box.ratio = 2,
-        xlab = "", ylab = "Array", ylim = c(dataprep$numArrays, 1), 
-        fill = colsb, panel = panel.superpose, panel.groups = panel.bwplot, main=foo, ...)
+        xlab = "", ylab = "Array",
+        fill = colsb, panel = panel.superpose, panel.groups = panel.bwplot, main=foo, 
+        scales = "free", prepanel =
+           function(x, y) {
+             list(xlim=quantile(x, probs = c(0.01, 0.99)),
+                  ylim=c(dataprep$numArrays+0.7, 0.3))
+           },    ...)
 
 
   shape = list("h" = if(dataprep$numArrays > 50) (dataprep$numArrays/8) else 10, "w" = 10) 
@@ -86,9 +84,8 @@ aqm.boxplot = function(expressionset, dataprep, intgroup, ...) {
              "section" = section,
              "title" = title,
              "legend" = legend,
-             "scores"   = list("median" = bmedian, "IQR" = biqr),
-             "outliers" = list("median" = bmedianout, "IQR" = biqrout),
              "shape" = shape)
+  
   class(out) = "aqmobj.box"
   
   return(out)   
