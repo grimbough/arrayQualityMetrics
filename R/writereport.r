@@ -131,50 +131,26 @@ aqm.make.index = function(obj, p)
 ##To create a part of report with figures and legend
 aqm.report.qm = function(p, qm, f, name)
   {
-    if(class(qm$shape) != "list")
-    {
-    if(qm$shape == "rect")
-      {
-      	h = 6
-        w = 10       
-      } 
-    if(qm$shape == "square")
-      {
-        h = 6
-        w = 6
-      }
-      } else {
-        #h = 25 #200 arrays
-        #w = 10 #200 arrays
-        #h = 20 #150 arrays
-        #w = 10 #150 arrays
-        #h = 20 #100 arrays
-        #w = 10 #100 arrays
-        #h = 12 #80 arrays
-        #w = 10 #80 arrays
-        #h = 10 #50 arrays
-        #w = 10 #50 arrays
-        #h = 7 #30 arrays
-        #w = 10 #30 arrays
-        #h = 6 #10 arrays
-        #w = 6 #10 arrays
-        #lm 8.97
-		#h = c(6,7,10,12,20,22,25)
-		#n=c(10,30,50,80,100,150,200)
-		#plot(h,n)
-		#abline(lm(n~h))
-		#lm(n~h
-		h = qm$shape$h
-        w = qm$shape$w
-      }
+    if(is.character(qm$shape))  {
+      switch(qm$shape,
+             "rect" =   { h=6; w = 10 },
+             "square" = { h=6; w = 6 },
+             stop(sprintf("Invalid 'shape': %s", qm$shape)))
+    } else {
+      h = qm$shape$h
+      w = qm$shape$w
+    }
     dpi = 72
 
     namepdf = paste(name, ".pdf", sep = "")
     namepng = paste(name, ".png", sep = "")
 
     png(file = namepng, h = h*dpi, w = w*dpi)
-    if(class(qm) == "aqmobj.ma"  || ((class(qm) == "aqmobj.spatial" || class(qm) == "aqmobj.spatialbg") && (class(qm$plot) == "list" && class(qm$plot[[1]]) == "trellis")))
-      print(qm$plot[[1]]) else aqm.plot(qm)
+    ## ??:
+    ##if( (class(qm) %in% c("aqmobj.ma", "aqmobj.spatial", "aqmobj.spatialbg")) &&
+    ##    (class(qm$plot) == "list" && class(qm$plot[[1]]) == "trellis") )
+    ##  print(qm$plot[[1]]) else aqm.plot(qm)
+    aqm.plot(qm)
     dev.off()
 
     pdf(file = namepdf, h = h, w = w)
@@ -182,8 +158,15 @@ aqm.report.qm = function(p, qm, f, name)
     dev.off()   
   
     img = hwriteImage(namepng)
-    hwrite(c(img,  paste("Figure ",f,": ",qm$title, sep="")), p, dim=c(2,1), style='font-weight:bold;text-align:center;font-family:helvetica', border=0, link=list(namepdf,NA))
-    hwrite(paste("<br>",qm$legend), p, style='text-align:justify;font-family:Lucida Grande;font-size:10pt')
+    hwrite(c(img,
+             paste("Figure ",f,": ", qm$title, sep="")),
+           p,
+           dim=c(2,1),
+           style='font-weight:bold;text-align:center;font-family:helvetica',
+           border=0, link=list(namepdf,NA))
+    hwrite(paste("<br>", qm$legend),
+           p,
+           style='text-align:justify;font-family:Lucida Grande;font-size:10pt')
   }
 
 ##To end the report

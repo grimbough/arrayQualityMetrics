@@ -9,22 +9,22 @@ dens = function(obj, ...)
 aqm.density = function(expressionset, dataprep, intgroup, outliers = c(), ...)
 { 
 
-  if(dataprep$nchannels == 2)
-    {  
-      den1 = dens(dataprep$rc)
-      den2 = dens(dataprep$gc)
-      den3 = dens(dataprep$dat)
-      ddf = rbind(den1,den2,den3)
-      fac = rep(c("a. Red Channel","b. Green Channel","c. Log(Ratio)"), each=nrow(den3))
-    } else ddf = dens(dataprep$dat)      
-  ##if(length(outliers) != 0)
-  ##{
-  ##ddfo = dens(dataprep$dat[,outliers])
-  ##dlistno <- density(rowMeans(dataprep$dat[,-outliers]), na.rm = TRUE)
-  ##ddfno <- data.frame(x=dlistno$x, y=dlistno$y, which="no")
-  ##ddf = rbind(ddfno,ddfo)
-  ##}
-
+  if(dataprep$nchannels == 2) {  
+    den1 = dens(dataprep$rc)
+    den2 = dens(dataprep$gc)
+    den3 = dens(dataprep$dat)
+    ddf  = rbind(den1, den2, den3)
+    panels = factor(rep(1:3, each = c(nrow(den1), nrow(den2), nrow(den3))),
+      levels = 1:3,
+      labels = c("a. Red Channel", "b. Green Channel", "c. Log2(Ratio)"))
+    formula = sample_id ~ values | panels
+    lay = c(3,1)
+  } else {
+    ddf = dens(dataprep$dat)
+    formula = sample_id ~ values
+    lay = c(1,1)
+  }
+  
   if (!missing(intgroup)) {
       gpcont = pData(expressionset)[colnames(pData(expressionset))==intgroup]
       coloursb = brewer.pal(8,rownames(brewer.pal.info[brewer.pal.info$category=="qual",])[6])
@@ -79,7 +79,7 @@ aqm.density = function(expressionset, dataprep, intgroup, outliers = c(), ...)
         }
     }
       
-  legend = "The figure <!-- FIG --> shows density estimates (smoothed histograms) of the data. Typically, the distributions of the arrays should have similar shapes and ranges. Arrays whose distributions are very different from the others should be considered for possible problems. On raw data, a bimodal distribution can be indicative of an array containing a spatial artefact and an array shifted to the right of an array with abnormal higher background intensities."
+  legend = "The figure <!-- FIG --> shows density estimates (smoothed histograms) of the data. Typically, the distributions of the arrays should have similar shapes and ranges. Arrays whose distributions are very different from the others should be considered for possible problems. On raw data, a bimodal distribution can be indicative of an array containing a spatial artefact; a distribution shifted to the right of an array with abnormal higher background intensities."
   
   title = "Density plots"
   section = "Array intensity distributions"
