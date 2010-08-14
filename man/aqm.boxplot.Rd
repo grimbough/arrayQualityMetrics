@@ -1,33 +1,42 @@
 \name{aqm.boxplot}
 \alias{aqm.boxplot}
+\alias{aqm.density}
+\alias{aqm.heatmap}
 
-\title{ Performs boxplots on aqmobj.prepdata objects. }
+\title{Compute boxplots, density plots, heatmap on a aqmobj.prepdata object.}
 
 \description{
-  \code{aqm.boxplot} performs boxplots, outlier detection from it and
-  formats the output for \code{aqm.plot} usage.
+  The functions do boxplots, density plots, heatmap and
+  produce output objects ready for rendering by \code{aqm.plot}.
 }
 
 \usage{
-aqm.boxplot(expressionset, dataprep, intgroup = "Covariate",
-            grouprep = FALSE, ...) } 
-
+aqm.boxplot(expressionset, dataprep, intgroup, ...)
+aqm.density(expressionset, dataprep, intgroup, outliers = NULL, ...)
+aqm.heatmap(expressionset, dataprep, intgroup, ...)
+}
 \arguments{
-  \item{expressionset}{ Same input as for the function
+  \item{expressionset, dataprep, intgroup}{ Same as for the function
     \code{\link{arrayQualityMetrics}} }
-  \item{dataprep}{ An object of class
-    \code{\link[arrayQualityMetrics]{aqmobj.prepdata}} }
-  \item{intgroup}{ Same input as for the function
-    \code{\link{arrayQualityMetrics}} }
-  \item{grouprep}{ Same input as for the function
-    \code{\link{arrayQualityMetrics}} }
-  \item{...}{ Any arguments to \code{\link[lattice:xyplot]{bwplot}} }
+  \item{outliers}{Indicates arrays to be highlighted on the plot.}
+
+  \item{...}{These arguments get passed on to
+    \code{\link[lattice:xyplot]{bwplot}} (in the case of
+    \code{aqm.boxplot}),
+    \code{\link[lattice:xyplot]{xyplot}} (in the case of
+    \code{aqm.density}),
+    \code{\link[lattice:xyplot]{levelplot}} (in the case of
+    \code{aqm.heatmap})
+  }
 }
 
-\value{ An object of class \code{\link{aqmobj.box}}. }
+\value{
+An object of class \code{\link{aqmobj.box}},
+  \code{\link{aqmobj.dens}} or \code{\link{aqmobj.heat}}, respectively.
+}
 
 \details{
-See the aqm.prepdata help or the aqm Vignette for example of this object.
+See \code{\link{aqm.prepdata}} and the \code{aqm} Vignette.
 }
 
 \author{ Audrey Kauffmann <kauffmann@bergonie.org> }

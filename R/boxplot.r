@@ -1,14 +1,12 @@
-
 within = function(x, range) {
   stopifnot(length(range)==2)
   return((x >= range[1]) & (x <= range[2]))
 }
 
-aqm.boxplot = function(expressionset, dataprep, intgroup = "Covariate", grouprep = FALSE, ...)
-{
+aqm.boxplot = function(expressionset, dataprep, intgroup, ...) {
 
   b = boxplot(dataprep$dat, plot=FALSE, range=0)
-
+  
   ## Outlier detection, applied to the boxplot statistics: to the medians (i.e. box positions),
   ## and differences between upper hinge and lower hinge (i.e. box sizes)
   bmedian = b$stat[3,]
@@ -28,16 +26,16 @@ aqm.boxplot = function(expressionset, dataprep, intgroup = "Covariate", grouprep
     bsgc = boxplot(dataprep$gc, plot=FALSE)
     
     bigdat  = c(as.numeric(bsrc$stats), as.numeric(bsgc$stats), as.numeric(bsdat$stats))
-    colbigd = c(as.vector(col(bsrc$stat)), as.vector(col(bsgc$stats)), as.vector(col(bsdat$stats)))
+    sample_id = c(as.vector(col(bsrc$stat)), as.vector(col(bsgc$stats)), as.vector(col(bsdat$stats)))
     fac = c(rep("a. Red Channel",   prod(dim(bsrc$stats ))),
             rep("b. Green Channel", prod(dim(bsgc$stats ))),
             rep("c. Log(Ratio)",    prod(dim(bsdat$stats))))
   } else {
     bigdat  = as.numeric(bsdat$stats)
-    colbigd = as.vector(col(bsdat$stats))
+    sample_id = as.vector(col(bsdat$stats))
   }
   
-  if (grouprep) {
+  if (!missing(intgroup)) {
     sampleGroups = as.factor(pData(expressionset)[, intgroup])
     isampleGroups = as.integer(sampleGroups)
     colours = brewer.pal(9, "Set1")
@@ -60,18 +58,19 @@ aqm.boxplot = function(expressionset, dataprep, intgroup = "Covariate", grouprep
   }
     
   if(dataprep$nchannels == 2) {
-    formula = colbigd ~ bigdat | factor(fac)
+    formula = sample_id ~ bigdat | factor(fac)
     lay = c(3,1)
   } else {
-    formula = colbigd ~ bigdat
+    formula = sample_id ~ bigdat
     lay = c(1,1)
   }  
 
   box = bwplot(formula, layout=lay, as.table=TRUE,
         strip = function(..., bg) strip.default(..., bg ="#cce6ff"),
-        horizontal = TRUE, groups = colbigd, 
+        horizontal = TRUE, groups = sample_id, 
         pch = "|",  col = "black", do.out = FALSE, box.ratio = 2,
-        xlab = "", fill = colsb, panel = panel.superpose, panel.groups = panel.bwplot, main=foo)
+        xlab = "", ylab = "Array", ylim = c(dataprep$numArrays, 1), 
+        fill = colsb, panel = panel.superpose, panel.groups = panel.bwplot, main=foo, ...)
 
 
   shape = list("h" = if(dataprep$numArrays > 50) (dataprep$numArrays/8) else 10, "w" = 10) 

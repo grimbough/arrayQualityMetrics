@@ -9,20 +9,17 @@ hmap = function(expressionset, sN, outM, numArrays, intgroup, ...)
     colnames(m) = sN
     rownames(m) = sN
     
-    if(!all(intgroup %in% names(phenoData(expressionset)@data)))
-      {
-        hfig = levelplot(m[od.row,od.row],
-          scales=list(x=list(rot=90)),
-          legend=list(
-            top=list(fun=dendrogramGrob,args=list(x=d.row,side="top")),
-            right=list(fun=dendrogramGrob,args=list(x=d.row,side="right"))),
-          colorkey = list(space ="left"),
-          xlab="",ylab="",
-          col.regions=colourRange, ...)
-      }
-   if(all(intgroup %in% names(phenoData(expressionset)@data)))
-      {
-        covar = lapply(seq(along = intgroup), function(i) pData(expressionset)[colnames(pData(expressionset))==intgroup[i]][,1])
+    if(!missing(intgroup))      {
+      hfig = levelplot(m[od.row,od.row],
+        scales=list(x=list(rot=90)),
+        legend=list(
+          top=list(fun=dendrogramGrob,args=list(x=d.row,side="top")),
+          right=list(fun=dendrogramGrob,args=list(x=d.row,side="right"))),
+        colorkey = list(space ="left"),
+        xlab="",ylab="",
+        col.regions=colourRange, ...)
+
+      covar = lapply(seq(along = intgroup), function(i) pData(expressionset)[colnames(pData(expressionset))==intgroup[i]][,1])
         lev = lapply(seq(along = intgroup), function(i) levels(as.factor(unlist(covar[i]))))
         corres = lapply(seq(along = intgroup), function(i) matrix(0,nrow=length(lev[[i]]),ncol=2))
         colourCov = lapply(seq(along = intgroup), function(i) brewer.pal(8,rownames(brewer.pal.info[brewer.pal.info$category=="qual",])[7-i]))
@@ -45,7 +42,7 @@ hmap = function(expressionset, sN, outM, numArrays, intgroup, ...)
           col.regions=colourRange,
           main = foo)
         dev.off()
-      } 
+    }
       
     leghmspe = if(is(expressionset, "BeadLevelList")) "the values used are the summarized ones obtained by using the function createBeadSummaryData from the package beadarray." else "without preprocessing." 
 
@@ -63,9 +60,6 @@ hmap = function(expressionset, sN, outM, numArrays, intgroup, ...)
   }
 
 
-##Heatmap
-aqm.heatmap = function(expressionset, dataprep, intgroup = "Covariate", ...)
-  {
-    heatmap = hmap(expressionset, dataprep$sN, dataprep$outM, dataprep$numArrays, intgroup)            
-    return(heatmap)         
-  }
+## heatmap
+aqm.heatmap = function(expressionset, dataprep, intgroup, ...)
+  hmap(expressionset, dataprep$sN, dataprep$outM, dataprep$numArrays, intgroup, ...)            

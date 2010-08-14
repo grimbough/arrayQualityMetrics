@@ -6,7 +6,7 @@ dens = function(obj, ...)
     return(ddf)
   }
 
-aqm.density = function(expressionset, dataprep, intgroup = "Covariate", grouprep = FALSE, outliers = NULL, ...)
+aqm.density = function(expressionset, dataprep, intgroup, outliers = NULL, ...)
 { 
 
   if(dataprep$nchannels == 2)
@@ -25,13 +25,10 @@ aqm.density = function(expressionset, dataprep, intgroup = "Covariate", grouprep
   ##ddf = rbind(ddfno,ddfo)
   ##}
 
-
-  if(all(intgroup %in% names(phenoData(expressionset)@data)) && grouprep == TRUE)
-    {
-      gp = intgroup[1]
-      gpcont = pData(expressionset)[colnames(pData(expressionset))==gp]
+  if (!missing(intgroup)) {
+      gpcont = pData(expressionset)[colnames(pData(expressionset))==intgroup]
       coloursb = brewer.pal(8,rownames(brewer.pal.info[brewer.pal.info$category=="qual",])[6])
-      intgroupcont = gpcont[,gp]
+      intgroupcont = gpcont[,intgroup]
       colsb = coloursb[as.factor(intgroupcont)]
       lwd = rep(1,dataprep$numArrays)
       lty = rep(1,dataprep$numArrays)
@@ -50,10 +47,10 @@ aqm.density = function(expressionset, dataprep, intgroup = "Covariate", grouprep
 
       if(dataprep$nchannels == 2)
         {  
-          den = xyplot(y ~ x | factor(fac), ddf, groups = rep(which,3), type = "l", ylab = "Density", xlab="", layout=c(3,1), strip = function(..., bg) strip.default(..., bg ="#cce6ff"), col = colsb, main=foo, lwd = lwd, lty = lty, key=key2) 
+          den = xyplot(y ~ x | factor(fac), ddf, groups = rep(which,3), type = "l", ylab = "Density", xlab="", layout=c(3,1), strip = function(..., bg) strip.default(..., bg ="#cce6ff"), col = colsb, main=foo, lwd = lwd, lty = lty, key=key2, ...) 
           shape = "rect"
         } else {
-          den = xyplot(y ~ x, ddf, groups = which, type = "l", ylab = "Density", xlab="", col = colsb, main=foo, lwd = lwd, lty = lty)
+          den = xyplot(y ~ x, ddf, groups = which, type = "l", ylab = "Density", xlab="", col = colsb, main=foo, lwd = lwd, lty = lty, ...)
           shape = "square"
         }
     } else {  
@@ -74,10 +71,10 @@ aqm.density = function(expressionset, dataprep, intgroup = "Covariate", grouprep
       
       if(dataprep$nchannels == 2)
         {  
-          den = xyplot(y ~ x | factor(fac), ddf, groups = rep(which,3), type = "l", ylab = "Density", xlab="", layout=c(3,1), strip = function(..., bg) strip.default(..., bg ="#cce6ff"),  lwd=lwd, lty=lty, col=colo, key=key) 
+          den = xyplot(y ~ x | factor(fac), ddf, groups = rep(which,3), type = "l", ylab = "Density", xlab="", layout=c(3,1), strip = function(..., bg) strip.default(..., bg ="#cce6ff"),  lwd=lwd, lty=lty, col=colo, key=key, ...) 
           shape = "rect"
         } else {
-          den = xyplot(y ~ x, ddf, groups = which, type = "l", ylab = "Density", xlab="", lwd=lwd, lty=lty, col=colo, key=key) 
+          den = xyplot(y ~ x, ddf, groups = which, type = "l", ylab = "Density", xlab="", lwd=lwd, lty=lty, col=colo, key=key, ...) 
           shape = "square"
         }
     }
