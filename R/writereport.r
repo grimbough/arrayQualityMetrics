@@ -107,7 +107,7 @@ aqm.make.index = function(obj, p)
   s = 1
   hwrite("<hr>", p)
   hwrite("Index",p, heading=2, style='font-family:helvetica,arial,sans-serif')
-  hwrite("PLEASE NOTE:<br>All figures below are links to PDF files: these contain images for every array in the report.  The PDF files may be several pages long, this HTML report presents only the first page.", p, style='font-weight:bold;font-family:helvetica;font-size:11pt;color:#FF0000')
+  hwrite("Note: bitmap figures shown in this HTML report are also linked to PDF files, to provide better figure quality, or to provide multi-page files in cases where in  this HTML report only the first page is presented.", p, style='font-family:helvetica;font-size:11pt;color:#808080;font-style:italic;')
 
   hwrite("<UL>", p)
   lasttype = "FAKE"
@@ -142,42 +142,50 @@ aqm.report.qm = function(p, qm, f, name)
     }
     dpi = 72
 
-    namepdf = paste(name, ".pdf", sep = "")
 
-    if("svg" %in% names(qm)) {
-      nameimg = paste(name, ".svg", sep = "")
-      svgtemp = tempfile()
-      svg(file = svgtemp, h = h, w = w)
-      htmltagname = "embed"
-    } else {
-      nameimg = paste(name, ".png", sep = "")
-      png(file = nameimg, h = h*dpi, w = w*dpi)
-      htmltagname = "img"
-    }
+    imageformat =  if("svg" %in% names(qm)) "svg" else "png"
+
+    ## The two cases, png and svg, need to be treated quite differently ...
+    switch(imageformat,
+           svg = {
+             nameimg = paste(name, ".svg", sep = "")
+             svgtemp = tempfile()
+             htmltagname = "embed"
+             svg(file = svgtemp, h = h, w = w)
+             aqm.plot(qm)
+             dev.off()
+             annotateSvgMatplot(svgtemp, nameimg, annotationInfo=qm$svg)
+             link = NULL
+           },
+           png = {
+             nameimg = paste(name, ".png", sep = "")
+             namepdf = paste(name, ".pdf", sep = "")
+             htmltagname = "img"
+             png(file = nameimg, h = h*dpi, w = w*dpi)
+             aqm.plot(qm)
+             dev.off()
+             pdf(file = namepdf, h = h, w = w)
+             aqm.plot(qm)
+             dev.off()
+             link = list(namepdf, NA)
+           },
+           stop(sprintf("Invalid value of 'imageformat': %s", imageformat))
+         )
     
     ## ??:
     ##if( (class(qm) %in% c("aqmobj.ma", "aqmobj.spatial", "aqmobj.spatialbg")) &&
     ##    (class(qm$plot) == "list" && class(qm$plot[[1]]) == "trellis") )
     ##  print(qm$plot[[1]]) else aqm.plot(qm)
     
-    aqm.plot(qm)
-    dev.off()
-
-    if("svg" %in% names(qm)) {
-      annotateSvgMatplot(svgtemp, nameimg, annotation=qm$svg$annotation)
-    }
-    
-    pdf(file = namepdf, h = h, w = w)
-    aqm.plot(qm)
-    dev.off()   
   
     img = aqm.hwriteImage(nameimg, tagname=htmltagname)
     
-    hwrite(c(img, paste("Figure ",f,": ", qm$title, sep="")),
+    hwrite(c(img, paste("Figure ", f, ": ", qm$title, sep="")),
            p,
            dim=c(2,1),
            style='font-weight:bold;text-align:center;font-family:helvetica',
-           border=0, link=list(namepdf,NA))
+           border=0, link=link)
+    
     hwrite(paste("<br>", qm$legend),
            p,
            style='text-align:justify;font-family:Lucida Grande;font-size:10pt')

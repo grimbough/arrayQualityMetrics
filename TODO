@@ -3,7 +3,6 @@
 In aqm.prepdata help:
 protocolData(CCl4)$scanDates = rep("2006/07/19", ncol(CCl4)) # to add soon
 
-
 1.) Duplicate correlation
 -------------------------
 If featureData contains a factor that identifies features containing 
@@ -13,3 +12,18 @@ standard deviation)
 2.) Outlier detection
 ---------------------
 Use outliers package and mvoutlier package as alternatives to boxplot.stats. See flowQ as a model.
+
+
+
+
+* The function 'aqm.boxplot' opens a graphics device (through its dependence on draw.key). It would be better
+  if it did not do that.
+
+* With the following, why are only two arrays shown?
+arrayQualityMetrics(subset10, "QA10", force = TRUE, do.logtransform = TRUE,
+                    intgroup = "FactorValue..ER.status.")
+
+* color choice of colour bars in heatmap, should be the same as for boxplots and densities.
+  
+
+* Mark outliers in density plot

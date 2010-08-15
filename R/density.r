@@ -21,11 +21,13 @@ aqm.density = function(expressionset, dataprep, intgroup, outliers = c(), ...)
     formula = y ~ x | panels
     lay = c(3,1)
 
+    ## TO DO: the making of annotation could be centralised somewhere in a function
     annotation = vector(mode="list", length = 3*length(sN))
     names(annotation) = sprintf("line%d", seq(along=annotation))
     for(i in seq(along=annotation)) {
       s = ((i-1) %% length(sN))+1
-      annotation[[i]] = list(title=sN[s], linkedids=names(annotation)[s+(0:2)*length(sN)])
+      annotation[[i]] = list(title = sprintf("Array %d: %s", s, sN[s]),
+                             linkedids = names(annotation)[s+(0:2)*length(sN)])
     }
 
   } else {
@@ -36,7 +38,8 @@ aqm.density = function(expressionset, dataprep, intgroup, outliers = c(), ...)
     annotation = vector(mode="list", length = length(sN))
     names(annotation) = sprintf("line%d", seq(along=annotation))
     for(i in seq(along=annotation))
-      annotation[[i]] = list(title=sN[i], linkedids=names(annotation)[i])
+      annotation[[i]] = list(title = sprintf("Array %d: %s", i, sN[i]),
+                             linkedids=names(annotation)[i])
   }
   
   cl = intgroupColours(intgroup, expressionset)
@@ -45,7 +48,7 @@ aqm.density = function(expressionset, dataprep, intgroup, outliers = c(), ...)
   if(length(outliers)>0)
     transparencysuffix[outliers] = "00"
 
-  lwd = rep(1,dataprep$numArrays)
+  lwd = rep(1,dataprep$numArrays) ## FIXME
   lty = rep(1,dataprep$numArrays)
   
   den = xyplot(formula, ddf, groups = which, layout = lay,
@@ -54,7 +57,7 @@ aqm.density = function(expressionset, dataprep, intgroup, outliers = c(), ...)
     scales = list(relation="free"),
     col = cl$arrayColours, lwd = lwd, lty = lty, ...)
   
-  shape = list("h" = 5, "w" = 2+lay[1]*4)
+  shape = list("h" = 5, "w" = 3+3*lay[1])
       
   legend = "The figure <!-- FIG --> shows density estimates (smoothed histograms) of the data. Typically, the distributions of the arrays should have similar shapes and ranges. Arrays whose distributions are very different from the others should be considered for possible problems. On raw data, a bimodal distribution can be indicative of an array containing a spatial artefact; a distribution shifted to the right of an array with abnormal higher background intensities."
   
@@ -66,7 +69,7 @@ aqm.density = function(expressionset, dataprep, intgroup, outliers = c(), ...)
              "title" = title,
              "legend" = legend,
              "shape" = shape,
-             "svg" = list(annotation=annotation))
+             "svg" = list(annotation=annotation, getfun=SVGAnnotation::getMatplotSeries))
     
   class(out) = "aqmobj.dens"
   return(out)   

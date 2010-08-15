@@ -8,7 +8,7 @@
 ##
 
 
-annotateSvgMatplot = function(infile, outfile,  annotation,
+annotateSvgMatplot = function(infile, outfile, annotationInfo,
   js = system.file("javascript", "imatplot.js", package = "arrayQualityMetrics")) 
   {
     stopifnot(js!="")
@@ -20,7 +20,7 @@ annotateSvgMatplot = function(infile, outfile,  annotation,
     addECMAScripts(doc, js, insertJS = TRUE)
     
     ## Add the lineWidth toggling
-    aqm.highlightMatplot(doc, annotation = annotation)
+    aqm.highlight(doc, annotationInfo = annotationInfo)
     
     ## Enlarge SVG view box to make spake for the "status bar"
     addy = 20
@@ -46,23 +46,24 @@ annotateSvgMatplot = function(infile, outfile,  annotation,
 ## The following is adapted from the functions
 ## highlightMatplot and highlightMatplotSeries in the package
 ## SVGAnnotation
-aqm.highlightMatplot= function(doc,
-  series = getMatplotSeries(doc),
-  annotation)
+aqm.highlight = function(doc, annotationInfo)
 {
   
-  if(length(annotation) != length(series))
-    stop("'length(annotation)' must be equal to 'length(series)', the number of lines in the plot.")
+  series = annotationInfo$getfun(doc)
+  anno = annotationInfo$annotation
+  
+  if(length(anno) != length(series))
+    stop("'length(annotationInfo$annotation)' must be equal to 'length(series)', the number of lines in the plot.")
   
   for(i in seq(along=series)){
     ops = sprintf("toggleSeries(%s, %s, %s)",
-      paste("[", paste("'", annotation[[i]]$linkedids, "'", sep="", collapse=","), "]", sep=""),
-      paste("'", annotation[[i]]$title, "'", sep=""),
+      paste("[", paste("'", anno[[i]]$linkedids, "'", sep="", collapse=","), "]", sep=""),
+      paste("'", anno[[i]]$title, "'", sep=""),
       c("true", "false"))
     names(ops) = c("onmouseover", "onmouseout")
     
     node = series[[i]]
-    xmlAttrs(node) = c(id = names(annotation)[i], ops)
+    xmlAttrs(node) = c(id = names(anno)[i], ops)
     convertCSSStylesToSVG(node)
     series[[i]] = node
   }

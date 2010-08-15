@@ -1,23 +1,34 @@
-aqm.pca = function(expressionset, dataprep, intgroup = "Covariate", ...)
+aqm.pca = function(expressionset, dataprep, intgroup, ...)
 {
-    covar = pData(expressionset)[colnames(pData(expressionset))==intgroup[1]][,1]
-    colourCovd = brewer.pal(8,rownames(brewer.pal.info[brewer.pal.info$category=="qual",])[6])
 
-    cols = colourCovd[as.factor(covar)]
+  sN = sampleNames(expressionset)
+  annotation = vector(mode="list", length = length(sN))
+  names(annotation) = sprintf("line%d", seq(along=annotation))
+  for(i in seq(along=annotation))
+    annotation[[i]] = list(title = sprintf("Array %d: %s", i, sN[i]),
+                           linkedids=names(annotation)[i])
 
-    pca = prcomp(t(na.omit(dataprep$dat)))
+  cl = intgroupColours(intgroup, expressionset)
+
+  pca = prcomp(t(na.omit(dataprep$dat)))
  
-    key = list(points = list(pch = 19, col=unlist(colourCovd)[as.factor(levels(as.factor(covar)))]), text = list(levels(as.factor(covar))))
-    key$rep = FALSE
-    key$space = "top"
-    pcafig = xyplot(PC2 ~ PC1 , as.data.frame(pca$x), pch=19, col=cols, key = key)
+  key =cl$key
+  key$space = "top"
+  
+  pcafig = xyplot(PC2 ~ PC1 , as.data.frame(pca$x), pch=19, col=cl$arrayColours, key = key)
 
-    legend = "The figure <!-- FIG --> represents a biplot for the first two principal components from the dataset. The colours correspond to the group of interest given. We expect the arrays to cluster accordingly to a relevant experimental factor. The principal components transformation of a data matrix re-expresses the features using linear combination of the original variables. The first principal component is the linear combination chosen to possess maximal variance, the second is the linear combination orthogonal to the first possessing maximal variance among all orthogonal combination."
-    title = "Principal Component Analysis"
-    section = "Between array comparison"
+  legend = "The figure <!-- FIG --> shows a scatterplot of the arrays along the first two principal components. We expect the arrays to cluster according to a relevant experimental factor. "
+  title = "Principal Component Analysis"
+  section = "Between array comparison"
    
-    out = list("plot" = pcafig, "section" = section,  "title" = title, "legend" = legend, "shape" = "square")
-    class(out) = "aqmobj.pca"
-    return(out) 
+  out = list("plot" = pcafig,
+             "section" = section,
+             "title" = title,
+             "legend" = legend,
+             "shape" = "square",
+             "svg" = list(annotation=annotation, getfun=SVGAnnotation::getPlotPoints))
+  
+  class(out) = "aqmobj.pca"
+  return(out) 
 }
 

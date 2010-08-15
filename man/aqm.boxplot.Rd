@@ -11,7 +11,7 @@
 }
 
 \usage{
-aqm.boxplot(expressionset, dataprep, intgroup, outliers, subsample = 10000, ...)
+aqm.boxplot(expressionset, dataprep, intgroup, subsample = 10000, ...)
 aqm.density(expressionset, dataprep, intgroup, outliers, ...)
 aqm.heatmap(expressionset, dataprep, intgroup, ...)
 }

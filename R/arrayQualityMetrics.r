@@ -32,10 +32,10 @@ setMethod("arrayQualityMetrics", signature(expressionset = "aqmInputObj"),
         stop(sprintf("'%s' should be a logical of length 1.", v))
 
     if(!(missing(intgroup)||is.na(intgroup))) {
-      if (!(is.character(intgroup) && (length(intgroup)==1)))
-        stop("'intgroup' should be a character of length 1.")
-      if(!(intgroup %in% colnames(pData(expressionset))))
-        stop("'intgroup' should match one of the column names of 'phenoData(expressionset)'.")
+      if (!(is.character(intgroup)))
+        stop("'intgroup' should be a 'character'.")
+      if(!all(intgroup %in% colnames(pData(expressionset))))
+        stop("all elements of 'intgroup' should match column names of 'phenoData(expressionset)'.")
     }
 
     ## Get going:
@@ -50,19 +50,20 @@ setMethod("arrayQualityMetrics", signature(expressionset = "aqmInputObj"),
     
     dataprep = aqm.prepdata(expressionset, do.logtransform, sN)
 
-    distributionOutliers = ksOutliers(dataprep$dat)
-    
     obj$maplot = try(aqm.maplot(dataprep = dataprep))
     if(inherits(obj$maplot, "try-error"))
       warning("Could not draw MA plots \n")
 
     if(inherits(expressionset, 'BeadLevelList') || inherits(expressionset, 'AffyBatch') ||
-       ("X" %in% rownames(featureData(expressionset)@varMetadata) && "Y" %in% rownames(featureData(expressionset)@varMetadata)) && spatial == TRUE) {            
+       (("X" %in% rownames(featureData(expressionset)@varMetadata)) &&
+        ("Y" %in% rownames(featureData(expressionset)@varMetadata))) && spatial == TRUE) {            
       obj$spatial =  try(aqm.spatial(expressionset = expressionset, dataprep = dataprep, scale = "Rank"))
       if(inherits(obj$spatial,"try-error"))
         warning("Could not draw spatial distribution of intensities \n")
                 
-      if((inherits(expressionset,'NChannelSet') && ("Rb" %in% colnames(dims(expressionset)) && "Gb" %in% colnames(dims(expressionset))))
+      if((inherits(expressionset,'NChannelSet') &&
+          ("Rb" %in% colnames(dims(expressionset)) &&
+          ("Gb" %in% colnames(dims(expressionset)))))
          || inherits(expressionset,'BeadLevelList')) {
         obj$spatialbg =  try(aqm.spatialbg(expressionset = expressionset, dataprep = dataprep, scale = "Rank"))
         if(inherits(obj$spatialbg,"try-error"))
@@ -74,12 +75,11 @@ setMethod("arrayQualityMetrics", signature(expressionset = "aqmInputObj"),
     if(inherits(obj$boxplot,"try-error"))
       warning("Could not draw boxplots \n")
 
-    obj$density = try(aqm.density(expressionset, dataprep=dataprep, intgroup=intgroup,
-      outliers = unlist(obj$boxplot$outliers)))
+    obj$density = try(aqm.density(expressionset, dataprep=dataprep, intgroup=intgroup, outliers = obj$boxplot$outliers))
     if(inherits(obj$density,"try-error"))
       warning("Could not draw density plots \n")
 
-    obj$heatmap = try(aqm.heatmap(expressionset = expressionset, dataprep = dataprep, intgroup))
+    obj$heatmap = try(aqm.heatmap(expressionset, dataprep=dataprep, intgroup=intgroup))
     if(inherits(obj$heatmap,"try-error"))
       warning("Could not draw heatmap \n") 
 

@@ -62,10 +62,11 @@ arrayQualityMetrics(expressionset,
 \item{do.logtransform}{indicates whether the data should be logarithm transformed before
   the analysis; a logical of length 1.}
   
-\item{intgroup}{the name of the sample covariate used to draw
-  a colour side bar next to the heatmap, and to define sample groups in
-  other plots (boxplots, densities). This should be a character
-  vector of length 1, and its value needs to match one of the column
+\item{intgroup}{the name of the sample covariate(s) used to draw
+  a colour side bar next to the heatmap. The first element of
+  \code{intgroup} is also used define sample groups in
+  other plots (boxplots, densities).
+  \code{intgroup} should be a character vector, and its elements need to match the columns
   names of \code{phenoData(expressionset)}. If missing or \code{NA},
   then the plots are not decorated with sample covariate information.}
 
