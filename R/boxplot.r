@@ -1,3 +1,6 @@
+##---------------------------------------------------------------
+## Simple distribution-based outlier detection using KS-statistic
+##---------------------------------------------------------------
 ksOutliers = function(x, subsamp = 300, theta = 2){
   if (nrow(x)>subsamp)
     x = x[sample(nrow(x), subsamp), ] 
@@ -12,6 +15,7 @@ ksOutliers = function(x, subsamp = 300, theta = 2){
 ##   key: a key explaining the mapping of factor values to colours
 ##----------------------------------------
 intgroupColours = function(intgroup, expressionset){
+
   if (!(missing(intgroup)||is.na(intgroup))) {
     groups  = as.factor(pData(expressionset)[, intgroup])
     igroups = as.integer(groups)
@@ -24,13 +28,13 @@ intgroupColours = function(intgroup, expressionset){
       colours = colours[1:nlevels(groups)]
     }
     list(arrayColours = colours[igroups],
-         key = draw.key(key = list(
-                          rect = list(col = colours),
-                          text = list(levels(groups)),
-                          rep = FALSE)))
+         key = list(
+           rect = list(col = colours),
+           text = list(levels(groups)),
+           rep = FALSE))
     
   } else {
-    list(arrayColours = rep("#1F78B4", dataprep$numArrays),
+    list(arrayColours = rep("#1F78B4", nrow(pData(expressionset))),
          key = NULL)
   }
 }
@@ -38,8 +42,8 @@ intgroupColours = function(intgroup, expressionset){
 ##----------------------------------------
 ## aqm.boxplot
 ##----------------------------------------
-aqm.boxplot = function(expressionset, dataprep, intgroup, outliers, subsample = 10000, ...) {
-
+aqm.boxplot = function(expressionset, dataprep, intgroup, outliers = c(), subsample = 10000, ...) {
+  
   if (nrow(dataprep$dat)>subsample) {
     ss = sample(nrow(dataprep$dat), subsample)
     nr = length(ss)
@@ -67,12 +71,9 @@ aqm.boxplot = function(expressionset, dataprep, intgroup, outliers, subsample = 
   
   cl = intgroupColours(intgroup, expressionset)
 
-  if(missing(outliers))
-    outliers=c()
-  
   box = bwplot(formula, groups = sample_id, layout = lay, as.table = TRUE,
         strip = function(..., bg) strip.default(..., bg ="#cce6ff"),
-        horizontal = TRUE, main = cl$key, 
+        horizontal = TRUE, main = if(!is.null(cl$key)) draw.key(key = cl$key), 
         pch = "|",  col = "black", do.out = FALSE, box.ratio = 2,
         xlab = "", ylab = "Array",
         fill = cl$arrayColours, panel = panel.superpose, 
@@ -83,7 +84,7 @@ aqm.boxplot = function(expressionset, dataprep, intgroup, outliers, subsample = 
         },
         panel.groups = function(x, y, ...) {
           panel.bwplot(x, y, ...)
-          if(packet.number()==lay[1]) {
+          if(lattice:::packet.number()==lay[1]) {
             whArray = list(...)$group.value
             if (whArray %in% outliers)
               ltext(xAsterisk, whArray, "*", font=2, cex=3, adj=c(0.5,0.75))

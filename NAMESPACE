@@ -50,8 +50,9 @@ importFrom(graphics, legend)
 
 importFrom(hwriter, closePage, hwrite, hwriteImage, openPage)
 
-importFrom(lattice, bwplot, panel.bwplot, densityplot, panel.smoothScatter,
-           panel.superpose, draw.key, levelplot, make.groups, strip.default,
+importFrom(lattice, bwplot, densityplot, draw.key,
+           levelplot, ltext, make.groups, packet.number,
+           panel.bwplot, panel.smoothScatter, panel.superpose, strip.default,
            trellis.par.get, trellis.par.set, xyplot)
 
 importFrom(latticeExtra, dendrogramGrob)
@@ -66,6 +67,11 @@ importFrom(stats, as.dendrogram, as.dist, density, fft, hclust,
 importFrom(utils, read.table, sessionInfo)
 
 importFrom(RColorBrewer, brewer.pal.info)
+
+importFrom(XML, addAttributes, "xmlAttrs<-", xmlParse, xmlRoot, newXMLNode, saveXML)
+
+importFrom(SVGAnnotation, addECMAScripts, addCSS, convertCSSStylesToSVG, enlargeSVGViewBox,
+           getMatplotSeries, getViewBox)
 
 export("arrayQualityMetrics")
 export("addXYfromGAL")
@@ -104,3 +110,5 @@ export("aqm.spatial")
 export("aqm.spatialbg")
 export("aqm.writereport")
 export("ksOutliers")
+export("ksOutliers")
+## export("annotateSvgMatplot")

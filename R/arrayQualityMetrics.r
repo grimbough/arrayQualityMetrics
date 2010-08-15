@@ -134,7 +134,8 @@ setMethod("arrayQualityMetrics", signature(expressionset = "aqmInputObj"),
       }
     
     for(i in seq(along = obj))
-      obj[[i]]$legend = gsub("The figure <!-- FIG -->",paste("<b>Figure",i, "</b>"),obj[[i]]$legend, ignore.case = TRUE) 
+      obj[[i]]$legend = gsub("The figure <!-- FIG -->", paste("<b>Figure",i, "</b>"),
+                obj[[i]]$legend, ignore.case = TRUE) 
     
     aqm.writereport(name, expressionset, obj)
     return(invisible(obj))

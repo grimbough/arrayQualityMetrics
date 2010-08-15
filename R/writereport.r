@@ -13,7 +13,7 @@ dircreation = function(outdir = getwd(), force = FALSE)
       if(!force && length(outdirContents)>0)
         stop(sprintf("'%s' is not empty.", outdir))
       if(force || length(outdirContents)==0)
-        message(sprintf("The report will be written in directory '%s'. ", outdir))
+        message(sprintf("The report will be written into directory '%s'. ", outdir))
         setwd(outdir)
        } else {
         dir.create(outdir, recursive=TRUE)
@@ -143,23 +143,37 @@ aqm.report.qm = function(p, qm, f, name)
     dpi = 72
 
     namepdf = paste(name, ".pdf", sep = "")
-    namepng = paste(name, ".png", sep = "")
 
-    png(file = namepng, h = h*dpi, w = w*dpi)
+    if("svg" %in% names(qm)) {
+      nameimg = paste(name, ".svg", sep = "")
+      svgtemp = tempfile()
+      svg(file = svgtemp, h = h, w = w)
+      htmltagname = "embed"
+    } else {
+      nameimg = paste(name, ".png", sep = "")
+      png(file = nameimg, h = h*dpi, w = w*dpi)
+      htmltagname = "img"
+    }
+    
     ## ??:
     ##if( (class(qm) %in% c("aqmobj.ma", "aqmobj.spatial", "aqmobj.spatialbg")) &&
     ##    (class(qm$plot) == "list" && class(qm$plot[[1]]) == "trellis") )
     ##  print(qm$plot[[1]]) else aqm.plot(qm)
+    
     aqm.plot(qm)
     dev.off()
 
+    if("svg" %in% names(qm)) {
+      annotateSvgMatplot(svgtemp, nameimg, annotation=qm$svg$annotation)
+    }
+    
     pdf(file = namepdf, h = h, w = w)
     aqm.plot(qm)
     dev.off()   
   
-    img = hwriteImage(namepng)
-    hwrite(c(img,
-             paste("Figure ",f,": ", qm$title, sep="")),
+    img = aqm.hwriteImage(nameimg, tagname=htmltagname)
+    
+    hwrite(c(img, paste("Figure ",f,": ", qm$title, sep="")),
            p,
            dim=c(2,1),
            style='font-weight:bold;text-align:center;font-family:helvetica',

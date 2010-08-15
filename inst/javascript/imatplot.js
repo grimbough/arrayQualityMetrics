@@ -7,27 +7,35 @@ function init(evt) {
 }
 
 
-function toggleSeries(which, on)
+function toggleSeries(which, title, on)
 {
-   var el = document.getElementById(which);
-   if(!el) {
-      return(false);
-   }
 
-   var cur = el.getAttribute('stroke-width');
-   var val;
-   var factor = 4;
+    var el;
+    var cur;
+    var val;
+    var factor = 4;
 
-   if(on) {
-      val = cur * factor; 
-      messageText.nodeValue = which;
+    if (on) {
+	messageText.nodeValue = title;
+    } else {
+	messageText.nodeValue = " ";
+    }
 
-   } else {
-      val = cur / factor;
-      messageText.nodeValue = " ";
-   }
+    for( var i = 0; i < which.length; i++ ) {
 
-   el.setAttribute('stroke-width', val);
-   
+	el = document.getElementById(which[i]);
+	if(!el) { 
+	    throw new Error("Did not find 'which[i]'.");
+	}
+
+	cur = el.getAttribute('stroke-width');
+	
+	if(on) {
+	    val = cur * factor; 
+	} else {
+	    val = cur / factor;
+	}
+	el.setAttribute('stroke-width', val);
+    }
    return(true);
 }

@@ -7,7 +7,8 @@ dens = function(obj, ...)
   }
 
 aqm.density = function(expressionset, dataprep, intgroup, outliers = c(), ...)
-{ 
+{
+  sN = sampleNames(expressionset)
 
   if(dataprep$nchannels == 2) {  
     den1 = dens(dataprep$rc)
@@ -17,74 +18,56 @@ aqm.density = function(expressionset, dataprep, intgroup, outliers = c(), ...)
     panels = factor(rep(1:3, each = c(nrow(den1), nrow(den2), nrow(den3))),
       levels = 1:3,
       labels = c("a. Red Channel", "b. Green Channel", "c. Log2(Ratio)"))
-    formula = sample_id ~ values | panels
+    formula = y ~ x | panels
     lay = c(3,1)
+
+    annotation = vector(mode="list", length = 3*length(sN))
+    names(annotation) = sprintf("line%d", seq(along=annotation))
+    for(i in seq(along=annotation)) {
+      s = ((i-1) %% length(sN))+1
+      annotation[[i]] = list(title=sN[s], linkedids=names(annotation)[s+(0:2)*length(sN)])
+    }
+
   } else {
     ddf = dens(dataprep$dat)
-    formula = sample_id ~ values
+    formula = y ~ x
     lay = c(1,1)
+
+    annotation = vector(mode="list", length = length(sN))
+    names(annotation) = sprintf("line%d", seq(along=annotation))
+    for(i in seq(along=annotation))
+      annotation[[i]] = list(title=sN[i], linkedids=names(annotation)[i])
   }
   
-  if (!(missing(intgroup)||is.na(intgroup))) {
-      gpcont = pData(expressionset)[colnames(pData(expressionset))==intgroup]
-      coloursb = brewer.pal(8,rownames(brewer.pal.info[brewer.pal.info$category=="qual",])[6])
-      intgroupcont = gpcont[,intgroup]
-      colsb = coloursb[as.factor(intgroupcont)]
-      lwd = rep(1,dataprep$numArrays)
-      lty = rep(1,dataprep$numArrays)
-      if(length(outliers) != 0)
-      {
-         lwd[outliers] = 3
-         colsb[-outliers]="grey"
-         key2 = list(lines=list(col=colsb[outliers]), text = list(as.character(dataprep$sN)[outliers]), points=FALSE, corner=c(1,1), x=1, y =0.94)
-         key2$rep = FALSE
-      } else key2 = NULL
-     
-      key = list(rect = list(col=unlist(coloursb)[as.factor(levels(as.factor(unlist(gpcont[,1]))))]), text = list(levels(as.factor(unlist(gpcont[,1])))))
-      key$rep = FALSE
-  
-      foo = draw.key(key = key)
+  cl = intgroupColours(intgroup, expressionset)
 
-      if(dataprep$nchannels == 2)
-        {  
-          den = xyplot(y ~ x | factor(fac), ddf, groups = rep(which,3), type = "l", ylab = "Density", xlab="", layout=c(3,1), strip = function(..., bg) strip.default(..., bg ="#cce6ff"), col = colsb, main=foo, lwd = lwd, lty = lty, key=key2, ...) 
-          shape = "rect"
-        } else {
-          den = xyplot(y ~ x, ddf, groups = which, type = "l", ylab = "Density", xlab="", col = colsb, main=foo, lwd = lwd, lty = lty, ...)
-          shape = "square"
-        }
-    } else {  
-          lwd = rep(1,dataprep$numArrays)
-	      lty = rep(1,dataprep$numArrays)
-      if(length(outliers) != 0)
-	  {
-	  lwd[outliers] = 3
-	  colo = rep("grey", dataprep$numArrays)
-	  colo[outliers] = brewer.pal(8,"Set1")[seq_len(length(outliers))]	  
-	  key = list(lines=list(col=colo[outliers]), text = list(as.character(dataprep$sN)[outliers]), points=FALSE, corner=c(1,1), x=1, y =0.94)
-      key$rep = FALSE
-      } else {
-      colo = rep(brewer.pal(8,"Set1"), signif(dataprep$numArrays/8,0))[seq_len(dataprep$numArrays)]
-	  key = list(lines=list(col=colo), text = list(as.character(dataprep$sN)), points=FALSE, corner=c(1,1), x=1, y =0.94)
-      key$rep = FALSE
-      }
-      
-      if(dataprep$nchannels == 2)
-        {  
-          den = xyplot(y ~ x | factor(fac), ddf, groups = rep(which,3), type = "l", ylab = "Density", xlab="", layout=c(3,1), strip = function(..., bg) strip.default(..., bg ="#cce6ff"),  lwd=lwd, lty=lty, col=colo, key=key, ...) 
-          shape = "rect"
-        } else {
-          den = xyplot(y ~ x, ddf, groups = which, type = "l", ylab = "Density", xlab="", lwd=lwd, lty=lty, col=colo, key=key, ...) 
-          shape = "square"
-        }
-    }
+  transparencysuffix = "80"  ## FIXME
+  if(length(outliers)>0)
+    transparencysuffix[outliers] = "00"
+
+  lwd = rep(1,dataprep$numArrays)
+  lty = rep(1,dataprep$numArrays)
+  
+  den = xyplot(formula, ddf, groups = which, layout = lay,
+    type = "l", ylab = "Density", xlab="",
+    strip = function(..., bg) strip.default(..., bg ="#cce6ff"),
+    scales = list(relation="free"),
+    col = cl$arrayColours, lwd = lwd, lty = lty, ...)
+  
+  shape = list("h" = 5, "w" = 2+lay[1]*4)
       
   legend = "The figure <!-- FIG --> shows density estimates (smoothed histograms) of the data. Typically, the distributions of the arrays should have similar shapes and ranges. Arrays whose distributions are very different from the others should be considered for possible problems. On raw data, a bimodal distribution can be indicative of an array containing a spatial artefact; a distribution shifted to the right of an array with abnormal higher background intensities."
   
   title = "Density plots"
   section = "Array intensity distributions"
   
-  out = list("plot" = den, "section" = section, "title" = title, "legend" = legend, "shape" = shape)
+  out = list("plot" = den,
+             "section" = section,
+             "title" = title,
+             "legend" = legend,
+             "shape" = shape,
+             "svg" = list(annotation=annotation))
+    
   class(out) = "aqmobj.dens"
   return(out)   
 }
