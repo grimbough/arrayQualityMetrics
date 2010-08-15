@@ -9,7 +9,7 @@ hmap = function(expressionset, sN, outM, numArrays, intgroup, ...)
     colnames(m) = sN
     rownames(m) = sN
     
-    if(!missing(intgroup)) {
+    if(!(missing(intgroup)||is.na(intgroup))) {
       hfig = levelplot(m[od.row,od.row],
         scales=list(x=list(rot=90)),
         legend=list(

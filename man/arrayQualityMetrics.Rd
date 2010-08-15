@@ -35,6 +35,7 @@ arrayQualityMetrics(expressionset,
                     force = FALSE,
                     do.logtransform = FALSE,
                     intgroup,
+                    grouprep,
 		    spatial = TRUE,
 		    sN = NULL)
 
@@ -61,11 +62,15 @@ arrayQualityMetrics(expressionset,
 \item{do.logtransform}{indicates whether the data should be logarithm transformed before
   the analysis; a logical of length 1.}
   
-\item{intgroup}{(optional) the name of the sample covariate used to draw
+\item{intgroup}{the name of the sample covariate used to draw
   a colour side bar next to the heatmap, and to define sample groups in
   other plots (boxplots, densities). This should be a character
   vector of length 1, and its value needs to match one of the column
-  names of the \code{phenoData(expressionset)}.}
+  names of \code{phenoData(expressionset)}. If missing or \code{NA},
+  then the plots are not decorated with sample covariate information.}
+
+\item{grouprep}{Deprecated. This argument used to indicate whether or not plots should
+  be decorated with sample covariate information (see argument \code{intgroup}).}
 
 \item{spatial}{indicates whether spatial plots
   should be made; a logical of length 1. This can be useful for large arrays (like Affymetrix

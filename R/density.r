@@ -25,7 +25,7 @@ aqm.density = function(expressionset, dataprep, intgroup, outliers = c(), ...)
     lay = c(1,1)
   }
   
-  if (!missing(intgroup)) {
+  if (!(missing(intgroup)||is.na(intgroup))) {
       gpcont = pData(expressionset)[colnames(pData(expressionset))==intgroup]
       coloursb = brewer.pal(8,rownames(brewer.pal.info[brewer.pal.info$category=="qual",])[6])
       intgroupcont = gpcont[,intgroup]

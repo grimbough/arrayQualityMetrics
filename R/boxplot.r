@@ -12,7 +12,7 @@ ksOutliers = function(x, subsamp = 300, theta = 2){
 ##   key: a key explaining the mapping of factor values to colours
 ##----------------------------------------
 intgroupColours = function(intgroup, expressionset){
-  if (!missing(intgroup)) {
+  if (!(missing(intgroup)||is.na(intgroup))) {
     groups  = as.factor(pData(expressionset)[, intgroup])
     igroups = as.integer(groups)
     colours = brewer.pal(9, "Set1")
@@ -89,7 +89,7 @@ aqm.boxplot = function(expressionset, dataprep, intgroup, outliers, subsample = 
               ltext(xAsterisk, whArray, "*", font=2, cex=3, adj=c(0.5,0.75))
           }
         },
-    ...)
+    ...) 
 
 
   shape = list("h" = 2.5 + dataprep$numArrays * 0.1 +  1/dataprep$numArrays, 

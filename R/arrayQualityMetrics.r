@@ -7,17 +7,23 @@ setGeneric("arrayQualityMetrics",
                     force = FALSE,
                     do.logtransform = FALSE,
                     intgroup,
+                    grouprep,
 		    spatial = TRUE,
                     sN = NULL)
            standardGeneric("arrayQualityMetrics"))
 
 ## aqmInputObj
 setMethod("arrayQualityMetrics", signature(expressionset = "aqmInputObj"),
-  function(expressionset, outdir, force, do.logtransform, intgroup, spatial, sN) {
-
+  function(expressionset, outdir, force, do.logtransform, intgroup, grouprep, spatial, sN) {
+    
     ## Argument checking: 
     ## (Done here, once and for all, rather than where the arguments are actually consumed - 
     ## in the hope that this simplifies the code and the user interface)
+
+    if(!missing(grouprep))
+      .Deprecated(msg = paste("The argument 'grouprep' of the function 'arrayQualityMetrics'",
+        "is deprecated and will be ignored. Use presence or missingness/NA-ness of 'intgroup' instead."))
+      
     if (!(is.character(outdir) && (length(outdir)==1)))
       stop("'outdir' should be a character of length 1.")
 
@@ -25,7 +31,7 @@ setMethod("arrayQualityMetrics", signature(expressionset = "aqmInputObj"),
       if (!(is.logical(get(v)) && (length(get(v))==1)))
         stop(sprintf("'%s' should be a logical of length 1.", v))
 
-    if(!missing(intgroup)){
+    if(!(missing(intgroup)||is.na(intgroup))) {
       if (!(is.character(intgroup) && (length(intgroup)==1)))
         stop("'intgroup' should be a character of length 1.")
       if(!(intgroup %in% colnames(pData(expressionset))))
