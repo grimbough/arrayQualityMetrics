@@ -20,7 +20,10 @@ maplotdraw = function(M, A, sN, numArrays, nchannels, class, ...)
       panel = function(x, y, ...) {
         x <- A[, x]
         y <- M[, y]
-        panel.smoothScatter(x, y, nbin = 250,...)
+        ## FIXME: raster=TRUE would be nice to reduce the size of the currently enormous PDF files
+        ##   but when tried last time (16.8.2010,  r52737), this made R crash  with
+        ## *** caught segfault *** address 0x28, cause 'memory not mapped'...
+        panel.smoothScatter(x, y, nbin = 250, raster=!TRUE, ...)
       },
       as.table=TRUE,      
       layout = c(app/2, 2, 1),
@@ -29,12 +32,14 @@ maplotdraw = function(M, A, sN, numArrays, nchannels, class, ...)
     
     id.firstpage = seq_len(app)
 
-    ma = lapply(seq_len(nfig), function(i) {id.thispage = (i-1) * app + id.firstpage; id.thispage = id.thispage[id.thispage <= numArrays]; update(trobj, index.cond = list(id.thispage))})
+    ma = lapply(seq_len(nfig), function(i)
+      {
+        id.thispage = (i-1) * app + id.firstpage
+        id.thispage = id.thispage[id.thispage <= numArrays]
+        update(trobj, index.cond = list(id.thispage))
+      })
 
-    if(nchannels == 1)
-      legspe = "where I<sub>1</sub> is the intensity of the array studied and I<sub>2</sub> is the intensity of a \"pseudo\"-array, which have the median values of all the arrays."
-    if(nchannels == 2)
-      legspe = "where I<sub>1</sub> and I<sub>2</sub> are the intensities of the two channels."
+    legspe = if(nchannels == 1) "where I<sub>1</sub> is the intensity of the array studied, and I<sub>2</sub> is the intensity of a \"pseudo\"-array that consists of the median across arrays." else "where I<sub>1</sub> and I<sub>2</sub> are the intensities of the two channels."
     
     legspe2 = if(class == "BeadLevelList") "The calculations are done on the summarized data obtained by using the function createBeadSummaryData from the package beadarray." else ""
     

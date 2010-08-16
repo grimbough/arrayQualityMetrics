@@ -52,11 +52,11 @@ aqm.prepdata(expressionset, do.logtransform = TRUE, sN = NULL)
 
 \examples{
     ## Load an example of a NChannelSet
-    library(CCl4)
-    data(CCl4)
+    library("CCl4")
+    data("CCl4")
 
     ## Normalization of CCl4 using vsn
-    library(vsn)
+    library("vsn")
     CCl4norm = justvsn(CCl4, subsample=2000)
 
     ## Add a column in the phenoData to annotate samples 

@@ -41,6 +41,9 @@ annotateSvgMatplot = function(infile, outfile, annotationInfo,
     addAttributes(svg, "onload"="init(evt);")
     
     saveXML(doc, outfile)
+
+    size = diff(vb)
+    return(size)
   }
 
 ## The following is adapted from the functions

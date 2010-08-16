@@ -2,11 +2,12 @@
 \alias{aqm.boxplot}
 \alias{aqm.density}
 \alias{aqm.heatmap}
+\alias{aqm.pca}
 
-\title{Compute boxplots, density plots, heatmap on a aqmobj.prepdata object.}
+\title{Compute boxplots, density plots, heatmap, PCA biplot on a aqmobj.prepdata object.}
 
 \description{
-  The functions do boxplots, density plots, heatmap and
+  The functions do boxplots, density plots, heatmap, PCA biplot and
   produce output objects ready for rendering by \code{aqm.plot}.
 }
 
@@ -14,6 +15,7 @@
 aqm.boxplot(expressionset, dataprep, intgroup, subsample = 10000, ...)
 aqm.density(expressionset, dataprep, intgroup, outliers, ...)
 aqm.heatmap(expressionset, dataprep, intgroup, ...)
+aqm.pca(expressionset, dataprep, intgroup, ...)
 }
 \arguments{
   \item{expressionset, dataprep, intgroup}{ Same as for the function

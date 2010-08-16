@@ -14,8 +14,6 @@ standard deviation)
 Use outliers package and mvoutlier package as alternatives to boxplot.stats. See flowQ as a model.
 
 
-
-
 * The function 'aqm.boxplot' opens a graphics device (through its dependence on draw.key). It would be better
   if it did not do that.
 
@@ -24,6 +22,14 @@ arrayQualityMetrics(subset10, "QA10", force = TRUE, do.logtransform = TRUE,
                     intgroup = "FactorValue..ER.status.")
 
 * color choice of colour bars in heatmap, should be the same as for boxplots and densities.
-  
 
 * Mark outliers in density plot
+
+* Somewhere, empty lists are printed: -  clean this up.
+[[1]]
+[[2]]
+[[1]]
+[[2]]
+
+
+* maplot.pdf is enormous, do we really need that? (I put raster=TRUE experimentally into maplot.r to fix that)
