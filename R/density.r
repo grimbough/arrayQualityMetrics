@@ -26,8 +26,10 @@ aqm.density = function(expressionset, dataprep, intgroup, outliers = c(), ...)
     names(annotation) = sprintf("line%d", seq(along=annotation))
     for(i in seq(along=annotation)) {
       s = ((i-1) %% length(sN))+1
-      annotation[[i]] = list(title = sprintf("Array %d: %s", s, sN[s]),
-                             linkedids = names(annotation)[s+(0:2)*length(sN)])
+      annotation[[i]] = if(i %in% outliers) list(title = sprintf("Array %d: %s *", s, sN[s]),
+                             linkedids = names(annotation)[s+(0:2)*length(sN)]) else
+                              list(title = sprintf("Array %d: %s", s, sN[s]),
+                               linkedids = names(annotation)[s+(0:2)*length(sN)])
     }
 
   } else {
@@ -53,6 +55,7 @@ aqm.density = function(expressionset, dataprep, intgroup, outliers = c(), ...)
   
   den = xyplot(formula, ddf, groups = which, layout = lay,
     type = "l", ylab = "Density", xlab="",
+    main = if(!is.null(cl$key)) draw.key(key = cl$key),
     strip = function(..., bg) strip.default(..., bg ="#cce6ff"),
     scales = list(relation="free"),
     col = cl$arrayColours, lwd = lwd, lty = lty, ...)

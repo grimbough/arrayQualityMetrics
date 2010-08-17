@@ -155,29 +155,24 @@ aqm.report.qm = function(p, qm, f, name)
              dev.off()
              size = annotateSvgMatplot(svgtemp, nameimg, annotationInfo=qm$svg)
              img = aqm.hwriteImage(nameimg, width=paste(size[1]), height=paste(size[2]))
-             link = NULL
            },
            png = {
              nameimg = paste(name, ".png", sep = "")
-             namepdf = paste(name, ".pdf", sep = "")
              png(file = nameimg, h = h*dpi, w = w*dpi)
-             aqm.plot(qm)
-             dev.off()
-             pdf(file = namepdf, h = h, w = w)
-             aqm.plot(qm)
+             if( (class(qm) %in% c("aqmobj.ma", "aqmobj.spatial", "aqmobj.spatialbg"))
+                && (class(qm$plot) == "list" && class(qm$plot[[1]]) == "trellis"))
+               print(qm$plot[[1]]) else aqm.plot(qm)
              dev.off()
              img = aqm.hwriteImage(nameimg)
-             link = list(namepdf, NA)
            },
            stop(sprintf("Invalid value of 'imageformat': %s", imageformat))
          )
-    
-    ## ??:
-    ##if( (class(qm) %in% c("aqmobj.ma", "aqmobj.spatial", "aqmobj.spatialbg")) &&
-    ##    (class(qm$plot) == "list" && class(qm$plot[[1]]) == "trellis") )
-    ##  print(qm$plot[[1]]) else aqm.plot(qm)
-    
-  
+    namepdf = paste(name, ".pdf", sep = "")
+    pdf(file = namepdf, h = h, w = w)
+    aqm.plot(qm)
+    dev.off()
+    link = list(namepdf, NA)
+      
     
     hwrite(c(img, paste("Figure ", f, ": ", qm$title, sep="")),
            p,

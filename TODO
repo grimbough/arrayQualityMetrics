@@ -14,16 +14,18 @@ standard deviation)
 Use outliers package and mvoutlier package as alternatives to boxplot.stats. See flowQ as a model.
 
 
-* The function 'aqm.boxplot' opens a graphics device (through its dependence on draw.key). It would be better
-  if it did not do that.
+* The function 'aqm.boxplot' opens a graphics device (through its dependence on draw.key). It would be better if it did not do that. 
+=> Fixed by adding a "dev.off()" but maybe there is a better way?
 
 * With the following, why are only two arrays shown?
 arrayQualityMetrics(subset10, "QA10", force = TRUE, do.logtransform = TRUE,
                     intgroup = "FactorValue..ER.status.")
+=> Cannot reproduce that error
 
-* color choice of colour bars in heatmap, should be the same as for boxplots and densities.
+* generates pdf files for density and PCA plots
+=> Done, the pdf files are created but the link in the html does not work on the svg image.
 
-* Mark outliers in density plot
+* replace rect/square by auto-determined image size. Check if that solves the problem of names on heatmap that are unreadable when > 50 arrays
 
 * Somewhere, empty lists are printed: -  clean this up.
 [[1]]

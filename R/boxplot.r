@@ -66,7 +66,7 @@ aqm.boxplot = function(expressionset, dataprep, intgroup, subsample = 10000, ...
     formula = sample_id ~ values | panels
     lay = c(3,1)
    } else {
-    values  = dataprep$dat[ss, ]
+    values  = as.numeric(dataprep$dat[ss, ])
     formula = sample_id ~ values
     lay = c(1,1)
   }
@@ -76,7 +76,8 @@ aqm.boxplot = function(expressionset, dataprep, intgroup, subsample = 10000, ...
 
   box = bwplot(formula, groups = sample_id, layout = lay, as.table = TRUE,
         strip = function(..., bg) strip.default(..., bg ="#cce6ff"),
-        horizontal = TRUE, main = if(!is.null(cl$key)) draw.key(key = cl$key), 
+        horizontal = TRUE,
+        main = if(!is.null(cl$key)) draw.key(key = cl$key), 
         pch = "|",  col = "black", do.out = FALSE, box.ratio = 2,
         xlab = "", ylab = "Array",
         fill = cl$arrayColours, panel = panel.superpose, 
@@ -93,8 +94,9 @@ aqm.boxplot = function(expressionset, dataprep, intgroup, subsample = 10000, ...
               ltext(xAsterisk, whArray, "*", font=2, cex=3, adj=c(0.5,0.75))
           }
         },
-    ...) 
+    ...)
 
+  if (!(missing(intgroup)||is.na(intgroup))) dev.off()
 
   shape = list("h" = 2.5 + dataprep$numArrays * 0.1 +  1/dataprep$numArrays, 
                "w" = 3+3*lay[1])
