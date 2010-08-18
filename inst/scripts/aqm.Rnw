@@ -34,7 +34,11 @@ if (Sys.info()["sysname"] == "Darwin")
 
 \section{Functions to format the data for aqm functions usage}
 
-There are two functions to prepare the data. They compute intermediate results that are then processed by the \Rfunction{aqm.xxx} functions. They are greedy and slow but as they only are ran once, it allows a better computational efficiency.
+There are two functions to prepare the data. They compute intermediate
+results that are then processed by the \Rfunction{aqm.xxx}
+functions. They are greedy for memory and slow, but they only need to
+run once, and this modular design allows us more flexibility and
+extensibility with the report generation.
 
 \begin{itemize}
 \item \Rfunction{aqm.prepdata}: generates a \Rclass{aqmobj.prepdata} object which can be the input of all the \Rfunction{aqm.xxx} functions.
@@ -43,7 +47,7 @@ There are two functions to prepare the data. They compute intermediate results t
 
 \section{Metrics available in the report}
 \subsection{Functions with outlier detection}
-The functions to compute quality metrics are the following:
+The functions that compute quality metrics are the following:
 \begin{itemize}
 \item \Rfunction{aqm.maplot}: computes the M versus A plot and generates an object \Rclass{aqmobj.ma}.
 \item \Rfunction{aqm.spatial}: computes the spatial distribution of the ranks for the foreground intensities and generates an object \Rclass{aqmobj.spatial}.

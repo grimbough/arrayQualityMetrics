@@ -25,7 +25,7 @@
 \pagebreak
 
 \section*{Introduction}
-The goal of this vignette is to show how to obtain a quality assessment report by the use of \Rfunction{arrayQualityMetrics}. The first step of the analysis of microarray is to assess the quality of the experiment. You should also assess the quality after preprocessing your data. Each type of microarray data (one colour, two colour, Affymetrix, Illumina...) is represented by a class of object in Bioconductor. However, the \Rfunction{arrayQualityMetrics} function is used the same way on any kind of data. \Rfunction{arrayQualityMetrics} produces a \emph{HTML} report as an output. The more information is in the input object, the more complete is the report produced.
+The goal of this vignette is to show how to obtain a quality assessment report with the \Rpackage{arrayQualityMetrics} package. The first step of the analysis of microarray is to assess the quality of the experiment. You should also assess the quality after preprocessing your data. Each type of microarray data (one colour, two colour, Affymetrix, Illumina...) is represented by a class of object in Bioconductor. However, the \Rfunction{arrayQualityMetrics} function is used the same way on any kind of data. The function \Rfunction{arrayQualityMetrics} produces a \emph{HTML} report as an output. The more information is in the input object, the more complete is the report produced.
 
 \section{Usage}
 
@@ -45,7 +45,9 @@ The function \Rfunction{arrayQualityMetrics} is called with the following argume
 \end{itemize}
 
 \section{Output}
-A report named \texttt{QMreport.html} is produced in the subdirectory given as 'outdir'. It contains text illustrated by pictures. Each of the picture is linked to corresponding \texttt{.pdf} files in order to provide high quality images for publication. In the case of \Rclass{AffyBatch} input, some Affymetrix specific plots are added to the standard report. However the way of calling the function remains the same. As explained in the Section \ref{ext}, other plots can be added to the standard report if some specific columns are present in the input object.
+A report named \texttt{QMreport.html} is produced in the subdirectory given as 'outdir'. It contains text illustrated by plots. Each of the plots is linked to corresponding \texttt{.pdf} files in order to provide high quality images for publication. In the case of \Rclass{AffyBatch} input, some Affymetrix specific plots are added to the standard report. However the way of calling the function remains the same. As explained in the Section \ref{ext}, other plots can be added to the standard report if some specific columns are present in the input object.
+
+The function \Rfunction{arrayQualityMetrics} also produces an R object (essentially, a very big list) with all the information contained in the report, and this object can be used by downstream tools for programmatic analysis of the report.
 
 \section{Minimal use}
 %
@@ -56,8 +58,8 @@ if (Sys.info()["sysname"] == "Darwin")
 %
 
 \subsection{Example on Affymetrix data}
-If you are working with Affymetrix chips, an \Rclass{AffyBatch} object is the most appropriate to import your raw data in Bioconductor. To learn how to produce an \Rclass{AffyBatch} from your data, please read the documentation from the \Rpackage{affy} package. 
-We can use the \emph{MLL.A} \Rclass{AffyBatch} provided in the data package \Rpackage{ALLMLL} as an example to create a quality report. \emph{MLL.A} has been obtained from the CEL files, using the \Rfunction{ReadAffy} function from the \Rpackage{affy} package.
+If you are working with Affymetrix chips, an \Rclass{AffyBatch} object is the most appropriate to import your raw data into Bioconductor. To learn how to produce an \Rclass{AffyBatch} from your data, please read the documentation of the \Rpackage{affy} package. 
+We can use the data set \emph{MLL.A}, an object of class \Rclass{AffyBatch}, provided in the data package \Rpackage{ALLMLL} as an example to create a quality report. \emph{MLL.A} was created from the CEL files, using the \Rfunction{ReadAffy} function from the \Rpackage{affy} package.
 
 %
 <<Data Loading>>=
@@ -77,11 +79,11 @@ arrayQualityMetrics(expressionset = MLL.A,
 @
 %
 
-Here is the simplest way of calling the function. We give a name to the directory ('outdir') and we overwrite the possibly existing files of this directory ('force'). Finally, we set 'do.logtransform' to log transform the intensities.
+This is the simplest way of calling the function. We give a name to the directory ('outdir') and we overwrite the possibly existing files of this directory ('force'). Finally, we set 'do.logtransform' to log transform the intensities.
 
 
 \subsection{Example with one colour arrays}
-If you are working on one colour non Affymetrix chips, you can load your data in Bioconductor as an \Rclass{ExpressionSet} object. Please see the documentation of the \Rpackage{Biobase} package to do so. The \Rclass{ExpressionSet} is made to contain one colour data set. Here, as an example, we can simulate this by using a preprocessed object from \emph{MLL.A} which contains one value for each gene.
+If you are working on one colour non Affymetrix chips, you can load your data into Bioconductor as an \Rclass{ExpressionSet} object. Please see the documentation of the \Rpackage{Biobase} package on how to do so. The \Rclass{ExpressionSet} is made to contain one colour data set. Here, as an example, we can simulate this by using a preprocessed object from \emph{MLL.A} which contains one value for each gene.
 
 %
 <<Normalisation,results=hide>>=
@@ -101,8 +103,8 @@ arrayQualityMetrics(expressionset = rMLL,
 We do not need to set 'do.logtransform' as the data are already log transformed.
 
 
-\subsection{Example with two colours arrays}
-If you are working on two colour chips, you can create a \Rclass{NChannelSet} to contain your data. The documentation of the \Rpackage{Biobase} package gives instruction to build a \Rclass{NChannelSet}.
+\subsection{Example with two colour arrays}
+If you are working on two colour chips, you can create an \Rclass{NChannelSet} to contain your data. The documentation of the \Rpackage{Biobase} package gives instruction to build a \Rclass{NChannelSet}.
 As an instance of a \Rclass{NChannelSet}, we can use the \Rpackage{CCl4} data package and normalize it using the variance stabilization method available in the package \Rpackage{vsn}.
 
 %

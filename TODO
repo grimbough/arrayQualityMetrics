@@ -21,38 +21,42 @@ Use outliers package and mvoutlier package as alternatives to boxplot.stats. See
    i.e., here not "if (!(missing(intgroup)||is.na(intgroup)))" but 
    "if(!is.null(cl$key))"
 
-* generates pdf files for density and PCA plots
+* generate pdf files for density and PCA plots
 => Done, the pdf files are created but the link in the html does not work on the svg image.
 
-* replace rect/square by auto-determined image size. Check if that solves the problem of names on heatmap that are unreadable when > 50 arrays
+* Everywhere replace rect/square by auto-determined image size. 
+  Check if that solves the problem of names on heatmap that are unreadable when > 50 arrays.
+  When heatmap gets too large (say, more than 80 arrays, don't include the SVG file into the plot,
+  but rather just provide a link to it so that people can open it separately.)
+
+  I am also not yet sure the SVG / annotation for the heatmap is more than a gimmick and 
+  really necessary - maybe we can revert back to PNG if it turns out to be too clumsy.
+
+* Use the boxplot infrastructure established in boxplot.r also for NUSE and RLE.
+  (related: In aqm.rle and aqm.nuse, the ylims are hard-coded (c(-1, 1) and c(0.95, 1.5)) and often seem 
+  too large - is there a good reason for that, or should we try to compute them dynamically depending 
+  on the range of the data?)
 
 * Somewhere, empty lists are printed: -  clean this up.
-[[1]]
-[[2]]
-[[1]]
-[[2]]
-
 
 * maplot.pdf and spatial.pdf are enormous, do we really need that? 
-  WH: I put raster=TRUE experimentally into maplot.r to fix that (for maplot), but when I tried it crashed my R.
+  WH: raster=TRUE in panel.smoothscatter(for maplot) will currentl crashed R
+     (see my email to Paul Murrell). 
      It works for me in other contexts (and reduces PDF file sizes for such plots enormously!) ,
-     perhaps here it is a particular problem with panel.smoothScatter.
-     Maybe the best is to send Paul Murell a reproducible bug report, wait until this functionality 
-     is more stable, and then use it.
+     I suggest to see whether Paul might round to fixing this.
 
-* In aqm.rle and aqm.nuse, the ylims are hard-coded (c(-1, 1) and c(0.95, 1.5)) and often seem 
-  too large - is there a good reason for that, or should we try to compute them dynamically depending 
-  on the range of the data?
-
-* The role of the 'sN' parameter is unclear, e.g. in the man page (what happens if not null?). 
-  It is also handled differently (or indeed ignored) in the different qm-functions. 
-  My suggestion would be to simply drop (deprecate) it; or replace it by a 
-  character, whose default is the current behaviour (a table at the top) and alternative behaviours are 
-  currently not implemented. 
-  If people really want to specify their own sample names, then they can simply stick them into the 
-  sampleNames slot of the 'expressionset'. That way, it will be unambiguous in the code where the sample names
-  to be used are to be found. The current situation is ambiguous (e.g. sN is passed to aqm.rnadeg, but not
-  to density) and clumsy  (lugging around an extra argument through all the function calls)
+* The role of the 'sN' parameter is unclear, e.g. in the man page
+  (what happens if not null?).  It is also handled differently (or
+  indeed ignored) in the different qm-functions.  My suggestion would
+  be to simply drop (deprecate) it; or replace it by a character,
+  whose default is the current behaviour (a table at the top) and
+  alternative behaviours are currently not implemented.  If people
+  really want to specify their own sample names, then they can simply
+  stick them into the sampleNames slot of the 'expressionset'. That
+  way, it will be unambiguous in the code where the sample names to be
+  used are to be found. The current situation is ambiguous (e.g. sN is
+  passed to aqm.rnadeg, but not to density) and clumsy (lugging around
+  an extra argument through all the function calls)
 
 * Fix the man pages for aqmobj.rnadeg etc. to reflect recent changes (to ease maintenance, 
   pages for similar classes could be collected into one file, like in aqm.boxplot.Rd)
