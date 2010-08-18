@@ -172,8 +172,11 @@ aqm.report.qm = function(p, qm, f, name)
     dev.off()
     link = list(namepdf, NA)
       
+    linkpdf = hwrite("PDF file.",
+      style='font-weight:bold;text-align:center;font-family:helvetica',
+      border=0, link=namepdf)
     
-    hwrite(c(img, paste("Figure ", f, ": ", qm$title, sep="")),
+    hwrite(c(img, paste("Figure ", f, ": ", qm$title,". ", linkpdf, sep="")),
            p,
            dim=c(2,1),
            style='font-weight:bold;text-align:center;font-family:helvetica',

@@ -1,18 +1,8 @@
-0.) scanDates handling for next release
----------------------------------------
-In aqm.prepdata help:
-protocolData(CCl4)$scanDates = rep("2006/07/19", ncol(CCl4)) # to add soon
-
 1.) Duplicate correlation
 -------------------------
 If featureData contains a factor that identifies features containing 
 the same reporter sequence, we can check for that (scatterplots, 
 standard deviation)
-
-2.) Outlier detection
----------------------
-Use outliers package and mvoutlier package as alternatives to boxplot.stats. See flowQ as a model.
-
 
 * The function 'aqm.boxplot' opens a graphics device (through its dependence on draw.key). It would be better if it did not do that. 
 => AK: Fixed by adding a "dev.off()" but maybe there is a better way?
@@ -21,9 +11,6 @@ Use outliers package and mvoutlier package as alternatives to boxplot.stats. See
    i.e., here not "if (!(missing(intgroup)||is.na(intgroup)))" but 
    "if(!is.null(cl$key))"
 
-* generate pdf files for density and PCA plots
-=> Done, the pdf files are created but the link in the html does not work on the svg image.
-
 * Everywhere replace rect/square by auto-determined image size. 
   Check if that solves the problem of names on heatmap that are unreadable when > 50 arrays.
   When heatmap gets too large (say, more than 80 arrays, don't include the SVG file into the plot,
@@ -31,6 +18,7 @@ Use outliers package and mvoutlier package as alternatives to boxplot.stats. See
 
   I am also not yet sure the SVG / annotation for the heatmap is more than a gimmick and 
   really necessary - maybe we can revert back to PNG if it turns out to be too clumsy.
+=> AK: I like the SVG for heatmap, not a gimmick to me, it is very convenient when there are many arrays.
 
 * Use the boxplot infrastructure established in boxplot.r also for NUSE and RLE.
   (related: In aqm.rle and aqm.nuse, the ylims are hard-coded (c(-1, 1) and c(0.95, 1.5)) and often seem 
