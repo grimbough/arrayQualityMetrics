@@ -1,19 +1,24 @@
-// global variables
+// (C) WH, 16.8.2010, from an example by DTL
+
+// Global variable: content of a message window for displaying object names.
 var messageText;
 
 function init(evt) {
-  // get reference to child (content) of the text-Element
+  // Get reference to child (content) of the text-Element
   messageText = document.getElementById("annotationtext").firstChild;
 }
 
-
+// This function is called upon 'onmouseover' (on=TRUE) and 
+// 'onmouseout' (on=FALSE) events. 'which' is a vector of IDs 
+// of the plot elements to be toggled, 'title' the text to be 
+// displayed in the message text window in the case of 'onmouseover'.
 function toggleSeries(which, title, on)
 {
 
     var el;
     var cur;
     var val;
-    var factor = 4;
+    var factor = 5;
 
     if (on) {
 	messageText.nodeValue = title;
@@ -29,7 +34,6 @@ function toggleSeries(which, title, on)
 	}
 
 	cur = el.getAttribute('stroke-width');
-	
 	if(on) {
 	    val = cur * factor; 
 	} else {
@@ -39,3 +43,5 @@ function toggleSeries(which, title, on)
     }
    return(true);
 }
+
+

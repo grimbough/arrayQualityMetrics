@@ -108,7 +108,7 @@ setMethod("arrayQualityMetrics", signature(expressionset = "aqmInputObj"),
     
     if(inherits(expressionset, "AffyBatch"))
       {
-        obj$rnadeg = try(aqm.rnadeg(expressionset, sN))
+        obj$rnadeg = try(aqm.rnadeg(expressionset))
         if(inherits(obj$rnadeg,"try-error"))
           warning("Cannot draw the RNA degradation plot \n")
         
@@ -140,7 +140,6 @@ setMethod("arrayQualityMetrics", signature(expressionset = "aqmInputObj"),
     aqm.writereport(name, expressionset, obj)
     return(invisible(obj))
   })
-
 
 
 

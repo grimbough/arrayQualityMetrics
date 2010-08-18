@@ -30,9 +30,9 @@ annotateSvgMatplot = function(infile, outfile, annotationInfo,
     vb = getViewBox(doc)
     g = xmlRoot(doc)[["g"]]
     newXMLNode("text", " ",
-               attrs = c("x" = vb[1,1]+50,
+               attrs = c("x" = vb[1,1],
                  "y" = vb[2,2]-addy,
-                 "font-size" = "14",
+                 "font-size" = "13",
                  "font-family" = "Arial,Helvetica",
                  "id" = "annotationtext"),
                parent = g)
@@ -56,7 +56,7 @@ aqm.highlight = function(doc, annotationInfo)
   anno = annotationInfo$annotation
   
   if(length(anno) != length(series))
-    stop("'length(annotationInfo$annotation)' must be equal to 'length(series)', the number of lines in the plot.")
+    stop("'length(annotationInfo$annotation)' must be equal to 'length(series)', the number of objects in the plot.")
   
   for(i in seq(along=series)){
     ops = sprintf("toggleSeries(%s, %s, %s)",

@@ -96,8 +96,6 @@ aqm.boxplot = function(expressionset, dataprep, intgroup, subsample = 10000, ...
         },
     ...)
 
-  if (!(missing(intgroup)||is.na(intgroup))) dev.off()
-
   shape = list("h" = 2.5 + dataprep$numArrays * 0.1 +  1/dataprep$numArrays, 
                "w" = 3+3*lay[1])
   

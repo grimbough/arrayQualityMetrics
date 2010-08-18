@@ -11,23 +11,51 @@ aqm.prepaffy = function(expressionset, sN)
   return(Affyobject)
 }
 
-##RNA Degradation
-aqm.rnadeg =function(expressionset, sN, ...)
+## phrase book
+phrase = list(
+  fig = function(x) sprintf("The figure <!-- FIG --> shows the <i>%s</i> plot.", x),
+  preproc = function(x) sprintf("%s values are computed from the preprocessed data (after background correction and quantile normalisation).", x),
+  affyPLM = "This diagnostic plot is based on tools provided in the <i>affyPLM</i> package."
+  )
+
+##RNA digestion
+aqm.rnadeg = function(expressionset)
   {
-    numArrays = dim(exprs(expressionset))[2]
-    sampleNames(expressionset) = if(is.null(sN))  seq_len(length(sampleNames(expressionset))) else  sN
+    sN = sampleNames(expressionset)
+    numArrays = length(sN)
+    maxcol = 8
+    colors = brewer.pal(maxcol, "Dark2")
+    acol = if(numArrays <= maxcol)
+      colors[seq_len(numArrays)] else   
+      c(colors, sample(colors, numArrays-length(colors), replace = TRUE))
     
-    acol = sample(brewer.pal(8, "Dark2"), numArrays, replace = (8<numArrays))
-    rnaDeg = try(AffyRNAdeg(expressionset, log.it = TRUE, ...))
-    if(class(rnaDeg)=='try-error')
-      warning("RNA degradation plot from the package 'affy' cannot be produced for this data set.")
+    rnaDeg = function() {
+      plotAffyRNAdeg(AffyRNAdeg(expressionset, log.it = TRUE),
+                     lwd = 1, col=acol)
+      legend("topright", lty=1, lwd=2, col=acol, legend = paste(seq(along=acol)))
+    }
+    
+    annotation = vector(mode="list", length = numArrays)
+    names(annotation) = sprintf("line%d", seq(along=annotation))
+    for(i in seq(along=annotation))
+      annotation[[i]] = list(title = sprintf("Array %d: %s", i, sN[i]),
+                             linkedids = names(annotation)[i])
 
-    legend = "In the figure <!-- FIG -->, a RNA digestion plot is computed on normalised data (so that standard deviation is equal to 1). In this plot each array is represented by a single line. It is important to identify any array(s) that has a slope which is very different from the others. The indication is that the RNA used for that array has potentially been handled quite differently from the other arrays. This diagnostic plot is based on tools provided in the <b>affy</b> package."
+    legend = paste(phrase$fig("RNA digestion"),
+                   phrase$preproc("Shown"),
+       "In this plot each array is represented by a single line; move the mouse over the lines to see their corresponding sample names. The plot can be used to identify array(s) that have a slope very different from the others. This could indicate that the RNA used for that array has been handled differently from what was done for the other arrays.",
+                   phrase$affyPLM)
 
-    title = "RNA degradation plot"
+    title = "RNA digestion plot"
     section = "Affymetrix specific plots"
     
-    out = list("plot" = rnaDeg, "section" = section, "title" = title, "legend" = legend, shape = "square")
+    out = list("plot" = rnaDeg,
+               "section" = section,
+               "title" = title,
+               "legend" = legend,
+               "shape" = list("h" = 5.5, "w" =7),
+               "svg" = list(annotation=annotation, getfun=SVGAnnotation::getMatplotSeries))
+    
     class(out) = "aqmobj.rnadeg"
     return(out)
   }
@@ -41,7 +69,10 @@ aqm.rle = function(affyproc, ...)
       whisklty = 0, staplelty = 0,
       main = "RLE", las = 3, cex.axis = 0.8, plot = FALSE, ...))
 
-    legend = "The figure <!-- FIG --> is a Relative Log Expression (RLE) plot. RLE are performed on preprocessed data (background correction and quantile normalisation). An array that has problems will either have larger spread, or will not be centred at M = 0, or both. This diagnostic plot is based on tools provided in the <b>affyPLM</b> package."
+      legend = paste(phrase$fig("Relative Log Expression (RLE)"),
+                   phrase$preproc("RLE"),
+        "Arrays whose boxes have larger spread or are centred at M = 0 are potentially problematic.",
+                   phrase$affyPLM)
 
     title = "Relative Log Expression plot"
 
@@ -62,9 +93,12 @@ aqm.nuse = function(affyproc, ...)
     outline = FALSE, col =  brewer.pal(9, "Set1")[2], main = "NUSE",
     las = 2, cex.axis = 0.8, plot=FALSE,...))
 
-  legend = "The figure <!-- FIG --> is a Normalized Unscaled Standard Error (NUSE) plot. NUSE are performed on preprocessed data (background correction and quantile normalisation). Low quality arrays are those that are substantially elevated or more spread out, relative to the other arrays. NUSE values are not comparable across data sets. This diagnostic plot is based on tools provided in the <b>affyPLM</b> package."
+  legend = paste(phrase$fig("Normalized Unscaled Standard Error (NUSE)"),
+                 phrase$preproc("NUSE"),
+    "Potential low quality arrays are those whose box is substantially elevated or more spread out relative to the other arrays. NUSE values are comparable within one data set, but usually not across different data sets.",
+                 phrase$affyPLM)
 
-  title = "Normalized Unscaled Standard Error plot"
+  title = "Normalized Unscaled Standard Error (NUSE) plot"
   section = "Affymetrix specific plots"
 
   nusemean = nuse$stat[3,]
@@ -84,13 +118,12 @@ aqm.nuse = function(affyproc, ...)
 ##QCStats
 aqm.qcstats = function(expressionset, ...)
   {                
-    qcStats = try(qc(expressionset, ...))
+    qcStats = function() {
+      plot.qc.stats(qc(expressionset, ...))
+    }
 
-    if(class(qcStats)=='try-error')
-      warning("'plot(qcStats)' from the package 'simpleaffy' failed for this dataset.")
-
-
-    legend = "The figure <!-- FIG --> represents the diagnostic plot recommended by Affymetrix. It is fully described in the package <b>simpleaffy</b>'s vignette. Any metrics that is shown in red is out of the manufacturer's specific boundaries and suggests a potential problem, any metrics shown in blue is fine."
+    legend =  paste(phrase$fig("the Affymetrix recommended diagnostic"),
+      "Please see the vignette of the package <i>simpleaffy</i> for a full explanation of the elements shown in this plot. Any metrics that is shown in red is outside the manufacturer's specified boundaries and suggests a potential problem; metrics shown in blue are considered acceptable.")
 
     title = "Diagnostic plot recommended by Affymetrix"
     section = "Affymetrix specific plots"
@@ -107,7 +140,7 @@ aqm.pmmm = function(expressionset, ...)
   MM = density(as.matrix(log2(mm(expressionset))), ...)
   PMMM = list(PM = PM, MM = MM)
 
-  legend = "The figure <!-- FIG --> shows the density distributions of the log<sub>2</sub> intensities grouped by the matching of the probes. Blue, density estimate of intensities of perfect match probes (PM) and grey the mismatch probes (MM). We expect that, MM probes having poorer hybridization than PM probes, the PM curve should be shifted to the right of the MM curve."
+  legend = "Figure <!-- FIG --> shows the density distributions of the log<sub>2</sub> intensities grouped by the matching type of the probes. The blue line shows a density estimate (smoothed histogram) from intensities of perfect match probes (PM), the grey line, one from the mismatch probes (MM). We expect that MM probes have poorer hybridization than PM probes, and thus that the PM curve be to the right of the MM curve."
 
   title = "Perfect matches and mismatches"
   section = "Affymetrix specific plots"

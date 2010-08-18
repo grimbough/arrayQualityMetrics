@@ -17,7 +17,7 @@ aqm.pca = function(expressionset, dataprep, intgroup, ...)
   
   pcafig = xyplot(PC2 ~ PC1 , as.data.frame(pca$x), pch=19, col=cl$arrayColours, key = key)
 
-  legend = "The figure <!-- FIG --> shows a scatterplot of the arrays along the first two principal components. We expect the arrays to cluster according to a relevant experimental factor. "
+  legend = "The figure <!-- FIG --> shows a scatterplot of the arrays along the first two principal components. You can use this plot to explore if the arrays cluster, and whether this is according to an intended experimental factor or according to unintended causes such as &quot;batch effects&quot;. Move the mouse over the points to see the sample names."
   title = "Principal Component Analysis"
   section = "Between array comparison"
    

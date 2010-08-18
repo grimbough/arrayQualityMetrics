@@ -1,4 +1,6 @@
-setClassUnion("aqmTrellis", c("aqmobj.ma", "aqmobj.heat", "aqmobj.pca", "aqmobj.probesmap", "aqmobj.spatial", "aqmobj.spatialbg", "aqmobj.dens"))
+setClassUnion("aqmTrellis",
+              c("aqmobj.ma", "aqmobj.heat", "aqmobj.pca", "aqmobj.probesmap",
+                "aqmobj.spatial", "aqmobj.spatialbg", "aqmobj.dens"))
 
 ##Creation of the outdir
 dircreation = function(outdir = getwd(), force = FALSE)
@@ -27,14 +29,24 @@ setGeneric("aqm.plot",
            function(obj)
            standardGeneric("aqm.plot"))
 
-##To produce the plots
-setMethod("aqm.plot",signature(obj = "aqmTrellis"), function(obj){
+## To produce the plots
+##  for class union 'aqmTrellis' 
+setMethod("aqm.plot", signature(obj = "aqmTrellis"), function(obj){
   print(obj$plot)})
 
+##  for other classes
+for(type in c("aqmobj.rnadeg", "aqmobj.qcs", "aqmobj.msd"))
+  setMethod("aqm.plot", signature(obj = type), function(obj) {
+    do.call(obj$plot, args = list())
+  })
+
+## idiosyncratic methods (it would be better to move all method-specific rendering
+##   into the functions that generate the objects).
+
 setMethod("aqm.plot",signature(obj = "aqmobj.pmmm"), function(obj){
-plot(obj$plot$MM, col = "grey", xlab = "log(Intensity)", main="")
-lines(obj$plot$PM, col = "blue")
-legend("topright", c("PM","MM"),lty=1,lwd=2,col= c("blue","grey"), bty = "n")
+  plot(obj$plot$MM, col = "grey", xlab = "log(Intensity)", main="")
+  lines(obj$plot$PM, col = "blue")
+  legend("topright", c("PM","MM"),lty=1,lwd=2,col= c("blue","grey"), bty = "n")
 })
 
 setMethod("aqm.plot",signature(obj = "aqmobj.box"), function(obj){
@@ -67,19 +79,6 @@ setMethod("aqm.plot",signature(obj = "aqmobj.nuse"), function(obj){
   print(bwplot(obj$plot$stats ~ as.vector(col(obj$plot$stats)), pch = "|", col = "black", do.out = FALSE, fill = "#1F78B4", horizontal = FALSE, box.ratio = 2, ylim = c(0.9,1.5), ylab="NUSE", xlab = ""))  
 })
 
-setMethod("aqm.plot",signature(obj = "aqmobj.rnadeg"), function(obj){
-  acol = sample(brewer.pal(8, "Dark2"), length(obj$plot$sample.names), replace = (8<length(obj$plot$sample.names)))
-  print(plotAffyRNAdeg(obj$plot, lwd = 2, col =acol))
-  legend("topright",lty=1,lwd=2,col=acol,legend = obj$plot$sample.names)
-
-
-})
-
-setMethod("aqm.plot",signature(obj = "aqmobj.qcs"), function(obj){
-  plot.qc.stats(obj$plot)})
-  
-setMethod("aqm.plot",signature(obj = "aqmobj.msd"), function(obj){
-  meanSdPlot(obj$plot)})
   
 ##To create the title
 aqm.make.title = function(name)

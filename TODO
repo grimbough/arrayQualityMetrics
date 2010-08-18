@@ -15,12 +15,11 @@ Use outliers package and mvoutlier package as alternatives to boxplot.stats. See
 
 
 * The function 'aqm.boxplot' opens a graphics device (through its dependence on draw.key). It would be better if it did not do that. 
-=> Fixed by adding a "dev.off()" but maybe there is a better way?
-
-* With the following, why are only two arrays shown?
-arrayQualityMetrics(subset10, "QA10", force = TRUE, do.logtransform = TRUE,
-                    intgroup = "FactorValue..ER.status.")
-=> Cannot reproduce that error
+=> AK: Fixed by adding a "dev.off()" but maybe there is a better way?
+=> WH: I removed that again, it seemed too fragile. Also, in such cases,
+   please use the same "if" condition than what was used in the complement;
+   i.e., here not "if (!(missing(intgroup)||is.na(intgroup)))" but 
+   "if(!is.null(cl$key))"
 
 * generates pdf files for density and PCA plots
 => Done, the pdf files are created but the link in the html does not work on the svg image.
@@ -34,4 +33,35 @@ arrayQualityMetrics(subset10, "QA10", force = TRUE, do.logtransform = TRUE,
 [[2]]
 
 
-* maplot.pdf is enormous, do we really need that? (I put raster=TRUE experimentally into maplot.r to fix that)
+* maplot.pdf and spatial.pdf are enormous, do we really need that? 
+  WH: I put raster=TRUE experimentally into maplot.r to fix that (for maplot), but when I tried it crashed my R.
+     It works for me in other contexts (and reduces PDF file sizes for such plots enormously!) ,
+     perhaps here it is a particular problem with panel.smoothScatter.
+     Maybe the best is to send Paul Murell a reproducible bug report, wait until this functionality 
+     is more stable, and then use it.
+
+* In aqm.rle and aqm.nuse, the ylims are hard-coded (c(-1, 1) and c(0.95, 1.5)) and often seem 
+  too large - is there a good reason for that, or should we try to compute them dynamically depending 
+  on the range of the data?
+
+* The role of the 'sN' parameter is unclear, e.g. in the man page (what happens if not null?). 
+  It is also handled differently (or indeed ignored) in the different qm-functions. 
+  My suggestion would be to simply drop (deprecate) it; or replace it by a 
+  character, whose default is the current behaviour (a table at the top) and alternative behaviours are 
+  currently not implemented. 
+  If people really want to specify their own sample names, then they can simply stick them into the 
+  sampleNames slot of the 'expressionset'. That way, it will be unambiguous in the code where the sample names
+  to be used are to be found. The current situation is ambiguous (e.g. sN is passed to aqm.rnadeg, but not
+  to density) and clumsy  (lugging around an extra argument through all the function calls)
+
+* Fix the man pages for aqmobj.rnadeg etc. to reflect recent changes (to ease maintenance, 
+  pages for similar classes could be collected into one file, like in aqm.boxplot.Rd)
+
+* The handling of exception is currently inconsistent. For instance, in aqm.rnadeg you have
+    rnaDeg = try(AffyRNAdeg(expressionset, log.it = TRUE))
+    if(class(rnaDeg)=='try-error')
+      warning("RNA digestion plot from the package 'affy' cannot be produced for this data set.")
+  but then the function continues as if nothing had happened, and an error is thrown later by the method 
+  "aqm.plot" with signature "aqmobj.rnadeg". Either build in error robustness throughout (e.g. 
+  by letting aqm.rnadeg return with the exception object, and then let aqm.plot be robust against that;
+  or, just throw the error and stop.

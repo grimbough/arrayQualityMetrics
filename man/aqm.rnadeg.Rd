@@ -1,7 +1,7 @@
 \name{aqm.rnadeg}
 \alias{aqm.rnadeg}
 
-\title{ Performs RNA degradation plot on AffyBatch. }
+\title{ Computes RNA degradation plot on AffyBatch. }
 
 \description{
   \code{aqm.rnadeg} performs RNA degradation on objects of class
@@ -9,13 +9,11 @@
   \code{aqm.plot} usage.
 }
 
-\usage{ aqm.rnadeg(expressionset, sN, ...) }
+\usage{ aqm.rnadeg(expressionset) }
 
 \arguments{
   \item{expressionset}{ An object of
     class \code{\link[affy:AffyBatch-class]{AffyBatch}}}
-  \item{sN}{ are the sample names to be written on the plot }
-  \item{...}{ Any arguments to \code{\link[affy]{AffyRNAdeg}} }
 }
 
 \value{ An object of class \code{\link{aqmobj.rnadeg}}. }
