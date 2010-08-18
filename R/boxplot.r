@@ -15,7 +15,10 @@ ksOutliers = function(x, subsamp = 300, theta = 2){
 ##   arrayColors:  color code for each array
 ##   key: a key explaining the mapping of factor values to colours
 ##----------------------------------------
-intgroupColours = function(intgroup, expressionset){
+intgroupColours = function(intgroup, expressionset, withOpacity = FALSE)
+{
+
+  n = nrow(pData(expressionset))  ## number of arrays
 
   if (!(missing(intgroup)||is.na(intgroup))) {
     groups  = as.factor(pData(expressionset)[, intgroup[1]])
@@ -28,17 +31,30 @@ intgroupColours = function(intgroup, expressionset){
     } else {
       colours = colours[1:nlevels(groups)]
     }
-    list(arrayColours = colours[igroups],
-         key = list(
-           rect = list(col = colours),
-           text = list(levels(groups)),
-           rep = FALSE))
-    
+    cols = colours[igroups]
+    key = list(
+      rect = list(col = colours),
+      text = list(levels(groups)),
+      rep = FALSE)
+  
   } else {
-    list(arrayColours = rep("#1F78B4", nrow(pData(expressionset))),
-         key = NULL)
+    cols = rep("#1F78B4", n)
+    key = NULL
   }
+
+  if(withOpacity)
+    cols = addOpacity(cols, n)
+
+  list(arrayColours = cols, key = key)
 }
+
+addOpacity = function(cols, n){
+  stopifnot(all(nchar(cols)==7))  ## expecting something like #80d020
+  opacity = if(n > 50) 0.125 else (0.8-n*0.0135)  ## the more arrays, the more transparency
+  opacity = as.hexmode(as.integer(255 * opacity))
+  paste(cols, opacity, sep="")
+}
+
 
 ##----------------------------------------
 ## aqm.boxplot

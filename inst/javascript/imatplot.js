@@ -1,3 +1,5 @@
+
+
 // (C) WH, 16.8.2010, from an example by DTL
 
 // Global variable: content of a message window for displaying object names.
@@ -16,8 +18,8 @@ function toggleSeries(which, title, on)
 {
 
     var el;
-    var cur;
-    var val;
+    var oldwidth;
+    var newwidth;
     var factor = 5;
 
     if (on) {
@@ -33,13 +35,19 @@ function toggleSeries(which, title, on)
 	    throw new Error("Did not find 'which[i]'.");
 	}
 
-	cur = el.getAttribute('stroke-width');
+	oldwidth = el.getAttribute('stroke-width');
 	if(on) {
-	    val = cur * factor; 
+	    newwidth = oldwidth * factor; 
+            if(!el.getAttribute('original-stroke-opacity'))
+              el.setAttribute('original-stroke-opacity', el.getAttribute('stroke-opacity'));
+	    el.setAttribute('stroke-opacity', 1);
 	} else {
-	    val = cur / factor;
+	    newwidth = oldwidth / factor;
+	    el.setAttribute('stroke-opacity', el.getAttribute('original-stroke-opacity'));
 	}
-	el.setAttribute('stroke-width', val);
+	el.setAttribute('stroke-width', newwidth);
+
+
     }
    return(true);
 }

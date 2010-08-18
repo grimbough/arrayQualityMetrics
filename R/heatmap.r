@@ -65,7 +65,7 @@ aqm.heatmap = function(expressionset, dataprep, intgroup, ...)
       k = (i-1)*numArrays + j
       oi = ord[i]
       oj = ord[j]
-      names(annotation)[k] = sprintf("rect%d-%d", oi, oj)
+      names(annotation)[k] = sprintf("aqm_%d_%d", oi, oj)
       annotation[[k]] = list(title = sprintf("%d vs %d (%s vs %s)", oi, oj, sN[oi], sN[oj]),
                   linkedids = names(annotation)[k])
     }
@@ -103,7 +103,7 @@ heatmapRectangles = function(doc, n) {
     for(i in 3:4) good = good && all(diff(  dx[,,i] )==0)
   }
   if(!good)
-    error("Error in identifying the heatmap elements in the SVG document while trying to add interactive annotation.")
+    stop("Error in identifying the heatmap elements in the SVG document while trying to add interactive annotation.")
 
   ## Now we are happy and can move on.
   return(XML::xmlChildren(prn))

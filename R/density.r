@@ -1,14 +1,23 @@
 dens = function(obj, ...)
   {
-    dlist <- apply(obj, 2, density, na.rm = TRUE)
-    names(dlist) <- seq_along(dlist)
-    ddf <- do.call(make.groups, lapply(dlist, function(l) with(l, data.frame(x = x, y = y))))
+    dlist = apply(obj, 2, density, na.rm = TRUE)
+    names(dlist) = seq_along(dlist)
+    ddf = do.call(make.groups, lapply(dlist, function(l) with(l, data.frame(x = x, y = y))))
     return(ddf)
   }
 
+namedEmptyList = function(n) {
+  x = vector(mode="list", length = n)
+  names(x) = sprintf("aqm_%d", seq(along=x))
+  return(x)
+}
+    
 aqm.density = function(expressionset, dataprep, intgroup, outliers = c(), ...)
 {
   sN = sampleNames(expressionset)
+
+  ## for the tooltips
+  title = sprintf("Array %d: %s%s", seq(along=sN), sN, ifelse(seq(along=sN) %in% outliers, " (*)", ""))
 
   if(dataprep$nchannels == 2) {  
     den1 = dens(dataprep$rc)
@@ -21,15 +30,11 @@ aqm.density = function(expressionset, dataprep, intgroup, outliers = c(), ...)
     formula = y ~ x | panels
     lay = c(3,1)
 
-    ## TO DO: the making of annotation could be centralised somewhere in a function
-    annotation = vector(mode="list", length = 3*length(sN))
-    names(annotation) = sprintf("line%d", seq(along=annotation))
+    annotation = namedEmptyList(3*length(sN))
     for(i in seq(along=annotation)) {
       s = ((i-1) %% length(sN))+1
-      annotation[[i]] = if(i %in% outliers) list(title = sprintf("Array %d: %s *", s, sN[s]),
-                             linkedids = names(annotation)[s+(0:2)*length(sN)]) else
-                              list(title = sprintf("Array %d: %s", s, sN[s]),
-                               linkedids = names(annotation)[s+(0:2)*length(sN)])
+      annotation[[i]] = list(title = title[s],
+                             linkedids = names(annotation)[s+(0:2)*length(sN)])
     }
 
   } else {
@@ -37,20 +42,15 @@ aqm.density = function(expressionset, dataprep, intgroup, outliers = c(), ...)
     formula = y ~ x
     lay = c(1,1)
 
-    annotation = vector(mode="list", length = length(sN))
-    names(annotation) = sprintf("line%d", seq(along=annotation))
+    annotation = namedEmptyList(length(sN))
     for(i in seq(along=annotation))
-      annotation[[i]] = list(title = sprintf("Array %d: %s", i, sN[i]),
+      annotation[[i]] = list(title = title[i],
                              linkedids=names(annotation)[i])
   }
   
-  cl = intgroupColours(intgroup, expressionset)
+  cl = intgroupColours(intgroup, expressionset, withOpacity = TRUE)
 
-  transparencysuffix = "80"  ## FIXME
-  if(length(outliers)>0)
-    transparencysuffix[outliers] = "00"
-
-  lwd = rep(1,dataprep$numArrays) ## FIXME
+  lwd = rep(1,dataprep$numArrays) 
   lty = rep(1,dataprep$numArrays)
   
   den = xyplot(formula, ddf, groups = which, layout = lay,

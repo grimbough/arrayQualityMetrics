@@ -28,6 +28,7 @@ aqm.rnadeg = function(expressionset)
     acol = if(numArrays <= maxcol)
       colors[seq_len(numArrays)] else   
       c(colors, sample(colors, numArrays-length(colors), replace = TRUE))
+    acol = addOpacity(acol, numArrays)
     
     rnaDeg = function() {
       plotAffyRNAdeg(AffyRNAdeg(expressionset, log.it = TRUE),
@@ -35,8 +36,7 @@ aqm.rnadeg = function(expressionset)
       legend("topright", lty=1, lwd=2, col=acol, legend = paste(seq(along=acol)))
     }
     
-    annotation = vector(mode="list", length = numArrays)
-    names(annotation) = sprintf("line%d", seq(along=annotation))
+    annotation = namedEmptyList(numArrays)
     for(i in seq(along=annotation))
       annotation[[i]] = list(title = sprintf("Array %d: %s", i, sN[i]),
                              linkedids = names(annotation)[i])

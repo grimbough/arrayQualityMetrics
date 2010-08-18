@@ -2,8 +2,7 @@ aqm.pca = function(expressionset, dataprep, intgroup, ...)
 {
 
   sN = sampleNames(expressionset)
-  annotation = vector(mode="list", length = length(sN))
-  names(annotation) = sprintf("line%d", seq(along=annotation))
+  annotation = namedEmptyList(length(sN))
   for(i in seq(along=annotation))
     annotation[[i]] = list(title = sprintf("Array %d: %s", i, sN[i]),
                            linkedids=names(annotation)[i])
