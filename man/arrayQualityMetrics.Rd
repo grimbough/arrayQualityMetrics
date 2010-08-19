@@ -38,7 +38,7 @@ arrayQualityMetrics(expressionset,
                     grouprep,
 		    spatial = TRUE,
 		    sN = NULL,
-                    title = paste("Quality metrics report for", deparse(substitute(expressionset))))
+                    reporttitle = paste("Quality metrics report for", deparse(substitute(expressionset))))
 }
 
 \arguments{
@@ -81,7 +81,7 @@ arrayQualityMetrics(expressionset,
   \code{NULL}, samples will be labeled by numbers 1, 2, .... on the
   plots, and a table is produced to map these numbers back to the
   names.}
-\item{title}{Title for the report (character of length 1).}
+\item{reporttitle}{Title for the report (character of length 1).}
 }
 
 \details{

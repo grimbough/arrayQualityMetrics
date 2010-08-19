@@ -81,13 +81,13 @@ setMethod("aqm.plot",signature(obj = "aqmobj.nuse"), function(obj){
 
   
 ##To create the title
-aqm.make.title = function(title)
+aqm.make.title = function(reporttitle)
   {
-    if(!(is.character(title)&&(length(title)==1)))
-      stop("'title' must be a character of length 1.")
+    if(!(is.character(reporttitle)&&(length(reporttitle)==1)))
+      stop("'reporttitle' must be a character of length 1.")
     p = openPage('QMreport.html')
     hwrite("<hr>", p)
-    hwrite(title, p, heading=1, style='text-align:center;font-family:helvetica,arial,sans-serif')
+    hwrite(reporttitle, p, heading=1, style='text-align:center;font-family:helvetica,arial,sans-serif')
     hwrite("<hr>", p)
     return(p)
   }

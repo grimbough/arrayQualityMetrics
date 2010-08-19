@@ -10,13 +10,13 @@ setGeneric("arrayQualityMetrics",
            grouprep,
 	   spatial = TRUE,
            sN = NULL,
-           title = paste("Quality metrics report for", deparse(substitute(expressionset)))
+           reporttitle = paste("Quality metrics report for", deparse(substitute(expressionset)))
   )
   standardGeneric("arrayQualityMetrics"))
 
 ## aqmInputObj
 setMethod("arrayQualityMetrics", signature(expressionset = "aqmInputObj"),
-  function(expressionset, outdir, force, do.logtransform, intgroup, grouprep, spatial, sN) {
+  function(expressionset, outdir, force, do.logtransform, intgroup, grouprep, spatial, sN, reporttitle) {
     
     ## Argument checking: 
     ## (Done here, once and for all, rather than where the arguments are actually consumed - 
@@ -26,8 +26,9 @@ setMethod("arrayQualityMetrics", signature(expressionset = "aqmInputObj"),
       .Deprecated(msg = paste("The argument 'grouprep' of the function 'arrayQualityMetrics'",
         "is deprecated and will be ignored. Use presence or missingness/NA-ness of 'intgroup' instead."))
       
-    if (!(is.character(outdir) && (length(outdir)==1)))
-      stop("'outdir' should be a character of length 1.")
+    for(v in c("outdir", "reporttitle"))
+      if (!(is.character(get(v)) && (length(get(v))==1)))
+        stop(sprintf("'%s' should be a character of length 1.", v))
 
     for(v in c("force", "do.logtransform", "spatial"))
       if (!(is.logical(get(v)) && (length(get(v))==1)))
@@ -136,7 +137,7 @@ setMethod("arrayQualityMetrics", signature(expressionset = "aqmInputObj"),
       obj[[i]]$legend = gsub("The figure <!-- FIG -->", paste("<b>Figure",i, "</b>"),
                 obj[[i]]$legend, ignore.case = TRUE) 
     
-    aqm.writereport(title, expressionset, obj)
+    aqm.writereport(reporttitle, expressionset, obj)
     return(invisible(obj))
   })
 
