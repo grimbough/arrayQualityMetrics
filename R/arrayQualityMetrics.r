@@ -2,15 +2,17 @@ setClassUnion("aqmInputObj", c("ExpressionSet", "AffyBatch", "NChannelSet", "Bea
 
 ## set the method for arrayQualityMetrics
 setGeneric("arrayQualityMetrics",
-           function(expressionset,
-                    outdir = getwd(),
-                    force = FALSE,
-                    do.logtransform = FALSE,
-                    intgroup,
-                    grouprep,
-		    spatial = TRUE,
-                    sN = NULL)
-           standardGeneric("arrayQualityMetrics"))
+  def = function(expressionset,
+           outdir = getwd(),
+           force = FALSE,
+           do.logtransform = FALSE,
+           intgroup,
+           grouprep,
+	   spatial = TRUE,
+           sN = NULL,
+           title = paste("Quality metrics report for", deparse(substitute(expressionset)))
+  )
+  standardGeneric("arrayQualityMetrics"))
 
 ## aqmInputObj
 setMethod("arrayQualityMetrics", signature(expressionset = "aqmInputObj"),
@@ -43,9 +45,6 @@ setMethod("arrayQualityMetrics", signature(expressionset = "aqmInputObj"),
     on.exit(setwd(olddir))
     dircreation(outdir, force)
                 
-    arg = as.list(match.call(expand.dots = TRUE))
-    name = arg$expressionset
-    name = deparse(substitute(name))
     obj = list()
     
     dataprep = aqm.prepdata(expressionset, do.logtransform, sN)
@@ -137,7 +136,7 @@ setMethod("arrayQualityMetrics", signature(expressionset = "aqmInputObj"),
       obj[[i]]$legend = gsub("The figure <!-- FIG -->", paste("<b>Figure",i, "</b>"),
                 obj[[i]]$legend, ignore.case = TRUE) 
     
-    aqm.writereport(name, expressionset, obj)
+    aqm.writereport(title, expressionset, obj)
     return(invisible(obj))
   })
 

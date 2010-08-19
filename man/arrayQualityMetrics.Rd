@@ -11,10 +11,10 @@
 \alias{arrayQualityMetrics,marrayNorm-method}
 \alias{arrayQualityMetrics,aqmInputObj-method}
 
-\title{ Quality metrics on microarray experiments }
+\title{Quality metrics for microarray experiments}
 
 \description{
-  \code{arrayQualityMetrics} performs quality metrics on
+  \code{arrayQualityMetrics} reports quality metrics on
   \code{\link[Biobase:class.ExpressionSet]{ExpressionSet}},
   \code{\link[affy:AffyBatch-class]{AffyBatch}} ,
   \code{\link[Biobase:class.NChannelSet]{NChannelSet}},
@@ -37,8 +37,8 @@ arrayQualityMetrics(expressionset,
                     intgroup,
                     grouprep,
 		    spatial = TRUE,
-		    sN = NULL)
-
+		    sN = NULL,
+                    title = paste("Quality metrics report for", deparse(substitute(expressionset))))
 }
 
 \arguments{
@@ -79,7 +79,9 @@ arrayQualityMetrics(expressionset,
 
 \item{sN}{Should the sample names be written on the plots? If
   \code{NULL}, samples will be labeled by numbers 1, 2, .... on the
-  plots, and a table is produced to map these numbers back to the names.}
+  plots, and a table is produced to map these numbers back to the
+  names.}
+\item{title}{Title for the report (character of length 1).}
 }
 
 \details{
