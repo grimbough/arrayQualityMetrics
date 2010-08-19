@@ -7,12 +7,13 @@ spatialplot = function(expressionset, dataprep, channel, label, scale, imageMat 
       }                        
     
     colourRamp = colorRampPalette(rgb(seq(0,1,l=256),seq(0,1,l=256),seq(1,0,l=256)))
-    if(dataprep$classori == "ExpressionSet" || dataprep$classori == "NChannelSet")
+
+    if(dataprep$classori %in% c("ExpressionSet", "NChannelSet"))
       {
         r = featureData(expressionset)$X
         c = featureData(expressionset)$Y
       }
-    if(dataprep$classori == "AffyBatch")
+    else if(dataprep$classori == "AffyBatch")
       {
         maxc = ncol(expressionset)
         maxr = nrow(expressionset)
@@ -20,28 +21,34 @@ spatialplot = function(expressionset, dataprep, channel, label, scale, imageMat 
         r = rep(seq_len(maxr), maxc)
         c = rep(seq_len(maxc), each = maxr)
       }
-    if(dataprep$classori == "BeadLevelList")
-      {        
+    else if(dataprep$classori == "BeadLevelList")
+      {
+        stopifnot(is.matrix(imageMat[[1]]))
         maxc = ncol(imageMat[[1]])
         maxr = nrow(imageMat[[1]])
         
         r = rep(seq_len(maxr), maxc)
         c = rep(seq_len(maxc), each = maxr)
-      }
-    
-      if(dataprep$classori == "BeadLevelList")
-        {
-          if(scale == "Rank")
-            imageMat = lapply(seq_len(dataprep$numArrays), function(i) rank(imageMat[[i]], na.last = "keep"))         
-          df = data.frame("Array" = rep(seq_len(dataprep$numArrays), each=maxr*maxc), "ch" = unlist(imageMat), "row" = r, "column" = c)
-        }
 
-      if(dataprep$classori != "BeadLevelList")
-        {
-          df = switch(scale,
-            "Rank" = data.frame("Array" = as.factor(col(dataprep$dat)), "ch" = unlist(lapply(seq_len(dataprep$numArrays), function(i) rank(channel[,i]))), "row" = r,  "column" = c),
-            "Log" = data.frame("Array" = as.factor(col(dataprep$dat)),  "ch" = unlist(lapply(seq_len(dataprep$numArrays), function(i) channel[,i])), "row" = r,  "column" = c))
-        }
+        if(scale == "Rank")
+          imageMat = lapply(seq_len(dataprep$numArrays),
+            function(i) rank(imageMat[[i]], na.last = "keep"))         
+
+        df = data.frame("Array" = rep(seq_len(dataprep$numArrays), each=maxr*maxc),
+                        "ch" = unlist(imageMat),
+                        "row" = r,
+                        "column" = c)
+      } else {
+        ## Since we need to define r and c
+        stop(sprintf("Do not know how to handle '%s'.", dataprep$classori))
+      }
+
+    if(dataprep$classori != "BeadLevelList")
+      {
+        df = switch(scale,
+          "Rank" = data.frame("Array" = as.factor(col(dataprep$dat)), "ch" = unlist(lapply(seq_len(dataprep$numArrays), function(i) rank(channel[,i]))), "row" = r,  "column" = c),
+          "Log" = data.frame("Array" = as.factor(col(dataprep$dat)),  "ch" = unlist(lapply(seq_len(dataprep$numArrays), function(i) channel[,i])), "row" = r,  "column" = c))
+      }
     
     levelplot(ch ~ column*row | Array, data=df, axis = noaxis, asp = "iso", col.regions = colourRamp, as.table=TRUE, strip = function(..., bg) strip.default(..., bg ="#cce6ff"), xlab = label, ylab = "")
   }
