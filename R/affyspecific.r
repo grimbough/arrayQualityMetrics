@@ -88,7 +88,10 @@ aqm.rle = function(expressionset, dataprep, affyproc, intgroup, subsample = 1000
     rlemed = rle2$stats[3,]
     rleout = which(abs(rlemed) > 0.1)
 
-    out = list("plot" = rle$plot, "section" = section, "title" = title, "legend" = legend, "scores" = rlemed, "outliers" = rleout, shape = "square")
+    shape = list("h" = 2.5 + dataprep$numArrays * 0.1 +  1/dataprep$numArrays, 
+               "w" = 6)
+
+    out = list("plot" = rle$plot, "section" = section, "title" = title, "legend" = legend, "scores" = rlemed, "outliers" = rleout, shape = shape)
     class(out) = "aqmobj.rle"
     return(out)
   }
@@ -130,7 +133,8 @@ aqm.nuse = function(expressionset, dataprep, affyproc, intgroup, subsample = 100
   nuse$title = "Normalized Unscaled Standard Error (NUSE) plot"
   nuse$section = "Affymetrix specific plots"
   
-  nuse$shape = "square"
+  nuse$shape = list("h" = 2.5 + dataprep$numArrays * 0.1 +  1/dataprep$numArrays, "w" = 6)
+
   class(nuse) = "aqmobj.nuse"
   return(nuse) 
 }
@@ -149,7 +153,9 @@ aqm.qcstats = function(expressionset, ...)
     title = "Diagnostic plot recommended by Affymetrix"
     section = "Affymetrix specific plots"
 
-    out = list("plot" = qcStats, "section" = section, "title" = title, "legend" = legend, shape = "square")
+    shape = list("h" = 4 + ncol(exprs(expressionset)) * 0.1 + 1/ncol(exprs(expressionset)),  "w" = 6)
+
+    out = list("plot" = qcStats, "section" = section, "title" = title, "legend" = legend, shape = shape)
     class(out) = "aqmobj.qcs"
     return(out)    
   }
@@ -165,7 +171,7 @@ aqm.pmmm = function(expressionset, ...)
 
   title = "Perfect matches and mismatches"
   section = "Affymetrix specific plots"
-  out = list("plot" = PMMM, "section" = section, "title" = title, "legend" = legend, shape = "square")
+  out = list("plot" = PMMM, "section" = section, "title" = title, "legend" = legend, shape = list("h" = 6, "w" = 6))
   class(out) = "aqmobj.pmmm"
   return(out)    
 }

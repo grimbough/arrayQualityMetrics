@@ -112,17 +112,9 @@ aqm.make.index = function(obj, p)
 ##To create a part of report with figures and legend
 aqm.report.qm = function(p, qm, f, name)
   {
-    if(is.character(qm$shape))  {
-      switch(qm$shape,
-             "rect" =   { h=6; w = 10 },
-             "square" = { h=6; w = 6 },
-             stop(sprintf("Invalid 'shape': %s", qm$shape)))
-    } else {
-      h = qm$shape$h
-      w = qm$shape$w
-    }
+    h = qm$shape$h
+    w = qm$shape$w
     dpi = 72
-
 
     imageformat =  if("svg" %in% names(qm)) "svg" else "png"
 
@@ -147,7 +139,7 @@ aqm.report.qm = function(p, qm, f, name)
              img = aqm.hwriteImage(nameimg)
            },
            stop(sprintf("Invalid value of 'imageformat': %s", imageformat))
-         )
+           )
     namepdf = paste(name, ".pdf", sep = "")
     pdf(file = namepdf, h = h, w = w)
     aqm.plot(qm)

@@ -132,10 +132,24 @@ setMethod("arrayQualityMetrics", signature(expressionset = "aqmInputObj"),
           warning("Cannot draw the Perfect Match versus MisMatch plot \n") 
       }
     
+
+    obj2 = list()
+    j=0
     for(i in seq(along = obj))
-      obj[[i]]$legend = gsub("The figure <!-- FIG -->", paste("<b>Figure",i, "</b>"),
-                obj[[i]]$legend, ignore.case = TRUE) 
+      {
+        if(!inherits(obj[[i]], "try-error"))
+          {
+            j=j+1
+            obj2[[j]] = obj[[i]]
+            names(obj2)[j] = names(obj)[i]
+          }
+      }
+
+    obj = obj2
     
+    for(i in seq(along = obj))
+      obj[[i]]$legend = gsub("The figure <!-- FIG -->", paste("<b>Figure",j, "</b>"), obj[[i]]$legend, ignore.case = TRUE)
+
     aqm.writereport(reporttitle, expressionset, obj)
     return(invisible(obj))
   })

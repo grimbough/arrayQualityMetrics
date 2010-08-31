@@ -24,7 +24,7 @@ aqm.pca = function(expressionset, dataprep, intgroup, ...)
              "section" = section,
              "title" = title,
              "legend" = legend,
-             "shape" = "square",
+             "shape" = list("h" = 6, "w" =6),
              "svg" = list(annotation=annotation, getfun=SVGAnnotation::getPlotPoints))
   
   class(out) = "aqmobj.pca"

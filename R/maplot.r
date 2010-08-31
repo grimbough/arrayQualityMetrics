@@ -51,7 +51,7 @@ maplotdraw = function(M, A, sN, numArrays, nchannels, class, ...)
     mastat = boxplot.stats(mamean)
     maout = sapply(seq_len(length(mastat$out)), function(x) which(mamean == mastat$out[x]))
 
-    out = list("plot" = ma, "section" = section, "title" = title, "legend" = legend, "scores" = mamean, "outliers" = maout, "shape" = "rect")
+    out = list("plot" = ma, "section" = section, "title" = title, "legend" = legend, "scores" = mamean, "outliers" = maout, "shape" = list("h"=6,"w"=10))
     class(out) = "aqmobj.ma"
     return(out)   
   }

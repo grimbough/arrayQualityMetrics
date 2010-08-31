@@ -14,7 +14,7 @@ aqm.meansd = function(dataprep, ...)
 
     title = "Standard deviation versus rank of the mean"
     section = "Variance mean dependence"
-    msd = list("plot" = msdplo, "section" = section, "title" = title, "legend" = legend, "shape" = "square")
+    msd = list("plot" = msdplo, "section" = section, "title" = title, "legend" = legend, "shape" = list("h"=6, "w"=6))
     class(msd) = "aqmobj.msd"
     return(msd)   
   }

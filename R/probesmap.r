@@ -11,7 +11,7 @@ aqm.probesmap = function(expressionset, dataprep, ...)
   title = "Probes mapping"
   section = "Probe stratification"
   
-  out = list("plot" = den, "section" = section, "title" = title, "legend" = legend, "shape" = "square")
+  out = list("plot" = den, "section" = section, "title" = title, "legend" = legend, "shape" = list("h"=6,"w"=6))
   class(out) = "aqmobj.probesmap"
   return(out)   
 }

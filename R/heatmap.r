@@ -70,13 +70,16 @@ aqm.heatmap = function(expressionset, dataprep, intgroup, ...)
                   linkedids = names(annotation)[k])
     }
   
+  shape = list("h" = 6 + dataprep$numArrays * 0.04, 
+               "w" = 5 + dataprep$numArrays * 0.04)
+  
   out = list("plot"= hfig,
     "section" = section,
     "title" = title,
     "legend" = legend,
     "scores" = madsum,
     "outliers" = madout,
-    "shape" = "square",
+    "shape" = shape,
     "svg" = list(annotation=annotation, getfun = function(doc) heatmapRectangles(doc, n=numArrays)))
   
   class(out) = "aqmobj.heat"

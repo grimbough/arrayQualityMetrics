@@ -4,19 +4,6 @@ If featureData contains a factor that identifies features containing
 the same reporter sequence, we can check for that (scatterplots, 
 standard deviation)
 
-* The handling of exception is currently inconsistent. For instance, in aqm.rnadeg you have
-    rnaDeg = try(AffyRNAdeg(expressionset, log.it = TRUE))
-    if(class(rnaDeg)=='try-error')
-      warning("RNA digestion plot from the package 'affy' cannot be produced for this data set.")
-  but then the function continues as if nothing had happened, and an error is thrown later by the method 
-  "aqm.plot" with signature "aqmobj.rnadeg". Either build in error robustness throughout (e.g. 
-  by letting aqm.rnadeg return with the exception object, and then let aqm.plot be robust against that;
-  or, just throw the error and stop.
-
-* Everywhere replace rect/square by auto-determined image size. 
-  Check if that solves the problem of names on heatmap that are unreadable when > 50 arrays.
-  When heatmap gets too large (say, more than 80 arrays, don't include the SVG file into the plot,
-  but rather just provide a link to it so that people can open it separately.)
 
 * The function 'aqm.boxplot' opens a graphics device (through its dependence on draw.key). It would be better if it did not do that. 
 => AK: Fixed by adding a "dev.off()" but maybe there is a better way?
@@ -28,6 +15,12 @@ standard deviation)
 
 * Somewhere, empty lists are printed: -  clean this up.
 => AK: STILL TO DO. Empty lists are printed when the MA plots are printed in the pdf file. I do not know how to get rid of it?
+
+* Everywhere replace rect/square by auto-determined image size. 
+  Check if that solves the problem of names on heatmap that are unreadable when > 50 arrays.
+  When heatmap gets too large (say, more than 80 arrays, don't include the SVG file into the plot,
+  but rather just provide a link to it so that people can open it separately.)
+=> AK: PARTIALLY DONE. I am not satisfied with the output. Even with increasing image size, not very readable when > 50 arrays.
 
 * Use the boxplot infrastructure established in boxplot.r also for NUSE and RLE.
   (related: In aqm.rle and aqm.nuse, the ylims are hard-coded (c(-1, 1) and c(0.95, 1.5)) and often seem 
@@ -60,3 +53,12 @@ standard deviation)
      I suggest to see whether Paul might round to fixing this.
 => AK: DONE. raster=TRUE worked in all my testings and files are indeed lighter, so I have kept it.
 
+* The handling of exception is currently inconsistent. For instance, in aqm.rnadeg you have
+    rnaDeg = try(AffyRNAdeg(expressionset, log.it = TRUE))
+    if(class(rnaDeg)=='try-error')
+      warning("RNA digestion plot from the package 'affy' cannot be produced for this data set.")
+  but then the function continues as if nothing had happened, and an error is thrown later by the method 
+  "aqm.plot" with signature "aqmobj.rnadeg". Either build in error robustness throughout (e.g. 
+  by letting aqm.rnadeg return with the exception object, and then let aqm.plot be robust against that;
+  or, just throw the error and stop.
+=> AK: DONE.

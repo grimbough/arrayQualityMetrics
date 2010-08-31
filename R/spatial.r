@@ -50,7 +50,7 @@ spatialplot = function(expressionset, dataprep, channel, label, scale, imageMat 
           "Log" = data.frame("Array" = as.factor(col(dataprep$dat)),  "ch" = unlist(lapply(seq_len(dataprep$numArrays), function(i) channel[,i])), "row" = r,  "column" = c))
       }
     
-    levelplot(ch ~ column*row | Array, data=df, axis = noaxis, asp = "iso", col.regions = colourRamp, as.table=TRUE, strip = function(..., bg) strip.default(..., bg ="#cce6ff"), xlab = label, ylab = "", panel = lattice.getOption("panel.levelplot.raster"))
+    levelplot(ch ~ column*row | Array, data=df, axis = noaxis, asp = "iso", col.regions = colourRamp, as.table=TRUE, strip = function(..., bg) strip.default(..., bg ="#cce6ff"), xlab = label, ylab = "", panel = "panel.levelplot.raster")
   }
 
 ## Scores computation
@@ -235,7 +235,7 @@ aqm.spatialbg = function(expressionset, dataprep, scale)
   
   legend = sprintf("The figure <!-- FIG --> shows false colour representations of the arrays' spatial distributions of feature local background estimates. The colour scale is shown in the panel on the right, and it is proportional to the ranks of the probe background intensities.")
 
-  out = list("plot" = bg, "section" = section, "title" = title, "legend" = legend, "shape" = "square")
+  out = list("plot" = bg, "section" = section, "title" = title, "legend" = legend, "shape" = list("h"=6,"w"=6))
   class(out) = "aqmobj.spatialbg"
   return(out)
 }
@@ -279,7 +279,7 @@ aqm.spatial = function(expressionset, dataprep, scale)
       names(locout) = if(length(locout) == 3) c("LR","Red","Green") else c("Red","Green")
     }
 
-  out = list("plot" = fore, "section" = section, "title" = title, "legend" = legend, "scores" = loc, "outliers" = locout, "shape" = "square")
+  out = list("plot" = fore, "section" = section, "title" = title, "legend" = legend, "scores" = loc, "outliers" = locout, "shape" = list("h"=6,"w"=6))
   class(out) = "aqmobj.spatial"
   return(out)
 }

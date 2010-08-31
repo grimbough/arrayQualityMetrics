@@ -53,7 +53,7 @@ importFrom(hwriter, closePage, hwrite, hwriteImage, openPage)
 importFrom(lattice, bwplot, densityplot, draw.key,
            levelplot, ltext, make.groups, packet.number,
            panel.bwplot, panel.smoothScatter, panel.superpose, strip.default,
-           trellis.par.get, trellis.par.set, xyplot, lattice.getOption)
+           trellis.par.get, trellis.par.set, xyplot)
 
 importFrom(latticeExtra, dendrogramGrob)
 
