@@ -37,7 +37,6 @@ arrayQualityMetrics(expressionset,
                     intgroup,
                     grouprep,
 		    spatial = TRUE,
-		    sN = NULL,
                     reporttitle = paste("Quality metrics report for", deparse(substitute(expressionset))))
 }
 
@@ -77,10 +76,6 @@ arrayQualityMetrics(expressionset,
   should be made; a logical of length 1. This can be useful for large arrays (like Affymetrix
   hgu133Plus2) when CPU time and RAM resources of the machine would be limiting. }
 
-\item{sN}{Should the sample names be written on the plots? If
-  \code{NULL}, samples will be labeled by numbers 1, 2, .... on the
-  plots, and a table is produced to map these numbers back to the
-  names.}
 \item{reporttitle}{Title for the report (character of length 1).}
 }
 

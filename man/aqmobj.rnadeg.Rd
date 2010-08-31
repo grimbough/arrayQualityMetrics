@@ -6,7 +6,7 @@
 
 \title{ Class to contain data generated from aqm.rnadegplot. }
 
-\description{ Class to contain data generated from aqm.rnadegplot. }
+\description{ Class to contain data generated from \code{aqm.rnadegplot}. }
 
 \section{Slots}{
   \describe{
@@ -28,11 +28,11 @@
 }
 
 \details{
-See the aqm.prepdata help or the aqm Vignette for example of this object.
+See \code{\link{aqm.prepdata}} and the \code{aqm} Vignette.
 }
 
 \author{ Audrey Kauffmann <kauffmann@bergonie.org> }
 
-\seealso{ \code{aqm.rnadeg}, \code{aqm.plot} }
+\seealso{ \code{\link{aqm.rnadeg}}, \code{\link{aqm.plot}} }
 
 \keyword{classes}

@@ -28,4 +28,4 @@ setClass("aqmobj.msd", representation(plot="ANY", section="character", title="ch
 
 setClass("aqmobj.prepdata", representation(rc = "matrix", gc = "matrix", rcb = "matrix", gcb = "matrix", M = "matrix", A = "matrix", dat = "matrix", outM = "ANY", sN = "ANY", numArrays = "numeric", nchannels = "numeric", logtransformed = "logical", classori = "character"))
 
-setClass("aqmobj.prepaffy", representation(dataPLM = "PLMset", sN = "character"))
+setClass("aqmobj.prepaffy", representation(dataPLM = "PLMset"))

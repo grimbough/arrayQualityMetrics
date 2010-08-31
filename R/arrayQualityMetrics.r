@@ -9,14 +9,13 @@ setGeneric("arrayQualityMetrics",
            intgroup,
            grouprep,
 	   spatial = TRUE,
-           sN = NULL,
            reporttitle = paste("Quality metrics report for", deparse(substitute(expressionset)))
   )
   standardGeneric("arrayQualityMetrics"))
 
 ## aqmInputObj
 setMethod("arrayQualityMetrics", signature(expressionset = "aqmInputObj"),
-  function(expressionset, outdir, force, do.logtransform, intgroup, grouprep, spatial, sN, reporttitle) {
+  function(expressionset, outdir, force, do.logtransform, intgroup, grouprep, spatial, reporttitle) {
     
     ## Argument checking: 
     ## (Done here, once and for all, rather than where the arguments are actually consumed - 
@@ -48,7 +47,7 @@ setMethod("arrayQualityMetrics", signature(expressionset = "aqmInputObj"),
                 
     obj = list()
     
-    dataprep = aqm.prepdata(expressionset, do.logtransform, sN)
+    dataprep = aqm.prepdata(expressionset, do.logtransform)
 
     obj$maplot = try(aqm.maplot(dataprep = dataprep))
     if(inherits(obj$maplot, "try-error"))
@@ -112,12 +111,12 @@ setMethod("arrayQualityMetrics", signature(expressionset = "aqmInputObj"),
         if(inherits(obj$rnadeg,"try-error"))
           warning("Cannot draw the RNA degradation plot \n")
         
-        affyproc = aqm.prepaffy(expressionset, dataprep$sN)
-        obj$rle = try(aqm.rle(affyproc))
+        affyproc = aqm.prepaffy(expressionset)
+        obj$rle = try(aqm.rle(expressionset, dataprep, affyproc, intgroup=intgroup))
         if(inherits(obj$rle,"try-error"))
           warning("Cannot draw the RLE plot \n") 
         
-        obj$nuse = try(aqm.nuse(affyproc))
+        obj$nuse = try(aqm.nuse(expressionset, dataprep, affyproc, intgroup=intgroup))
         if(inherits(obj$nuse,"try-error"))
           warning("Cannot draw the NUSE plot \n") 
         
@@ -145,9 +144,9 @@ setMethod("arrayQualityMetrics", signature(expressionset = "aqmInputObj"),
 
 for(othertype in c("RGList", "MAList", "marrayRaw", "marrayNorm"))
   setMethod("arrayQualityMetrics", signature(expressionset = othertype),
-            function(expressionset, outdir, force, do.logtransform, intgroup, spatial, sN) {
+            function(expressionset, outdir, force, do.logtransform, intgroup, spatial) {
               expressionset = try(as(expressionset, "NChannelSet"))
               if(inherits(expressionset,'try-error'))
                 stop(sprintf("Argument 'expressionset' is of class '%s', and its automatic conversion into 'NChannelSet' failed. Please try to convert it manually.\n", othertype))
-              arrayQualityMetrics(expressionset, outdir, force, do.logtransform, intgroup, spatial, sN)
+              arrayQualityMetrics(expressionset, outdir, force, do.logtransform, intgroup, spatial)
             })

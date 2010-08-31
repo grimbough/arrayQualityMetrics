@@ -1,6 +1,8 @@
 setClassUnion("aqmTrellis",
               c("aqmobj.ma", "aqmobj.heat", "aqmobj.pca", "aqmobj.probesmap",
                 "aqmobj.spatial", "aqmobj.spatialbg", "aqmobj.dens"))
+setClassUnion("aqmBoxes",
+              c("aqmobj.box", "aqmobj.rle", "aqmobj.nuse"))
 
 ##Creation of the outdir
 dircreation = function(outdir = getwd(), force = FALSE)
@@ -49,7 +51,7 @@ setMethod("aqm.plot",signature(obj = "aqmobj.pmmm"), function(obj){
   legend("topright", c("PM","MM"),lty=1,lwd=2,col= c("blue","grey"), bty = "n")
 })
 
-setMethod("aqm.plot",signature(obj = "aqmobj.box"), function(obj){
+setMethod("aqm.plot",signature(obj = "aqmBoxes"), function(obj){
   box.rectangle <- trellis.par.get("box.rectangle")
   box.rectangle$col = "black"
   trellis.par.set("box.rectangle",box.rectangle)
@@ -58,27 +60,6 @@ setMethod("aqm.plot",signature(obj = "aqmobj.box"), function(obj){
   trellis.par.set("box.umbrella",box.umbrella)
   print(obj$plot)
 })
-
-setMethod("aqm.plot",signature(obj = "aqmobj.rle"), function(obj){
-  box.rectangle <- trellis.par.get("box.rectangle")
-  box.rectangle$col = "black"
-  trellis.par.set("box.rectangle",box.rectangle)
-  box.umbrella <- trellis.par.get("box.umbrella")
-  box.umbrella$col = "transparent"
-  trellis.par.set("box.umbrella",box.umbrella)
-  print(bwplot(obj$plot$stats ~ as.vector(col(obj$plot$stats)), pch = "|", col = "black", do.out = FALSE, fill = "#1F78B4", horizontal = FALSE, box.ratio = 2, ylim = c(-1,1), ylab="RLE", xlab = ""))
-})
-
-setMethod("aqm.plot",signature(obj = "aqmobj.nuse"), function(obj){
-  box.rectangle <- trellis.par.get("box.rectangle")
-  box.rectangle$col = "black"
-  trellis.par.set("box.rectangle",box.rectangle)
-  box.umbrella <- trellis.par.get("box.umbrella")
-  box.umbrella$col = "black"
-  trellis.par.set("box.umbrella",box.umbrella)
-  print(bwplot(obj$plot$stats ~ as.vector(col(obj$plot$stats)), pch = "|", col = "black", do.out = FALSE, fill = "#1F78B4", horizontal = FALSE, box.ratio = 2, ylim = c(0.9,1.5), ylab="NUSE", xlab = ""))  
-})
-
   
 ##To create the title
 aqm.make.title = function(reporttitle)

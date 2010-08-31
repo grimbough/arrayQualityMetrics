@@ -7,12 +7,11 @@ logtransform = function(x)
 ##Methods to prepare the data
 setGeneric("aqm.prepdata",
            function(expressionset,
-                    do.logtransform = TRUE,
-                    sN = NULL)
+                    do.logtransform = TRUE)
            standardGeneric("aqm.prepdata"))
 
 ##NCS
-setMethod("aqm.prepdata",signature(expressionset = "NChannelSet"), function(expressionset, do.logtransform, sN){
+setMethod("aqm.prepdata",signature(expressionset = "NChannelSet"), function(expressionset, do.logtransform){
   if(do.logtransform)
     {
       rc = logtransform(assayData(expressionset)$R)
@@ -30,10 +29,8 @@ setMethod("aqm.prepdata",signature(expressionset = "NChannelSet"), function(expr
   M = dat = rc - gc
   A = 0.5*(rc+gc)
   
-  if(is.null(sN)) sN = seq_len(length(sampleNames(expressionset))) else {
-    if(length(sN) != length(sampleNames(expressionset))) stop("The argument sN must be of the same length than the number of samples.\n")  }
- 
- 
+  sN = seq_len(length(sampleNames(expressionset)))
+  
   numArrays = ncol(rc)
   colnames(dat) = sN
   if("dyeswap" %in% names(phenoData(expressionset)@data))
@@ -53,7 +50,7 @@ setMethod("aqm.prepdata",signature(expressionset = "NChannelSet"), function(expr
 })
 
 ##ES & AB
-setMethod("aqm.prepdata",signature(expressionset = "aqmOneCol"), function(expressionset, do.logtransform, sN){
+setMethod("aqm.prepdata",signature(expressionset = "aqmOneCol"), function(expressionset, do.logtransform){
   if(do.logtransform)
     {
       dat = logtransform(exprs(expressionset))
@@ -63,8 +60,7 @@ setMethod("aqm.prepdata",signature(expressionset = "aqmOneCol"), function(expres
   M =  dat - medArray
   A =  (dat + medArray)/2
   
- if(is.null(sN)) sN = seq_len(length(sampleNames(expressionset))) else {
-    if(length(sN) != length(sampleNames(expressionset))) stop("The argument sN must be of the same length than the number of samples.\n")  }
+  sN = seq_len(length(sampleNames(expressionset)))
  
   numArrays = ncol(dat)
   outM = as.dist(dist2(dat))
@@ -75,11 +71,10 @@ setMethod("aqm.prepdata",signature(expressionset = "aqmOneCol"), function(expres
 })
           
 ##BLL
-setMethod("aqm.prepdata",signature(expressionset = "BeadLevelList"), function(expressionset, do.logtransform, sN){
+setMethod("aqm.prepdata",signature(expressionset = "BeadLevelList"), function(expressionset, do.logtransform){
             
- if(is.null(sN)) sN = seq_len(length(arrayNames(expressionset))) else {
-    if(length(sN) != length(arrayNames(expressionset))) stop("The argument sN must be of the same length than the number of samples.\n")  }
-
+ sN = seq_len(length(arrayNames(expressionset)))
+ 
   numArrays = as.numeric(dim(expressionset)[1])
             
   if(expressionset@arrayInfo$channels == "single")

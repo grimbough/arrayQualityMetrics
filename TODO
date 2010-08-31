@@ -4,34 +4,36 @@ If featureData contains a factor that identifies features containing
 the same reporter sequence, we can check for that (scatterplots, 
 standard deviation)
 
-* The function 'aqm.boxplot' opens a graphics device (through its dependence on draw.key). It would be better if it did not do that. 
-=> AK: Fixed by adding a "dev.off()" but maybe there is a better way?
-=> WH: I removed that again, it seemed too fragile. Also, in such cases,
-   please use the same "if" condition than what was used in the complement;
-   i.e., here not "if (!(missing(intgroup)||is.na(intgroup)))" but 
-   "if(!is.null(cl$key))"
+* The handling of exception is currently inconsistent. For instance, in aqm.rnadeg you have
+    rnaDeg = try(AffyRNAdeg(expressionset, log.it = TRUE))
+    if(class(rnaDeg)=='try-error')
+      warning("RNA digestion plot from the package 'affy' cannot be produced for this data set.")
+  but then the function continues as if nothing had happened, and an error is thrown later by the method 
+  "aqm.plot" with signature "aqmobj.rnadeg". Either build in error robustness throughout (e.g. 
+  by letting aqm.rnadeg return with the exception object, and then let aqm.plot be robust against that;
+  or, just throw the error and stop.
 
 * Everywhere replace rect/square by auto-determined image size. 
   Check if that solves the problem of names on heatmap that are unreadable when > 50 arrays.
   When heatmap gets too large (say, more than 80 arrays, don't include the SVG file into the plot,
   but rather just provide a link to it so that people can open it separately.)
 
-  I am also not yet sure the SVG / annotation for the heatmap is more than a gimmick and 
-  really necessary - maybe we can revert back to PNG if it turns out to be too clumsy.
-=> AK: I like the SVG for heatmap, not a gimmick to me, it is very convenient when there are many arrays.
+* The function 'aqm.boxplot' opens a graphics device (through its dependence on draw.key). It would be better if it did not do that. 
+=> AK: Fixed by adding a "dev.off()" but maybe there is a better way?
+=> WH: I removed that again, it seemed too fragile. Also, in such cases,
+   please use the same "if" condition than what was used in the complement;
+   i.e., here not "if (!(missing(intgroup)||is.na(intgroup)))" but 
+   "if(!is.null(cl$key))"
+=> AK: STILL TO DO. I did not manage to fix the opening of a graphics device when running aqm.boxplot.
+
+* Somewhere, empty lists are printed: -  clean this up.
+=> AK: STILL TO DO. Empty lists are printed when the MA plots are printed in the pdf file. I do not know how to get rid of it?
 
 * Use the boxplot infrastructure established in boxplot.r also for NUSE and RLE.
   (related: In aqm.rle and aqm.nuse, the ylims are hard-coded (c(-1, 1) and c(0.95, 1.5)) and often seem 
   too large - is there a good reason for that, or should we try to compute them dynamically depending 
   on the range of the data?)
-
-* Somewhere, empty lists are printed: -  clean this up.
-
-* maplot.pdf and spatial.pdf are enormous, do we really need that? 
-  WH: raster=TRUE in panel.smoothscatter(for maplot) will currentl crashed R
-     (see my email to Paul Murrell). 
-     It works for me in other contexts (and reduces PDF file sizes for such plots enormously!) ,
-     I suggest to see whether Paul might round to fixing this.
+=> AK: DONE. Is that okay to use the same score/outlier for NUSE than for boxplot?
 
 * The role of the 'sN' parameter is unclear, e.g. in the man page
   (what happens if not null?).  It is also handled differently (or
@@ -45,15 +47,16 @@ standard deviation)
   used are to be found. The current situation is ambiguous (e.g. sN is
   passed to aqm.rnadeg, but not to density) and clumsy (lugging around
   an extra argument through all the function calls)
+=> AK: DONE. I got rid of it but aqmobj.prepaffy is now only a PLMset, shall I remove the aqmobj.prepaffy object type as it is redundant with PLMset?
 
 * Fix the man pages for aqmobj.rnadeg etc. to reflect recent changes (to ease maintenance, 
   pages for similar classes could be collected into one file, like in aqm.boxplot.Rd)
+=> AK: DONE. I have also "merged" help files when appropriate.
 
-* The handling of exception is currently inconsistent. For instance, in aqm.rnadeg you have
-    rnaDeg = try(AffyRNAdeg(expressionset, log.it = TRUE))
-    if(class(rnaDeg)=='try-error')
-      warning("RNA digestion plot from the package 'affy' cannot be produced for this data set.")
-  but then the function continues as if nothing had happened, and an error is thrown later by the method 
-  "aqm.plot" with signature "aqmobj.rnadeg". Either build in error robustness throughout (e.g. 
-  by letting aqm.rnadeg return with the exception object, and then let aqm.plot be robust against that;
-  or, just throw the error and stop.
+* maplot.pdf and spatial.pdf are enormous, do we really need that? 
+  WH: raster=TRUE in panel.smoothscatter(for maplot) will currentl crashed R
+     (see my email to Paul Murrell). 
+     It works for me in other contexts (and reduces PDF file sizes for such plots enormously!) ,
+     I suggest to see whether Paul might round to fixing this.
+=> AK: DONE. raster=TRUE worked in all my testings and files are indeed lighter, so I have kept it.
+

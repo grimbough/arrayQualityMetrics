@@ -54,7 +54,7 @@
 }
   
 \details{
-See the aqm.prepdata help or the aqm Vignette for example of this object.
+See \code{\link{aqm.prepdata}} and the \code{aqm} Vignette.
 }
 
 \author{Audrey Kauffmann <kauffmann@bergonie.org>}

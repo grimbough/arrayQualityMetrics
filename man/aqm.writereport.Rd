@@ -18,7 +18,7 @@
 \value{ An html report named 'QMreport.html' in the working directory. }
 
 \details{
-See the aqm Vignette for example of this object.
+See the \code{aqm} Vignette.
 }
 
 \author{ Audrey Kauffmann <kauffmann@bergonie.org> }

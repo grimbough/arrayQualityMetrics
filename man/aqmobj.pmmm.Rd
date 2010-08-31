@@ -6,7 +6,7 @@
 
 \title{ Class to contain data generated from aqm.pmmm. }
 
-\description{ Class to contain data generated from aqm.pmmm. }
+\description{ Class to contain data generated from \code{aqm.pmmm}. }
 
 \section{Slots}{
   \describe{
@@ -28,11 +28,11 @@
 }
 
 \details{
-See the aqm.pmmm help or the aqm Vignette for example of this object.
+See \code{\link{aqm.pmmm}} and the \code{aqm} Vignette.
 }
 
 \author{ Audrey Kauffmann <kauffmann@bergonie.org> }
 
-\seealso{ \code{aqm.pmmm}, \code{aqm.plot} }
+\seealso{ \code{\link{aqm.pmmm}}, \code{\link{aqm.plot}} }
 
 \keyword{classes}

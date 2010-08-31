@@ -23,7 +23,7 @@ maplotdraw = function(M, A, sN, numArrays, nchannels, class, ...)
         ## FIXME: raster=TRUE would be nice to reduce the size of the currently enormous PDF files
         ##   but when tried last time (16.8.2010,  r52737), this made R crash  with
         ## *** caught segfault *** address 0x28, cause 'memory not mapped'...
-        panel.smoothScatter(x, y, nbin = 250, raster=!TRUE, ...)
+        panel.smoothScatter(x, y, nbin = 250, raster=TRUE, ...)
       },
       as.table=TRUE,      
       layout = c(app/2, 2, 1),

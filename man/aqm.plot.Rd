@@ -2,13 +2,11 @@
 \alias{aqm.plot}
 \alias{aqm.plot-methods}
 \alias{aqm.plot,aqmTrellis-method}
-\alias{aqm.plot,aqmobj.box-method}
+\alias{aqm.plot,aqmBoxes-method}
 \alias{aqm.plot,aqmobj.dens-method}
 \alias{aqm.plot,aqmobj.msd-method}
-\alias{aqm.plot,aqmobj.nuse-method}
 \alias{aqm.plot,aqmobj.pmmm-method}
 \alias{aqm.plot,aqmobj.qcs-method}
-\alias{aqm.plot,aqmobj.rle-method}
 \alias{aqm.plot,aqmobj.rnadeg-method}
 
 \title{ Performs plots from aqm objects. }

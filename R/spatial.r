@@ -50,7 +50,7 @@ spatialplot = function(expressionset, dataprep, channel, label, scale, imageMat 
           "Log" = data.frame("Array" = as.factor(col(dataprep$dat)),  "ch" = unlist(lapply(seq_len(dataprep$numArrays), function(i) channel[,i])), "row" = r,  "column" = c))
       }
     
-    levelplot(ch ~ column*row | Array, data=df, axis = noaxis, asp = "iso", col.regions = colourRamp, as.table=TRUE, strip = function(..., bg) strip.default(..., bg ="#cce6ff"), xlab = label, ylab = "")
+    levelplot(ch ~ column*row | Array, data=df, axis = noaxis, asp = "iso", col.regions = colourRamp, as.table=TRUE, strip = function(..., bg) strip.default(..., bg ="#cce6ff"), xlab = label, ylab = "", panel = lattice.getOption("panel.levelplot.raster"))
   }
 
 ## Scores computation

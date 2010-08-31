@@ -13,13 +13,11 @@
 \section{Slots}{
   \describe{
     \item{\code{dataPLM}:}{ A \code{\link[affyPLM:PLMset-class]{PLMset}}. }
-    \item{\code{sN}:}{ Integers numbering the arrays to be used to label
-      the plots. }
     }
   }
   
 \details{
-See the aqm.prepaffy help or the aqm Vignette for example of this object.
+See \code{\link{aqm.prepaffy}} and the \code{aqm} Vignette.
 }
 
 \author{ Audrey Kauffmann <kauffmann@bergonie.org> }
