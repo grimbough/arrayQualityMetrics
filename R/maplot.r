@@ -16,19 +16,12 @@ maplotdraw = function(M, A, sN, numArrays, nchannels, class, ...)
       ylim = ylimMA,
       xlab = "A",
       ylab = "M",
-      
-      panel = function(x, y, ...) {
-        x <- A[, x]
-        y <- M[, y]
-        ## FIXME: raster=TRUE would be nice to reduce the size of the currently enormous PDF files
-        ##   but when tried last time (16.8.2010,  r52737), this made R crash  with
-        ## *** caught segfault *** address 0x28, cause 'memory not mapped'...
-        panel.smoothScatter(x, y, nbin = 250, raster=TRUE, ...)
-      },
-      as.table=TRUE,      
+      panel = function(x, y, ...) panel.smoothScatter(x=A[, x], y=M[, y], nbin = 250, raster=TRUE, ...),
+      as.table = TRUE,      
       layout = c(app/2, 2, 1),
       asp = "iso",
-      strip = function(..., bg) strip.default(..., bg ="#cce6ff"))
+      strip = function(..., bg) strip.default(..., bg ="#cce6ff")
+    )
     
     id.firstpage = seq_len(app)
 
@@ -43,7 +36,7 @@ maplotdraw = function(M, A, sN, numArrays, nchannels, class, ...)
     
     legspe2 = if(class == "BeadLevelList") "The calculations are done on the summarized data obtained by using the function createBeadSummaryData from the package beadarray." else ""
     
-    legend = sprintf("The figure <!-- FIG --> shows the MA plot for each array. M and A are defined as :<br>M = log<sub>2</sub>(I<sub>1</sub>) - log<sub>2</sub>(I<sub>2</sub>)<br>A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>)),<br>%s %s Typically, we expect the mass of the distribution in an MA plot to be concentrated along the M = 0 axis, and there should be no trend in the mean of M as a function of A. A trend in the lower range of A usually indicates that the arrays have different background intensities, this may be addressed by background correction. A trend in the upper range of A usually indicates saturation of the measurements, in mild cases, this may be addressed by non-linear normalisation (e.g. quantile normalisation).", legspe, legspe2)
+    legend = sprintf("The figure <!-- FIG --> shows the MA plot for each array. M and A are defined as :<br>M = log<sub>2</sub>(I<sub>1</sub>) - log<sub>2</sub>(I<sub>2</sub>)<br>A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>)),<br>%s %s Typically, we expect the mass of the distribution in an MA plot to be concentrated along the M = 0 axis, and there should be no trend in M as a function of A. If there is a trend in the lower range of A, this often indicates that the arrays have different background intensities; this may be addressed by background correction. A trend in the upper range of A can indicate saturation of the measurements; in mild cases, this may be addressed by non-linear normalisation (e.g. quantile normalisation).", legspe, legspe2)
 
     title = "MA plots"
     section = "Individual array quality"

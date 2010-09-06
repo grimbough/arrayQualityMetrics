@@ -4,12 +4,16 @@ aqm.heatmap = function(expressionset, dataprep, intgroup, ...)
   outM = dataprep$outM
   numArrays = dataprep$numArrays
 
+  madsum  = rowSums(as.matrix(outM), na.rm=TRUE)
+  madstat = boxplot.stats(madsum)
+  outliers =  which(madsum %in% madstat$out)
+  
   colourRange = rgb(seq(0,1,l=256),seq(0,1,l=256),seq(1,0,l=256))
   
   dend = as.dendrogram(hclust(outM, method = "single"))
   ord = order.dendrogram(dend)
   m = as.matrix(outM)
-  colnames(m) = rownames(m) = paste(seq_len(numArrays))
+  colnames(m) = rownames(m) = paste(ifelse(seq_len(numArrays)%in%outliers, "* ", ""), seq_len(numArrays), sep="")
     
   if(!(missing(intgroup)||is.na(intgroup))) {
     covar  = lapply(seq(along = intgroup), function(i) pData(expressionset)[, intgroup[i]])
@@ -48,27 +52,23 @@ aqm.heatmap = function(expressionset, dataprep, intgroup, ...)
         
   leghmspe = if(is(expressionset, "BeadLevelList")) "The values used are the summarized ones obtained by using the function createBeadSummaryData from the package beadarray." else "" 
 
-  legend = sprintf("The figure <!-- FIG --> shows a false colour heatmap of between array distances (see below for their definition). The colour scale is chosen to cover the range of distances encountered in the dataset. Arrays for which the sum of the distances to the others is much different from the others are detected as outlier arrays. The dendrogram on this plot can help to find batch effects, as well as reveal clustering of the arrays according to biological effects.<br>The distances <i>d<sub>xy</sub></i> between arrays <i>x</i> and <i>y</i> are the mean absolute difference (L<sub>1</sub>-metric) of the vector of M-values for each pair of arrays (computed on the data from all probes without filtering): <i>d<sub>xy</sub> =  mean|M<sub>xi</sub>-M<sub>yi</sub>|</i>. Here, <i>M<sub>xi</sub></i> is the M-value of the <i>i</i>-th probe on the <i>x</i>-th array. %s",  leghmspe)
+  legend = sprintf("The figure <!-- FIG --> shows a false colour heatmap of between array distances (see below for their definition). The colour scale is chosen to cover the range of distances encountered in the dataset. Arrays for which the sum of the distances to the others is much different from the others are detected as outlier arrays (marked by &quot;*&quot;). The dendrogram on this plot can help to find batch effects, as well as reveal clustering of the arrays according to biological effects.<br>The distance <i>d<sub>xy</sub></i> between arrays <i>x</i> and <i>y</i> is the mean absolute difference (L<sub>1</sub>-distance) between the vectors of M-values of the arrays (computed on the data from all probes without filtering). In formula, <i>d<sub>xy</sub> =  mean|M<sub>xi</sub>-M<sub>yi</sub>|</i>. Here, <i>M<sub>xi</sub></i> is the M-value of the <i>i</i>-th probe on the <i>x</i>-th array. %s",  leghmspe)
 ## "Consider the following decomposition of <i>M<sub>xi</sub>: M<sub>xi</sub> = z<sub>i</sub> + &beta;<sub>xi</sub> + &epsilon;<sub>xi</sub></i>, where <i>z<sub>i</sub></i> is the probe effect for probe <i>i</i> (the same across all arrays), <i>&epsilon;<sub>xi</sub></i> are i.i.d. random variables with mean zero and <i>&beta;<sub>xi</sub></i> is such that for any array <i>x</i>, the majority of values <i>&beta;<sub>xi</sub></i> are negligibly small (i. e. close to zero). <i>&beta;<sub>xi</sub></i> represents differential expression effects. In this model, all values <i>d<sub>xy</sub></i> are (in expectation) the same, namely 2 times the standard deviation of <i>&epsilon;<sub>xi</sub></i>."
     
   title = "Heatmap representation of the distances between arrays"
   section = "Between array comparison"
 
-  madsum  = rowSums(as.matrix(outM), na.rm=TRUE)
-  madstat = boxplot.stats(madsum)
-  madout =  which(madsum %in% madstat$out)
-
-  sN = sampleNames(expressionset)
-  annotation = vector(mode="list", length = numArrays^2)
-  for(i in seq_len(numArrays))
-    for(j in seq_len(numArrays)) {
-      k = (i-1)*numArrays + j
-      oi = ord[i]
-      oj = ord[j]
-      names(annotation)[k] = sprintf("aqm_%d_%d", oi, oj)
-      annotation[[k]] = list(title = sprintf("%d vs %d (%s vs %s)", oi, oj, sN[oi], sN[oj]),
-                  linkedids = names(annotation)[k])
-    }
+  ##sN = sampleNames(expressionset)
+  ##annotation = vector(mode="list", length = numArrays^2)
+  ##for(i in seq_len(numArrays))
+  ##  for(j in seq_len(numArrays)) {
+  ##    k = (i-1)*numArrays + j
+  ##    oi = ord[i]
+  ##    oj = ord[j]
+  ##    names(annotation)[k] = sprintf("aqm_%d_%d", oi, oj)
+  ##    annotation[[k]] = list(title = sprintf("%d vs %d (%s vs %s)", oi, oj, sN[oi], sN[oj]),
+  ##                linkedids = names(annotation)[k])
+  ##  }
   
   shape = list("h" = 6 + dataprep$numArrays * 0.04, 
                "w" = 5 + dataprep$numArrays * 0.04)
@@ -78,7 +78,7 @@ aqm.heatmap = function(expressionset, dataprep, intgroup, ...)
     "title" = title,
     "legend" = legend,
     "scores" = madsum,
-    "outliers" = madout,
+    "outliers" = outliers,
     "shape" = shape)
   ##-- no svg / annotation: is not especially helpful, and does not scale well for large arrays
   ##  "svg" = list(annotation=annotation, getfun = function(doc) heatmapRectangles(doc, n=numArrays)))

@@ -15,10 +15,10 @@
 aqm.boxplot(expressionset, dataprep, intgroup, subsample = 10000, ...)
 aqm.density(expressionset, dataprep, intgroup, outliers, ...)
 aqm.heatmap(expressionset, dataprep, intgroup, ...)
-aqm.pca(expressionset, dataprep, intgroup, ...)
+aqm.pca(expressionset, dataprep, intgroup, outliers, ...)
 }
 \arguments{
-  \item{expressionset, dataprep, intgroup}{ Same as for the function
+  \item{expressionset, dataprep, intgroup}{Same as for the function
     \code{\link{arrayQualityMetrics}} }
   \item{outliers}{Indicates arrays to be highlighted as potential
     outliers in the plots.}

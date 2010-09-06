@@ -36,7 +36,7 @@ aqm.boxplot = function(expressionset, dataprep, intgroup, subsample = 10000, ...
                    labels = c("a. Red Channel", "b. Green Channel", "c. Log2(Ratio)"))
     formula = sample_id ~ values | panels
     lay = c(3,1)
-    legspe = "Three panels are shown: left, red channel; middle, green channel; right, log<sub>2</sub>(ratio). Outlier detection was performed only on the distribution of log<sub>2</sub>(ratio)."
+    legspe = "Three panels are shown: left, red channel; middle, green channel; right, log<sub>2</sub>(ratio). Outlier detection  was performed on the distribution of log<sub>2</sub>(ratio). "
    } else {
     values  = as.numeric(dataprep$dat[ss, ])
     formula = sample_id ~ values
@@ -64,7 +64,7 @@ aqm.boxplot = function(expressionset, dataprep, intgroup, subsample = 10000, ...
           if(lattice:::packet.number()==lay[1]) {
             whArray = list(...)$group.value
             if (whArray %in% ks$outliers)
-              ltext(xAsterisk, whArray, "*", font=2, cex=3, adj=c(0.5,0.75))
+              ltext(xAsterisk, whArray, "*", font=2, cex=2, adj=c(0.5, 0.75))
           }
         },
     ...)
@@ -72,9 +72,9 @@ aqm.boxplot = function(expressionset, dataprep, intgroup, subsample = 10000, ...
   shape = list("h" = 2.5 + dataprep$numArrays * 0.1 +  1/dataprep$numArrays, 
                "w" = 3+3*lay[1])
   
-  outliertext = if(length(ks$outliers)>0) "Outliers are marked by an asterisk (*). " else ""
+  outliertext = if(length(ks$outliers)>0) "Outliers -according to the Kolmogorov-Smirnov statistic between each array's distribution and the distribution of the pooled data- are marked by an asterisk (*). " else ""
   
-  legend = sprintf("The figure <!-- FIG --> presents boxplots of the data. It gives a simple summary of the signal intensity distributions across all arrays. %sEach box corresponds to one array. Typically, one expects the boxes to have similar positions and widths. If the distribution of an array is very different from the others, this may indicate an experimental problem. %s", legspe, outliertext)
+  legend = sprintf("The figure <!-- FIG --> presents boxplots representing summaries of the signal intensity distributions of the arrays. %sEach box corresponds to one array. Typically, one expects the boxes to have similar positions and widths. If the distribution of an array is very different from the others, this may indicate an experimental problem. %s", legspe, outliertext)
 
   title = "Boxplots"
   section = "Array intensity distributions"

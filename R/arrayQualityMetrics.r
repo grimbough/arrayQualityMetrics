@@ -6,7 +6,7 @@ setGeneric("arrayQualityMetrics",
            outdir = getwd(),
            force = FALSE,
            do.logtransform = FALSE,
-           intgroup,
+           intgroup = NULL,
            grouprep,
 	   spatial = TRUE,
            reporttitle = paste("Quality metrics report for", deparse(substitute(expressionset)))
@@ -33,8 +33,8 @@ setMethod("arrayQualityMetrics", signature(expressionset = "aqmInputObj"),
       if (!(is.logical(get(v)) && (length(get(v))==1)))
         stop(sprintf("'%s' should be a logical of length 1.", v))
 
-    if(!(missing(intgroup)||is.na(intgroup))) {
-      if (!(is.character(intgroup)))
+    if (!is.null(intgroup)) {
+      if (!is.character(intgroup))
         stop("'intgroup' should be a 'character'.")
       if(!all(intgroup %in% colnames(pData(expressionset))))
         stop("all elements of 'intgroup' should match column names of 'phenoData(expressionset)'.")
@@ -49,9 +49,7 @@ setMethod("arrayQualityMetrics", signature(expressionset = "aqmInputObj"),
     
     dataprep = aqm.prepdata(expressionset, do.logtransform)
 
-    obj$maplot = try(aqm.maplot(dataprep = dataprep))
-    if(inherits(obj$maplot, "try-error"))
-      warning("Could not draw MA plots \n")
+    obj$maplot = aqm.maplot(dataprep = dataprep)
 
     if(inherits(expressionset, 'BeadLevelList') || inherits(expressionset, 'AffyBatch') ||
        (("X" %in% rownames(featureData(expressionset)@varMetadata)) &&
@@ -70,85 +68,58 @@ setMethod("arrayQualityMetrics", signature(expressionset = "aqmInputObj"),
       }                
     }
                         
-    obj$boxplot = try(aqm.boxplot(expressionset, dataprep=dataprep, intgroup=intgroup))
-    if(inherits(obj$boxplot,"try-error"))
-      warning("Could not draw boxplots \n")
+    obj$boxplot = aqm.boxplot(expressionset, dataprep=dataprep, intgroup=intgroup)
+    obj$density = aqm.density(expressionset, dataprep=dataprep, intgroup=intgroup, outliers = obj$boxplot$outliers)
 
-    obj$density = try(aqm.density(expressionset, dataprep=dataprep, intgroup=intgroup, outliers = obj$boxplot$outliers))
-    if(inherits(obj$density,"try-error"))
-      warning("Could not draw density plots \n")
-
-    obj$heatmap = try(aqm.heatmap(expressionset, dataprep=dataprep, intgroup=intgroup))
-    if(inherits(obj$heatmap,"try-error"))
-      warning("Could not draw heatmap \n") 
-
-    if(!missing(intgroup)){
-      obj$pca = try(aqm.pca(expressionset = expressionset, dataprep = dataprep, intgroup))
-      if(inherits(obj$pca,"try-error"))
-        warning("Could not draw PCA \n")
-    }
-
-    obj$meansd = try(aqm.meansd(dataprep = dataprep))
-    if(inherits(obj$meansd,"try-error"))
-      warning("Could not draw Mean vs Standard Deviation \n")
-          
+    obj$heatmap = aqm.heatmap(expressionset, dataprep=dataprep, intgroup=intgroup)
+    obj$pca     = aqm.pca(expressionset, dataprep=dataprep, intgroup=intgroup, outliers = obj$heatmap$outliers)
+    obj$meansd  = aqm.meansd(dataprep=dataprep)
 
     if(inherits(expressionset,'BeadLevelList'))
       warning("Could not plot the probes mapping densities on a BeadLevelList object.")
-    if(!inherits(expressionset,'BeadLevelList')) {
-      if("hasTarget" %in% rownames(featureData(expressionset)@varMetadata))
-        {
-          obj$probesmap = try(aqm.probesmap(expressionset = expressionset, dataprep = dataprep))
-          if(inherits(obj$probesmap,"try-error"))
-            warning("Cannot draw probes mapping plot \n")
-        }
-    }
+    if(!inherits(expressionset,'BeadLevelList'))
+      {
+        if("hasTarget" %in% rownames(featureData(expressionset)@varMetadata))
+          {
+            obj$probesmap = try(aqm.probesmap(expressionset = expressionset, dataprep = dataprep))
+            if(inherits(obj$probesmap,"try-error"))
+              warning("Could not draw probes mapping plot \n")
+          }
+      }
     
     
     if(inherits(expressionset, "AffyBatch"))
       {
         obj$rnadeg = try(aqm.rnadeg(expressionset))
         if(inherits(obj$rnadeg,"try-error"))
-          warning("Cannot draw the RNA degradation plot \n")
+          warning("Could not draw the RNA degradation plot \n")
         
         affyproc = aqm.prepaffy(expressionset)
         obj$rle = try(aqm.rle(expressionset, dataprep, affyproc, intgroup=intgroup))
         if(inherits(obj$rle,"try-error"))
-          warning("Cannot draw the RLE plot \n") 
+          warning("Could not draw the RLE plot \n") 
         
         obj$nuse = try(aqm.nuse(expressionset, dataprep, affyproc, intgroup=intgroup))
         if(inherits(obj$nuse,"try-error"))
-          warning("Cannot draw the NUSE plot \n") 
+          warning("Could not draw the NUSE plot \n") 
         
         if(length(grep("exon", cdfName(expressionset), ignore.case=TRUE)) == 0)
           {
             obj$qcstats =  try(aqm.qcstats(expressionset))
             if(inherits(obj$qcstats,"try-error"))
-              warning("Cannot draw the QCStats plot \n")
+              warning("Could not draw the QCStats plot \n")
           }
         
         obj$pmmm = try(aqm.pmmm(expressionset))
         if(inherits(obj$pmmm,"try-error"))
-          warning("Cannot draw the Perfect Match versus MisMatch plot \n") 
+          warning("Could not draw the Perfect Match versus Mismatch plot \n") 
       }
     
-
-    obj2 = list()
-    j=0
-    for(i in seq(along = obj))
-      {
-        if(!inherits(obj[[i]], "try-error"))
-          {
-            j=j+1
-            obj2[[j]] = obj[[i]]
-            names(obj2)[j] = names(obj)[i]
-          }
-      }
-
-    obj = obj2
+    remove = names(obj)[ sapply(obj, inherits, what = "try-error") ]
+    for(r in remove) obj[[r]] = NULL
     
     for(i in seq(along = obj))
-      obj[[i]]$legend = gsub("The figure <!-- FIG -->", paste("<b>Figure",j, "</b>"), obj[[i]]$legend, ignore.case = TRUE)
+      obj[[i]]$legend = gsub("The figure <!-- FIG -->", paste("<b>Figure", i, "</b>"), obj[[i]]$legend, ignore.case = TRUE)
 
     aqm.writereport(reporttitle, expressionset, obj)
     return(invisible(obj))

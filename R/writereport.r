@@ -4,7 +4,7 @@ setClassUnion("aqmTrellis",
 setClassUnion("aqmBoxes",
               c("aqmobj.box", "aqmobj.rle", "aqmobj.nuse"))
 
-##Creation of the outdir
+## Creation of the outdir
 dircreation = function(outdir = getwd(), force = FALSE)
   {
     if(file.exists(outdir)){
@@ -31,18 +31,17 @@ setGeneric("aqm.plot",
            function(obj)
            standardGeneric("aqm.plot"))
 
-## To produce the plots
-##  for class union 'aqmTrellis' 
+## Produce the plots for class union 'aqmTrellis' 
 setMethod("aqm.plot", signature(obj = "aqmTrellis"), function(obj){
   print(obj$plot)})
 
-##  for other classes
+##  For other classes
 for(type in c("aqmobj.rnadeg", "aqmobj.qcs", "aqmobj.msd"))
   setMethod("aqm.plot", signature(obj = type), function(obj) {
     do.call(obj$plot, args = list())
   })
 
-## idiosyncratic methods (it would be better to move all method-specific rendering
+## Idiosyncratic methods (it would be better to move all method-specific rendering
 ##   into the functions that generate the objects).
 
 setMethod("aqm.plot",signature(obj = "aqmobj.pmmm"), function(obj){
@@ -191,12 +190,12 @@ scores = function(expressionset, obj)
     if(length(grep("aqmobj.spatial",classes)) != 0)
       {
         nscores = nscores +1
-        namesm = c(namesm, "Spatial distribution")
+        namesm = c(namesm, "Spatial")
       }
     if(length(grep("aqmobj.box",classes)) != 0)
       {
         nscores = nscores +1
-        namesm = c(namesm, "Boxplots")
+        namesm = c(namesm, "Distribution")
       }
     if(length(grep("aqmobj.heat",classes)) != 0)
       {

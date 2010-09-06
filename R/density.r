@@ -12,12 +12,12 @@ namedEmptyList = function(n) {
   return(x)
 }
     
-aqm.density = function(expressionset, dataprep, intgroup, outliers = c(), ...)
+aqm.density = function(expressionset, dataprep, intgroup, outliers, ...)
 {
   sN = sampleNames(expressionset)
 
-  ## for the tooltips
-  title = sprintf("Array %d: %s%s", seq(along=sN), sN, ifelse(seq(along=sN) %in% outliers, " (*)", ""))
+  ## For the tooltips
+  title = sprintf("Array %d: %s", seq(along=sN), sN)
 
   if(dataprep$nchannels == 2) {  
     den1 = dens(dataprep$rc)
@@ -51,10 +51,8 @@ aqm.density = function(expressionset, dataprep, intgroup, outliers = c(), ...)
   ## Could colour lines either by covariate of interest ('intgroup') or by
   ##  whether or not it is considered an outlier. Second seems to be more useful.
   ## cl = intgroupColours(intgroup, expressionset, withOpacity = TRUE)
-  cl = outlierColours(outliers, n = nrow(pData(expressionset)))
-
-  lwd = rep(1,dataprep$numArrays) 
-  lty = rep(1,dataprep$numArrays)
+  cl = outlierColours(outliers, n = nrow(pData(expressionset)), withOpacity = TRUE)
+  lwd = lty = 1
   
   den = xyplot(formula, ddf, groups = which, layout = lay,
     type = "l", ylab = "Density", xlab="",
@@ -65,9 +63,9 @@ aqm.density = function(expressionset, dataprep, intgroup, outliers = c(), ...)
   
   shape = list("h" = 5, "w" = 3+3*lay[1])
 
-  outliertext = if(length(outliers)>0) "Outliers are highlighted by colour. " else ""
+  outliertext = if(length(outliers)>0) " Outliers -according to the same criterion as in the boxplots- are highlighted by colour." else ""
 
-  legend = sprintf("The figure <!-- FIG --> shows density estimates (smoothed histograms) of the data. Typically, the distributions of the arrays should have similar shapes and ranges. Arrays whose distributions are very different from the others should be considered for possible problems. Move the mouse over the lines in the plot to see the  corresponding sample names.%s<BR> On raw data, a bimodal distribution can be indicative of an array containing a spatial artefact; a distribution shifted to the right of an array with abnormally high background intensities.", outliertext)
+  legend = sprintf("The figure <!-- FIG --> shows density estimates (smoothed histograms) of the data. Typically, the distributions of the arrays should have similar shapes and ranges. Arrays whose distributions are very different from the others should be considered for possible problems. Move the mouse over the lines in the plot to see the  corresponding sample names.%s<BR>On raw data, a bimodal distribution can be indicative of an array containing a spatial artefact; a distribution shifted to the right of an array with abnormally high background intensities.", outliertext)
   
   title = "Density plots"
   section = "Array intensity distributions"
