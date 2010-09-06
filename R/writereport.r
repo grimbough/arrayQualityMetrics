@@ -176,71 +176,32 @@ aqm.make.ending = function(p)
 ##Score table formatting
 scores = function(expressionset, obj)
   {
+    titles = c(
+      "aqmobj.ma"      = "MA plots",
+      "aqmobj.spatial" = "Spatial",
+      "aqmobj.box"     = "Distribution",
+      "aqmobj.heat"    = "Heatmap",
+      "aqmobj.rle"     = "RLE",
+      "aqmobj.nuse"    = "NUSE")
+
+    classes = sapply(obj, class)
+    mt = match(classes, names(titles))
+
     sN = sampleNames(expressionset)
-    nscores = 0
-    namesm = c()
 
-    classes = sapply(seq(along = obj), function(i) class(obj[[i]]))
-
-    if(length(grep("aqmobj.ma",classes)) != 0)
-      {
-        nscores = nscores +1
-        namesm = c(namesm, "MA plots")
-      }
-    if(length(grep("aqmobj.spatial",classes)) != 0)
-      {
-        nscores = nscores +1
-        namesm = c(namesm, "Spatial")
-      }
-    if(length(grep("aqmobj.box",classes)) != 0)
-      {
-        nscores = nscores +1
-        namesm = c(namesm, "Distribution")
-      }
-    if(length(grep("aqmobj.heat",classes)) != 0)
-      {
-        nscores = nscores +1
-        namesm = c(namesm, "Heatmap")
-      }
-    if(length(grep("aqmobj.rle",classes)) != 0)
-      {
-        nscores = nscores +1
-        namesm = c(namesm, "RLE")
-      }
-    if(length(grep("aqmobj.nuse",classes)) != 0)
-      {
-        nscores = nscores +1
-        namesm = c(namesm, "NUSE")
-      }
+    df = data.frame(
+      "Array #"    = seq_len(length(sN)),
+      "Array Name" = sN,
+      stringsAsFactors = FALSE)
   
-    if(is.null(protocolData(expressionset)$ScanDate))
-    {
-    m = matrix("",nrow = length(sN), ncol = nscores+2)
-    colnames(m) = c("Array #", "Array Name", namesm)
-    m[,1] = seq_len(length(sN))
-    m[,2] = sN    
-    } else {
-    m = matrix("",nrow = length(sN), ncol = nscores+3)
-    colnames(m) = c("Array #", "Array Name", "Scan Dates", namesm)
-    m[,1] = seq_len(length(sN))
-    m[,2] = sN
-    m[,3] = protocolData(expressionset)$ScanDate    
-    }
+    if(!is.null(protocolData(expressionset)$ScanDate))
+      df$"Scan Dates" = protocolData(expressionset)$ScanDate
     
-    if(length(obj$maplot$outliers) != 0)
-      m[obj$maplot$outliers,"MA plots"] = "*"    
-    if(length(obj$spatial$outliers) != 0)
-      m[unlist(obj$spatial$outliers),"Spatial distribution"] = "*"    
-    if(length(unlist(obj$boxplot$outliers)) != 0)
-      m[unlist(obj$boxplot$outliers),"Boxplots"] = "*"    
-    if(length(obj$heatmap$outliers) != 0)
-      m[obj$heatmap$outliers,"Heatmap"] = "*"    
-    if(length(obj$rle$outliers) != 0)
-      m[obj$rle$outliers,"RLE"] = "*"    
-    if(length(unlist(obj$nuse$outliers)) != 0)
-      m[unlist(obj$nuse$outliers),"NUSE"] = "*"
+    for(i in which(!is.na(mt)))      
+      df[[titles[mt[i]]]] =
+        ifelse(seq(along=sN) %in% obj[[i]]$outliers, "*", "")
 
-    return(m)
+    return(df)
   }
 
 
