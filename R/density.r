@@ -47,8 +47,11 @@ aqm.density = function(expressionset, dataprep, intgroup, outliers = c(), ...)
       annotation[[i]] = list(title = title[i],
                              linkedids=names(annotation)[i])
   }
-  
-  cl = intgroupColours(intgroup, expressionset, withOpacity = TRUE)
+
+  ## Could colour lines either by covariate of interest ('intgroup') or by
+  ##  whether or not it is considered an outlier. Second seems to be more useful.
+  ## cl = intgroupColours(intgroup, expressionset, withOpacity = TRUE)
+  cl = outlierColours(outliers, n = nrow(pData(expressionset)))
 
   lwd = rep(1,dataprep$numArrays) 
   lty = rep(1,dataprep$numArrays)
@@ -61,8 +64,10 @@ aqm.density = function(expressionset, dataprep, intgroup, outliers = c(), ...)
     col = cl$arrayColours, lwd = lwd, lty = lty, ...)
   
   shape = list("h" = 5, "w" = 3+3*lay[1])
-      
-  legend = "The figure <!-- FIG --> shows density estimates (smoothed histograms) of the data. Typically, the distributions of the arrays should have similar shapes and ranges. Arrays whose distributions are very different from the others should be considered for possible problems. Move the mouse over the lines in the plot to see the  corresponding sample names.<BR> On raw data, a bimodal distribution can be indicative of an array containing a spatial artefact; a distribution shifted to the right of an array with abnormally high background intensities."
+
+  outliertext = if(length(outliers)>0) "Outliers are highlighted by colour. " else ""
+
+  legend = sprintf("The figure <!-- FIG --> shows density estimates (smoothed histograms) of the data. Typically, the distributions of the arrays should have similar shapes and ranges. Arrays whose distributions are very different from the others should be considered for possible problems. Move the mouse over the lines in the plot to see the  corresponding sample names.%s<BR> On raw data, a bimodal distribution can be indicative of an array containing a spatial artefact; a distribution shifted to the right of an array with abnormally high background intensities.", outliertext)
   
   title = "Density plots"
   section = "Array intensity distributions"

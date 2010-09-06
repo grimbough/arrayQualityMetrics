@@ -1,8 +1,7 @@
 * The arrays marked as outliers should by default be already highlighted in
   the density plots.
+  Explain outlier detection and highlighting.
 
-* Remove tooltips from heatmap, it scales badly with heatmap size, and is not 
-  really needed.
 
 * The function 'aqm.boxplot' opens a graphics device (through its
   dependence on draw.key). Avoid that.

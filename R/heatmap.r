@@ -79,8 +79,9 @@ aqm.heatmap = function(expressionset, dataprep, intgroup, ...)
     "legend" = legend,
     "scores" = madsum,
     "outliers" = madout,
-    "shape" = shape,
-    "svg" = list(annotation=annotation, getfun = function(doc) heatmapRectangles(doc, n=numArrays)))
+    "shape" = shape)
+  ##-- no svg / annotation: is not especially helpful, and does not scale well for large arrays
+  ##  "svg" = list(annotation=annotation, getfun = function(doc) heatmapRectangles(doc, n=numArrays)))
   
   class(out) = "aqmobj.heat"
   return(out) 

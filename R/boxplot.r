@@ -10,51 +10,6 @@ ksOutliers = function(x, subsamp = 300, theta = 2){
        outliers = which( (s-mean(s)) / sd(s) > theta ))
 }
 
-##----------------------------------------
-## This function returns a list with:
-##   arrayColors:  color code for each array
-##   key: a key explaining the mapping of factor values to colours
-##----------------------------------------
-intgroupColours = function(intgroup, expressionset, withOpacity = FALSE)
-{
-
-  n = nrow(pData(expressionset))  ## number of arrays
-
-  if (!(missing(intgroup)||is.na(intgroup))) {
-    groups  = as.factor(pData(expressionset)[, intgroup[1]])
-    igroups = as.integer(groups)
-    colours = brewer.pal(9, "Set1")
-    if(nlevels(groups) > length(colours)) {
-      warning(sprintf("'intgroup[1]' has %d levels, but only the first 9 are used for colouring.", nlevels(groups)))
-      igroups[igroups > length(colours)] = length(colours)+1
-      colours = c(colours, "#101010")
-    } else {
-      colours = colours[1:nlevels(groups)]
-    }
-    cols = colours[igroups]
-    key = list(
-      rect = list(col = colours),
-      text = list(levels(groups)),
-      rep = FALSE)
-  
-  } else {
-    cols = rep("#1F78B4", n)
-    key = NULL
-  }
-
-  if(withOpacity)
-    cols = addOpacity(cols, n)
-
-  list(arrayColours = cols, key = key)
-}
-
-addOpacity = function(cols, n){
-  stopifnot(all(nchar(cols)==7))  ## expecting something like #80d020
-  opacity = if(n > 50) 0.125 else (0.8-n*0.0135)  ## the more arrays, the more transparency
-  opacity = as.hexmode(as.integer(255 * opacity))
-  paste(cols, opacity, sep="")
-}
-
 
 ##----------------------------------------
 ## aqm.boxplot
@@ -81,10 +36,12 @@ aqm.boxplot = function(expressionset, dataprep, intgroup, subsample = 10000, ...
                    labels = c("a. Red Channel", "b. Green Channel", "c. Log2(Ratio)"))
     formula = sample_id ~ values | panels
     lay = c(3,1)
+    legspe = "Three panels are shown: left, red channel; middle, green channel; right, log<sub>2</sub>(ratio). Outlier detection was performed only on the distribution of log<sub>2</sub>(ratio)."
    } else {
     values  = as.numeric(dataprep$dat[ss, ])
     formula = sample_id ~ values
     lay = c(1,1)
+    legspe = ""
   }
   xAsterisk = quantile(dataprep$dat[ss,], probs = 0.01)
   
@@ -115,11 +72,9 @@ aqm.boxplot = function(expressionset, dataprep, intgroup, subsample = 10000, ...
   shape = list("h" = 2.5 + dataprep$numArrays * 0.1 +  1/dataprep$numArrays, 
                "w" = 3+3*lay[1])
   
-  legspe = if(dataprep$nchannels == 2) "Left panel: red channel, middle panel: green channel, right panel: log<sub>2</sub>(ratio). " else ""
-
   outliertext = if(length(ks$outliers)>0) "Outliers are marked by an asterisk (*). " else ""
   
-  legend = sprintf("The figure <!-- FIG --> presents boxplots of the data. It gives a simple summary of the signal intensity distributions across all arrays. %sEach box corresponds to one array. Typically, one expects the boxes to have similar positions and widths. If the distribution of an individual array is very different from the others, this may indicate an experimental problem. %s", legspe, outliertext)
+  legend = sprintf("The figure <!-- FIG --> presents boxplots of the data. It gives a simple summary of the signal intensity distributions across all arrays. %sEach box corresponds to one array. Typically, one expects the boxes to have similar positions and widths. If the distribution of an array is very different from the others, this may indicate an experimental problem. %s", legspe, outliertext)
 
   title = "Boxplots"
   section = "Array intensity distributions"
