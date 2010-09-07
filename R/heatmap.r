@@ -70,8 +70,8 @@ aqm.heatmap = function(expressionset, dataprep, intgroup, ...)
   ##                linkedids = names(annotation)[k])
   ##  }
   
-  shape = list("h" = 6 + dataprep$numArrays * 0.04, 
-               "w" = 5 + dataprep$numArrays * 0.04)
+  shape = list("h" = 6 + dataprep$numArrays * 0.1, 
+               "w" = 5 + dataprep$numArrays * 0.1)
   
   out = list("plot"= hfig,
     "section" = section,
