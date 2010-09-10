@@ -11,11 +11,12 @@ setGeneric("arrayQualityMetrics",
 	   spatial = TRUE,
            reporttitle = paste("Quality metrics report for", deparse(substitute(expressionset)))
   )
-  standardGeneric("arrayQualityMetrics"))
+  standardGeneric("arrayQualityMetrics"),
+  signature = "expressionset")
 
 ## aqmInputObj
 setMethod("arrayQualityMetrics", signature(expressionset = "aqmInputObj"),
-  function(expressionset, outdir, force, do.logtransform, intgroup, grouprep, spatial, reporttitle) {
+  function(expressionset, outdir = getwd(), force = FALSE, do.logtransform = FALSE, intgroup = NULL, grouprep, spatial = TRUE, reporttitle = paste("Quality metrics report for", deparse(substitute(expressionset)))) {
     
     ## Argument checking: 
     ## (Done here, once and for all, rather than where the arguments are actually consumed - 
@@ -53,7 +54,7 @@ setMethod("arrayQualityMetrics", signature(expressionset = "aqmInputObj"),
 
     if(inherits(expressionset, 'BeadLevelList') || inherits(expressionset, 'AffyBatch') ||
        (("X" %in% rownames(featureData(expressionset)@varMetadata)) &&
-        ("Y" %in% rownames(featureData(expressionset)@varMetadata))) && spatial == TRUE) {            
+        ("Y" %in% rownames(featureData(expressionset)@varMetadata))) && spatial) {            
       obj$spatial =  try(aqm.spatial(expressionset = expressionset, dataprep = dataprep, scale = "Rank"))
       if(inherits(obj$spatial,"try-error"))
         warning("Could not draw spatial distribution of intensities \n")
@@ -77,15 +78,12 @@ setMethod("arrayQualityMetrics", signature(expressionset = "aqmInputObj"),
 
     if(inherits(expressionset,'BeadLevelList'))
       warning("Could not plot the probes mapping densities on a BeadLevelList object.")
-    if(!inherits(expressionset,'BeadLevelList'))
-      {
-        if("hasTarget" %in% rownames(featureData(expressionset)@varMetadata))
+    else if("hasTarget" %in% rownames(featureData(expressionset)@varMetadata))
           {
             obj$probesmap = try(aqm.probesmap(expressionset = expressionset, dataprep = dataprep))
             if(inherits(obj$probesmap,"try-error"))
               warning("Could not draw probes mapping plot \n")
           }
-      }
     
     
     if(inherits(expressionset, "AffyBatch"))
@@ -129,7 +127,7 @@ setMethod("arrayQualityMetrics", signature(expressionset = "aqmInputObj"),
 
 for(othertype in c("RGList", "MAList", "marrayRaw", "marrayNorm"))
   setMethod("arrayQualityMetrics", signature(expressionset = othertype),
-            function(expressionset, outdir, force, do.logtransform, intgroup, spatial) {
+            function(expressionset, outdir = getwd(), force = FALSE, do.logtransform = FALSE, intgroup = NULL, spatial = TRUE) {
               expressionset = try(as(expressionset, "NChannelSet"))
               if(inherits(expressionset,'try-error'))
                 stop(sprintf("Argument 'expressionset' is of class '%s', and its automatic conversion into 'NChannelSet' failed. Please try to convert it manually.\n", othertype))
