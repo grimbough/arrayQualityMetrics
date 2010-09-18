@@ -14,27 +14,31 @@ intgroupColours = function(intgroup, expressionset, withOpacity = FALSE)
 
   n = nrow(pData(expressionset))  ## number of arrays
 
-  if (!(missing(intgroup)||is.na(intgroup))) {
-    groups  = as.factor(pData(expressionset)[, intgroup[1]])
-    igroups = as.integer(groups)
-    colours = brewer.pal(9, "Set1")
-    if(nlevels(groups) > length(colours)) {
-      warning(sprintf("'intgroup[1]' has %d levels, but only the first 9 are used for colouring.", nlevels(groups)))
-      igroups[igroups > length(colours)] = length(colours)+1
-      colours = c(colours, "#101010")
-    } else {
-      colours = colours[1:nlevels(groups)]
-    }
-    cols = colours[igroups]
-    key = list(
-      rect = list(col = colours),
-      text = list(levels(groups)),
-      rep = FALSE)
+  cols = rep("#1F78B4", n)
+  key = NULL
   
-  } else {
-    cols = rep("#1F78B4", n)
-    key = NULL
-  }
+  if (!missing(intgroup)) {
+    stopifnot(length(intgroup)==1)
+    if(!is.na(intgroup)) {
+      groups  = as.factor(pData(expressionset)[, intgroup[1]])
+      igroups = as.integer(groups)
+      colours = brewer.pal(9, "Set1")
+      if(nlevels(groups) > length(colours)) {
+        warning(sprintf("'intgroup' has %d levels, but only the first 9 are used for colouring.",
+                        nlevels(groups)))
+        igroups[igroups > length(colours)] = length(colours)+1
+        colours = c(colours, "#101010")
+      } else {
+        colours = colours[1:nlevels(groups)]
+      }
+      cols = colours[igroups]
+      key = list(
+        rect = list(col = colours),
+        text = list(levels(groups)),
+        rep = FALSE)
+      
+    }# if 
+  } # if
 
   if(withOpacity)
     cols = addOpacity(cols, n)

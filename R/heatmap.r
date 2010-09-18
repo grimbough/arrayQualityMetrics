@@ -8,22 +8,34 @@ aqm.heatmap = function(expressionset, dataprep, intgroup, ...)
   madstat = boxplot.stats(madsum)
   outliers =  which(madsum %in% madstat$out)
   
-  colourRange = rgb(seq(0,1,l=256),seq(0,1,l=256),seq(1,0,l=256))
+  colourRange = rgb(seq(0, 1, l=256),
+                    seq(0, 1, l=256),
+                    seq(1, 0, l=256))
   
   dend = as.dendrogram(hclust(outM, method = "single"))
   ord = order.dendrogram(dend)
+
   m = as.matrix(outM)
-  colnames(m) = rownames(m) = paste(ifelse(seq_len(numArrays)%in%outliers, "* ", ""), seq_len(numArrays), sep="")
-    
+  colnames(m) = rownames(m) = paste(ifelse(seq_len(numArrays) %in% outliers, "* ", ""),
+                                    seq_len(numArrays), sep="")
+
+  palettes = c("Set1", "Set2", "Set3", "Accent", "Dark2", "Paired", "Pastel1", "Pastel2")
+  stopifnot(all(palettes %in% rownames(brewer.pal.info)))
+  palettes = rep(palettes, ceiling(length(intgroup) / length(palettes)))
+  
   if(!(missing(intgroup)||is.na(intgroup))) {
-    covar  = lapply(seq(along = intgroup), function(i) pData(expressionset)[, intgroup[i]])
-    lev    = lapply(seq(along = intgroup), function(i) levels(as.factor(unlist(covar[i]))))
-    corres = lapply(seq(along = intgroup), function(i) matrix(0, nrow=length(lev[[i]]), ncol=2))
-    colourCov = lapply(seq(along = intgroup), function(i) brewer.pal(8,rownames(brewer.pal.info[brewer.pal.info$category=="qual",])[7-i]))
+    covar  = lapply(seq(along = intgroup), function(i) pData(expressionset)[[intgroup[i]]])
+    lev    = lapply(seq(along = intgroup), function(i) levels(as.factor(covar[[i]])))
+
+    colourCov = lapply(seq(along = intgroup), function(i)
+      brewer.pal(brewer.pal.info[palettes[i], "maxcolors"], palettes[i])) 
       
-    key = lapply(seq(along = intgroup), function(i)
-      list(rect = list(col=unlist(colourCov[i])[as.factor(levels(as.factor(unlist(covar[i]))))]),
-           text = list(levels(as.factor(unlist(covar[i]))))))
+    key = lapply(seq(along = intgroup), function(i) {
+      fac = as.factor(covar[[i]])
+      list(rect = list(col = colourCov[[i]][as.factor(levels(fac))]),
+           text = list(levels(fac)))
+    })
+    
     key = unlist(key, recursive=FALSE)
     key$rep = FALSE
     
@@ -31,10 +43,10 @@ aqm.heatmap = function(expressionset, dataprep, intgroup, ...)
     
     thelegend = list(
       top = list(fun=dendrogramGrob, args=list(x=dend,side="top")),
-      right=list(fun=dendrogramGrob, args=list(x=dend, side="right",
-                                       size.add=1, add = sapply(seq(along = intgroup), function(i)
-                                                     list(rect = list(col = "transparent",
-                                                            fill = unlist(colourCov[i])[as.factor(unlist(covar[i]))]))),
+      right=list(fun=dendrogramGrob, args=list(x=dend, side="right", size.add=1,
+         add = sapply(seq(along = intgroup), function(i)
+            list(rect = list(col = "transparent",
+                 fill = colourCov[[i]][as.factor(covar[[i]])]))),
                                        type = "rectangle")))
   } else {
     thelegend = list(
