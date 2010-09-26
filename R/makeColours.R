@@ -17,7 +17,7 @@ intgroupColours = function(intgroup, expressionset, withOpacity = FALSE)
   cols = rep("#1F78B4", n)
   key = NULL
   
-  if (!missing(intgroup)) {
+  if (length(intgroup)>0) {
     stopifnot(length(intgroup)==1)
     if(!is.na(intgroup)) {
       groups  = as.factor(pData(expressionset)[, intgroup[1]])

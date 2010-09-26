@@ -19,11 +19,11 @@ aqm.heatmap = function(expressionset, dataprep, intgroup, ...)
   colnames(m) = rownames(m) = paste(ifelse(seq_len(numArrays) %in% outliers, "* ", ""),
                                     seq_len(numArrays), sep="")
 
-  palettes = c("Set1", "Set2", "Set3", "Accent", "Dark2", "Paired", "Pastel1", "Pastel2")
-  stopifnot(all(palettes %in% rownames(brewer.pal.info)))
-  palettes = rep(palettes, ceiling(length(intgroup) / length(palettes)))
+  if(length(intgroup)>0) {
+    palettes = c("Set1", "Set2", "Set3", "Accent", "Dark2", "Paired", "Pastel1", "Pastel2")
+    stopifnot(all(palettes %in% rownames(brewer.pal.info)))
+    palettes = rep(palettes, ceiling(length(intgroup) / length(palettes)))
   
-  if(!(missing(intgroup)||is.na(intgroup))) {
     covar  = lapply(seq(along = intgroup), function(i) pData(expressionset)[[intgroup[i]]])
     lev    = lapply(seq(along = intgroup), function(i) levels(as.factor(covar[[i]])))
 
@@ -101,7 +101,7 @@ aqm.heatmap = function(expressionset, dataprep, intgroup, ...)
 
 ## Find the numArrays x numArrays rectangles of the heatmap
 ##   (there is some subtlety since there are also other rectangles in the plot, from the
-##    colour key, the intgroup sidebar, the legend; we avoid these by selecting 'getPlotRegionNodes')
+##    colour key, the sidebar, the legend; we avoid these by selecting 'getPlotRegionNodes')
 
 heatmapRectangles = function(doc, n) {
   

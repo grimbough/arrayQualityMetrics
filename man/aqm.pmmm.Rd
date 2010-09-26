@@ -24,8 +24,8 @@
 \seealso{ \code{\link{aqmobj.pmmm}} }
 
 \examples{
-    library(ALLMLL)
-    data(MLL.A)
+    library("ALLMLL")
+    data("MLL.A")
     pm = aqm.pmmm(MLL.A)
     class(pm)
     aqm.plot(pm)

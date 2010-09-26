@@ -15,16 +15,21 @@ setGeneric("arrayQualityMetrics",
   signature = "expressionset")
 
 ## aqmInputObj
-setMethod("arrayQualityMetrics", signature(expressionset = "aqmInputObj"),
-  function(expressionset, outdir = getwd(), force = FALSE, do.logtransform = FALSE, intgroup = NULL, grouprep, spatial = TRUE, reporttitle = paste("Quality metrics report for", deparse(substitute(expressionset)))) {
+setMethod("arrayQualityMetrics",
+          signature(expressionset = "aqmInputObj"),
+          function(expressionset,
+                   outdir = getwd(),
+                   force = FALSE,
+                   do.logtransform = FALSE,
+                   intgroup = NULL,
+                   grouprep,
+                   spatial = TRUE,
+                   reporttitle = paste("Quality metrics report for", deparse(substitute(expressionset)))) {
     
     ## Argument checking: 
-    ## (Done here, once and for all, rather than where the arguments are actually consumed - 
-    ## in the hope that this simplifies the code and the user interface)
-
     if(!missing(grouprep))
       .Deprecated(msg = paste("The argument 'grouprep' of the function 'arrayQualityMetrics'",
-        "is deprecated and will be ignored. Use presence or missingness/NA-ness of 'intgroup' instead."))
+        "is deprecated and will be ignored. Use 'intgroup' instead."))
       
     for(v in c("outdir", "reporttitle"))
       if (!(is.character(get(v)) && (length(get(v))==1)))
@@ -69,12 +74,12 @@ setMethod("arrayQualityMetrics", signature(expressionset = "aqmInputObj"),
       }                
     }
                         
-    obj$boxplot = aqm.boxplot(expressionset, dataprep=dataprep, intgroup=intgroup)
-    obj$density = aqm.density(expressionset, dataprep=dataprep, intgroup=intgroup, outliers = obj$boxplot$outliers)
+    obj$boxplot = aqm.boxplot(expressionset, dataprep=dataprep, intgroup = intgroup)
+    obj$density = aqm.density(expressionset, dataprep=dataprep, intgroup = intgroup, outliers = obj$boxplot$outliers)
 
-    obj$heatmap = aqm.heatmap(expressionset, dataprep=dataprep, intgroup=intgroup)
-    obj$pca     = aqm.pca(expressionset, dataprep=dataprep, intgroup=intgroup, outliers = obj$heatmap$outliers)
-    obj$meansd  = aqm.meansd(dataprep=dataprep)
+    obj$heatmap = aqm.heatmap(expressionset, dataprep=dataprep, intgroup = intgroup)
+    obj$pca     = aqm.pca(    expressionset, dataprep=dataprep, intgroup = intgroup, outliers = obj$heatmap$outliers)
+    obj$meansd  = aqm.meansd( dataprep=dataprep)
 
     if(inherits(expressionset,'BeadLevelList'))
       warning("Could not plot the probes mapping densities on a BeadLevelList object.")

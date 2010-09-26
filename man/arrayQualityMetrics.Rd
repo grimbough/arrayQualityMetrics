@@ -43,20 +43,22 @@ arrayQualityMetrics(expressionset,
 \arguments{
   \item{expressionset}{an object of
     class \code{\link[Biobase:class.ExpressionSet]{ExpressionSet}},
-    \code{\link[affy:AffyBatch-class]{AffyBatch}} ,
-    \code{\link[Biobase:class.NChannelSet]{NChannelSet}} ,
-    \code{\link[beadarray:class-BeadLevelList]{BeadLevelList}} ,
-    \code{\link[limma:rglist]{RGList}} ,
-    \code{\link[limma:malist]{MAList}} ,
-    \code{aqmInputObj} ,
-    \code{\link[marray:marrayRaw-class]{marrayRaw}} or
-    \code{\link[marray:marrayNorm-class]{marrayNorm}} .}
+    \code{\link[affy:AffyBatch-class]{AffyBatch}},
+    \code{\link[Biobase:class.NChannelSet]{NChannelSet}},
+    \code{\link[beadarray:class-BeadLevelList]{BeadLevelList}},
+    \code{\link[limma:rglist]{RGList}},
+    \code{\link[limma:malist]{MAList}},
+    \code{\link[marray:marrayRaw-class]{marrayRaw}},
+    \code{\link[marray:marrayNorm-class]{marrayNorm}} or
+    \code{aqmInputObj}}
 
-\item{outdir}{the name of the directory in which the results are
+\item{outdir}{the name of the directory in which the report is
   created; a character of length 1.}
   
-\item{force}{indicates whether \code{outdir} should be overwritten if it
-  already exists; a logical of length 1.}
+\item{force}{if the directory named by \code{outdir} already exists, then, if \code{force} is
+  \code{TRUE}, the directory is overwritten, otherwise an
+  error is thrown; if the directory does not exist, the value of
+  \code{force} is irrelevant; a logical of length 1.}
   
 \item{do.logtransform}{indicates whether the data should be logarithm transformed before
   the analysis; a logical of length 1.}
@@ -83,13 +85,13 @@ See the arrayQualityMetrics vignette for examples of this function.
 }
 
 \value{
-  A directory \code{outdir} containing a HTML report named QMreport.html
-  and all the PNG and PDF plots is created. 
+  A side effect of the function is the creation of directory named by \code{outdir} containing a HTML report \code{QMreport.html}
+  and PNG and PDF files with figures. The function also returns a list with R
+  objects containing the report elements for subsequent programmatic processing.
 }
 
 \author{
-  Audrey Kauffmann, Wolfgang Huber. 
-  Maintainer: <kauffmann@bergonie.org>  
+  Audrey Kauffmann.
 }
 
 \keyword{hplot}
