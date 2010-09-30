@@ -18,26 +18,22 @@ intgroupColours = function(intgroup, expressionset, withOpacity = FALSE)
   key = NULL
   
   if (length(intgroup)>0) {
-    stopifnot(length(intgroup)==1)
-    if(!is.na(intgroup)) {
-      groups  = as.factor(pData(expressionset)[, intgroup[1]])
-      igroups = as.integer(groups)
-      colours = brewer.pal(9, "Set1")
-      if(nlevels(groups) > length(colours)) {
-        warning(sprintf("'intgroup' has %d levels, but only the first 9 are used for colouring.",
-                        nlevels(groups)))
-        igroups[igroups > length(colours)] = length(colours)+1
-        colours = c(colours, "#101010")
-      } else {
-        colours = colours[1:nlevels(groups)]
-      }
-      cols = colours[igroups]
-      key = list(
-        rect = list(col = colours),
-        text = list(levels(groups)),
-        rep = FALSE)
-      
-    }# if 
+    groups  = as.factor(pData(expressionset)[, intgroup[1]])
+    igroups = as.integer(groups)
+    colours = brewer.pal(9, "Set1")
+    if(nlevels(groups) > length(colours)) {
+      warning(sprintf("'intgroup[1]' has %d levels, but only the first 9 are used for colouring.",
+                      nlevels(groups)))
+      igroups[igroups > length(colours)] = length(colours)+1
+      colours = c(colours, "#101010")
+    } else {
+      colours = colours[1:nlevels(groups)]
+    }
+    cols = colours[igroups]
+    key = list(
+      rect = list(col = colours),
+      text = list(levels(groups)),
+      rep = FALSE)
   } # if
 
   if(withOpacity)

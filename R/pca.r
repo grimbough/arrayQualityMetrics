@@ -7,17 +7,18 @@ aqm.pca = function(expressionset, dataprep, intgroup, outliers, ...)
     annotation[[i]] = list(title = sprintf("Array %d: %s", i, sN[i]),
                            linkedids=names(annotation)[i])
 
-  cl = intgroupColours(intgroup, expressionset, withOpacity = FALSE)
-  ## pch = ifelse(seq(along=sN) %in% outliers, 8, 20)
+  cl  = intgroupColours(intgroup, expressionset, withOpacity = FALSE)
   cex = ifelse(seq(along=sN) %in% outliers, 3, 1)
-  pch = 19
+  pch = 19 # ifelse(seq(along=sN) %in% outliers, 8, 20) # this does not work well with 
   
   pca = prcomp(t(na.omit(dataprep$dat)))
  
-  key =cl$key
-  key$space = "top"
+  key = cl$key
+  if(!is.null(key))
+    key$space = "top"
   
-  pcafig = xyplot(PC2 ~ PC1 , data=as.data.frame(pca$x), pch=pch, cex=cex, col=cl$arrayColours, key = key)
+  pcafig = xyplot(PC2 ~ PC1 , data=as.data.frame(pca$x), pch=pch, cex=cex, col=cl$arrayColours,
+    main = if(!is.null(cl$key)) draw.key(key = cl$key))
 
   legfactortip = if(length(intgroup)==0) " (You can indicate such a factor by colour using the 'intgroup' argument.)" else ""
   legoutliers = if(length(outliers)>0) " Outliers -according to the same criterion as in the heatmap plot- are indicated by larger symbols." else "" 

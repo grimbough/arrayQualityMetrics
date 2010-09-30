@@ -81,7 +81,7 @@ arrayQualityMetrics(expressionset,
 }
 
 \details{
-See the arrayQualityMetrics vignette for examples of this function.
+  See the arrayQualityMetrics vignette for examples of this function.
 }
 
 \value{
