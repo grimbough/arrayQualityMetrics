@@ -1,22 +1,11 @@
-* The arrays marked as outliers should by default be already highlighted in
-  the density plots.
-  Explain outlier detection and highlighting.
-
-
 * The function 'aqm.boxplot' opens a graphics device (through its
   dependence on draw.key). Avoid that.
 
 * Remove printing of empty lists onto console when the MA plots are written
   into the pdf file. 
 
-* Everywhere replace rect/square by auto-determined image size.  Check
-  if that solves the problem of names on heatmap that are unreadable
-  when > 50 arrays.  When heatmap gets too large (say, more than 80
-  arrays, don't include the SVG file into the plot, but rather just
-  provide a link to it so that people can open it separately.)  
-  => AK:
-  PARTIALLY DONE. I am not satisfied with the output. Even with
-  increasing image size, not very readable when > 50 arrays.
+* When heatmap gets large (e.g. >50 arrays), array names tend not to be very 
+  readable.
 
 * Duplicate correlation: If featureData contains a factor that
   identifies features containing the same reporter sequence, we can
