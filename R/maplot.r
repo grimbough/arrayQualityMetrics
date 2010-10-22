@@ -1,17 +1,19 @@
 ##Function to perform the MAplot
-maplotdraw = function(M, A, sN, numArrays, nchannels, class, ...)
+maplotdraw = function(M, A, numArrays, nchannels, class, ...)
   {
     app = 4 + 2*(sum(numArrays>c(4,6)))
     nfig = ceiling(numArrays/8)
     
     xlimMA = quantile(A, probs=1e-4*c(1,-1)+c(0,1), na.rm=TRUE)
     ylimMA = quantile(M, probs=1e-4*c(1,-1)+c(0,1), na.rm=TRUE)
+
+    i = seq_len(numArrays)
+    dummy.df = data.frame(
+      i = factor(i, levels = i),
+      x = i,
+      y = i)
     
-    dummy.df = data.frame(sN = factor(sN, levels = sN),
-      x = seq(along = sN),
-      y = seq(along = sN))
-    
-    trobj = xyplot(y ~ x | sN, dummy.df,
+    trobj = xyplot(y ~ x | i, dummy.df,
       xlim = xlimMA,
       ylim = ylimMA,
       xlab = "A",
@@ -44,14 +46,16 @@ maplotdraw = function(M, A, sN, numArrays, nchannels, class, ...)
     mastat = boxplot.stats(mamean)
     maout = sapply(seq_len(length(mastat$out)), function(x) which(mamean == mastat$out[x]))
 
-    out = list("plot" = ma, "section" = section, "title" = title, "legend" = legend, "scores" = mamean, "outliers" = maout, "shape" = list("h"=6,"w"=10))
-    class(out) = "aqmobj.ma"
-    return(out)   
+    new("aqmTrellis",
+        plot = ma,
+        section = section,
+        title = title,
+        legend = legend,
+        outliers = maout,
+        shape = list(h=6, w=10))
   }
 
-##Wrapper
-aqm.maplot = function(dataprep, ...)
-  {           
-    MAplot = maplotdraw(dataprep$M, dataprep$A, dataprep$sN, dataprep$numArrays, dataprep$nchannels, dataprep$classori, ...)
-    return(MAplot)         
-  }
+## To Do: this is just bureaucracy - get rid of it.
+aqm.maplot = function(x)
+  maplotdraw(x$M, x$A, x$numArrays, x$nchannels, x$classori)
+

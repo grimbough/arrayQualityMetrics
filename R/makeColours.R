@@ -9,16 +9,15 @@
 ##   arrayColors:  color code for each array
 ##   key: a key explaining the mapping of factor values to colours
 ##----------------------------------------
-intgroupColours = function(intgroup, expressionset, withOpacity = FALSE)
+intgroupColours = function(x, withOpacity = FALSE)
 {
 
-  n = nrow(pData(expressionset))  ## number of arrays
-
+  n = x$numArrays
   cols = rep("#1F78B4", n)
   key = NULL
   
-  if (length(intgroup)>0) {
-    groups  = as.factor(pData(expressionset)[, intgroup[1]])
+  if (length(x$intgroup)>0) {
+    groups  = as.factor(pData(x$expressionset)[, x$intgroup[1]])
     igroups = as.integer(groups)
     colours = brewer.pal(9, "Set1")
     if(nlevels(groups) > length(colours)) {
@@ -27,7 +26,7 @@ intgroupColours = function(intgroup, expressionset, withOpacity = FALSE)
       igroups[igroups > length(colours)] = length(colours)+1
       colours = c(colours, "#101010")
     } else {
-      colours = colours[1:nlevels(groups)]
+      colours = colours[seq_len(nlevels(groups))]
     }
     cols = colours[igroups]
     key = list(

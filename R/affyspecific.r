@@ -1,14 +1,9 @@
-##Methods to prepare the data
-aqm.prepaffy = function(expressionset)
+## Methods to prepare the data
+prepaffy = function(expressionset)
 {
-  pp1 = try(preprocess(expressionset))
-  dataPLM = try(fitPLM(pp1, background = FALSE, normalize = FALSE))
-  if(class(pp1)=='try-error' || class(dataPLM)=='try-error')
-    warning("RLE and NUSE plots from the package 'affyPLM' cannot be produced for this data set.")
-
-  Affyobject = list("dataPLM" = dataPLM)
-  class(Affyobject) = "aqmobj.prepaffy"
-  return(Affyobject)
+  pp1 = preprocess(expressionset)
+  dataPLM = fitPLM(pp1, background = FALSE, normalize = FALSE)
+  list("dataPLM" = dataPLM)
 }
 
 ## phrase book
@@ -18,7 +13,7 @@ phrase = list(
   affyPLM = "This diagnostic plot is based on tools provided in the <i>affyPLM</i> package."
   )
 
-##RNA digestion
+## RNA digestion
 aqm.rnadeg = function(expressionset)
   {
     sN = sampleNames(expressionset)
@@ -49,131 +44,127 @@ aqm.rnadeg = function(expressionset)
     title = "RNA digestion plot"
     section = "Affymetrix specific plots"
     
-    out = list("plot" = rnaDeg,
-               "section" = section,
-               "title" = title,
-               "legend" = legend,
-               "shape" = list("h" = 5.5, "w" =7),
-               "svg" = list(annotation=annotation, getfun=SVGAnnotation::getMatplotSeries))
-    
-    class(out) = "aqmobj.rnadeg"
-    return(out)
-  }
+    new("aqmPlotfun",
+        plot = rnaDeg,
+        section = section,
+        title = title,
+        legend = legend,
+        shape = list("h" = 5.5, "w" =7),
+        svg = list(annotation=annotation, getfun=SVGAnnotation::getMatplotSeries))
+   }
 
 
-##RLE
-aqm.rle = function(expressionset, dataprep, affyproc, intgroup, subsample = 10000, ...)
+## RLE
+aqm.rle = function(x, affyproc)
   {   
     if (affyproc$dataPLM@model.description$R.model$which.parameter.types[3] == 1){
-      medianchip <- apply(coefs(affyproc$dataPLM), 1, median)
-      M <- sweep(coefs(affyproc$dataPLM),1,medianchip,FUN='-')
+      medianchip = apply(coefs(affyproc$dataPLM), 1, median)
+      dat = sweep(coefs(affyproc$dataPLM), 1, medianchip, FUN='-')
     } else {
       stop("It doesn't appear that a model with sample effects was used.")
     }
 
-    prepaf = dataprep
-    prepaf$dat = M
-    rle = try(aqm.boxplot(expressionset, prepaf, intgroup, subsample = subsample, ...)) ## TO DO: Not sure if the score computation is correct though
+    rle = aqm.boxplot(list(dat=dat, intgroup=x$intgroup, nchannels=1, numArrays=x$numArrays))
 
-    legend = paste(phrase$fig("Relative Log Expression (RLE)"),
+    rle@legend = paste(phrase$fig("Relative Log Expression (RLE)"),
       phrase$preproc("RLE"),
-      "Arrays whose boxes have larger spread or are centred at M = 0 are potentially problematic.",
+      "Arrays whose boxes have larger spread or are centered away from M = 0 are potentially problematic.",
       phrase$affyPLM)
     
-    title = "Relative Log Expression plot"
-    
-    section = "Affymetrix specific plots"
+    rle@title = "Relative Log Expression plot"
+    rle@section = "Affymetrix specific plots"
+    rle@outliers = integer(0)
 
-    rle2 = try(Mbox(affyproc$dataPLM, plot = FALSE))
-    rlemed = rle2$stats[3,]
-    rleout = which(abs(rlemed) > 0.1)
+    ## To Do: Fix the outlier computation
+    ## rle2 = try(Mbox(affyproc$dataPLM, plot = FALSE))
+    ## rlemed = rle2$stats[3,]
+    ## rleout = which(abs(rlemed) > 0.1)
 
-    shape = list("h" = 2.5 + dataprep$numArrays * 0.1 +  1/dataprep$numArrays, 
-               "w" = 6)
-
-    out = list("plot" = rle$plot, "section" = section, "title" = title, "legend" = legend, "scores" = rlemed, "outliers" = rleout, shape = shape)
-    class(out) = "aqmobj.rle"
-    return(out)
+    return(rle)
   }
 
-##NUSE
-aqm.nuse = function(expressionset, dataprep, affyproc, intgroup, subsample = 10000, ...)
+## NUSE
+aqm.nuse = function(x, affyproc)
 { 
-  ##bwplot for PLMset
+  ## bwplot for PLMset
+  ## To Do: Use 'colSums' - it's faster
   compute.nuse <- function(which){
-    nuse <- apply(affyproc$dataPLM@weights[[1]][which,],2,sum)
-    1/sqrt(nuse)
+    1/sqrt(apply(affyproc$dataPLM@weights[[1]][which,,drop=FALSE], 2, sum))
   }
+  
   model <- affyproc$dataPLM@model.description$modelsettings$model
-  if (affyproc$dataPLM@model.description$R.model$which.parameter.types[3] == 1 & affyproc$dataPLM@model.description$R.model$which.parameter.types[1] == 0 ){
-    grp.rma.se1.median <- apply(se(affyproc$dataPLM), 1,median,na.rm=TRUE)
-    grp.rma.rel.se1.mtx <- sweep(se(affyproc$dataPLM),1,grp.rma.se1.median,FUN='/')
+  if ((affyproc$dataPLM@model.description$R.model$which.parameter.types[3] == 1) &&
+      (affyproc$dataPLM@model.description$R.model$which.parameter.types[1] == 0) ){
+    grp.rma.se1.median  = apply(se(affyproc$dataPLM), 1,median,na.rm=TRUE)
+    grp.rma.rel.se1.mtx = sweep(se(affyproc$dataPLM),1,grp.rma.se1.median,FUN='/')
   } else {
-    which <-indexProbesProcessed(affyproc$dataPLM)
-    ses <- matrix(0,length(which) ,4)
+    which <- indexProbesProcessed(affyproc$dataPLM)
+    ses   <- matrix(0, length(which), 4)
     if (affyproc$dataPLM@model.description$R.model$response.variable == 1){
-      for (i in 1:length(which))
+      for (i in seq(along=which))
         ses[i,] <- compute.nuse(which[[i]])
     } else {
-      stop("Sorry I can't currently impute NUSE values for this PLMset object")
+      stop("Sorry, I don't know how to compute NUSE values for this PLMset object")
     }
     grp.rma.se1.median <- apply(ses, 1,median)
     grp.rma.rel.se1.mtx <- sweep(ses,1,grp.rma.se1.median,FUN='/')
   }
 
-  prepaf = dataprep
-  prepaf$dat = grp.rma.rel.se1.mtx
-  nuse = try(aqm.boxplot(expressionset, prepaf, intgroup, subsample = subsample, ...)) ## TO DO: Not sure if the score computation is correct though
+  nuse = aqm.boxplot(list(dat=grp.rma.rel.se1.mtx, intgroup=x$intgroup, nchannels=1, numArrays=x$numArrays))
 
-  nuse$legend = paste(phrase$fig("Normalized Unscaled Standard Error (NUSE)"),
+  nuse@legend = paste(phrase$fig("Normalized Unscaled Standard Error (NUSE)"),
     phrase$preproc("NUSE"),
     "Potential low quality arrays are those whose box is substantially elevated or more spread out relative to the other arrays. NUSE values are comparable within one data set, but usually not across different data sets.",
     phrase$affyPLM)
 
-  nuse$title = "Normalized Unscaled Standard Error (NUSE) plot"
-  nuse$section = "Affymetrix specific plots"
-  
-  nuse$shape = list("h" = 2.5 + dataprep$numArrays * 0.1 +  1/dataprep$numArrays, "w" = 6)
+  nuse@title = "Normalized Unscaled Standard Error (NUSE) plot"
+  nuse@section = "Affymetrix specific plots"
+  nuse@outliers = integer(0)
 
-  class(nuse) = "aqmobj.nuse"
-  return(nuse) 
+  return(nuse)
 }
 
 
-##QCStats
-aqm.qcstats = function(expressionset, ...)
-  {                
-    qcStats = function() {
-      plot.qc.stats(qc(expressionset, ...))
-    }
+## QCStats
+aqm.qcstats = function(expressionset) {                
 
-    legend =  paste(phrase$fig("the Affymetrix recommended diagnostic"),
-      "Please see the vignette of the package <i>simpleaffy</i> for a full explanation of the elements shown in this plot. Any metrics that is shown in red is outside the manufacturer's specified boundaries and suggests a potential problem; metrics shown in blue are considered acceptable.")
-
-    title = "Diagnostic plot recommended by Affymetrix"
-    section = "Affymetrix specific plots"
-
-    shape = list("h" = 4 + ncol(exprs(expressionset)) * 0.1 + 1/ncol(exprs(expressionset)),  "w" = 6)
-
-    out = list("plot" = qcStats, "section" = section, "title" = title, "legend" = legend, shape = shape)
-    class(out) = "aqmobj.qcs"
-    return(out)    
+  qcStats = function() {
+    plot.qc.stats(qc(expressionset))
   }
+  
+  legend =  paste(phrase$fig("the Affymetrix recommended diagnostic"),
+    "Please see the vignette of the package <i>simpleaffy</i> for a full explanation of the elements shown in this plot. Any metrics that is shown in red is outside the manufacturer's specified boundaries and suggests a potential problem; metrics shown in blue are considered acceptable.")
+  
+  shape = list("h" = 4 + ncol(exprs(expressionset)) * 0.1 + 1/ncol(exprs(expressionset)),  "w" = 6)
+  
+  new("aqmPlotfun",
+      plot = qcStats,
+      section = "Affymetrix specific plots",
+      title = "Diagnostic plot recommended by Affymetrix",
+      legend = legend,
+      shape = shape)
+}
 
-##PM / MM
-aqm.pmmm = function(expressionset, ...)
+## PM / MM
+aqm.pmmm = function(expressionset)
 {  
-  PM = density(as.matrix(log2(pm(expressionset))), ...)
-  MM = density(as.matrix(log2(mm(expressionset))), ...)
-  PMMM = list(PM = PM, MM = MM)
+  PM = density(as.matrix(log2(pm(expressionset))))
+  MM = density(as.matrix(log2(mm(expressionset))))
 
+  PMMM = function(){
+    plot(MM, col = "grey", xlab = "log(Intensity)", main="")
+    lines(PM, col = "blue")
+    legend("topright", c("PM","MM"), lty=1, lwd=2, col= c("blue","grey"), bty = "n")
+  }
+  
   legend = "Figure <!-- FIG --> shows the density distributions of the log<sub>2</sub> intensities grouped by the matching type of the probes. The blue line shows a density estimate (smoothed histogram) from intensities of perfect match probes (PM), the grey line, one from the mismatch probes (MM). We expect that MM probes have poorer hybridization than PM probes, and thus that the PM curve be to the right of the MM curve."
 
-  title = "Perfect matches and mismatches"
-  section = "Affymetrix specific plots"
-  out = list("plot" = PMMM, "section" = section, "title" = title, "legend" = legend, shape = list("h" = 6, "w" = 6))
-  class(out) = "aqmobj.pmmm"
-  return(out)    
+  new("aqmPlotfun",
+      plot = PMMM,
+      section = "Affymetrix specific plots",
+      title = "Perfect matches and mismatches",
+      legend = legend,
+      shape = list("h" = 6, "w" = 6))
 }
 
 

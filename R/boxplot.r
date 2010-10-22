@@ -14,38 +14,38 @@ ksOutliers = function(x, subsamp = 300, theta = 2){
 ##----------------------------------------
 ## aqm.boxplot
 ##----------------------------------------
-aqm.boxplot = function(expressionset, dataprep, intgroup, subsample = 10000, ...) {
+aqm.boxplot = function(x, subsample = 10000) {
   
-  ks = ksOutliers(dataprep$dat)
+  ks = ksOutliers(x$dat)
   
-  if (nrow(dataprep$dat)>subsample) {
-    ss = sample(nrow(dataprep$dat), subsample)
+  if (nrow(x$dat)>subsample) {
+    ss = sample(nrow(x$dat), subsample)
     nr = length(ss)
   } else {
     ss = TRUE
-    nr = nrow(dataprep$dat)
+    nr = nrow(x$dat)
   }
   
-  sample_id = rep( seq_len(dataprep$numArrays), each = nr )
+  sample_id = rep( seq_len(x$numArrays), each = nr )
   
-  if(dataprep$nchannels == 2)  {
-    values    = with(dataprep, c(rc[ss,], gc[ss,], dat[ss,]))
+  if(x$nchannels == 2)  {
+    values    = with(x, c(rc[ss,], gc[ss,], dat[ss,]))
     sample_id = rep(sample_id, times = 3)
-    panels    = factor(rep(1:3, each = nr * dataprep$numArrays),
+    panels    = factor(rep(1:3, each = nr * x$numArrays),
                    levels = 1:3,
                    labels = c("a. Red Channel", "b. Green Channel", "c. Log2(Ratio)"))
     formula = sample_id ~ values | panels
     lay = c(3,1)
     legspe = "Three panels are shown: left, red channel; middle, green channel; right, log<sub>2</sub>(ratio). Outlier detection  was performed on the distribution of log<sub>2</sub>(ratio). "
    } else {
-    values  = as.numeric(dataprep$dat[ss, ])
+    values  = as.numeric(x$dat[ss, ])
     formula = sample_id ~ values
     lay = c(1,1)
     legspe = ""
   }
-  xAsterisk = quantile(dataprep$dat[ss,], probs = 0.01)
+  xAsterisk = quantile(x$dat[ss,], probs = 0.01)
   
-  cl = intgroupColours(intgroup, expressionset)
+  cl = intgroupColours(x)
 
   box = bwplot(formula, groups = sample_id, layout = lay, as.table = TRUE,
         strip = function(..., bg) strip.default(..., bg ="#cce6ff"),
@@ -55,7 +55,7 @@ aqm.boxplot = function(expressionset, dataprep, intgroup, subsample = 10000, ...
         xlab = "", ylab = "Array",
         fill = cl$arrayColours, panel = panel.superpose, 
         scales = list(x=list(relation="free"), y=list(axs="i")),
-        ylim = c(dataprep$numArrays+0.7,0.3),
+        ylim = c(x$numArrays+0.7,0.3),
         prepanel = function(x, y) {
           list(xlim = quantile(x, probs = c(0.01, 0.99)))
         },
@@ -66,10 +66,9 @@ aqm.boxplot = function(expressionset, dataprep, intgroup, subsample = 10000, ...
             if (whArray %in% ks$outliers)
               ltext(xAsterisk, whArray, "*", font=2, cex=2, adj=c(0.5, 0.75))
           }
-        },
-    ...)
+        })
 
-  shape = list("h" = 2.5 + dataprep$numArrays * 0.1 +  1/dataprep$numArrays, 
+  shape = list("h" = 2.5 + x$numArrays * 0.1 +  1/x$numArrays, 
                "w" = 3+3*lay[1])
   
   outliertext = if(length(ks$outliers)>0) "Outliers -according to the Kolmogorov-Smirnov statistic between each array's distribution and the distribution of the pooled data- are marked by an asterisk (*). " else ""
@@ -79,15 +78,11 @@ aqm.boxplot = function(expressionset, dataprep, intgroup, subsample = 10000, ...
   title = "Boxplots"
   section = "Array intensity distributions"
 
-  out = list("plot" = box,
-             "section" = section,
-             "title" = title,
-             "legend" = legend,
-             "scores" = ks$statistic,
-             "outliers" = ks$outliers,
-             "shape" = shape)
-  
-  class(out) = "aqmobj.box"
-  
-  return(out)   
+  new("aqmTrellis",
+      plot = box,
+      section = section,
+      title = title,
+      legend = legend,
+      outliers = ks$outliers,
+      shape = shape)
 }

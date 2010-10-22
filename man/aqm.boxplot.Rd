@@ -1,51 +1,47 @@
 \name{aqm.boxplot}
+
 \alias{aqm.boxplot}
 \alias{aqm.density}
 \alias{aqm.heatmap}
 \alias{aqm.pca}
+\alias{aqm.maplot}
+\alias{aqm.meansd}
+\alias{aqm.probesmap}
 
-\title{Compute boxplots, density plots, heatmap, PCA biplot on a aqmobj.prepdata object.}
+\title{Compute plots.}
 
 \description{
-  The functions do boxplots, density plots, heatmap, PCA biplot and
-  produce output objects ready for rendering by \code{aqm.plot}.
+  These functions produce objects containing the various plots used in
+  the report, which can then be rendered by \code{aqm.plot}.
 }
 
 \usage{
-aqm.boxplot(expressionset, dataprep, intgroup, subsample = 10000, ...)
-aqm.density(expressionset, dataprep, intgroup, outliers, ...)
-aqm.heatmap(expressionset, dataprep, intgroup, ...)
-aqm.pca(expressionset, dataprep, intgroup, outliers, ...)
+aqm.boxplot(x, subsample = 10000)
+aqm.density(x, outliers)
+aqm.heatmap(x)
+aqm.pca(x, outliers)
+aqm.maplot(x)
+aqm.meansd(x)
+aqm.probesmap(x)
 }
+
 \arguments{
-  \item{expressionset, dataprep, intgroup}{Same as for the function
-    \code{\link{arrayQualityMetrics}} }
-  \item{outliers}{Indicates arrays to be highlighted as potential
+  \item{x}{An object resulting from a call to \code{\link{prepdata}}.}
+  \item{outliers}{Integer vector indicating the arrays to be highlighted as 
     outliers in the plots.}
   \item{subsample}{For the boxplot computations, if the arrays have more
-    features than indicates by this number, then randomly subsample that
-    number of them. }
-  \item{...}{These arguments get passed on to
-    \code{\link[lattice:xyplot]{bwplot}} (in the case of
-    \code{aqm.boxplot}),
-    \code{\link[lattice:xyplot]{xyplot}} (in the case of
-    \code{aqm.density}),
-    \code{\link[lattice:xyplot]{levelplot}} (in the case of
-    \code{aqm.heatmap})
-  }
+    features than indicated by this number, then randomly subsample that
+    number of them.}
 }
 
 \value{
-An object of class \code{\link{aqmobj.box}},
-  \code{\link{aqmobj.dens}} or \code{\link{aqmobj.heat}}, respectively.
+An object of class \code{aqmTrellis} or \code{aqmPlotfun}.
 }
 
 \details{
-See \code{\link{aqm.prepdata}} and the \code{aqm} Vignette.
+See \code{\link{prepdata}} and the \code{aqm} Vignette.
 }
 
-\author{ Audrey Kauffmann <kauffmann@bergonie.org> }
+\author{Audrey Kauffmann}
 
-\seealso{ \code{\link{aqm.prepdata}}, \code{\link{aqmobj.prepdata}},
-  \code{\link{aqmobj.box}} }
 

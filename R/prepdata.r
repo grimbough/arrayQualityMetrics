@@ -1,38 +1,43 @@
 setClassUnion("aqmOneCol", c("ExpressionSet", "AffyBatch"))
 
-##Functions
-logtransform = function(x)
-  ifelse(x>0, suppressWarnings(log2(x)), rep(NA_real_, length(x)))
+logtransform = function(x) {
+  if (is.null(x)) {
+    NULL
+  } else { 
+    ifelse(x>0, suppressWarnings(log2(x)), rep(NA_real_, length(x)))
+  }
+}
 
-##Methods to prepare the data
-setGeneric("aqm.prepdata",
+## Platform specific data-preparation
+setGeneric("platformspecific",
            function(expressionset,
                     do.logtransform = TRUE)
-           standardGeneric("aqm.prepdata"))
+           standardGeneric("platformspecific"))
 
-##NCS
-setMethod("aqm.prepdata",signature(expressionset = "NChannelSet"), function(expressionset, do.logtransform){
+## NChannelSset
+setMethod("platformspecific",
+          signature(expressionset = "NChannelSet"),
+function(expressionset, do.logtransform){
+  rc = assayData(expressionset)$R
+  gc = assayData(expressionset)$G
+  
+  rcb = if(exists("Rb", envir = assayData(expressionset))) assayData(expressionset)$Rb else NULL
+  gcb = if(exists("Gb", envir = assayData(expressionset))) assayData(expressionset)$Gb else NULL
+
   if(do.logtransform)
     {
-      rc = logtransform(assayData(expressionset)$R)
-      gc = logtransform(assayData(expressionset)$G)
-    } else {
-      rc = assayData(expressionset)$R
-      gc = assayData(expressionset)$G
-    }
-  if("Rb" %in% colnames(dims(expressionset)) && "Gb" %in% colnames(dims(expressionset)))
-    {
-      rcb = logtransform(assayData(expressionset)$Rb)
-      gcb = logtransform(assayData(expressionset)$Gb)
-    } else rcb = gcb = NULL
+      rc  = logtransform(rc)
+      gc  = logtransform(gc)
+      rcb = logtransform(rcb)
+      gcb = logtransform(gcb)
+    } 
 
   M = dat = rc - gc
   A = 0.5*(rc+gc)
   
-  sN = seq_len(length(sampleNames(expressionset)))
-  
+  colnames(dat) = seq(along = sampleNames(expressionset))
   numArrays = ncol(rc)
-  colnames(dat) = sN
+  
   if("dyeswap" %in% names(phenoData(expressionset)@data))
     {
       lev = levels(expressionset@phenoData$dyeswap)
@@ -41,74 +46,98 @@ setMethod("aqm.prepdata",signature(expressionset = "NChannelSet"), function(expr
       reverseddye = names(expressionset@phenoData$dyeswap[expressionset@phenoData$dyeswap == min(lev)])
       dat[,reverseddye] = - dat[,reverseddye]
     }
+  
   outM = as.dist(dist2(dat))
   
-  
-  object = list("rc" = rc, "gc" = gc, "rcb" = rcb, "gcb" = gcb, "M" = M, "A" = A, "dat" = dat, "outM" = outM, "sN" = sN, "numArrays" = numArrays, "nchannels" = 2, "logtransformed" = do.logtransform, "classori" = class(expressionset)[1])
-  class(object) = "aqmobj.prepdata"
-  return(object)
+  list(
+     "rc" = rc, "gc" = gc, "rcb" = rcb, "gcb" = gcb,
+     "M" = M, "A" = A, "dat" = dat,
+     "outM" = outM, "numArrays" = numArrays,
+     "nchannels" = 2)
 })
 
-##ES & AB
-setMethod("aqm.prepdata",signature(expressionset = "aqmOneCol"), function(expressionset, do.logtransform){
+## ExpressionSet and AffyBatch
+setMethod("platformspecific",
+          signature(expressionset = "aqmOneCol"),
+function(expressionset, do.logtransform){
+  dat = exprs(expressionset)    
   if(do.logtransform)
-    {
-      dat = logtransform(exprs(expressionset))
-    } else dat = exprs(expressionset)    
+    dat = logtransform(dat)
   
   medArray = rowMedians(dat, na.rm=TRUE)
   M =  dat - medArray
   A =  (dat + medArray)/2
   
-  sN = seq_len(length(sampleNames(expressionset)))
- 
   numArrays = ncol(dat)
   outM = as.dist(dist2(dat))
   
-  object = list("rc" = NULL, "gc" = NULL,  "rcb" = NULL, "gcb" = NULL,"M" = M, "A" = A, "dat" = dat, "outM" = outM, "sN" = sN, "numArrays" = numArrays, "nchannels" = 1, "logtransformed" = do.logtransform, "classori" = class(expressionset)[1])
-  class(object) = "aqmobj.prepdata"
-  return(object)
+  list(
+    "rc" = NULL, "gc" = NULL,  "rcb" = NULL, "gcb" = NULL,
+    "M" = M, "A" = A, "dat" = dat,
+    "outM" = outM, "numArrays" = numArrays,
+    "nchannels" = 1)
 })
           
-##BLL
-setMethod("aqm.prepdata",signature(expressionset = "BeadLevelList"), function(expressionset, do.logtransform){
+## BeadLevelList
+setMethod("platformspecific",
+          signature(expressionset = "BeadLevelList"),
+function(expressionset, do.logtransform){
             
- sN = seq_len(length(arrayNames(expressionset)))
- 
   numArrays = as.numeric(dim(expressionset)[1])
-            
-  if(expressionset@arrayInfo$channels == "single")
-    {
-      summaryES = createBeadSummaryData(expressionset, imagesPerArray = 1, log = do.logtransform)
-      rc = gc = NULL
-      nch = 1
-    }
-  if(expressionset@arrayInfo$channels == "two")
-    {
-      summaryESRG = createBeadSummaryData(expressionset, what = "RG", imagesPerArray = 1, log = do.logtransform)
-      rc = assayData(summaryESRG)$R                         
-      gc = assayData(summaryESRG)$G                
-      summaryES = createBeadSummaryData(expressionset ,what = "M", imagesPerArray = 1, log = do.logtransform)
-      nch = 2
-    }            
+
+  switch(expressionset@arrayInfo$channels,
+   "single" =  {
+     summaryES = createBeadSummaryData(expressionset, imagesPerArray = 1, log = do.logtransform)
+     rc = gc = NULL
+     nch = 1
+   },
+   "two" = {
+     summaryESRG = createBeadSummaryData(expressionset, what = "RG", imagesPerArray = 1, log = do.logtransform)
+     rc = assayData(summaryESRG)$R                         
+     gc = assayData(summaryESRG)$G                
+     summaryES = createBeadSummaryData(expressionset ,what = "M", imagesPerArray = 1, log = do.logtransform)
+     nch = 2
+   },
+   stop(sprintf("Invalid expressionset@arrayInfo$channels = '%s'", expressionset@arrayInfo$channels))    
+  ) ## switch
   
   dat = exprs(summaryES)
   outM = as.dist(dist2(dat))
  
-  if(expressionset@arrayInfo$channels == "single")
-    {
+  switch(expressionset@arrayInfo$channels,
+   "single" = {
       medArray = rowMedians(dat, na.rm=TRUE)
       M =  dat - medArray
       A =  (dat + medArray)/2
-    }
-  if(expressionset@arrayInfo$channels == "two")
-    {
+   },
+   "two" = {
       M = rc - gc
       A = 0.5*(rc +gc)
-    }
+   })
   
-  object = list("rc" = rc, "gc" = gc, "rcb" = NULL, "gcb" = NULL, "M" = M, "A" = A, "dat" = dat, "outM" = outM, "sN" = sN, "numArrays" = numArrays, "nchannels" = nch, "logtransformed" = do.logtransform, "classori" = class(expressionset)[1])
-  class(object) = "aqmobj.prepdata"
-  return(object)
+  list(
+    "rc" = rc, "gc" = gc, "rcb" = NULL, "gcb" = NULL,
+    "M" = M, "A" = A, "dat" = dat,
+    "outM" = outM, "numArrays" = numArrays,
+    "nchannels" = nch)
 })
 
+
+prepdata = function(expressionset, intgroup, do.logtransform) {
+
+  cls = class(expressionset)
+  if (any(cls %in% c("RGList", "MAList", "marrayRaw", "marrayNorm"))) {
+    expressionset = try(as(expressionset, "NChannelSet"))
+    if(inherits(expressionset,'try-error'))
+      stop(sprintf("Argument 'expressionset' is of class '%s', and its automatic conversion into 'NChannelSet' failed. Please try to convert it manually.\n", paste(cls, collapse=", ")))
+  }
+
+  x = platformspecific(expressionset, do.logtransform)
+
+  x$intgroup = intgroup
+  x$do.logtransform = do.logtransform
+  x$classori = class(expressionset)[1]
+  x$expressionset = expressionset
+  
+  return(x)
+}

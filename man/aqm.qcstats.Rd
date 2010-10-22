@@ -1,7 +1,12 @@
 \name{aqm.qcstats}
-\alias{aqm.qcstats}
 
-\title{ Performs QCstats plot on AffyBatch. }
+\alias{aqm.qcstats}
+\alias{aqm.pmmm}
+\alias{aqm.rnadeg}
+\alias{aqm.rle}
+\alias{aqm.nuse}
+
+\title{Compute Affymetrix specific plots.}
 
 \description{
   \code{aqm.qcstats} performs QCstats on objects of class
@@ -9,22 +14,30 @@
   \code{aqm.plot} usage.
 }
 
-\usage{ aqm.qcstats(expressionset, ...) }
+\usage{
+aqm.qcstats(expressionset)
+aqm.pmmm(expressionset)
+aqm.rnadeg(expressionset)
+aqm.rle(x, affyproc)
+aqm.nuse(x, affyproc)
+}
 
 \arguments{
-  \item{expressionset}{ is an object of
-    class \code{\link[affy:AffyBatch-class]{AffyBatch}} }
-  \item{...}{ Any arguments to \code{\link[simpleaffy:qc]{qc}} }
- }
+  \item{expressionset}{An \code{AffyBatch} object.}
+  \item{x}{The object resulting from the call to \code{\link{prepdata}(expressionset)}.}
+  \item{affyproc}{The object resulting from the call to \code{\link{prepaffy}(expressionset)}.}
+}
 
-\value{ An object of class  \code{\link{aqmobj.qcs}}. }
+\value{
+An object of class \code{aqmTrellis} or \code{aqmPlotfun}.
+}
 
-\author{ Audrey Kauffmann <kauffmann@bergonie.org> }
+\author{Audrey Kauffmann}
 
-\seealso{ \code{\link{aqmobj.qcs}} }
+\seealso{\code{\link{aqm.boxplot}}}
 
 \examples{
-    library(ALLMLL)
+    library("ALLMLL")
     data(MLL.A)
     qm = aqm.qcstats(MLL.A)
     class(qm)

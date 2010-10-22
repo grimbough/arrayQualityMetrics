@@ -6,8 +6,6 @@
 ##     - title (character string)
 ##     - linked ids (character vector)
 ##
-
-
 annotateSvgMatplot = function(infile, outfile, annotationInfo,
   js = system.file("javascript", "imatplot.js", package = "arrayQualityMetrics")) 
   {

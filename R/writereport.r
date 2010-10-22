@@ -1,9 +1,3 @@
-setClassUnion("aqmTrellis",
-              c("aqmobj.ma", "aqmobj.heat", "aqmobj.pca", "aqmobj.probesmap",
-                "aqmobj.spatial", "aqmobj.spatialbg", "aqmobj.dens"))
-setClassUnion("aqmBoxes",
-              c("aqmobj.box", "aqmobj.rle", "aqmobj.nuse"))
-
 ## Creation of the outdir
 dircreation = function(outdir = getwd(), force = FALSE)
   {
@@ -26,60 +20,39 @@ dircreation = function(outdir = getwd(), force = FALSE)
       }
   }
 
-## Write report functions
+
+## Produce the plots for classes 'aqmTrellis' and 'aqmPlotfun' 
 setGeneric("aqm.plot",
            function(obj)
            standardGeneric("aqm.plot"))
 
-## Produce the plots for class union 'aqmTrellis' 
 setMethod("aqm.plot", signature(obj = "aqmTrellis"), function(obj){
-  print(obj$plot)})
+  print(obj@plot) })
 
-##  For other classes
-for(type in c("aqmobj.rnadeg", "aqmobj.qcs", "aqmobj.msd"))
-  setMethod("aqm.plot", signature(obj = type), function(obj) {
-    do.call(obj$plot, args = list())
-  })
-
-## Idiosyncratic methods (it would be better to move all method-specific rendering
-##   into the functions that generate the objects).
-
-setMethod("aqm.plot",signature(obj = "aqmobj.pmmm"), function(obj){
-  plot(obj$plot$MM, col = "grey", xlab = "log(Intensity)", main="")
-  lines(obj$plot$PM, col = "blue")
-  legend("topright", c("PM","MM"),lty=1,lwd=2,col= c("blue","grey"), bty = "n")
-})
-
-setMethod("aqm.plot",signature(obj = "aqmBoxes"), function(obj){
-  box.rectangle <- trellis.par.get("box.rectangle")
-  box.rectangle$col = "black"
-  trellis.par.set("box.rectangle",box.rectangle)
-  box.umbrella <- trellis.par.get("box.umbrella")
-  box.umbrella$col = "black"
-  trellis.par.set("box.umbrella",box.umbrella)
-  print(obj$plot)
-})
+setMethod("aqm.plot", signature(obj = "aqmPlotfun"), function(obj) {
+  do.call(obj@plot, args = list()) })
   
-##To create the title
-aqm.make.title = function(reporttitle)
+## Create the title
+aqm.make.title = function(reporttitle, outdir)
   {
     if(!(is.character(reporttitle)&&(length(reporttitle)==1)))
       stop("'reporttitle' must be a character of length 1.")
-    p = openPage('QMreport.html')
+    p = openPage(file.path(outdir, 'QMreport.html'))
     hwrite("<hr>", p)
     hwrite(reporttitle, p, heading=1, style='text-align:center;font-family:helvetica,arial,sans-serif')
     hwrite("<hr>", p)
     return(p)
   }
 
-##To create a new section
+## Create a new section
 aqm.make.section = function(p, s, qm)
   {
     hwrite("<hr>", p)
-    sec = paste("<a name= 'S",s,"'>Section ", s, ": ", qm$section,"</a>", sep = "")
+    sec = paste("<a name= 'S",s,"'>Section ", s, ": ", qm@section,"</a>", sep = "")
     hwrite(sec, p, heading=2, style='font-family:helvetica,arial,sans-serif')
   }
 
+##  To Do: Use style sheet rather than jumbling font descriptions in here!
 
 ##To create the index
 aqm.make.index = function(obj, p)
@@ -109,15 +82,15 @@ aqm.make.index = function(obj, p)
 
 
 ##To create a part of report with figures and legend
-aqm.report.qm = function(p, qm, f, name)
+aqm.report.qm = function(p, qm, f, name, outdir)
   {
-    h = qm$shape$h
-    w = qm$shape$w
+    h = qm@shape$h
+    w = qm@shape$w
     dpi = 72
 
-    imageformat =  if("svg" %in% names(qm)) "svg" else "png"
+    imageformat =  if(length(qm@svg)>0) "svg" else "png"
 
-    ## The two cases, png and svg, need to be treated quite differently ...
+    ## The two cases, png and svg, need to be treated differently 
     switch(imageformat,
            svg = {
              nameimg = paste(name, ".svg", sep = "")
@@ -125,15 +98,13 @@ aqm.report.qm = function(p, qm, f, name)
              svg(file = svgtemp, h = h, w = w)
              aqm.plot(qm)
              dev.off()
-             size = annotateSvgMatplot(svgtemp, nameimg, annotationInfo=qm$svg)
+             size = annotateSvgMatplot(svgtemp, file.path(outdir, nameimg), annotationInfo=qm@svg)
              img = aqm.hwriteImage(nameimg, width=paste(size[1]), height=paste(size[2]))
            },
            png = {
-             nameimg = paste(name, ".png", sep = "")
+             nameimg = file.path(outdir, paste(name, ".png", sep = ""))
              png(file = nameimg, h = h*dpi, w = w*dpi)
-             if( (class(qm) %in% c("aqmobj.ma", "aqmobj.spatial", "aqmobj.spatialbg"))
-                && (class(qm$plot) == "list" && class(qm$plot[[1]]) == "trellis"))
-               print(qm$plot[[1]]) else aqm.plot(qm)
+             aqm.plot(qm)
              dev.off()
              img = aqm.hwriteImage(nameimg)
            },
@@ -149,18 +120,18 @@ aqm.report.qm = function(p, qm, f, name)
       style='font-weight:bold;text-align:center;font-family:helvetica',
       border=0, link=namepdf)
     
-    hwrite(c(img, paste("Figure ", f, ": ", qm$title,". ", linkpdf, sep="")),
+    hwrite(c(img, paste("Figure ", f, ": ", qm@title,". ", linkpdf, sep="")),
            p,
            dim=c(2,1),
            style='font-weight:bold;text-align:center;font-family:helvetica',
            border=0, link=link)
     
-    hwrite(paste("<br>", qm$legend),
+    hwrite(paste("<br>", qm@legend),
            p,
            style='text-align:justify;font-family:Lucida Grande;font-size:10pt')
   }
 
-##To end the report
+## End the report
 aqm.make.ending = function(p)
   {
     z = sessionInfo("arrayQualityMetrics")
@@ -173,7 +144,7 @@ aqm.make.ending = function(p)
     closePage(p)
   }
 
-##Score table formatting
+## Score table formatting
 scores = function(expressionset, obj)
   {
     titles = c(
@@ -205,15 +176,17 @@ scores = function(expressionset, obj)
   }
 
 
-
-aqm.writereport = function(name, expressionset, obj)
+aqm.writereport = function(name, obj, outdir)
   {
+    ## To Do: do we need this? Should it really be done here, or next to the processing of the 'usesvg' argument
+    ##    in the 'arrayQualityMetrics' function?
     if (Sys.info()["sysname"] == "Darwin")
       options(bitmapType = "cairo")
+
     sec = 1
-    p = aqm.make.title(name)
+    p = aqm.make.title(name, outdir)
   
-    sc = scores(expressionset, obj)
+    sc = scores(obj)
     col = rep(c("#d0d0ff","#e0e0f0"), (ceiling((nrow(sc)+1)/2))) #
 
     if(nrow(sc) < length(col))  
@@ -227,27 +200,21 @@ aqm.writereport = function(name, expressionset, obj)
           
     hwrite("*outlier array",style=normset,p)
 
-    if(class(obj) != "list")
+
+    aqm.make.index(obj, p)
+
+    lasttype = "Something Else"
+    
+    for(i in seq(along = obj))
       {
-        aqm.make.section(p, s = sec, qm = obj)
-        aqm.report.qm(p, obj, 1, "fig")
-      } else {
-
-        aqm.make.index(obj, p)
-
-        lasttype = "FAKE"
-    
-        for(i in seq(along = obj))
+        if(obj[[i]]$section != lasttype)
           {
-            if(obj[[i]]$section != lasttype)
-              {
-                aqm.make.section(p, s = sec, qm = obj[[i]])
-                sec = sec+1
-              }
-            aqm.report.qm(p, obj[[i]], i, names(obj)[i])
-            lasttype = obj[[i]]$section
+            aqm.make.section(p, s = sec, qm = obj[[i]])
+            sec = sec+1
           }
+        aqm.report.qm(p, qm=obj[[i]], f=i, name=names(obj)[i], outdir=outdir)
+        lasttype = obj[[i]]$section
       }
-    
+     
     aqm.make.ending(p)
   }

@@ -1,34 +1,38 @@
 \name{aqm.spatial}
 \alias{aqm.spatial}
+\alias{aqm.spatialbg}
 
-\title{ Performs spatial distribution representation of the arrays from
-  aqmobj.prepdata objects. }
+\title{Computes spatial distribution statistics of the arrays.}
 
 \description{
-  \code{aqm.spatial} performs representation of the spatial distribution
-  of the intensities on the arrays, outlier detection and formats the
+  \code{aqm.spatial} and \code{aqm.spatialbg} compute spatial distribution statistics of the arrays,
+  perform outlier detection and prepare the
   output for \code{aqm.plot} usage.
 }
 
-\usage{ aqm.spatial(expressionset, dataprep, scale) }
+\usage{
+  aqm.spatial(expressionset, dataprep, scale)
+  aqm.spatialbg(expressionset, dataprep, scale)
+}
 
 \arguments{
   \item{expressionset}{ Same input as for the function
     \code{\link{arrayQualityMetrics}} }
-  \item{dataprep}{ An object of class \code{\link{aqmobj.prepdata}} }
+  \item{dataprep}{ Result of the call to \code{\link{prepdata}}. }
   \item{scale}{ The spatial distribution can be represented on the rank
   of the intensities or on the logarithm scale. Possible options are
-  thus 'Rank' and 'Log'. }
- }
-
-\value{ An object of class \code{\link{aqmobj.spatial}}. }
-
-\details{
-See \code{\link{aqm.prepdata}} and the \code{aqm} Vignette.
+  thus 'Rank' and 'Log'.}
 }
 
-\author{ Audrey Kauffmann <kauffmann@bergonie.org> }
+\value{
+An object of class \code{aqmTrellis}.
+}
 
-\seealso{ \code{\link{aqm.prepdata}}, \code{\link{aqmobj.prepdata}},
-  \code{\link{aqmobj.spatial}} }
+\details{
+See the \code{aqm} vignette.
+}
+
+\author{Audrey Kauffmann}
+
+\seealso{ \code{\link{aqm.boxplot}}, \code{\link{prepdata}} }
 

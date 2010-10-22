@@ -196,9 +196,9 @@ imageplotBLL = function(BLData, array = 1, nrow = 100, ncol = 100,
 ## BLL
 setMethod("spatialbg",signature(expressionset = "BeadLevelList"), function(expressionset, dataprep, scale)
           {
-            imageMatgb = lapply(seq_len(dataprep$numArrays), function(i) imageplotBLL(expressionset, array = i, whatToPlot="Gb", log = dataprep$logtransformed))
+            imageMatgb = lapply(seq_len(dataprep$numArrays), function(i) imageplotBLL(expressionset, array = i, whatToPlot="Gb", log = dataprep$do.logtransform))
             if(expressionset@arrayInfo$channels == "two")
-              imageMatrb = lapply(seq_len(dataprep$numArrays), function(i) imageplotBLL(expressionset, array = i, whatToPlot="Rb", log = dataprep$logtransformed))
+              imageMatrb = lapply(seq_len(dataprep$numArrays), function(i) imageplotBLL(expressionset, array = i, whatToPlot="Rb", log = dataprep$do.logtransform))
             
             spgb = spatialplot(expressionset, dataprep,dataprep$gcb, paste(scale, "(green background intensity)"), scale, imageMatgb)
             sprb = NULL
@@ -210,9 +210,9 @@ setMethod("spatialbg",signature(expressionset = "BeadLevelList"), function(expre
             
 setMethod("spatial",signature(expressionset = "BeadLevelList"), function(expressionset, dataprep, scale)
           {
-            imageMatg = lapply(seq_len(dataprep$numArrays), function(i) imageplotBLL(expressionset, array = i, whatToPlot="G", log = dataprep$logtransformed))
+            imageMatg = lapply(seq_len(dataprep$numArrays), function(i) imageplotBLL(expressionset, array = i, whatToPlot="G", log = dataprep$do.logtransform))
             if(expressionset@arrayInfo$channels == "two")
-              imageMatr = lapply(seq_len(dataprep$numArrays), function(i) imageplotBLL(expressionset, array = i, whatToPlot="R", log = dataprep$logtransformed))
+              imageMatr = lapply(seq_len(dataprep$numArrays), function(i) imageplotBLL(expressionset, array = i, whatToPlot="R", log = dataprep$do.logtransform))
             
             spg = spatialplot(expressionset, dataprep,dataprep$gc, paste(scale, "(green intensity)"), scale, imageMatg)
             spr = NULL
@@ -235,9 +235,12 @@ aqm.spatialbg = function(expressionset, dataprep, scale)
   
   legend = sprintf("The figure <!-- FIG --> shows false colour representations of the arrays' spatial distributions of feature local background estimates. The colour scale is shown in the panel on the right, and it is proportional to the ranks of the probe background intensities.")
 
-  out = list("plot" = bg, "section" = section, "title" = title, "legend" = legend, "shape" = list("h"=6,"w"=6))
-  class(out) = "aqmobj.spatialbg"
-  return(out)
+  new("aqmTrellis",
+      plot = bg,
+      section = section,
+      title = title,
+      legend = legend, 
+      shape = list("h"=6,"w"=6))
 }
 
 ## FOREGROUND
@@ -264,7 +267,7 @@ aqm.spatial = function(expressionset, dataprep, scale)
     }
  
   if(inherits(expressionset, "BeadLevelList"))
-    loc = scoresspatbll(expressionset, dataprep, dataprep$logtransformed)
+    loc = scoresspatbll(expressionset, dataprep, dataprep$do.logtransform)
 
   if(is(loc,"numeric"))
     {
@@ -279,7 +282,11 @@ aqm.spatial = function(expressionset, dataprep, scale)
       names(locout) = if(length(locout) == 3) c("LR","Red","Green") else c("Red","Green")
     }
 
-  out = list("plot" = fore, "section" = section, "title" = title, "legend" = legend, "scores" = loc, "outliers" = locout, "shape" = list("h"=6,"w"=6))
-  class(out) = "aqmobj.spatial"
-  return(out)
+  new("aqmTrellis",
+      plot = fore,
+      section = section,
+      title = title,
+      legend = legend,
+      outliers = locout,
+      shape = list("h"=6,"w"=6))
 }
