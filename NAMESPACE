@@ -75,24 +75,20 @@ importFrom(SVGAnnotation, addECMAScripts, addCSS, convertCSSStylesToSVG, enlarge
 ##--------------------------------------------------
 ## export
 ##--------------------------------------------------
+exportClasses("aqmReportModule")
+
 export("arrayQualityMetrics")
-export("addXYfromGAL")
-export("aqm.plot")
-export("aqm.boxplot")
-export("aqm.maplot")
-export("aqm.density")
-export("aqm.probesmap")
-export("aqm.meansd")
-export("aqm.heatmap")
-export("aqm.pca")
-export("aqm.rle")
-export("aqm.nuse")
-export("aqm.rnadeg")
-export("aqm.qcstats")
-export("aqm.pmmm")
-export("aqm.spatial")
-export("aqm.spatialbg")
+export("prepdata", "prepaffy")
+
 export("aqm.writereport")
+
+export("aqm.boxplot", "aqm.maplot",  "aqm.density", "aqm.probesmap",
+       "aqm.meansd",  "aqm.heatmap", "aqm.pca",
+       "aqm.rle",     "aqm.nuse",    "aqm.rnadeg", "aqm.qcstats",
+       "aqm.pmmm",
+       "aqm.spatial", "aqm.spatialbg")
+
+export("addXYfromGAL")
 export("ksOutliers")
 
 

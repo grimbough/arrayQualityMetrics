@@ -11,3 +11,17 @@
   identifies features containing the same reporter sequence, we can
   check for that (scatterplots, standard deviation)
 
+* affyspecific.r: 
+  - Fix the outlier computation (see 'TODO')
+  - Use 'colSums' - it's faster  (see 'TODO')
+
+* arrayQualityMetrics.R:
+  - move spatial computations into function 'aqm.spatial'  (see 'TODO')
+
+* writereport.r:
+  - do we need (Sys.info()["sysname"] == "Darwin") here?  (see 'TODO')
+  Use style sheet rather than hard-coding font descriptions all over the place into the code.
+
+
+* maplot.r:
+  clumsy outlier computation

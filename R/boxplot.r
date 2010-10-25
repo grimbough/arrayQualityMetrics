@@ -78,7 +78,7 @@ aqm.boxplot = function(x, subsample = 10000) {
   title = "Boxplots"
   section = "Array intensity distributions"
 
-  new("aqmTrellis",
+  new("aqmReportModule",
       plot = box,
       section = section,
       title = title,

@@ -67,7 +67,7 @@ aqm.density = function(x, outliers)
   title = "Density plots"
   section = "Array intensity distributions"
   
-  new("aqmTrellis",
+  new("aqmReportModule",
       "plot"    = den,
       "section" = section,
       "title"   = title,

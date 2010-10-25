@@ -26,7 +26,7 @@ aqm.pca = function(x, outliers) {
   title = "Principal Component Analysis"
   section = "Between array comparison"
    
-  new("aqmTrellis",
+  new("aqmReportModule",
       plot = pcafig,
       section = section,
       title = title,

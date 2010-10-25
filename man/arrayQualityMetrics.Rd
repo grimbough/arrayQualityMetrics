@@ -1,47 +1,22 @@
 \name{arrayQualityMetrics}
 \alias{arrayQualityMetrics}
-\alias{arrayQualityMetrics-methods}
-\alias{arrayQualityMetrics,ExpressionSet-method}
-\alias{arrayQualityMetrics,AffyBatch-method}
-\alias{arrayQualityMetrics,NChannelSet-method}
-\alias{arrayQualityMetrics,BeadLevelList-method}
-\alias{arrayQualityMetrics,RGList-method}
-\alias{arrayQualityMetrics,MAList-method}
-\alias{arrayQualityMetrics,marrayRaw-method}
-\alias{arrayQualityMetrics,marrayNorm-method}
-\alias{arrayQualityMetrics,aqmInputObj-method}
 
 \title{Quality metrics for microarray experiments}
 
-\description{
-  \code{arrayQualityMetrics} reports quality metrics on
-  \code{\link[Biobase:class.ExpressionSet]{ExpressionSet}},
-  \code{\link[affy:AffyBatch-class]{AffyBatch}} ,
-  \code{\link[Biobase:class.NChannelSet]{NChannelSet}},
-  \code{\link[beadarray:class-BeadLevelList]{BeadLevelList}},
-  \code{\link[limma:rglist]{RGList}},
-  \code{\link[limma:malist]{MAList}},
-  \code{aqmInputObj},
-  \code{\link[marray:marrayRaw-class]{marrayRaw}} or
-  \code{\link[marray:marrayNorm-class]{marrayNorm}} containing
-  microarray data from any platforms, one or two channels. The results,
-  presented in a HTML report, are designated to allow the user
-  to rapidly assess the quality of a set of arrays.
+\description{Produce an array quality metrics report. This is the main function
+  of the package.
 }
 
 \usage{
-arrayQualityMetrics(expressionset,
-                    outdir = getwd(),
-                    force = FALSE,
-                    do.logtransform = FALSE,
-                    intgroup = NULL,
-                    grouprep,
-		    spatial = TRUE,
-                    reporttitle = paste("Quality metrics report for", deparse(substitute(expressionset))))
+arrayQualityMetrics(expressionset, outdir = getwd(), force = FALSE,
+    do.logtransform = FALSE, intgroup = NULL, grouprep, spatial = TRUE,
+    reporttitle = paste("Quality metrics report for", deparse(substitute(expressionset))),
+    usesvg)
 }
 
 \arguments{
-  \item{expressionset}{an object of
+  \item{expressionset}{a Bioconductor microarray dataset container. This
+    can be an object of
     class \code{\link[Biobase:class.ExpressionSet]{ExpressionSet}},
     \code{\link[affy:AffyBatch-class]{AffyBatch}},
     \code{\link[Biobase:class.NChannelSet]{NChannelSet}},
@@ -49,8 +24,7 @@ arrayQualityMetrics(expressionset,
     \code{\link[limma:rglist]{RGList}},
     \code{\link[limma:malist]{MAList}},
     \code{\link[marray:marrayRaw-class]{marrayRaw}},
-    \code{\link[marray:marrayNorm-class]{marrayNorm}} or
-    \code{aqmInputObj}}
+    \code{\link[marray:marrayNorm-class]{marrayNorm}}.}
 
 \item{outdir}{the name of the directory in which the report is
   created; a character of length 1.}
@@ -78,20 +52,26 @@ arrayQualityMetrics(expressionset,
   hgu133Plus2) when CPU time and RAM resources of the machine would be limiting. }
 
 \item{reporttitle}{title for the report (character of length 1).}
+
+\item{usesvg}{a logical of length 1, indicating whether 
+  graphics should be produced with interactive tooltips and highlighting
+  on mouseover through using JavaScripted SVG. If missing, the value of \code{capabilities()["cairo"]}
+  is used. Use of this option is recommended: some of the graphics will be much less useful without
+  JavaScripted SVG.}
 }
+
 
 \details{
   See the arrayQualityMetrics vignette for examples of this function.
 }
 
 \value{
-  A side effect of the function is the creation of directory named by \code{outdir} containing a HTML report \code{QMreport.html}
-  and PNG and PDF files with figures. The function also returns a list with R
-  objects containing the report elements for subsequent programmatic processing.
-}
+  A side effect of the function is the creation of directory named
+  by \code{outdir} containing a HTML report \code{QMreport.html} and
+  figures. The function also returns a list with R objects containing
+  the report elements for subsequent programmatic processing.  }
 
 \author{
   Audrey Kauffmann.
 }
 
-\keyword{hplot}

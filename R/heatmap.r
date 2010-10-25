@@ -74,7 +74,7 @@ aqm.heatmap = function(x)
   ##-- no svg annotation: is not especially helpful, and does not scale well for large arrays
   ##  "svg" = list(annotation=annotation, getfun = function(doc) heatmapRectangles(doc, n=numArrays)))
 
-  new("aqmTrellis",
+  new("aqmReportModule",
       "plot"     = hfig,
       "section"  = section,
       "title"    = title,

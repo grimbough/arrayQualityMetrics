@@ -22,7 +22,7 @@ aqm.probesmap = function(x)
   
   legend = "The figure <!-- FIG --> shows the density distributions of the log<sub>2</sub> ratios grouped by the mapping of the probes, i.e. by whether they have <tt>TRUE</tt> or <tt>FALSE</tt> in the <tt>hasTarget</tt> slot. The goal of this plot is to check whether the intensities of the probes mapping to a target are shifted to higher values compared to the intensities of the probes without known target. Two curves superposed may mean a problem in the annotation of the features."
     
-  new("aqmTrellis",
+  new("aqmReportModule",
       plot = den,
       section = "Probe stratification",
       title = "Probes mapping",

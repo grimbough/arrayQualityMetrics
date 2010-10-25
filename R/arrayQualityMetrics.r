@@ -32,10 +32,12 @@ arrayQualityMetrics = function(
   if(missing(usesvg)){
     ## Note: assignment within the if-condition
     if(! (usesvg <- capabilities()["cairo"]) )
-      warning("capabilities()[\"cairo\"] is FALSE - all graphs will be static. Please install the cairo library for your R to obtain interactive svg graphics.") 
+      warning("capabilities()[\"cairo\"] is FALSE - all graphics will be static. Please install the cairo library for your R to obtain interactive svg graphics.") 
   } else {
     if( is.logical(usesvg) && (length(usesvg)==1) && !is.na(usesvg) )
       stop("'usesvg' must be TRUE or FALSE")
+    if(!capabilities()["cairo"])
+      stop("capabilities()[\"cairo\"] is FALSE - cannot produce interactive svg graphics. Please install the cairo library for your R.") 
   }
 
   ## output directory
@@ -47,7 +49,7 @@ arrayQualityMetrics = function(
   ##  as well as some generally useful derived statistics of the data
   x = prepdata(expressionset, intgroup, do.logtransform) 
   
-  ## To Do: move this into function 'aqm.spatial'
+  ## TODO: move this into function 'aqm.spatial'
   if(inherits(expressionset, 'BeadLevelList') || inherits(expressionset, 'AffyBatch') ||
      (("X" %in% rownames(featureData(expressionset)@varMetadata)) &&
       ("Y" %in% rownames(featureData(expressionset)@varMetadata))) && spatial) {            

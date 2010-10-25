@@ -13,7 +13,10 @@ aqm.meansd = function(x) {
   title = "Standard deviation versus rank of the mean"
   section = "Variance mean dependence"
   
-  new("aqmPlotfun",
+  new("aqmReportModule",
       plot = msdplo,
-      section = section, title = title, legend = legend, shape = list("h"=6, "w"=6))
+      section = section,
+      title = title,
+      legend = legend,
+      shape = list("h"=6, "w"=6))
 }

@@ -44,7 +44,7 @@ aqm.rnadeg = function(expressionset)
     title = "RNA digestion plot"
     section = "Affymetrix specific plots"
     
-    new("aqmPlotfun",
+    new("aqmReportModule",
         plot = rnaDeg,
         section = section,
         title = title,
@@ -75,7 +75,7 @@ aqm.rle = function(x, affyproc)
     rle@section = "Affymetrix specific plots"
     rle@outliers = integer(0)
 
-    ## To Do: Fix the outlier computation
+    ## TODO: Fix the outlier computation
     ## rle2 = try(Mbox(affyproc$dataPLM, plot = FALSE))
     ## rlemed = rle2$stats[3,]
     ## rleout = which(abs(rlemed) > 0.1)
@@ -87,7 +87,7 @@ aqm.rle = function(x, affyproc)
 aqm.nuse = function(x, affyproc)
 { 
   ## bwplot for PLMset
-  ## To Do: Use 'colSums' - it's faster
+  ## TODO: Use 'colSums' - it's faster
   compute.nuse <- function(which){
     1/sqrt(apply(affyproc$dataPLM@weights[[1]][which,,drop=FALSE], 2, sum))
   }
@@ -137,7 +137,7 @@ aqm.qcstats = function(expressionset) {
   
   shape = list("h" = 4 + ncol(exprs(expressionset)) * 0.1 + 1/ncol(exprs(expressionset)),  "w" = 6)
   
-  new("aqmPlotfun",
+  new("aqmReportModule",
       plot = qcStats,
       section = "Affymetrix specific plots",
       title = "Diagnostic plot recommended by Affymetrix",
@@ -159,7 +159,7 @@ aqm.pmmm = function(expressionset)
   
   legend = "Figure <!-- FIG --> shows the density distributions of the log<sub>2</sub> intensities grouped by the matching type of the probes. The blue line shows a density estimate (smoothed histogram) from intensities of perfect match probes (PM), the grey line, one from the mismatch probes (MM). We expect that MM probes have poorer hybridization than PM probes, and thus that the PM curve be to the right of the MM curve."
 
-  new("aqmPlotfun",
+  new("aqmReportModule",
       plot = PMMM,
       section = "Affymetrix specific plots",
       title = "Perfect matches and mismatches",

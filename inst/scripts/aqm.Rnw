@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{arrayQualityMetrics modules}
+%\VignetteIndexEntry{Working with arrayQualityMetrics report sections}
 %\VignetteDepends{}
 
 \documentclass[11pt]{article}
@@ -17,19 +17,18 @@
 
 \begin{document}
 
-\title{Calling individual modules of arrayQualityMetrics}
+\title{Working with arrayQualityMetrics report modules}
 \author{Audrey Kauffmann}
 \maketitle
 \tableofcontents
 \pagebreak
 
 \section*{Introduction}
-In the vignette arrayQualityMetrics.pdf, you can learn how to use the arrayQualityMetrics function to create a full report. In this vignette, we show how to only run one or several of the metrics and how to add your own modules to customize the report.
-%
-<<options,echo=FALSE>>=
-if (Sys.info()["sysname"] == "Darwin")
-  options(bitmapType = "cairo")
-@
+In the other vignette of this package, \emph{Quality assessment with
+  arrayQualityMetrics}, you can learn how to use the
+\Rfunction{arrayQualityMetrics} function to create a full report. In this
+vignette, we show how to produce individual report modules and
+how to add your own modules to customize the report.
 %
 
 \section{Functions to format the data for aqm functions usage}

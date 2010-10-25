@@ -235,7 +235,7 @@ aqm.spatialbg = function(expressionset, dataprep, scale)
   
   legend = sprintf("The figure <!-- FIG --> shows false colour representations of the arrays' spatial distributions of feature local background estimates. The colour scale is shown in the panel on the right, and it is proportional to the ranks of the probe background intensities.")
 
-  new("aqmTrellis",
+  new("aqmReportModule",
       plot = bg,
       section = section,
       title = title,
@@ -282,7 +282,7 @@ aqm.spatial = function(expressionset, dataprep, scale)
       names(locout) = if(length(locout) == 3) c("LR","Red","Green") else c("Red","Green")
     }
 
-  new("aqmTrellis",
+  new("aqmReportModule",
       plot = fore,
       section = section,
       title = title,

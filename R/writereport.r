@@ -21,17 +21,15 @@ dircreation = function(outdir = getwd(), force = FALSE)
   }
 
 
-## Produce the plots for classes 'aqmTrellis' and 'aqmPlotfun' 
-setGeneric("aqm.plot",
-           function(obj)
-           standardGeneric("aqm.plot"))
+## Produce the plots 
+aqm.plot = function(x) {
+  if (is(x@plot, "list"))
+    print(x@plot) else
+  if (is(x@plot, "function"))
+    do.call(x@plot, args = list())
+  else stop(sprintf("Invalid 'x@plot' of class '%s'.", paste(class(x@plot), collapse=", ")))
+}
 
-setMethod("aqm.plot", signature(obj = "aqmTrellis"), function(obj){
-  print(obj@plot) })
-
-setMethod("aqm.plot", signature(obj = "aqmPlotfun"), function(obj) {
-  do.call(obj@plot, args = list()) })
-  
 ## Create the title
 aqm.make.title = function(reporttitle, outdir)
   {
@@ -51,8 +49,6 @@ aqm.make.section = function(p, s, qm)
     sec = paste("<a name= 'S",s,"'>Section ", s, ": ", qm@section,"</a>", sep = "")
     hwrite(sec, p, heading=2, style='font-family:helvetica,arial,sans-serif')
   }
-
-##  To Do: Use style sheet rather than jumbling font descriptions in here!
 
 ##To create the index
 aqm.make.index = function(obj, p)
@@ -84,6 +80,8 @@ aqm.make.index = function(obj, p)
 ##To create a part of report with figures and legend
 aqm.report.qm = function(p, qm, f, name, outdir)
   {
+    stopifnot(is(qm, "aqmReportModule"))
+
     h = qm@shape$h
     w = qm@shape$w
     dpi = 72
@@ -178,7 +176,7 @@ scores = function(expressionset, obj)
 
 aqm.writereport = function(name, obj, outdir)
   {
-    ## To Do: do we need this? Should it really be done here, or next to the processing of the 'usesvg' argument
+    ## TODO: do we need this? Should it really be done here, or next to the processing of the 'usesvg' argument
     ##    in the 'arrayQualityMetrics' function?
     if (Sys.info()["sysname"] == "Darwin")
       options(bitmapType = "cairo")
