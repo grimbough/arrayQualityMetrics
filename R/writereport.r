@@ -8,16 +8,13 @@ dircreation = function(outdir = getwd(), force = FALSE)
       outdirContents = dir(outdir, all.files = TRUE)
       outdirContents = setdiff(outdirContents, c(".", ".."))
               
-      if(!force && length(outdirContents)>0)
+      if(!force && length(outdirContents)>0) 
         stop(sprintf("'%s' is not empty.", outdir))
-      if(force || length(outdirContents)==0)
-        message(sprintf("The report will be written into directory '%s'. ", outdir))
-        setwd(outdir)
-       } else {
-        dir.create(outdir, recursive=TRUE)
-        message(sprintf("The directory '%s' has been created.", outdir))
-        setwd(outdir)
-      }
+      message(sprintf("The report will be written into directory '%s'. ", outdir))
+    } else {
+      dir.create(outdir, recursive=TRUE)
+      message(sprintf("The directory '%s' has been created.", outdir))
+    }
   }
 
 
@@ -62,16 +59,16 @@ aqm.make.index = function(obj, p)
   lasttype = "FAKE"
   for(i in seq_len(length(obj)))
     {
-      if(obj[[i]]$section != lasttype)
+      if(obj[[i]]@section != lasttype)
         {
           if(s != 1)
             hwrite("</UL>", p)
 
-          hwrite(paste("<br><LI>Section ", s,": ", obj[[i]]$section,"<UL>",sep=""), p, link=paste("#S",s,sep=""), style= 'font-weight:bold;font-family:helvetica;font-size:12pt')
+          hwrite(paste("<br><LI>Section ", s,": ", obj[[i]]@section,"<UL>",sep=""), p, link=paste("#S",s,sep=""), style= 'font-weight:bold;font-family:helvetica;font-size:12pt')
           s = s+1
         }
-      hwrite(paste("<LI>",obj[[i]]$title,sep=""), p, style= 'font-weight:normal;font-family:helvetica;font-size:11pt')
-      lasttype = obj[[i]]$section
+      hwrite(paste("<LI>",obj[[i]]@title,sep=""), p, style= 'font-weight:normal;font-family:helvetica;font-size:11pt')
+      lasttype = obj[[i]]@section
     }
   hwrite("</UL></UL>", p)
 }
@@ -143,20 +140,17 @@ aqm.make.ending = function(p)
   }
 
 ## Score table formatting
-scores = function(expressionset, obj)
+scores = function(obj)
   {
     titles = c(
-      "aqmobj.ma"      = "MA plots",
-      "aqmobj.spatial" = "Spatial",
-      "aqmobj.box"     = "Distribution",
-      "aqmobj.heat"    = "Heatmap",
-      "aqmobj.rle"     = "RLE",
-      "aqmobj.nuse"    = "NUSE")
+      "maplot"  = "MA plots",
+      "spatial" = "Spatial",
+      "boxplot" = "Distribution",
+      "heatmap" = "Heatmap",
+      "rle"     = "RLE",
+      "nuse"    = "NUSE")
 
-    classes = sapply(obj, class)
-    mt = match(classes, names(titles))
-
-    sN = sampleNames(expressionset)
+    mt = match(names(obj), names(titles))
 
     df = data.frame(
       "Array #"    = seq_len(length(sN)),
@@ -168,51 +162,46 @@ scores = function(expressionset, obj)
     
     for(i in which(!is.na(mt)))      
       df[[titles[mt[i]]]] =
-        ifelse(seq(along=sN) %in% obj[[i]]$outliers, "*", "")
+        ifelse(seq(along=sN) %in% obj[[i]]@outliers, "*", "")
 
     return(df)
   }
 
 
-aqm.writereport = function(name, obj, outdir)
+aqm.writereport = function(modules, arrayTable, name, outdir)
   {
-    ## TODO: do we need this? Should it really be done here, or next to the processing of the 'usesvg' argument
-    ##    in the 'arrayQualityMetrics' function?
-    if (Sys.info()["sysname"] == "Darwin")
-      options(bitmapType = "cairo")
-
     sec = 1
     p = aqm.make.title(name, outdir)
   
-    sc = scores(obj)
-    col = rep(c("#d0d0ff","#e0e0f0"), (ceiling((nrow(sc)+1)/2))) #
+    ## col = rep(c("#d0d0ff", "#e0e0f0"), (ceiling((nrow(sc)+1)/2)))
 
-    if(nrow(sc) < length(col))  
-      col = col[seq_len((length(col)-(abs((nrow(sc)+1) - length(col)))))]
+    ## if(nrow(sc) < length(col))    ## TODO clean up this is bizarre
+    ##   col = col[seq_len((length(col)-(abs((nrow(sc)+1) - length(col)))))]
 
     boldset = 'font-weight:bold;text-align:center;font-family:Lucida Grande;font-size:10pt'
     normset = 'text-align:center;font-family:Lucida Grande;font-size:10pt'
 
-    hwrite("Summary",p, heading=2, style='font-family:helvetica,arial,sans-serif')
-    hwrite(sc, p, border=0, bgcolor = matrix(col, ncol=ncol(sc), nrow=(nrow(sc)+1)), cellpadding = 2, cellspacing = 5, style=matrix(c(rep(boldset, ncol(sc)), rep(c(boldset, rep(normset, ncol(sc)-1)), nrow(sc))), ncol=ncol(sc), nrow=(nrow(sc)+1), byrow=TRUE))
-          
-    hwrite("*outlier array",style=normset,p)
+    hwrite("Summary", p, heading=2, style='font-family:helvetica,arial,sans-serif')
+    ## hwrite(sc, p, border=0, bgcolor = matrix(col, ncol=ncol(sc), nrow=(nrow(sc)+1)),
+    ##       cellpadding = 2, cellspacing = 5, style = matrix(c(rep(boldset, ncol(sc)), rep(c(boldset, rep(normset, ncol(sc)-1)), nrow(sc))), ncol=ncol(sc), nrow=(nrow(sc)+1), byrow=TRUE))
+    ## hwrite("*outlier array",style=normset,p)
 
-
-    aqm.make.index(obj, p)
+    aqm.make.index(modules, p)
 
     lasttype = "Something Else"
     
-    for(i in seq(along = obj))
+    for(i in seq(along = modules))
       {
-        if(obj[[i]]$section != lasttype)
+        if(modules[[i]]@section != lasttype)
           {
-            aqm.make.section(p, s = sec, qm = obj[[i]])
+            aqm.make.section(p, s = sec, qm = modules[[i]])
             sec = sec+1
           }
-        aqm.report.qm(p, qm=obj[[i]], f=i, name=names(obj)[i], outdir=outdir)
-        lasttype = obj[[i]]$section
+        aqm.report.qm(p, qm=modules[[i]], f=i, name=names(modules)[i], outdir=outdir)
+        lasttype = modules[[i]]@section
       }
      
     aqm.make.ending(p)
+    
+    return(invisible(as.list(eval(match.call()))[-1]))  ## TODO is there a more elegant way to do this?
   }

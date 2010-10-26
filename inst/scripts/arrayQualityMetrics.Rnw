@@ -73,34 +73,34 @@ programmatic analysis of the report.
 \section{Minimal use}
 %
 <<options,echo=FALSE>>=
-if (Sys.info()["sysname"] == "Darwin")
-  options(bitmapType = "cairo")
 options(error = recover)
 @
 %
 
 \subsection{Example on Affymetrix data}
 If you are working with Affymetrix chips, an \Rclass{AffyBatch} object
-is the most appropriate to import your raw data into Bioconductor. To
-learn how to produce an \Rclass{AffyBatch} from your data, please read
-the documentation of the \Rpackage{affy} package.  Here, we use the
-data set \emph{MLL.A}, an object of class \Rclass{AffyBatch} which is
-provided in the data package \Rpackage{ALLMLL} for demonstration.
-\emph{MLL.A} was created from CEL files using the function
-\Rfunction{ReadAffy} from the \Rpackage{affy} package.
-
+is the most appropriate to import your raw data into Bioconductor.
+Starting from CEL files, this is typically done using the function
+\Rfunction{ReadAffy} from the \Rpackage{affy} package\footnote{For 
+more information on how to produce an \Rclass{AffyBatch} from your data, please see
+the documentation of the \Rpackage{affy} package.}.  Here, we use the
+dataset \emph{MLL.A}, an object of class \Rclass{AffyBatch} 
+provided in the data package \Rpackage{ALLMLL}.
 %
 <<DataLoading>>=
 library("ALLMLL")
 data("MLL.A")
 @ 
 
-Now that the data are loaded, we can call \Rfunction{arrayQualityMetrics}.
+Now that the data are loaded, we can call
+\Rfunction{arrayQualityMetrics}\footnote{For this vignette, in order to save
+computation time, we only call the function on the first 5 arrays; in
+your own application, you can call it on the complete data object.}. 
 
 %
 <<AffyBatchQM,results=hide>>=
 library("arrayQualityMetrics")
-arrayQualityMetrics(expressionset = MLL.A,
+arrayQualityMetrics(expressionset = MLL.A[, 1:5],
                     outdir = "MLL",
                     force = TRUE,
                     do.logtransform = TRUE)

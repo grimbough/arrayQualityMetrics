@@ -1,24 +1,32 @@
-##Function to perform the MAplot
 aqm.maplot = function(x) {
+
+  M = x$M
+  A = x$A
+
+  ## TODO Fit a quadratic model M ~ A, then sort by size of the coefficients (from bad to good).
+  ## Do outlier detection on that.
+  mamean = colMeans(abs(M), na.rm=TRUE)
+  mastat = boxplot.stats(mamean)
+  maout  = integer(0) ## sapply(seq_len(length(mastat$out)), function(x) which(mamean == mastat$out[x]))
   
   app = 4 + 2*(sum(x$numArrays>c(4,6)))
   nfig = ceiling(x$numArrays/8)
     
-  xlimMA = quantile(x$A, probs=1e-4*c(1,-1)+c(0,1), na.rm=TRUE)
-  ylimMA = quantile(x$M, probs=1e-4*c(1,-1)+c(0,1), na.rm=TRUE)
+  xlimMA = quantile(A, probs=1e-4*c(1,-1)+c(0,1), na.rm=TRUE)
+  ylimMA = quantile(M, probs=1e-4*c(1,-1)+c(0,1), na.rm=TRUE)
 
   i = seq_len(x$numArrays)
   dummy.df = data.frame(
     i = factor(i, levels = i),
-    x = i,
-    y = i)
+    px = i,
+    py = i)
   
-  trobj = xyplot(y ~ x | i, dummy.df,
+  trobj = xyplot(py ~ px | i, dummy.df,
     xlim = xlimMA,
     ylim = ylimMA,
     xlab = "A",
     ylab = "M",
-    panel = function(x, y, ...) panel.smoothScatter(x=x$A[, x], y=x$M[, y], nbin = 250, raster=TRUE, ...),
+    panel = function(x, y, ...) panel.smoothScatter(x=A[, x], y=M[, y], nbin = 250, raster=TRUE, ...),
     as.table = TRUE,      
     layout = c(app/2, 2, 1),
     asp = "iso",
@@ -40,12 +48,9 @@ aqm.maplot = function(x) {
     
   legend = sprintf("The figure <!-- FIG --> shows the MA plot for each array. M and A are defined as :<br>M = log<sub>2</sub>(I<sub>1</sub>) - log<sub>2</sub>(I<sub>2</sub>)<br>A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>)),<br>%s %s Typically, we expect the mass of the distribution in an MA plot to be concentrated along the M = 0 axis, and there should be no trend in M as a function of A. If there is a trend in the lower range of A, this often indicates that the arrays have different background intensities; this may be addressed by background correction. A trend in the upper range of A can indicate saturation of the measurements; in mild cases, this may be addressed by non-linear normalisation (e.g. quantile normalisation).", legspe1, legspe2)
 
-  mamean = colMeans(abs(x$M), na.rm=TRUE)
-  mastat = boxplot.stats(mamean)
-  maout  = sapply(seq_len(length(mastat$out)), function(x) which(mamean == mastat$out[x])) ## TODO this can be done more elegantly
   
   new("aqmReportModule",
-      plot = ma,
+      plot = ma, 
       section = "Individual array quality",
       title = "MA plots",
       legend = legend,

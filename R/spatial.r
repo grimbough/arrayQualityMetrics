@@ -58,22 +58,22 @@ scoresspat = function(expressionset, dataprep, ch)
   {
     if(dataprep$classori == "BeadLevelList")
       stop("Cannot apply scoresspat to BeadLevelList objects. Please use scoresspatbll instead.")
+    
     if(dataprep$classori != "AffyBatch")
       {
         maxr = max(featureData(expressionset)$X)
         maxc = max(featureData(expressionset)$Y)
-      }
-    if(dataprep$classori == "AffyBatch")
-      {
+      } else  {
         maxr = nrow(expressionset)
         maxc = ncol(expressionset)
       }
     
-    mdat = lapply(seq_len(dataprep$numArrays), function(x) matrix(ch[,x],ncol=maxc,nrow=maxr,byrow=T))
+    mdat = lapply(seq_len(dataprep$numArrays), function(x) matrix(ch[, x], ncol=maxc, nrow=maxr, byrow=T))
+
     loc = sapply(mdat, function(x) {
-      apg = abs(fft(x)) ## absolute values of the periodogram
+      apg = abs(fft(x))       ## absolute values of the periodogram
       lowFreq = apg[1:4, 1:4]
-      lowFreq[1,1] = 0                  # drop the constant component
+      lowFreq[1,1] = 0        ## drop the constant component
       highFreq = c(apg[-(1:4), ], apg[1:4, -(1:4)])
       return(sum(lowFreq)/sum(highFreq))
     })
@@ -148,7 +148,7 @@ setMethod("spatial",signature(expressionset = "aqmOneCol"), function(expressions
             return(spi)
           })
             
-##BeadLeveList plot modified from beadarry package
+## BeadLeveList plot modified from beadarry package
 imageplotBLL = function(BLData, array = 1, nrow = 100, ncol = 100,
                      whatToPlot ="G", log=TRUE, zlim=NULL, method="illumina",
                      n = 3, trim=0.05, ...){
@@ -246,46 +246,27 @@ aqm.spatialbg = function(expressionset, dataprep, scale)
 ## FOREGROUND
 aqm.spatial = function(expressionset, dataprep, scale)
 {
-  if(scale != "Log" && scale != "Rank")
-    stop("The argument scale must be 'Log' or 'Rank'\n")
+  if(!( (length(scale)==1) && is.character(scale) && (scale %in% c("Log", "Rank")) ))
+    stop("'scale' must be 'Log' or 'Rank'\n")
 
   fore = spatial(expressionset, dataprep, scale)
   
-  title = "Spatial distribution of feature intensities"
-  section = "Individual array quality"
-
   legend = sprintf("The figure <!-- FIG --> shows false colour representations of the arrays' spatial distributions of feature intensities. The colour scale is shown in the panel on the right, and it is proportional to the ranks of the probe intensities. Normally, when the features are distributed randomly on the arrays, one expects to see a uniform distribution; sets of control features with particularly high or low intensities may stand out. Note that the rank scale has the potential to amplify patterns that are small in amplitude but systematic within an array. It is possible to create plots that are not in rank scale but log-transformed scale, calling the aqm.spatial function and modifying the argument 'scale'.")          
 
-  if(!inherits(expressionset, "BeadLevelList"))
-    loc = scoresspat(expressionset, dataprep, dataprep$dat)
+  ## Outlier detection
+  loc = if(inherits(expressionset, "BeadLevelList")) {
+    scoresspatbll(expressionset, dataprep, dataprep$do.logtransform)
+  } else {
+    scoresspat(expressionset, dataprep, dataprep$dat)
+  }
   
-  if(inherits(expressionset, "NChannelSet"))
-    {
-      locr = scoresspat(expressionset, dataprep, dataprep$rc)
-      locg = scoresspat(expressionset, dataprep, dataprep$gc)
-      loc = list("LogRatio"=loc, "Red"=locr, "Green"=locg)
-    }
+  locstat = boxplot.stats(loc)
+  locout  = which(loc %in% locstat$out)
  
-  if(inherits(expressionset, "BeadLevelList"))
-    loc = scoresspatbll(expressionset, dataprep, dataprep$do.logtransform)
-
-  if(is(loc,"numeric"))
-    {
-      locstat = boxplot.stats(loc)
-      locout = sapply(seq_len(length(locstat$out)), function(x) which(loc == locstat$out[x]))
-    }
- 
-  if(is(loc,"list"))
-    {
-      locstat = lapply(seq_len(length(loc)), function(i) boxplot.stats(loc[[i]]))
-      locout = lapply(seq_len(length(loc)), function(j) sapply(seq_len(length(locstat[[j]]$out)), function(x) which(loc[[j]] == locstat[[j]]$out[x])))
-      names(locout) = if(length(locout) == 3) c("LR","Red","Green") else c("Red","Green")
-    }
-
   new("aqmReportModule",
       plot = fore,
-      section = section,
-      title = title,
+      section = "Individual array quality",
+      title = "Spatial distribution of feature intensities",
       legend = legend,
       outliers = locout,
       shape = list("h"=6,"w"=6))
