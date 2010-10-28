@@ -96,7 +96,6 @@ arrayQualityMetrics = function(
   ##---------array table---------------------
   atab = data.frame()  ## TODO -- see function 'scores' in writereport.r
 
-
-  aqm.writereport(modules = m, arrayTable = atab, name = reporttitle, outdir = outdir)
+  aqm.writereport(modules = m, arrayTable = atab, reporttitle = reporttitle, outdir = outdir)
 }
 

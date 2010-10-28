@@ -20,7 +20,7 @@ dircreation = function(outdir = getwd(), force = FALSE)
 
 ## Produce the plots 
 aqm.plot = function(x) {
-  if (is(x@plot, "list"))
+  if (is(x@plot, "trellis") || is(x@plot, "list")) ## TODO remove 'list' once maplot is fixed
     print(x@plot) else
   if (is(x@plot, "function"))
     do.call(x@plot, args = list())
@@ -47,34 +47,37 @@ aqm.make.section = function(p, s, qm)
     hwrite(sec, p, heading=2, style='font-family:helvetica,arial,sans-serif')
   }
 
-##To create the index
-aqm.make.index = function(obj, p)
+## Create the index
+aqm.make.index = function(modules, p)
 {
   s = 1
   hwrite("<hr>", p)
-  hwrite("Index",p, heading=2, style='font-family:helvetica,arial,sans-serif')
+  hwrite("Index", p, heading=2, style='font-family:helvetica,arial,sans-serif')
   hwrite("Note: bitmap figures shown in this HTML report are also linked to PDF files, to provide better figure quality, or to provide multi-page files in cases where in  this HTML report only the first page is presented.", p, style='font-family:helvetica;font-size:11pt;color:#808080;font-style:italic;')
 
   hwrite("<UL>", p)
   lasttype = "FAKE"
-  for(i in seq_len(length(obj)))
+  for(i in seq_len(length(modules)))
     {
-      if(obj[[i]]@section != lasttype)
+      if(modules[[i]]@section != lasttype)
         {
-          if(s != 1)
+          if(s != 1) ## end the previous section
             hwrite("</UL>", p)
 
-          hwrite(paste("<br><LI>Section ", s,": ", obj[[i]]@section,"<UL>",sep=""), p, link=paste("#S",s,sep=""), style= 'font-weight:bold;font-family:helvetica;font-size:12pt')
+          hwrite(paste("<br><LI>Section ", s,": ", modules[[i]]@section, "<UL>",sep=""), p,
+                 link = paste("#S",s,sep=""),
+                 style = 'font-weight:bold;font-family:helvetica;font-size:12pt')
           s = s+1
         }
-      hwrite(paste("<LI>",obj[[i]]@title,sep=""), p, style= 'font-weight:normal;font-family:helvetica;font-size:11pt')
-      lasttype = obj[[i]]@section
+      hwrite(paste("<LI>", modules[[i]]@title,sep=""), p,
+             style = 'font-weight:normal;font-family:helvetica;font-size:11pt')
+      lasttype = modules[[i]]@section
     }
   hwrite("</UL></UL>", p)
 }
 
 
-##To create a part of report with figures and legend
+## Create a part of report with figures and legend
 aqm.report.qm = function(p, qm, f, name, outdir)
   {
     stopifnot(is(qm, "aqmReportModule"))
@@ -97,8 +100,8 @@ aqm.report.qm = function(p, qm, f, name, outdir)
              img = aqm.hwriteImage(nameimg, width=paste(size[1]), height=paste(size[2]))
            },
            png = {
-             nameimg = file.path(outdir, paste(name, ".png", sep = ""))
-             png(file = nameimg, h = h*dpi, w = w*dpi)
+             nameimg = paste(name, ".png", sep = "")
+             png(file = file.path(outdir, nameimg), h = h*dpi, w = w*dpi)
              aqm.plot(qm)
              dev.off()
              img = aqm.hwriteImage(nameimg)
@@ -168,10 +171,10 @@ scores = function(obj)
   }
 
 
-aqm.writereport = function(modules, arrayTable, name, outdir)
+aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
   {
     sec = 1
-    p = aqm.make.title(name, outdir)
+    p = aqm.make.title(reporttitle = reporttitle, outdir = outdir)
   
     ## col = rep(c("#d0d0ff", "#e0e0f0"), (ceiling((nrow(sc)+1)/2)))
 
@@ -202,6 +205,10 @@ aqm.writereport = function(modules, arrayTable, name, outdir)
       }
      
     aqm.make.ending(p)
-    
-    return(invisible(as.list(eval(match.call()))[-1]))  ## TODO is there a more elegant way to do this?
+
+    if(length(annotateSvgMatplotWarning)>0)
+      warning("The format or content of the SVG documents ", paste(annotateSvgMatplotWarning, collapse=", "), " was unexpected, and this function cannot add interactivity enhancements. Currently, the best workaround appears to be installing a more compatible version of libcairo. Please contact the package maintainer to discuss the status of this problem.")
+
+    ## TODO is there a more elegant way to do this?
+    invisible(list(modules=modules, arrayTable=arrayTable, reporttitle=reporttitle, outdir=outdir))
   }

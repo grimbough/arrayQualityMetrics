@@ -10,22 +10,22 @@ aqm.probesmap = function(x)
   } 
 
   df = data.frame(
-    "ProbesMap" = rep(featureData(x$expressionset)$hasTarget, ncol(x$dat)),
-    "dat"       = x$dat)
+    "hasTarget" = rep(fData(x$expressionset)$hasTarget, ncol(x$dat)),
+    "dat"       = as.vector(x$dat))
 
   den = densityplot( ~ dat,
     data = df,
-    groups = ProbesMap,
+    groups = hasTarget,
     plot.points = FALSE,
     auto.key = list(lines = TRUE, points = FALSE, x = 1, y = 0.99, corner=c(1,1)),
     xlab = "Intensity")
   
-  legend = "The figure <!-- FIG --> shows the density distributions of the log<sub>2</sub> ratios grouped by the mapping of the probes, i.e. by whether they have <tt>TRUE</tt> or <tt>FALSE</tt> in the <tt>hasTarget</tt> slot. The goal of this plot is to check whether the intensities of the probes mapping to a target are shifted to higher values compared to the intensities of the probes without known target. Two curves superposed may mean a problem in the annotation of the features."
+  legend = "The figure <!-- FIG --> shows the intensity distributions (density estimates, pooled across all arrays) grouped by the value of the feature-level property <tt>hasTarget</tt>. This plot allows you to see whether the intensities of different types of features are systematically different. For instance, if <tt>hasTarget</tt> indicates whether or not a feature maps to a known gene, then you would expect the distribution of those features for which this property is true to be shifted towards higher values."
     
   new("aqmReportModule",
       plot = den,
-      section = "Probe stratification",
-      title = "Probes mapping",
+      section = "Feature stratification",
+      title = "Feature stratification",
       legend = legend,
       shape = list("h"=6,"w"=6))
 }
