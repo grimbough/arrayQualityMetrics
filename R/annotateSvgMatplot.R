@@ -66,7 +66,7 @@ aqm.highlight = function(doc, annotationInfo)
   
   series = annotationInfo$getfun(doc)
   anno = annotationInfo$annotation
-
+  
   ## TODO - this should never happen
   if(length(anno) != length(series))
     return(FALSE)
@@ -85,3 +85,8 @@ aqm.highlight = function(doc, annotationInfo)
   }
   return(TRUE)
 }
+
+## based upon SVGAnnotation::getMatplotSeries
+aqm.getseries = function(doc)
+    SVGAnnotation::getMatplotSeries(doc,
+         paths = XML::getNodeSet(doc, "//x:g[starts-with(@id, 'surface')]//x:path", "x"))

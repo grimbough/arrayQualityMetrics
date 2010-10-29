@@ -32,6 +32,6 @@ aqm.pca = function(x, outliers) {
       title = title,
       legend = legend,
       shape = list("h" = 6, "w" =6),
-      svg = list(annotation=annotation, getfun=SVGAnnotation::getPlotPoints))
+      svg = list(annotation=annotation, getfun=aqm.getseries))
 }
 

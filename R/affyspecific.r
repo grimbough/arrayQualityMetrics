@@ -50,7 +50,7 @@ aqm.rnadeg = function(expressionset)
         title = title,
         legend = legend,
         shape = list("h" = 5.5, "w" =7),
-        svg = list(annotation=annotation, getfun=SVGAnnotation::getMatplotSeries))
+        svg = list(annotation=annotation, getfun=aqm.getseries))
    }
 
 

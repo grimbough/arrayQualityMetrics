@@ -73,5 +73,5 @@ aqm.density = function(x, outliers)
       "title"   = title,
       "legend"  = legend,
       "shape"   = shape,
-      "svg"     = list(annotation=annotation, getfun=SVGAnnotation::getMatplotSeries))
+      "svg"     = list(annotation=annotation, getfun = aqm.getseries))
 }

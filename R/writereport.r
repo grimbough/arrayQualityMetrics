@@ -108,15 +108,16 @@ aqm.report.qm = function(p, qm, f, name, outdir)
            },
            stop(sprintf("Invalid value of 'imageformat': %s", imageformat))
            )
+    
     namepdf = paste(name, ".pdf", sep = "")
-    pdf(file = namepdf, h = h, w = w)
+    pdf(file = file.path(outdir, namepdf), h = h, w = w)
     aqm.plot(qm)
     dev.off()
     link = list(namepdf, NA)
       
     linkpdf = hwrite("PDF file.",
       style='font-weight:bold;text-align:center;font-family:helvetica',
-      border=0, link=namepdf)
+      border = 0, link = namepdf)
     
     hwrite(c(img, paste("Figure ", f, ": ", qm@title,". ", linkpdf, sep="")),
            p,
