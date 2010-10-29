@@ -39,7 +39,7 @@ aqm.probesmap(x)
 # Affymetrix specific sections
 aqm.qcstats(expressionset)
 aqm.pmmm(expressionset)
-aqm.rnadeg(expressionset)
+aqm.rnadeg(x)
 aqm.rle(x, affyproc)
 aqm.nuse(x, affyproc)
 }

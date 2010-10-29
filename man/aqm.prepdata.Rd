@@ -5,7 +5,7 @@
 \title{Compute useful summary statistics from a data object.}
 
 \usage{
-prepdata(expressionset, intgroup, do.logtransform)
+prepdata(expressionset, intgroup, do.logtransform, usesvg)
 prepaffy(expressionset)
 }
 
@@ -17,7 +17,7 @@ prepaffy(expressionset)
   \code{\link[Biobase:class.NChannelSet]{NChannelSet}} for two colour arrays, or
   \code{\link[beadarray:class-BeadLevelList]{BeadLevelList}} for Illumina
   bead arrays.}
-  \item{intgroup, do.logtransform}{as in \code{\link{arrayQualityMetrics}}.}
+  \item{intgroup, do.logtransform, usesvg}{as in \code{\link{arrayQualityMetrics}}.}
 }
 
 \description{\code{prepdata} computes summary statistics that are useful

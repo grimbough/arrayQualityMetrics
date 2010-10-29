@@ -30,11 +30,13 @@ aqm.density = function(x, outliers = c())
     formula = y ~ x | panels
     lay = c(3,1)
 
-    annotation = namedEmptyList(3*x$numArrays)
-    for(i in seq(along=annotation)) {
-      s = ((i-1) %% x$numArrays)+1
-      annotation[[i]] = list(title = title[s],
-                             linkedids = names(annotation)[s+(0:2)*x$numArrays])
+    if(x$usesvg){
+      annotation = namedEmptyList(3*x$numArrays)
+      for(i in seq(along=annotation)) {
+        s = ((i-1) %% x$numArrays)+1
+        annotation[[i]] = list(title = title[s],
+                    linkedids = names(annotation)[s+(0:2)*x$numArrays])
+      }
     }
 
   } else {  ## nchannels==1
@@ -42,10 +44,12 @@ aqm.density = function(x, outliers = c())
     formula = y ~ x
     lay = c(1,1)
 
-    annotation = namedEmptyList(x$numArrays)
-    for(i in seq(along=annotation))
-      annotation[[i]] = list(title = title[i],
-                             linkedids=names(annotation)[i])
+    if(x$usesvg){
+      annotation = namedEmptyList(x$numArrays)
+      for(i in seq(along=annotation))
+        annotation[[i]] = list(title = title[i],
+                    linkedids=names(annotation)[i])
+    }
   }
 
   cl = outlierColours(outliers, n = x$numArrays, withOpacity = TRUE)
@@ -58,20 +62,15 @@ aqm.density = function(x, outliers = c())
     scales = list(relation="free"),
     col = cl$arrayColours, lwd = lwd, lty = lty)
   
-  shape = list("h" = 5, "w" = 3+3*lay[1])
-
   outliertext = if(length(outliers)>0) " Outliers -according to the same criterion as in the boxplots- are highlighted by colour." else ""
 
   legend = sprintf("The figure <!-- FIG --> shows density estimates (smoothed histograms) of the data. Typically, the distributions of the arrays should have similar shapes and ranges. Arrays whose distributions are very different from the others should be considered for possible problems. Move the mouse over the lines in the plot to see the  corresponding sample names.%s<BR>On raw data, a bimodal distribution can be indicative of an array containing a spatial artefact; a distribution shifted to the right of an array with abnormally high background intensities.", outliertext)
   
-  title = "Density plots"
-  section = "Array intensity distributions"
-  
   new("aqmReportModule",
       "plot"    = den,
-      "section" = section,
-      "title"   = title,
+      "section" = "Array intensity distributions",
+      "title"   = "Density plots",
       "legend"  = legend,
-      "shape"   = shape,
-      "svg"     = list(annotation=annotation, getfun = aqm.getseries))
+      "shape"   = list("h" = 5, "w" = 3+3*lay[1]),
+      "svg"     = if(x$usesvg) list(annotation=annotation, getfun = aqm.getMatplotSeries) else list())
 }

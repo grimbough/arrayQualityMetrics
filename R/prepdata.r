@@ -123,7 +123,7 @@ function(expressionset, do.logtransform){
 })
 
 
-prepdata = function(expressionset, intgroup, do.logtransform) {
+prepdata = function(expressionset, intgroup, do.logtransform, usesvg) {
 
   cls = class(expressionset)
   if (any(cls %in% c("RGList", "MAList", "marrayRaw", "marrayNorm"))) {
@@ -136,6 +136,8 @@ prepdata = function(expressionset, intgroup, do.logtransform) {
 
   x$intgroup = intgroup
   x$do.logtransform = do.logtransform
+  x$usesvg   = usesvg
+  
   x$classori = class(expressionset)[1]
   x$expressionset = expressionset
   

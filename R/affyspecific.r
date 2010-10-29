@@ -14,43 +14,42 @@ phrase = list(
   )
 
 ## RNA digestion
-aqm.rnadeg = function(expressionset)
+aqm.rnadeg = function(x)
   {
-    sN = sampleNames(expressionset)
-    numArrays = length(sN)
+    sN = sampleNames(x$expressionset)
+
     maxcol = 8
     colors = brewer.pal(maxcol, "Dark2")
-    acol = if(numArrays <= maxcol)
-      colors[seq_len(numArrays)] else   
-      c(colors, sample(colors, numArrays-length(colors), replace = TRUE))
-    acol = addOpacity(acol, numArrays)
+    acol = if(x$numArrays <= maxcol)
+      colors[seq_len(x$numArrays)] else   
+      c(colors, sample(colors, x$numArrays-length(colors), replace = TRUE))
+    acol = addOpacity(acol, x$numArrays)
     
     rnaDeg = function() {
-      plotAffyRNAdeg(AffyRNAdeg(expressionset, log.it = TRUE),
+      plotAffyRNAdeg(AffyRNAdeg(x$expressionset, log.it = TRUE),
                      lwd = 1, col=acol)
       legend("topright", lty=1, lwd=2, col=acol, legend = paste(seq(along=acol)))
     }
     
-    annotation = namedEmptyList(numArrays)
-    for(i in seq(along=annotation))
-      annotation[[i]] = list(title = sprintf("Array %d: %s", i, sN[i]),
-                             linkedids = names(annotation)[i])
-
+    if(x$usesvg){
+      annotation = namedEmptyList(x$numArrays)
+      for(i in seq(along=annotation))
+        annotation[[i]] = list(title = sprintf("Array %d: %s", i, sN[i]),
+                    linkedids = names(annotation)[i])
+    }
+    
     legend = paste(phrase$fig("RNA digestion"),
                    phrase$preproc("Shown"),
        "In this plot each array is represented by a single line; move the mouse over the lines to see their corresponding sample names. The plot can be used to identify array(s) that have a slope very different from the others. This could indicate that the RNA used for that array has been handled differently from what was done for the other arrays.",
                    phrase$affyPLM)
 
-    title = "RNA digestion plot"
-    section = "Affymetrix specific plots"
-    
     new("aqmReportModule",
-        plot = rnaDeg,
-        section = section,
-        title = title,
-        legend = legend,
-        shape = list("h" = 5.5, "w" =7),
-        svg = list(annotation=annotation, getfun=aqm.getseries))
+        plot    = rnaDeg,
+        section = "Affymetrix specific plots",
+        title   = "RNA digestion plot",
+        legend  = legend,
+        shape   = list("h" = 5.5, "w" =7),
+        svg     =  if(x$usesvg) list(annotation=annotation, getfun = aqm.getMatplotSeries) else list())
    }
 
 

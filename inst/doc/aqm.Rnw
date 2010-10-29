@@ -104,7 +104,7 @@ nCCl4 = justvsn(CCl4, subsample=2200)
 
 We need to create an object \Rclass{aqmobj.prepdata} to be able to call the quality metrics functions.
 <<DataPreparation>>=
-dataprep = prepdata(expressionset = nCCl4, intgroup = c(), do.logtransform = FALSE)
+dataprep = prepdata(expressionset = nCCl4, intgroup = c(), do.logtransform = FALSE, usesvg = capabilities()["cairo"])
 @ 
 
 We compute the boxplot and density plots metrics and then create a list containing both of them.

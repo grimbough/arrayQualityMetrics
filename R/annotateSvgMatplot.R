@@ -20,16 +20,10 @@ annotateSvgMatplot = function(infile, outfile, annotationInfo,
     vb  = getViewBox(doc)
     
     ## Add the lineWidth toggling
-    res = aqm.highlight(doc, annotationInfo = annotationInfo)
+    annotateOK = aqm.highlight(doc, annotationInfo = annotationInfo)
     
-    ## Did it work??----------------------
-    if(!res){
-      ## No
-      annotateSvgMatplotWarning = c(annotateSvgMatplotWarning, basename(outfile))
-      
-    } else {
-      
-      ## Yes
+    ## Did it work?
+    if(annotateOK){
       
       ## Enlarge SVG view box to make spake for the "status bar"
       addy = 20
@@ -54,8 +48,8 @@ annotateSvgMatplot = function(infile, outfile, annotationInfo,
     }
     
     saveXML(doc, outfile)
-    size = diff(vb)
-    return(size)
+
+    return(list(size=diff(vb), annotateOK=annotateOK))
   }
 
 ## The following is adapted from the functions
@@ -68,8 +62,10 @@ aqm.highlight = function(doc, annotationInfo)
   anno = annotationInfo$annotation
   
   ## TODO - this should never happen
-  if(length(anno) != length(series))
+  if(length(anno) != length(series)) {
+    ## browser()
     return(FALSE)
+  }
   
   for(i in seq(along=series)){
     ops = sprintf("toggleSeries(%s, %s, %s)",
@@ -87,6 +83,6 @@ aqm.highlight = function(doc, annotationInfo)
 }
 
 ## based upon SVGAnnotation::getMatplotSeries
-aqm.getseries = function(doc)
+aqm.getMatplotSeries = function(doc)
     SVGAnnotation::getMatplotSeries(doc,
          paths = XML::getNodeSet(doc, "//x:g[starts-with(@id, 'surface')]//x:path", "x"))

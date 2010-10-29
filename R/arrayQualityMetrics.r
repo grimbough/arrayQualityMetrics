@@ -33,12 +33,12 @@ arrayQualityMetrics = function(
   if(missing(usesvg)){
     ## Note: assignment within the if-condition
     if(! (usesvg <- capabilities()["cairo"]) )
-      warning("capabilities()[\"cairo\"] is FALSE - all graphics will be static. Please install the cairo library for your R to obtain interactive svg graphics.") 
+      warning("capabilities()[\"cairo\"] is FALSE - all graphics will be static. Please install the cairo library for your R to obtain interactive SVG graphics.") 
   } else {
     if( is.logical(usesvg) && (length(usesvg)==1) && !is.na(usesvg) )
       stop("'usesvg' must be TRUE or FALSE")
-    if(!capabilities()["cairo"])
-      stop("capabilities()[\"cairo\"] is FALSE - cannot produce interactive svg graphics. Please install the cairo library for your R.") 
+    if(usesvg && (!capabilities()["cairo"]))
+      stop("capabilities()[\"cairo\"] is FALSE - cannot produce interactive SVG graphics. Please install the cairo library for your R.") 
   }
 
   
@@ -50,7 +50,7 @@ arrayQualityMetrics = function(
   
   ## create a comprehensive data object 'x', with the original data,
   ##  as well as some generally useful derived statistics of the data
-  x = prepdata(expressionset, intgroup, do.logtransform) 
+  x = prepdata(expressionset, intgroup=intgroup, do.logtransform=do.logtransform, usesvg=usesvg) 
   
   ##---------Spatial intensity distributions------
   if (spatial) {
@@ -80,10 +80,10 @@ arrayQualityMetrics = function(
 
   ##--------Affymetrix specific modules------------
   if(inherits(expressionset, "AffyBatch")) {
-    affyproc   = prepaffy(expressionset)
-    m$rnadeg = aqm.rnadeg(expressionset)
-    m$rle    = aqm.rle(x,  affyproc = affyproc)
-    m$nuse   = aqm.nuse(x, affyproc = affyproc)
+    affyproc  = prepaffy(expressionset)
+    m$rnadeg  = aqm.rnadeg(x)
+    m$rle     = aqm.rle(x,  affyproc = affyproc)
+    m$nuse    = aqm.nuse(x, affyproc = affyproc)
     if(length(grep("exon", cdfName(expressionset), ignore.case=TRUE)) == 0)
       m$qcstats =  aqm.qcstats(expressionset)
     
@@ -94,7 +94,8 @@ arrayQualityMetrics = function(
     m[[i]]@legend = gsub("The figure <!-- FIG -->", paste("<b>Figure", i, "</b>"), m[[i]]@legend, ignore.case = TRUE)
 
   ##---------array table---------------------
-  atab = data.frame()  ## TODO -- see function 'scores' in writereport.r
+     ## TODO -- see function 'scores' in writereport.r
+  atab = data.frame("Array Metadata" = "to be implemented", stringsAsFactors=FALSE) 
 
   aqm.writereport(modules = m, arrayTable = atab, reporttitle = reporttitle, outdir = outdir)
 }
