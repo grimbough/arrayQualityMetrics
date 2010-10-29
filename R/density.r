@@ -12,7 +12,7 @@ namedEmptyList = function(n) {
   return(x)
 }
     
-aqm.density = function(x, outliers)
+aqm.density = function(x, outliers = c())
 {
   sN = sampleNames(x$expressionset)
 

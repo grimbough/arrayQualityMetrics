@@ -29,7 +29,7 @@
 
 \usage{
 aqm.boxplot(x, subsample = 10000)
-aqm.density(x, outliers)
+aqm.density(x, outliers = c())
 aqm.heatmap(x)
 aqm.pca(x, outliers)
 aqm.maplot(x)
