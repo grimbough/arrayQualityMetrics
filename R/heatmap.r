@@ -21,7 +21,7 @@ aqm.heatmap = function(x)
     stopifnot(all(palettes %in% rownames(brewer.pal.info)))
     palettes = rep(palettes, ceiling(length(x$intgroup) / length(palettes)))
   
-    covar  = lapply(seq(along = x$intgroup), function(i) pData(x$expressionset)[[x$intgroup[i]]])
+    covar  = lapply(seq(along = x$intgroup), function(i) x$pData[[x$intgroup[i]]])
     lev    = lapply(seq(along = x$intgroup), function(i) levels(as.factor(covar[[i]])))
 
     colourCov = lapply(seq(along = x$intgroup), function(i)
@@ -59,11 +59,7 @@ aqm.heatmap = function(x)
     xlab="", ylab="",
     col.regions=colourRange, main = foo)
         
-  leghmspe = if(is(x$expressionset, "BeadLevelList"))
-    "The values used are the summarized ones obtained by using the function createBeadSummaryData from the package beadarray." else "" 
-
-  legend = sprintf("The figure <!-- FIG --> shows a false colour heatmap of between array distances (see below for their definition). The colour scale is chosen to cover the range of distances encountered in the dataset. Arrays for which the sum of the distances to the others is much different from the others are detected as outlier arrays (marked by &quot;*&quot;). The dendrogram on this plot can help to find batch effects, as well as reveal clustering of the arrays according to biological effects.<br>The distance <i>d<sub>xy</sub></i> between arrays <i>x</i> and <i>y</i> is the mean absolute difference (L<sub>1</sub>-distance) between the vectors of M-values of the arrays (computed on the data from all probes without filtering). In formula, <i>d<sub>xy</sub> =  mean|M<sub>xi</sub>-M<sub>yi</sub>|</i>. Here, <i>M<sub>xi</sub></i> is the M-value of the <i>i</i>-th probe on the <i>x</i>-th array. %s",  leghmspe)
-## "Consider the following decomposition of <i>M<sub>xi</sub>: M<sub>xi</sub> = z<sub>i</sub> + &beta;<sub>xi</sub> + &epsilon;<sub>xi</sub></i>, where <i>z<sub>i</sub></i> is the probe effect for probe <i>i</i> (the same across all arrays), <i>&epsilon;<sub>xi</sub></i> are i.i.d. random variables with mean zero and <i>&beta;<sub>xi</sub></i> is such that for any array <i>x</i>, the majority of values <i>&beta;<sub>xi</sub></i> are negligibly small (i. e. close to zero). <i>&beta;<sub>xi</sub></i> represents differential expression effects. In this model, all values <i>d<sub>xy</sub></i> are (in expectation) the same, namely 2 times the standard deviation of <i>&epsilon;<sub>xi</sub></i>."
+  legend = "The figure <!-- FIG --> shows a false colour heatmap of between array distances. The colour scale is chosen to cover the range of distances encountered in the dataset. Arrays for which the sum of the distances to the others is much different from the others are detected as outlier arrays (marked by &quot;*&quot;). The dendrogram on this plot can help to find batch effects, as well as reveal clustering of the arrays according to biological effects.<br>The distance <i>d<sub>xy</sub></i> between arrays <i>x</i> and <i>y</i> is the mean absolute difference (L<sub>1</sub>-distance) between the vectors of M-values of the arrays (computed on the data from all probes without filtering). In formula, <i>d<sub>xy</sub> =  mean|M<sub>xi</sub>-M<sub>yi</sub>|</i>. Here, <i>M<sub>xi</sub></i> is the M-value of the <i>i</i>-th probe on the <i>x</i>-th array."
     
   title = "Heatmap representation of the distances between arrays"
   section = "Between array comparison"

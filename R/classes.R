@@ -16,3 +16,5 @@ setClass("aqmReportModule",
      outliers  = integer(0),       
      svg       = list()))
 
+
+setClassUnion("oneColourArray", c("ExpressionSet", "AffyBatch"))

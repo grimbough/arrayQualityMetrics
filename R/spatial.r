@@ -139,7 +139,7 @@ setMethod("spatial",signature(expressionset = "NChannelSet"), function(expressio
               
 ## ES-AB
 ## Foreground rank representation
-setMethod("spatial",signature(expressionset = "aqmOneCol"), function(expressionset, dataprep, scale)
+setMethod("spatial",signature(expressionset = "oneColourArray"), function(expressionset, dataprep, scale)
           {
             lgl = switch(scale,
               "Rank" = "Rank(intensity)",

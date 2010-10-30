@@ -14,7 +14,7 @@ namedEmptyList = function(n) {
     
 aqm.density = function(x, outliers = c())
 {
-  sN = sampleNames(x$expressionset)
+  sN = colnames(x$dat)
 
   ## For the tooltips
   title = sprintf("Array %d: %s", seq(along=sN), sN)

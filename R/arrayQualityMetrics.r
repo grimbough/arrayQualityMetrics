@@ -29,18 +29,7 @@ arrayQualityMetrics = function(
       stop("all elements of 'intgroup' should match column names of 'phenoData(expressionset)'.")
   }
 
-  ## SVG
-  if(missing(usesvg)){
-    ## Note: assignment within the if-condition
-    if(! (usesvg <- capabilities()["cairo"]) )
-      warning("capabilities()[\"cairo\"] is FALSE - all graphics will be static. Please install the cairo library for your R to obtain interactive SVG graphics.") 
-  } else {
-    if( is.logical(usesvg) && (length(usesvg)==1) && !is.na(usesvg) )
-      stop("'usesvg' must be TRUE or FALSE")
-    if(usesvg && (!capabilities()["cairo"]))
-      stop("capabilities()[\"cairo\"] is FALSE - cannot produce interactive SVG graphics. Please install the cairo library for your R.") 
-  }
-
+  usesvg = checkUsesvg( usesvg )
   
   ## output directory
   dircreation(outdir, force)
@@ -80,8 +69,8 @@ arrayQualityMetrics = function(
 
   ##--------Affymetrix specific modules------------
   if(inherits(expressionset, "AffyBatch")) {
+    m$rnadeg  = aqm.rnadeg(expressionset, x)
     affyproc  = prepaffy(expressionset)
-    m$rnadeg  = aqm.rnadeg(x)
     m$rle     = aqm.rle(x,  affyproc = affyproc)
     m$nuse    = aqm.nuse(x, affyproc = affyproc)
     if(length(grep("exon", cdfName(expressionset), ignore.case=TRUE)) == 0)
@@ -93,10 +82,6 @@ arrayQualityMetrics = function(
   for(i in seq(along = m))
     m[[i]]@legend = gsub("The figure <!-- FIG -->", paste("<b>Figure", i, "</b>"), m[[i]]@legend, ignore.case = TRUE)
 
-  ##---------array table---------------------
-     ## TODO -- see function 'scores' in writereport.r
-  atab = data.frame("Array Metadata" = "to be implemented", stringsAsFactors=FALSE) 
-
-  aqm.writereport(modules = m, arrayTable = atab, reporttitle = reporttitle, outdir = outdir)
+  aqm.writereport(modules = m, arrayTable = x$pData, reporttitle = reporttitle, outdir = outdir)
 }
 

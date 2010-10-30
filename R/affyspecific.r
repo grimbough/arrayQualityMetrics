@@ -14,19 +14,13 @@ phrase = list(
   )
 
 ## RNA digestion
-aqm.rnadeg = function(x)
+aqm.rnadeg = function(expressionset, x)
   {
-    sN = sampleNames(x$expressionset)
-
-    maxcol = 8
-    colors = brewer.pal(maxcol, "Dark2")
-    acol = if(x$numArrays <= maxcol)
-      colors[seq_len(x$numArrays)] else   
-      c(colors, sample(colors, x$numArrays-length(colors), replace = TRUE))
-    acol = addOpacity(acol, x$numArrays)
+    sN = colnames(x$dat)
+    acol = intgroupColours(x, withOpacity = TRUE)
     
     rnaDeg = function() {
-      plotAffyRNAdeg(AffyRNAdeg(x$expressionset, log.it = TRUE),
+      plotAffyRNAdeg(AffyRNAdeg(expressionset, log.it = TRUE),
                      lwd = 1, col=acol)
       legend("topright", lty=1, lwd=2, col=acol, legend = paste(seq(along=acol)))
     }

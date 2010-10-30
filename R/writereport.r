@@ -32,9 +32,17 @@ aqm.make.title = function(reporttitle, outdir)
   {
     if(!(is.character(reporttitle)&&(length(reporttitle)==1)))
       stop("'reporttitle' must be a character of length 1.")
+
+    filenames = c("arrayQualityMetrics.css", "arrayQualityMetrics.js")
+    filelocs  = system.file("javascript", filenames, package = "arrayQualityMetrics")
+    filelocs[ filelocs!="" ]
+    if(length(filelocs)<length(filenames))
+        stop(sprintf("Could not find all of: '%s'.", paste(filenames, collapse=", ")))
+    file.copy(filelocs, outdir)
+                
     p = openPage(file.path(outdir, 'QMreport.html'))
     hwrite("<hr>", p)
-    hwrite(reporttitle, p, heading=1, style='text-align:center;font-family:helvetica,arial,sans-serif')
+    hwrite(reporttitle, p, heading=1)
     hwrite("<hr>", p)
     return(p)
   }
@@ -44,7 +52,7 @@ aqm.make.section = function(p, s, qm)
   {
     hwrite("<hr>", p)
     sec = paste("<a name= 'S",s,"'>Section ", s, ": ", qm@section,"</a>", sep = "")
-    hwrite(sec, p, heading=2, style='font-family:helvetica,arial,sans-serif')
+    hwrite(sec, p, heading=2)
   }
 
 ## Create the index
@@ -181,27 +189,23 @@ scores = function(obj)
     return(df)
   }
 
+aqm.make.table = function(arrayTable, p) {
+
+    hwrite(arrayTable, p, border=0,
+           row.bgcolor = list("#ffffff", c("#d0d0ff", "#e0e0f0")),
+           cellpadding = 2, cellspacing = 5,
+           row.style = list('font-weight:bold'))
+    
+  }
 
 aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
   {
     sec = 1
     p = aqm.make.title(reporttitle = reporttitle, outdir = outdir)
-  
-    ## col = rep(c("#d0d0ff", "#e0e0f0"), (ceiling((nrow(sc)+1)/2)))
 
-    ## if(nrow(sc) < length(col))    ## TODO clean up this is bizarre
-    ##   col = col[seq_len((length(col)-(abs((nrow(sc)+1) - length(col)))))]
-
-    boldset = 'font-weight:bold;text-align:center;font-family:Lucida Grande;font-size:10pt'
-    normset = 'text-align:center;font-family:Lucida Grande;font-size:10pt'
-
-    hwrite("Summary", p, heading=2, style='font-family:helvetica,arial,sans-serif')
-    ## hwrite(sc, p, border=0, bgcolor = matrix(col, ncol=ncol(sc), nrow=(nrow(sc)+1)),
-    ##       cellpadding = 2, cellspacing = 5, style = matrix(c(rep(boldset, ncol(sc)), rep(c(boldset, rep(normset, ncol(sc)-1)), nrow(sc))), ncol=ncol(sc), nrow=(nrow(sc)+1), byrow=TRUE))
-    ## hwrite("*outlier array",style=normset,p)
-
+    aqm.make.table(arrayTable, p)
+    
     aqm.make.index(modules, p)
-
     lasttype = "Something Else"
     
     for(i in seq(along = modules))

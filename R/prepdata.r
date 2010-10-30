@@ -1,10 +1,12 @@
-setClassUnion("aqmOneCol", c("ExpressionSet", "AffyBatch"))
 
 logtransform = function(x) {
   if (is.null(x)) {
     NULL
-  } else { 
-    ifelse(x>0, suppressWarnings(log2(x)), rep(NA_real_, length(x)))
+  } else {
+    pos = (x>0)
+    x[!pos] = NA_real_
+    x[pos] = log2(x[pos])
+    x
   }
 }
 
@@ -18,11 +20,11 @@ setGeneric("platformspecific",
 setMethod("platformspecific",
           signature(expressionset = "NChannelSet"),
 function(expressionset, do.logtransform){
-  rc = assayData(expressionset)$R
-  gc = assayData(expressionset)$G
   
-  rcb = if(exists("Rb", envir = assayData(expressionset))) assayData(expressionset)$Rb else NULL
-  gcb = if(exists("Gb", envir = assayData(expressionset))) assayData(expressionset)$Gb else NULL
+  rc  = assayData(expressionset)$R
+  gc  = assayData(expressionset)$G
+  rcb = assayData(expressionset)$Rb
+  gcb = assayData(expressionset)$Gb
 
   if(do.logtransform)
     {
@@ -38,28 +40,29 @@ function(expressionset, do.logtransform){
   colnames(dat) = seq(along = sampleNames(expressionset))
   numArrays = ncol(rc)
   
-  if("dyeswap" %in% names(phenoData(expressionset)@data))
+  if("dyeswap" %in% colnames(phenoData(expressionset)))
     {
-      lev = levels(expressionset@phenoData$dyeswap)
+      if(!is.factor(expressionset$dyeswap))
+        stop("'expressionset$dyeswap' must be a factor.")
+      lev = levels(expressionset$dyeswap)
       if(length(lev) != 2)
-        stop("The dyeswap slot of the phenoData must be binary.\n")
-      reverseddye = names(expressionset@phenoData$dyeswap[expressionset@phenoData$dyeswap == min(lev)])
-      dat[,reverseddye] = - dat[,reverseddye]
+        stop("The factor 'expressionset$dyeswap' must have exactly two levels")
+
+      reverse = (as.integer(expressionset$dyeswap)==1)
+      dat[,rev] = - dat[,rev]
     }
-  
-  outM = as.dist(dist2(dat))
   
   list(
      "rc" = rc, "gc" = gc, "rcb" = rcb, "gcb" = gcb,
      "M" = M, "A" = A, "dat" = dat,
-     "outM" = outM, "numArrays" = numArrays,
-     "nchannels" = 2)
+     "nchannels" = 2, pData = pData(expressionset), fData = fData(expressionset))
 })
 
 ## ExpressionSet and AffyBatch
 setMethod("platformspecific",
-          signature(expressionset = "aqmOneCol"),
+          signature(expressionset = "oneColourArray"),
 function(expressionset, do.logtransform){
+  
   dat = exprs(expressionset)    
   if(do.logtransform)
     dat = logtransform(dat)
@@ -68,14 +71,9 @@ function(expressionset, do.logtransform){
   M =  dat - medArray
   A =  (dat + medArray)/2
   
-  numArrays = ncol(dat)
-  outM = as.dist(dist2(dat))
-  
   list(
-    "rc" = NULL, "gc" = NULL,  "rcb" = NULL, "gcb" = NULL,
     "M" = M, "A" = A, "dat" = dat,
-    "outM" = outM, "numArrays" = numArrays,
-    "nchannels" = 1)
+    "nchannels" = 1, pData = pData(expressionset), fData = fData(expressionset))
 })
           
 ## BeadLevelList
@@ -95,14 +93,13 @@ function(expressionset, do.logtransform){
      summaryESRG = createBeadSummaryData(expressionset, what = "RG", imagesPerArray = 1, log = do.logtransform)
      rc = assayData(summaryESRG)$R                         
      gc = assayData(summaryESRG)$G                
-     summaryES = createBeadSummaryData(expressionset ,what = "M", imagesPerArray = 1, log = do.logtransform)
+     summaryES = createBeadSummaryData(expressionset , what = "M", imagesPerArray = 1, log = do.logtransform)
      nch = 2
    },
-   stop(sprintf("Invalid expressionset@arrayInfo$channels = '%s'", expressionset@arrayInfo$channels))    
+   stop(sprintf("Invalid 'expressionset@arrayInfo$channels': %s", expressionset@arrayInfo$channels))    
   ) ## switch
   
   dat = exprs(summaryES)
-  outM = as.dist(dist2(dat))
  
   switch(expressionset@arrayInfo$channels,
    "single" = {
@@ -116,10 +113,9 @@ function(expressionset, do.logtransform){
    })
   
   list(
-    "rc" = rc, "gc" = gc, "rcb" = NULL, "gcb" = NULL,
+    "rc" = rc, "gc" = gc, 
     "M" = M, "A" = A, "dat" = dat,
-    "outM" = outM, "numArrays" = numArrays,
-    "nchannels" = nch)
+    "nchannels" = nch, pData = pData(expressionset), fData = fData(expressionset)) ## TODO - this needs to be fixed.
 })
 
 
@@ -134,12 +130,14 @@ prepdata = function(expressionset, intgroup, do.logtransform, usesvg) {
 
   x = platformspecific(expressionset, do.logtransform)
 
-  x$intgroup = intgroup
-  x$do.logtransform = do.logtransform
-  x$usesvg   = usesvg
-  
-  x$classori = class(expressionset)[1]
-  x$expressionset = expressionset
+  x = append(x, list(
+    outM            = as.dist(dist2(x$dat)),
+    numArrays       = ncol(x$dat),
+    intgroup        = intgroup,
+    do.logtransform = do.logtransform,
+    usesvg          = usesvg,
+    classori        = class(expressionset)[1],  ## TODO is this needed anywhere? If not, drop
+    expressionset   = expressionset))
   
   return(x)
 }

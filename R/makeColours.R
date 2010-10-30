@@ -17,7 +17,7 @@ intgroupColours = function(x, withOpacity = FALSE)
   key = NULL
   
   if (length(x$intgroup)>0) {
-    groups  = as.factor(pData(x$expressionset)[, x$intgroup[1]])
+    groups  = as.factor(x$pData[[x$intgroup[1]]])
     igroups = as.integer(groups)
     colours = brewer.pal(9, "Set1")
     if(nlevels(groups) > length(colours)) {

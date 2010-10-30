@@ -1,6 +1,6 @@
 aqm.pca = function(x, outliers) {
 
-  sN = sampleNames(x$expressionset)
+  sN = colnames(x$dat)
 
   if(x$usesvg) {
     annotation = namedEmptyList(x$numArrays)

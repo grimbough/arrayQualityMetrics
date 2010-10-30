@@ -1,16 +1,11 @@
 aqm.probesmap = function(x)
 {
 
-  if(!("hasTarget" %in% colnames(fData(x$expressionset))))
+  if(!("hasTarget" %in% colnames(x$fData)))
     return(NULL)
   
-  if(inherits(x$expressionset, "BeadLevelList")) {
-    warning("probe mapping plot is not implemented for BeadLevelList objects.")
-    return(NULL)
-  } 
-
   df = data.frame(
-    "hasTarget" = rep(fData(x$expressionset)$hasTarget, ncol(x$dat)),
+    "hasTarget" = rep(x$fData$hasTarget, ncol(x$dat)),
     "dat"       = as.vector(x$dat))
 
   den = densityplot( ~ dat,

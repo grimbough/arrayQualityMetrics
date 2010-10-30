@@ -7,14 +7,9 @@
 ##     - linked ids (character vector)
 ##
 
-annotateSvgMatplotWarning = c()
-
-annotateSvgMatplot = function(infile, outfile, annotationInfo,
-  js = system.file("javascript", "imatplot.js", package = "arrayQualityMetrics")) 
+annotateSvgMatplot = function(infile, outfile, annotationInfo) 
   {
-    if(js=="")
-      stop(sprintf("Could not find '%s'.", js))
-    
+     
     doc = xmlParse(infile)
     svg = xmlRoot(doc)
     vb  = getViewBox(doc)
@@ -41,7 +36,7 @@ annotateSvgMatplot = function(infile, outfile, annotationInfo,
                  parent = g)
       
       ## addCSS(doc, insert = TRUE)
-      addECMAScripts(doc, js, insertJS = TRUE)
+      addECMAScripts(doc, "arrayQualityMetrics.js", insertJS = FALSE)
       
       ## Add an onload Java script call to the <svg> tag
       addAttributes(svg, "onload"="init(evt);")
@@ -86,3 +81,23 @@ aqm.highlight = function(doc, annotationInfo)
 aqm.getMatplotSeries = function(doc)
     SVGAnnotation::getMatplotSeries(doc,
          paths = XML::getNodeSet(doc, "//x:g[starts-with(@id, 'surface')]//x:path", "x"))
+
+
+## check the 'usesvg' parameter, and the available infrastructure, and if appropriate, emit warning.
+checkUsesvg = function(usesvg) {
+
+  if(missing(usesvg)){
+    ## Note: assignment within the if-condition
+    if(! (usesvg <- capabilities()["cairo"]) )
+      warning("capabilities()[\"cairo\"] is FALSE - all graphics will be static. Please install the cairo library for your R to obtain interactive SVG graphics.") 
+  } else {
+    if( is.logical(usesvg) && (length(usesvg)==1) && !is.na(usesvg) )
+      stop("'usesvg' must be TRUE or FALSE")
+    if(usesvg && (!capabilities()["cairo"]))
+      stop("capabilities()[\"cairo\"] is FALSE - cannot produce interactive SVG graphics. Please install the cairo library for your R.") 
+  }
+  
+  return(usesvg)
+}
+
+  
