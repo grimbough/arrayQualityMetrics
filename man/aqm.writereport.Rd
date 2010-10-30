@@ -19,7 +19,7 @@
 \value{A side effect of this function is the creation of the HTML report.}
 
 \details{
-See the \code{aqm} Vignette.
+See the vignette \emph{Working with arrayQualityMetrics report sections}.
 }
 
 \author{Audrey Kauffmann, Wolfgang Huber}

@@ -33,6 +33,7 @@ aqm.make.title = function(reporttitle, outdir)
     if(!(is.character(reporttitle)&&(length(reporttitle)==1)))
       stop("'reporttitle' must be a character of length 1.")
 
+    ## ------- copy and link the CSS and JavaScript files
     filenames = c("arrayQualityMetrics.css", "arrayQualityMetrics.js")
     filelocs  = system.file("javascript", filenames, package = "arrayQualityMetrics")
     filelocs[ filelocs!="" ]
@@ -40,7 +41,10 @@ aqm.make.title = function(reporttitle, outdir)
         stop(sprintf("Could not find all of: '%s'.", paste(filenames, collapse=", ")))
     file.copy(filelocs, outdir)
                 
-    p = openPage(file.path(outdir, 'QMreport.html'))
+    p = openPage(file.path(outdir, 'QMreport.html'),
+      link.javascript = filenames[2],
+      link.css        = filenames[1])
+
     hwrite("<hr>", p)
     hwrite(reporttitle, p, heading=1)
     hwrite("<hr>", p)
@@ -105,7 +109,7 @@ aqm.report.qm = function(p, qm, f, name, outdir)
              svg(file = svgtemp, h = h, w = w)
              aqm.plot(qm)
              dev.off()
-             annRes = annotateSvgMatplot(svgtemp, file.path(outdir, nameimg), annotationInfo=qm@svg)
+             annRes = annotateSvgMatplot(infile=svgtemp, outfile=nameimg, outdir=outdir, annotationInfo=qm@svg)
              if(!annRes$annotateOK)
                svgwarn = "Note: the figure is static - enhancement with interactive effects (mouseover tooltips) failed. This is likely due to a version incompatibility of the arrayQualityMetrics package and libcairo. Please contact the Bioconductor mailing list to report this problem." 
              sizes = paste(annRes$size)

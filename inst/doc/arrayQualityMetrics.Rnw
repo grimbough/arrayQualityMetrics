@@ -73,7 +73,7 @@ programmatic analysis of the report.
 \section{Basic use}
 %
 <<options,echo=FALSE>>=
-options(error = recover)
+options(error = recover, warn = 2)
 @
 %
 

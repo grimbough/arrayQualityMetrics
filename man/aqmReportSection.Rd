@@ -63,11 +63,7 @@ An object of class \code{aqmReportModule}. For a simple example of the
 }
 
 \details{
-See the \code{aqm} Vignette.
-}
-
-\examples{
-  ## See vignette
+See the vignette \emph{Working with arrayQualityMetrics report sections}.
 }
 
 \author{Audrey Kauffmann, Wolfgang Huber}

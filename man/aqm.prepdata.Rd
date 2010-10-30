@@ -25,8 +25,9 @@ prepaffy(expressionset)
   helper function used by \code{\link{arrayQualityMetrics}}.}
 
 \value{A list with various derived values.}
-\author{Audrey Kauffmann.}
 
-\examples{
-   ## See vignette
+\details{
+See the vignette \emph{Working with arrayQualityMetrics report sections}.
 }
+
+\author{Audrey Kauffmann, Wolfgang Huber}

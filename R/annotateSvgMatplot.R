@@ -7,7 +7,7 @@
 ##     - linked ids (character vector)
 ##
 
-annotateSvgMatplot = function(infile, outfile, annotationInfo) 
+annotateSvgMatplot = function(infile, outfile, outdir, annotationInfo) 
   {
      
     doc = xmlParse(infile)
@@ -36,13 +36,16 @@ annotateSvgMatplot = function(infile, outfile, annotationInfo)
                  parent = g)
       
       ## addCSS(doc, insert = TRUE)
-      addECMAScripts(doc, "arrayQualityMetrics.js", insertJS = FALSE)
+
+      oldwd = setwd(outdir)  ## the following function needs this
+      addECMAScripts(doc, scripts = "arrayQualityMetrics.js", insertJS = FALSE)
+      setwd(oldwd)
       
       ## Add an onload Java script call to the <svg> tag
       addAttributes(svg, "onload"="init(evt);")
     }
     
-    saveXML(doc, outfile)
+    saveXML(doc, file.path(outdir, outfile))
 
     return(list(size=diff(vb), annotateOK=annotateOK))
   }

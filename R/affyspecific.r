@@ -17,12 +17,11 @@ phrase = list(
 aqm.rnadeg = function(expressionset, x)
   {
     sN = colnames(x$dat)
-    acol = intgroupColours(x, withOpacity = TRUE)
+    cl = intgroupColours(x)
     
     rnaDeg = function() {
       plotAffyRNAdeg(AffyRNAdeg(expressionset, log.it = TRUE),
-                     lwd = 1, col=acol)
-      legend("topright", lty=1, lwd=2, col=acol, legend = paste(seq(along=acol)))
+                     lwd = 1, col = cl$arrayColours)
     }
     
     if(x$usesvg){
