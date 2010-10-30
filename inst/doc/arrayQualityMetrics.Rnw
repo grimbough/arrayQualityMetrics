@@ -1,5 +1,5 @@
 %\VignetteIndexEntry{Quality assessment with arrayQualityMetrics}
-%\VignetteDepends{CCl4, ALLMLL,vsn}
+%\VignetteDepends{CCl4, ALLMLL, vsn}
 %\VignettePackage{arrayQualityMetrics}
 
 \documentclass[11pt]{article}
@@ -22,17 +22,17 @@
 \author{Audrey Kauffmann, Wolfgang Huber}
 \maketitle
 \tableofcontents
-\pagebreak
 
 \section*{Introduction}
 
 The \Rpackage{arrayQualityMetrics} package produces, through a single
 function call, a comprehensive HTML report of \emph{quality metrics}
-about the data set.  The quality metrics are mainly on the
-\emph{per-array} level, i.\,e.\ they can be used to assess the
-relative quality of different arrays within a data set. Some of the
-metrics can also be used to diagnose batch effects, and thus the
-quality of the overall data set.
+about a microarray
+dataset~\cite{Kauffmann:2009a:Bioinf,Kauffmann:2010:Genomics,McCall2010}.
+The quality metrics are mainly on the \emph{per-array} level,
+i.\,e.\ they can be used to assess the relative quality of different
+arrays within a data set. Some of the metrics can also be used to
+diagnose batch effects, and thus the quality of the overall data set.
 
 The report can be extended to contain further diagnostics through
 additional arguments, and we will see examples below.
@@ -70,14 +70,14 @@ The function \Rfunction{arrayQualityMetrics} also produces an R object
 the report, and this object can be used by downstream tools for
 programmatic analysis of the report.
 
-\section{Minimal use}
+\section{Basic use}
 %
 <<options,echo=FALSE>>=
 options(error = recover)
 @
 %
 
-\subsection{Example on Affymetrix data}
+\subsection{Affymetrix data - before preprocessing}w
 If you are working with Affymetrix chips, an \Rclass{AffyBatch} object
 is the most appropriate to import your raw data into Bioconductor.
 Starting from CEL files, this is typically done using the function
@@ -101,7 +101,7 @@ your own application, you can call it on the complete data object.}.
 <<AffyBatchQM,results=hide>>=
 library("arrayQualityMetrics")
 arrayQualityMetrics(expressionset = MLL.A[, 1:5],
-                    outdir = "MLL",
+                    outdir = "Report for MLL.A",
                     force = TRUE,
                     do.logtransform = TRUE)
 @
@@ -112,43 +112,50 @@ the directory (\texttt{outdir}) and we overwrite the possibly existing
 files of this directory (\texttt{force}). Finally, we set
 \texttt{do.logtransform} to logarithm transform the intensities.
 
-\subsection{Example with one colour arrays}
-
-If you are working on one colour non Affymetrix chips, you can load
-your data into Bioconductor as an \Rclass{ExpressionSet}
-object. Please see the documentation of the \Rpackage{Biobase} package
-on how to do so. Here, for demonstration, we use the
-\Rclass{ExpressionSet} produced from \emph{MLL.A} by calling the RMA
-algorithm.  It contains one value (expression estimate) for each gene
+%--------------------------------------------------
+\subsection{Affymetrix data - after preprocessing}
+%--------------------------------------------------
+We call the RMA algorithm on \emph{MLL.A} to obtain a preprocessed
+dataset.  The preprocessing includes background correction, between
+array intensity adjustment (normalisation) and probeset
+summarisation. The resulting object \Robject{nMLL} is of class
+\Rclass{ExpressionSet} and
+contains one value (expression estimate) for each gene
 for each array.
-
 %
-<<Normalisation,results=hide>>=
-rMLL = rma(MLL.A)
+<<Normalisation, results=hide>>=
+nMLL = rma(MLL.A)
 @ 
 %
-
-We can then call \Rfunction{arrayQualityMetrics}.
-
+We can then call again the function \Rfunction{arrayQualityMetrics}.
 %
 <<ExpressionSet,results=hide>>=
-arrayQualityMetrics(expressionset = rMLL,
-                    outdir = "Report for rMLL",
+arrayQualityMetrics(expressionset = nMLL,
+                    outdir = "Report for nMLL",
                     force = TRUE)
 @
 %
 We do not need to set \texttt{do.logtransform} as after
 \Rfunction{rma} the data are already logarithm transformed.
 
-\subsection{Example with two colour arrays}
+If you are working on one colour arrays other than Affymetrix
+genechips, you can load your data into Bioconductor as an
+\Rclass{ExpressionSet} object \footnote{See the documentation of the
+  \Rpackage{Biobase} package.} and proceed exactly as above.
+
+\subsection{Two colour arrays}
 
 If you are working on two colour chips, you can create an
 \Rclass{NChannelSet} to contain your data. The documentation of the
 \Rpackage{Biobase} package gives instructions on how to build a
-\Rclass{NChannelSet}.  Here, for demonstration, we use the data set
-\Robject{CCl4} from the data package \Rpackage{CCl4} and normalize it
-using the variance stabilization method available in the package
-\Rpackage{vsn}.
+\Rclass{NChannelSet} from scratch. Furthermore, the package
+\Rpackage{limma} can import a wide range of data formats used for two
+colour arrays, and will produce objects of class \Rclass{RGList},
+\Rclass{MAList}. \Rfunction{arrayQualityMetrics} also understands these.
+
+Here, we consider the data set \Robject{CCl4} from the data package
+\Rpackage{CCl4} and normalize it using the variance stabilization
+method available in the package \Rpackage{vsn}.
 
 %
 <<NChannelSet,results=hide>>=
@@ -162,19 +169,19 @@ arrayQualityMetrics(expressionset = nCCl4,
 @
 %
 
-\subsection{Other type of objects}
+\subsection{Illumina beadarrays}
 
-Through the previous examples, you have seen that
-\Rfunction{arrayQualityMetrics} is used the same way on different
-types of object.  If you have Illumina bead arrays, you can build a
+For Illumina bead arrays, you can build a
 \Rclass{BeadLevelList}, which is explained in the \Rpackage{beadarray}
-package, and run \Rfunction{arrayQualityMetrics}.  It is also possible
-to use \Rfunction{arrayQualityMetrics} on objects of the classes \Rclass{RGList},
-\Rclass{MAList}, \Rclass{marrayRaw} and \Rclass{marrayNorm}. More
-information about the \Rclass{RGList} and \Rclass{MAList} classes is
-given in the package \Rpackage{limma}. The objects \Rclass{marrayRaw}
-and \Rclass{marrayNorm} are explained in the vignette of the package
-\Rpackage{marray}.
+package, and again run the function \Rfunction{arrayQualityMetrics}.  
+
+\subsection{Loading data from ArrayExpress}
+
+You can use the \Rpackage{ArrayExpress}
+package~\cite{Kauffmann:2009b:Bioinf} to download datasets from the
+EBI's ArrayExpress database. The resulting \Rclass{ExpressionSet},
+\Rclass{AffyBatch} or \Rclass{NChannelSet} objects can be directly fed
+into \Rfunction{arrayQualityMetrics}.
 
 \section{Playing with the arguments}
 
@@ -184,7 +191,7 @@ A useful feature of \Rfunction{arrayQualityMetrics} is the possibility
 to show the results in the context of an experimental factor of
 interest, i.\,e.\ a categorical variable associated with the arrays
 such as \emph{hybridisation date}, \emph{treatment level} or
-\emph{replicate number}. Specifying a factor does not change anything
+\emph{replicate number}. Specifying a factor does not change 
 how the quality metrics are computed. By setting the argument
 \Rfunction{intgroup} to contain the names of one or multiple columns
 of the data object's \Rclass{phenoData} slot\footnote{This is where
@@ -193,47 +200,49 @@ the heatmap with colours representing the respective factors is added.
 Similarly, the colours of the boxplots and density plots reflect the
 levels of the first of the factors named by \Rfunction{intgroup}.
 
-We use the \emph{rMLL} example again, and create artificial columns
+We use the \emph{nMLL} example again, and create artificial
+(nonsensical) array metadata factors \Robject{condition} and
+\Robject{batch} (see Section~\ref{sec:rin} for a more realistic example).
 
 %
 <<intgroup1>>=
-pData(rMLL)$fact1 = rep(letters[1:4], times = 5)
-pData(rMLL)$fact2 = rep(letters[1:4], each = 5)
+pData(nMLL)$condition = rep(letters[1:4], times = 5)
+pData(nMLL)$batch = rep(paste(1:4), each = 5)
 @ 
 <<intgroup2, results=hide>>=
-arrayQualityMetrics(expressionset = rMLL,
-                    outdir = "rMLL-facts",
+arrayQualityMetrics(expressionset = nMLL,
+                    outdir = "Report for nMLL with factors",
                     force = TRUE,
-                    intgroup = c("fact1","fact2"))
+                    intgroup = c("condition", "batch"))
 @
 %
 
 \section{Extended use}
 \label{ext}
-Some of the quality metrics provided by the package are performed
-using specific information about the features of the arrays.  To have
-more quality metrics in the report, you can add the needed information
-in your input object.  We can use the \emph{nCCl4} example again.
+Some of the quality metrics that the package can compute require
+specific information about the features on the arrays.  To use these,
+you need to make sure that this information is provided in your input
+object.  We use the \emph{nCCl4} example again.
 
 \subsection{Spatial layout of the array}
 
 To plot the spatial distributions of the intensities of the arrays,
-\Rfunction{arrayQualityMetrics} needs the coordinates of the spots on
-the chip. In the case of \Rclass{AffyBatch} or \Rclass{BeadLevelList},
-this is automatically done without further information needed. For the
-other types of objects, two columns corresponding to the row and
-column numbers of the features are required in the
-\Rclass{featureData}. These columns should be named "X" for rows and
-"Y" for columns. If the arrays are split into blocks, then the
-function \Rfunction{addXYfromGAL} (please check its manual page for
-details) should be executed prior to \Rfunction{arrayQualityMetrics}
-to convert the rows and columns of the blocks in absolute "X" and "Y"
-on the array. In the example of the data set \emph{CCl4}, the
-coordinates of the spots are in the columns named "Row" and "Column"
-of the featureData (the slot of the object containing the annotation
-of the probes). We thus need to copy this information in columns named
-"X" and "Y" respectively, so that these coordinates are taken into
-account and the spatial distribution of the intensities can be drawn.
+\Rfunction{arrayQualityMetrics} needs the spatial coordinates of the
+features on the chip. For \Rclass{AffyBatch} or
+\Rclass{BeadLevelList}, this information is automatically available
+without further user input. For the other types of objects, two
+columns corresponding to $X$ and $Y$ coordinates of the features are
+required in the \Robject{featureData} slot of the object.  These
+columns should be named "X" and "Y". If the arrays are split into
+blocks, rows and columns, then the function \Rfunction{addXYfromGAL}
+(please check its manual page for details) can used to convert the
+row, column and blocks indices into absolute "X" and "Y" coordinates on the
+array. In the example of the data set \emph{CCl4}, the coordinates of
+the spots are in the columns named "Row" and "Column" of the
+featureData (the slot of the object containing the annotation of the
+probes). We copy this information into columns named "X"
+and "Y" respectively, so that these coordinates are taken into account
+and the spatial distribution of the intensities can be drawn.
 
 %
 <<XYcoordinates>>=
@@ -245,76 +254,72 @@ featureData(nCCl4)$Y = featureData(nCCl4)$Column
 \subsection{Mapping of the reporters}
 
 The report can also include an assessment of the effect of the target
-mapping of the reporters. Thus a \Rclass{featureData} column named
-\texttt{hasTarget} should include a logical \texttt{TRUE} if the
-reporter matches for a coding mRNA and \texttt{FALSE} if not. In the
-\emph{CCl4} example, many of the feature names are RefSeq
-identifiers. Thus, we test the feature names whether they with "NM",
-and assume that these corresponding to coding mRNA. "hasTarget" can be
-derived from this, in the following way:
-
+mapping of the reporters. You can define a \Rclass{featureData} column
+named \Robject{hasTarget} that indicates, by logical \texttt{TRUE}, if
+the reporter matches a known transcript, and by \texttt{FALSE}, if
+not. In the \emph{CCl4} example, many of the reporter names are RefSeq
+identifiers, while others are not. Thus, we let \Robject{hasTarget}
+indicate whether the name begins with "NM".
 %
 <<hasTarget>>=
 featureData(nCCl4)$hasTarget = (regexpr("^NM", featureData(nCCl4)$Name) > 0)
+table(featureData(nCCl4)$hasTarget)
 @
 %
-This command line produces \texttt{TRUE} if the probe name starts with
-"NM" and \texttt{FALSE} if it does not.
 
-\subsection{GC content of the reporters}
+%\subsection{GC content of the reporters}
+%If the GC content of the reporters is known, then it is possible to
+%indicate that in the \Robject{featureData} slot of the
+%\Rclass{NChannelSet} object under the column name "GC". Then a study of the
+%GC content effect on intensities of the arrays can be performed. In
+%the \emph{CCl4} example we do not have this information. However, the
+%process would be very similar to what is done with the "hasTarget"
+%column.
 
-If the GC content of the reporters is known, then it is possible to include it as percentages in the
-\Rclass{featureData} of the \Rclass{NChannelSet} under the column name "GC". Then a study of
-the GC content effect on intensities of the arrays can be performed. In the \emph{CCl4} example we do not have this information. However, the process would be very similar to what is done with the "hasTarget" column.
 
+\subsection{RNA quality}
+\label{sec:rin}
 
-\subsection{RNA quality - RIN number}
-
-As seen before, we can make use of a factor of interest. In the case
-of the \emph{CCl4} dataset, the RNA hybridized to the arrays can be of
-good, medium or poor quality accordingly to its RIN number (see
-\emph{CCl4} vignette). We can read the sample information of
-\emph{CCl4}, there are 4 RIN values: 2.5, 5, 9 and 9.7, with 9 always
-corresponding to the reference. As the RIN number is given per dye, we
-need to create a variable which will be "Good" when one of the two
-dyes RIN is 9.7, "Medium" when it is 5 and "Poor" when it is 2.5. In
-this example, we will copy this variable in a column "RNAintegrity" of
-the \Rclass{phenoData}. We will set the argument 'intgroup' with this
-name when calling the function \Rfunction{arrayQualityMetrics}.
-
+The RNA hybridized to the arrays in the \Rpackage{CCl4} dataset was
+intentionally made to good, medium or poor quality, and this is
+recorded by a so-called RIN value (see \emph{CCl4} vignette).
 %
-<<Covariate>>=
-datapath = system.file("extdata", package="CCl4")
-p = read.AnnotatedDataFrame("samplesInfo.txt", path=datapath)
-cond = paste(p$RIN.Cy3,p$RIN.Cy5,sep="/")
-poor = grep(cond,pattern="2.5")
-medium = grep(cond,pattern="^5/|/5")
-good = grep(cond,pattern="9.7")
-cov = rep(0, length = nrow(p))
-cov[good] = "Good"
-cov[medium] = "Medium"
-cov[poor] = "Poor"
-phenoData(nCCl4)$RNAintegrity = cov
-@
+<<pData>>=
+pd = pData(CCl4)
+rownames(pd) = NULL
+pd              
+@ 
 %
-<<NChannelSet,results=hide>>=
+The RIN is always 9 for the reference (DMSO), the relevant value is that
+for the test sample (CCl4).
+<<>>=
+RIN = with(pd, ifelse( Cy3=="CCl4", RIN.Cy3, RIN.Cy5))
+fRIN = factor(RIN)
+levels(fRIN) = c("poor", "medium", "good")
+pData(nCCl4)$"RNA-integrity" = fRIN
+@ 
+%
+Now we can use this to set the argument \Robject{intgroup} when
+calling the function \Rfunction{arrayQualityMetrics}.
+%
+<<NChannelSet, results=hide>>=
 arrayQualityMetrics(expressionset = nCCl4,
-                    outdir = "CCl4-RIN",
+                    outdir = "Report for nCCl4 with RIN",
                     force = TRUE,
-                    intgroup = "RNAintegrity")
+                    intgroup = "RNA-integrity")
 @
 %
-
-A report named \texttt{QMreport.html} is produced in the subdirectory
-\texttt{CCl4-RIN}. Boxplots and density plots are represented with
-colours depending on the "RNAintegrity" value, and a side bar is drawn
-next to the heatmap and coloured according to this factor as well.
+Boxplots, PCA plot and heatmap in the report will now indicate the values
+of the factor \texttt{RNA-integrity} for each array.
 
 \subsection*{Session Info}
 %
-<<pkgs, results=tex>>=
+<<pkgs, results=tex, echo=FALSE>>=
 toLatex(sessionInfo())
 @
 %
+
+\bibliographystyle{natbib}
+\bibliography{arrayQualityMetrics}
 
 \end{document}
