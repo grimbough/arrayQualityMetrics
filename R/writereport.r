@@ -195,12 +195,19 @@ scores = function(obj)
 
 aqm.make.table = function(arrayTable, p) {
 
-    hwrite(arrayTable, p, border=0,
-           row.bgcolor = list("#ffffff", c("#d0d0ff", "#e0e0f0")),
-           cellpadding = 2, cellspacing = 5,
-           row.style = list('font-weight:bold'))
-    
-  }
+   ## TO DO: add outlier detection
+   ## Add on click events
+  
+  arrayTable = cbind(
+    highlight = "<input type=\"checkbox\" name=\"name\" value=\"yes\"/>",
+    arrayTable, stringsAsFactors = FALSE)
+  
+  hwrite(arrayTable, p, border=0,
+         row.bgcolor = rep(list("#ffffff", c("#d0d0ff", "#e0e0f0")), ceiling(nrow(arrayTable)/2)),
+         cellpadding = 2, cellspacing = 5,
+         row.style = list('font-weight:bold'))
+  
+}
 
 aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
   {
