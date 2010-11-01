@@ -61,9 +61,9 @@ arrayQualityMetrics = function(
   ##---------Generic modules------
   m$maplot    = aqm.maplot (x)
   m$boxplot   = aqm.boxplot(x)
-  m$density   = aqm.density(x, outliers = m$boxplot@outliers)
+  m$density   = aqm.density(x)
   m$heatmap   = aqm.heatmap(x)
-  m$pca       = aqm.pca    (x, outliers = m$heatmap@outliers)
+  m$pca       = aqm.pca    (x)
   m$meansd    = aqm.meansd (x)
   m$probesmap = aqm.probesmap(x)
 
@@ -79,9 +79,6 @@ arrayQualityMetrics = function(
     m$pmmm = aqm.pmmm(expressionset)
   }
   
-  for(i in seq(along = m))
-    m[[i]]@legend = gsub("The figure <!-- FIG -->", paste("<b>Figure", i, "</b>"), m[[i]]@legend, ignore.case = TRUE)
-
   aqm.writereport(modules = m, arrayTable = x$pData, reporttitle = reporttitle, outdir = outdir)
 }
 

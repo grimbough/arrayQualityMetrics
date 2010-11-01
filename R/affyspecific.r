@@ -16,19 +16,12 @@ phrase = list(
 ## RNA digestion
 aqm.rnadeg = function(expressionset, x)
   {
-    sN = colnames(x$dat)
+ 
     cl = intgroupColours(x)
     
     rnaDeg = function() {
       plotAffyRNAdeg(AffyRNAdeg(expressionset, log.it = TRUE),
                      lwd = 1, col = cl$arrayColours)
-    }
-    
-    if(x$usesvg){
-      annotation = namedEmptyList(x$numArrays)
-      for(i in seq(along=annotation))
-        annotation[[i]] = list(title = sprintf("Array %d: %s", i, sN[i]),
-                    linkedids = names(annotation)[i])
     }
     
     legend = paste(phrase$fig("RNA digestion"),
@@ -42,7 +35,9 @@ aqm.rnadeg = function(expressionset, x)
         title   = "RNA digestion plot",
         legend  = legend,
         shape   = list("h" = 5.5, "w" =7),
-        svg     =  if(x$usesvg) list(annotation=annotation, getfun = aqm.getMatplotSeries) else list())
+        svg     =  if(x$usesvg)
+        list(getfun = aqm.getMatplotSeries, numObjects = x$numArrays,
+             strokewidth = c(1,3), strokeopacity = c(0.4, 1)) else list())
    }
 
 

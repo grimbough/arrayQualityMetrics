@@ -1,53 +1,24 @@
-## postprocess svg file to provide explanation on objects
-##
-## annotation: named list, length matches the number of elements to be annotated
-##   the names are the unique ids
-##   each list element is again a list of
-##     - title (character string)
-##     - linked ids (character vector)
-##
-
-annotateSvgMatplot = function(infile, outfile, outdir, annotationInfo) 
+## --------------------------------------------------
+## Postprocess an SVG file to add mouse events
+## --------------------------------------------------
+annotateSvgPlot = function(infile, outfile, outdir, annotationInfo) 
   {
      
     doc = xmlParse(infile)
     svg = xmlRoot(doc)
     vb  = getViewBox(doc)
     
-    ## Add the lineWidth toggling
-    annotateOK = aqm.highlight(doc, annotationInfo = annotationInfo)
+    annotateOK = aqm.highlight(doc, annotationInfo)
     
     ## Did it work?
-    if(annotateOK){
-      
-      ## Enlarge SVG view box to make spake for the "status bar"
-      addy = 20
-      enlargeSVGViewBox(doc, 0, addy) ## nothing in x-direction, 100 units in y-direction
-      
-      ## Add the "status bar"
-      vb = getViewBox(doc)
-      g = xmlRoot(doc)[["g"]]
-      newXMLNode("text", " ",
-                 attrs = c("x" = vb[1,1],
-                   "y" = vb[2,2]-addy,
-                   "font-size" = "13",
-                   "font-family" = "Arial,Helvetica",
-                   "id" = "annotationtext"),
-                 parent = g)
-      
-      ## addCSS(doc, insert = TRUE)
-
-      oldwd = setwd(outdir)  ## the following function needs this
-      addECMAScripts(doc, scripts = "arrayQualityMetrics.js", insertJS = FALSE)
-      setwd(oldwd)
-      
-      ## Add an onload Java script call to the <svg> tag
-      addAttributes(svg, "onload"="init(evt);")
-    }
-    
+    if(annotateOK)
+      {
+        oldwd = setwd(outdir)  ## the following function needs this
+        addECMAScripts(doc, scripts = "arrayQualityMetrics.js", insertJS = FALSE)
+        setwd(oldwd)
+      }
     saveXML(doc, file.path(outdir, outfile))
-
-    return(list(size=diff(vb), annotateOK=annotateOK))
+    return(list(size=diff(vb), annotateOK = annotateOK))
   }
 
 ## The following is adapted from the functions
@@ -55,32 +26,41 @@ annotateSvgMatplot = function(infile, outfile, outdir, annotationInfo)
 ## SVGAnnotation
 aqm.highlight = function(doc, annotationInfo)
 {
+  getfun = annotationInfo$getfun
+  numObj = annotationInfo$numObjects
   
+  stopifnot( !is.null(getfun), !is.null(numObj), is.numeric(numObj), length(numObj)==1, !is.na(numObj) )
   series = annotationInfo$getfun(doc)
-  anno = annotationInfo$annotation
   
   ## TODO - this should never happen
-  if(length(anno) != length(series)) {
+  if( (length(series) %% numObj) != 0) {
     ## browser()
     return(FALSE)
   }
-  
-  for(i in seq(along=series)){
-    ops = sprintf("toggleSeries(%s, %s, %s)",
-      paste("[", paste("'", anno[[i]]$linkedids, "'", sep="", collapse=","), "]", sep=""),
-      paste("'", anno[[i]]$title, "'", sep=""),
-      c("true", "false"))
-    names(ops) = c("onmouseover", "onmouseout")
-    
-    node = series[[i]]
-    xmlAttrs(node) = c(id = names(anno)[i], ops)
-    convertCSSStylesToSVG(node)
-    series[[i]] = node
-  }
+
+  if (length(series)>0)
+    for(i in 0:(length(series)-1))
+      {
+        ## For now, we use directly the integers 'i' to refer to the objects.
+        ## This is OK since SVGAnnotation does not do anything more sophisticated anyway.
+        ## Once the SVG files produced from R contain real identifiers for the plot objects (lines, points)
+        ##   we should use these.
+        ops = c("onclick" = sprintf("top.clickPlotElement(%d)", i %% numObj),
+            "onmouseover" = sprintf("top.showTip(%d)", i %% numObj),
+            "onmouseout"  = "top.hideTip()" )
+        
+        node = series[[i+1]]     ## some pain dealing with 0 versus 1 based arrays...
+        xmlAttrs(node) = c(id = sprintf("aqm%d", i), ops)
+        convertCSSStylesToSVG(node)
+        series[[i+1]] = node
+      }
   return(TRUE)
 }
 
-## based upon SVGAnnotation::getMatplotSeries
+## This is one instance of a function that can be used for 'getfun'
+## in aqm.highlight. It is based upon SVGAnnotation::getMatplotSeries.
+## It used by aqm.density and aqm.rnadeg, which show "matplot"-like lines.
+## aqm.pca, which shows a scatterplot with points, uses SVGAnnotation:::getPlotPoints
 aqm.getMatplotSeries = function(doc)
     SVGAnnotation::getMatplotSeries(doc,
          paths = XML::getNodeSet(doc, "//x:g[starts-with(@id, 'surface')]//x:path", "x"))

@@ -29,9 +29,9 @@
 
 \usage{
 aqm.boxplot(x, subsample = 10000)
-aqm.density(x, outliers = c())
+aqm.density(x)
 aqm.heatmap(x)
-aqm.pca(x, outliers)
+aqm.pca(x)
 aqm.maplot(x)
 aqm.meansd(x)
 aqm.probesmap(x)
@@ -46,14 +46,12 @@ aqm.nuse(x, affyproc)
 
 \arguments{
   \item{x}{The object resulting from a call to \code{\link{prepdata}(expressionset)}.}
-  \item{outliers}{Integer vector indicating the arrays to be highlighted as 
-    outliers in the plots.}
-  \item{subsample}{For the boxplot computations, if the arrays have more
-    features than indicated by this number, then randomly subsample that
-    number of them.}
   \item{expressionset}{An object of class \code{AffyBatch}.}
    \item{affyproc}{The object resulting from a call to
      \code{\link{prepaffy}(expressionset)}.}
+  \item{subsample}{For the boxplot computations, if the arrays have more
+    features than indicated by this number, then randomly subsample that
+    number of them.}
 }
 
 \value{

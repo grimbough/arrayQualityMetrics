@@ -26,7 +26,7 @@ aqm.hwriteImage = function (image.url, page = NULL, ..., image.border = 0, width
     
     str = switch(getExtension(image.url),
       "svg" = {
-        alt = paste(alt, "To render SVG, consider using Firefox, Safari, Opera or IE >=9."
+        alt = paste(alt, "To render SVG, consider using Firefox, Safari, Opera or IE >=9.")
         ## This is ugly: in order to avoid confusion with hmakeTag's own 'data' argument
         ##   I use DATA, using the fact that R is case-sensitive while HTML is not.
         ## I also put the 'alt' text both in the alt attribute and as text between <object..> and </object>,

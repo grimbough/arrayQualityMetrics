@@ -12,48 +12,29 @@ namedEmptyList = function(n) {
   return(x)
 }
     
-aqm.density = function(x, outliers = c())
+aqm.density = function(x)
 {
-  sN = colnames(x$dat)
-
-  ## For the tooltips
-  title = sprintf("Array %d: %s", seq(along=sN), sN)
-
-  if(x$nchannels == 2) {  
-    den1 = dens(x$rc)
-    den2 = dens(x$gc)
-    den3 = dens(x$dat)
-    ddf  = rbind(den1, den2, den3)
-    panels = factor(rep(1:3, each = c(nrow(den1), nrow(den2), nrow(den3))),
-      levels = 1:3,
-      labels = c("a. Red Channel", "b. Green Channel", "c. Log2(Ratio)"))
-    formula = y ~ x | panels
-    lay = c(3,1)
-
-    if(x$usesvg){
-      annotation = namedEmptyList(3*x$numArrays)
-      for(i in seq(along=annotation)) {
-        s = ((i-1) %% x$numArrays)+1
-        annotation[[i]] = list(title = title[s],
-                    linkedids = names(annotation)[s+(0:2)*x$numArrays])
-      }
-    }
-
-  } else {  ## nchannels==1
-    ddf = dens(x$dat)
-    formula = y ~ x
-    lay = c(1,1)
-
-    if(x$usesvg){
-      annotation = namedEmptyList(x$numArrays)
-      for(i in seq(along=annotation))
-        annotation[[i]] = list(title = title[i],
-                    linkedids=names(annotation)[i])
-    }
-  }
-
-  cl = outlierColours(outliers, n = x$numArrays, withOpacity = TRUE)
+  
+  cl = intgroupColours(x)
   lwd = lty = 1
+ 
+  if(x$nchannels == 2)
+    {  
+      den1 = dens(x$rc)
+      den2 = dens(x$gc)
+      den3 = dens(x$dat)
+      ddf  = rbind(den1, den2, den3)
+      panels = factor(rep(1:3, each = c(nrow(den1), nrow(den2), nrow(den3))),
+        levels = 1:3,
+        labels = c("a. Red Channel", "b. Green Channel", "c. Log2(Ratio)"))
+      formula = y ~ x | panels
+      lay = c(3,1)
+    } else {  ## nchannels==1
+      ddf = dens(x$dat)
+      formula = y ~ x
+      lay = c(1,1)
+    }
+
   
   den = xyplot(formula, ddf, groups = which, layout = lay,
     type = "l", ylab = "Density", xlab="",
@@ -62,9 +43,7 @@ aqm.density = function(x, outliers = c())
     scales = list(relation="free"),
     col = cl$arrayColours, lwd = lwd, lty = lty)
   
-  outliertext = if(length(outliers)>0) " Outliers -according to the same criterion as in the boxplots- are highlighted by colour." else ""
-
-  legend = sprintf("The figure <!-- FIG --> shows density estimates (smoothed histograms) of the data. Typically, the distributions of the arrays should have similar shapes and ranges. Arrays whose distributions are very different from the others should be considered for possible problems. Move the mouse over the lines in the plot to see the  corresponding sample names.%s<BR>On raw data, a bimodal distribution can be indicative of an array containing a spatial artefact; a distribution shifted to the right of an array with abnormally high background intensities.", outliertext)
+  legend = "The figure <!-- FIG --> shows density estimates (smoothed histograms) of the data. Typically, the distributions of the arrays should have similar shapes and ranges. Arrays whose distributions are very different from the others should be considered for possible problems. Move the mouse over the lines in the plot to see the  corresponding sample names.%s<BR>On raw data, a bimodal distribution can be indicative of an array containing a spatial artefact; a distribution shifted to the right of an array with abnormally high background intensities."
   
   new("aqmReportModule",
       "plot"    = den,
@@ -72,5 +51,8 @@ aqm.density = function(x, outliers = c())
       "title"   = "Density plots",
       "legend"  = legend,
       "shape"   = list("h" = 5, "w" = 3+3*lay[1]),
-      "svg"     = if(x$usesvg) list(annotation=annotation, getfun = aqm.getMatplotSeries) else list())
+      "svg"     = if(x$usesvg)
+      list(getfun = aqm.getMatplotSeries, numObjects = x$numArrays,
+           strokewidth = c(1,3), strokeopacity = c(0.4, 1)) else
+      list())
 }
