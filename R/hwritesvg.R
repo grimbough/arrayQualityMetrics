@@ -11,7 +11,7 @@
 ## The function tries to be clever and guesses the image format from the extension.
 
 aqm.hwriteImage = function (image.url, page = NULL, ..., image.border = 0, width = NULL, 
-    height = NULL, capture = FALSE) 
+    height = NULL, capture = FALSE, id = NULL) 
 {
     if (capture) {
         if (is.null(width)) 
@@ -31,13 +31,39 @@ aqm.hwriteImage = function (image.url, page = NULL, ..., image.border = 0, width
         ##   I use DATA, using the fact that R is case-sensitive while HTML is not.
         ## I also put the 'alt' text both in the alt attribute and as text between <object..> and </object>,
         ##   as IE does not seem to honour the alt attribute.
-        hwriter::hmakeTag("object", type="image/svg+xml", DATA = image.url, border = image.border, 
-                          alt = alt, data = alt, width = width, height = height)
+        hmakeTag("object", type="image/svg+xml", DATA = image.url, border = image.border, 
+                          alt = alt, data = alt, width = width, height = height, id = id)
       }, {
       ## default:
-        hwriter::hmakeTag("img", src = image.url, border = image.border, 
-                          alt = alt, width = width, height = height)
+        hmakeTag("img", src = image.url, border = image.border, 
+                          alt = alt, width = width, height = height, id = id)
       })
-    hwriter::hwrite(str, page, ...)
+    hwrite(str, page, ...)
 }
 
+
+## copied from hwriter::openPage (file page.R), with an additional argument
+##  'bodyattributes'
+
+aqm.hwriteOpenPage = function(filename, dirname=NULL, title=filename,
+  link.javascript=NULL, link.css=NULL, css=NULL, head=NULL, charset="utf-8", lang="en",
+  body.attributes=c())
+{
+  if (!is.null(dirname)) {
+    if (!file.exists(dirname)) dir.create(dirname, rec=TRUE, showWar=FALSE)
+    filename = file.path(dirname, filename)
+  }
+  page = file(filename,'wt')
+  doctype = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n'
+  meta = hmakeTag('meta',NULL,'http-equiv'='Content-Type',content=paste("text/html; charset=", charset, sep=''), newline=FALSE)
+  
+  if (!is.null(link.javascript)) link.javascript = paste(hmakeTag('script', language='JavaScript', src=link.javascript), collapse='\n')
+  if (!is.null(link.css)) link.css = paste(hmakeTag('link', rel='stylesheet', type='text/css', href=link.css), collapse='\n')
+  if (!is.null(css)) css = paste(hmakeTag('style', css), collapse='\n')
+  
+  head = paste(meta, hmakeTag('title',title), head, link.javascript, link.css, css, sep='\n')
+  head = hmakeTag('head', head, newline=TRUE)
+  hwrite(paste(doctype, "<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='", lang, "' lang='", lang, "'>", head,
+               '<body', paste(' ', names(body.attributes), '="', body.attributes, '"', collapse=' '), '>', sep=''), page)
+  page
+}

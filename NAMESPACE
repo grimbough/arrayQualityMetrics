@@ -47,7 +47,7 @@ importFrom(grDevices, boxplot.stats, colorRampPalette, dev.off, pdf,
 
 importFrom(graphics, legend)
 
-importFrom(hwriter, closePage, hwrite, hwriteImage, openPage)
+importFrom(hwriter, closePage, hwrite, hmakeTag, hwriteImage, openPage)
 
 importFrom(lattice, bwplot, densityplot, draw.key,
            levelplot, ltext, make.groups, packet.number,

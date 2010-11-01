@@ -72,7 +72,7 @@ function setAllPlots(array, status)
 
     for(i=0; i<svgObjectIds.length; i++) 
     {
-	id = "aqm_" + (array+1);
+	id = "aqm" + array;
 	el = svgObjects[i].contentDocument.getElementById(id);
 	if(!el) 
 	{ 

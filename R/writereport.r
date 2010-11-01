@@ -42,9 +42,10 @@ aqm.make.title = function(reporttitle, outdir, params)
     
     copySubstitute(src = filelocs, dest = outdir, recursive = TRUE, symbolValues = params)
                 
-    p = openPage(file.path(outdir, 'QMreport.html'),
+    p = aqm.hwriteOpenPage(file.path(outdir, 'QMreport.html'),
       link.javascript = filenames[2],
-      link.css        = filenames[1])
+      link.css        = filenames[1],
+      body.attributes = c("onload" = "reportinit()"))
 
     hwrite("<hr>", p)
     hwrite(reporttitle, p, heading=1)
@@ -187,7 +188,8 @@ scores = function(obj)
       "Array #"    = seq_len(length(sN)),
       "Array Name" = sN,
       stringsAsFactors = FALSE)
-  
+
+    ## TODO - this should go into vignette, explain how to put this into the pData.
     if(!is.null(protocolData(expressionset)$ScanDate))
       df$"Scan Dates" = protocolData(expressionset)$ScanDate
     
