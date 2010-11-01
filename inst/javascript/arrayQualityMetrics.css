@@ -1,5 +1,5 @@
 body { 
-    padding-top: 100; padding-left: 5%; padding-right: 5%;
+    padding-top: 10px; padding-left: 5%; padding-right: 5%;
     font-family: Palatino; 
     background-color: #ffffff 
 }
@@ -29,27 +29,3 @@ h2 {
    font-family:helvetica,arial,sans-serif
 }
 
-.textbox {
-    text-align: left ;
-    background-color: #c0c0ff
-    padding: 5% ;
-    margin-left:30px ;
-    margin-right:30px
-}
-
-a.example:link {color: black; text-decoration: none; border: solid black 1px; padding:4px ; background: white}
-a.example:visited {color: black; text-decoration: none; border: solid black 1px; padding:4px ; background: white}
-a.example:hover {background:#ffdc98}
-
-a.example2:link {color: black; text-decoration: none; border: solid black 1px; padding:4px ; background: white}
-a.example2:visited {color: black; text-decoration: none; border: solid black 1px; padding:4px ; background: white}
-a.example2:hover {background:#c0c0ff}
-
-.king {
-    margin-left: 10px; margin-top:4px; margin-bottom:4px ; 
-    padding-left: 10px; padding-top: 3px; padding-bottom: 3px;
-    background-color: white; 
-    border: solid 1px black;
-    font-style: italic ;
-    text-align: left
-}
