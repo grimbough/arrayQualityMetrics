@@ -29,12 +29,3 @@ h2 {
    font-family:helvetica,arial,sans-serif
 }
 
-#arraytooltip{
-position: absolute;
-border: 1px solid red;
-width: 150px;
-padding: 2px;
-background-color: lightyellow;
-visibility: hidden;
-z-index: 100;
-}

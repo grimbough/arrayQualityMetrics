@@ -91,9 +91,17 @@ aqm.make.index = function(modules, p)
   hwrite("</UL></UL>", p)
 }
 
+##--------------------------------------------------
+annotationTable = function(aTab, id, width=300){
+  name = paste(id, "cell", sep=":")
+  mat  = cbind(paste("<td>", c("rowname", colnames(aTab)), "</td>", sep=""), "<td name='", name,"'></td>")
+  rows = paste("<tr>", apply(mat, 1, paste, collapse=""), "</tr>", sep="")
+  tab  = paste(rows, collapse="\n")
+  tab  = paste("<table id='", id, "' width=", width, ">", tab, "</table>", sep="") 
+}
 
 ## Create a part of report with figures and legend
-aqm.report.qm = function(p, qm, f, name, outdir)
+aqm.report.qm = function(p, qm, f, name, arrayTable, outdir)
   {
     stopifnot(is(qm, "aqmReportModule"))
 
@@ -105,6 +113,7 @@ aqm.report.qm = function(p, qm, f, name, outdir)
     svgwarn = FALSE
 
     figID = paste("Fig", name, sep=":")
+    tabID = paste("Tab", name, sep=":")
     
     ## The two cases, png and svg, need to be treated differently 
     switch(imageformat,
@@ -114,11 +123,13 @@ aqm.report.qm = function(p, qm, f, name, outdir)
              svg(file = svgtemp, h = h, w = w)
              aqm.plot(qm)
              dev.off()
-             annRes = annotateSvgPlot(infile=svgtemp, outfile=nameimg, outdir=outdir, annotationInfo=qm@svg)
+             annRes = annotateSvgPlot(infile=svgtemp, outfile=nameimg, outdir=outdir,
+               annotationInfo = c(qm@svg, tabID = tabID)) 
              if(!annRes$annotateOK)
-               svgwarn = "Note: the figure is static - enhancement with interactive effects (mouseover tooltips) failed. This is likely due to a version incompatibility of the arrayQualityMetrics package and libcairo. Please contact the Bioconductor mailing list to report this problem." 
+               svgwarn = "Note: the figure is static - enhancement with interactive effects failed. This is likely due to a version incompatibility of the arrayQualityMetrics package and libcairo. Please contact the Bioconductor mailing list to report this problem." 
              sizes = paste(annRes$size)
-             img = aqm.hwriteImage(nameimg, width=sizes[1], height=sizes[2], id=figID)
+             img = hwrite(c(aqm.hwriteImage(nameimg, width=sizes[1], height=sizes[2], id=figID),
+                            annotationTable(arrayTable, id=tabID)))
            },
            png = {
              nameimg = paste(name, ".png", sep = "")
@@ -144,7 +155,7 @@ aqm.report.qm = function(p, qm, f, name, outdir)
            p,
            dim=c(2,1),
            style='font-weight:bold;text-align:center;font-family:helvetica',
-           border=0, link=link)
+           border=0)
 
 
     hwrite(paste("<br>", gsub("The figure <!-- FIG -->", paste("<b>Figure", f, "</b>"), qm@legend, ignore.case = TRUE)), 
@@ -228,13 +239,20 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
 
     formatStrokeParameters = function(w)
       paste("[", apply(sapply(svgdata, "[[", w), 2, paste, collapse=", "), "]", collapse=", ")
-      
+
+    ## use RSONIO?
+    df = cbind(rowname = rownames(arrayTable), arrayTable, stringsAsFactors=FALSE)
+    pDataJS = sapply(df, function(x) paste("'", x, "'", sep=""))
+    pDataJS = paste("[", apply(pDataJS, 1, paste, collapse=", "), "]", sep="", collapse=", ")
+    
     p = aqm.make.title(
       reporttitle = reporttitle,
       outdir = outdir,
       params = c(
         HIGHLIGHTARRAYSINITIAL = paste(c("false", "true")[1+(runif(nrow(arrayTable))<0.2)], collapse=", "),
+        ARRAYMETADATA          = pDataJS,
         SVGOBJECTIDS           = paste("'Fig:", names(svgdata), "'", sep="", collapse=", "),
+        TABLEIDS               = paste("'Tab:", names(svgdata), "'", sep="", collapse=", "),
         STROKEOPACITY          = formatStrokeParameters("strokeopacity"),
         STROKEWIDTH            = formatStrokeParameters("strokewidth")))
 
@@ -251,7 +269,7 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
             aqm.make.section(p, s = sec, qm = modules[[i]])
             sec = sec+1
           }
-        aqm.report.qm(p, qm=modules[[i]], f=i, name=names(modules)[i], outdir=outdir)
+        aqm.report.qm(p, qm=modules[[i]], f=i, name=names(modules)[i], arrayTable=arrayTable, outdir=outdir)
         lasttype = modules[[i]]@section
       }
      

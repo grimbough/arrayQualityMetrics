@@ -28,8 +28,12 @@ aqm.highlight = function(doc, annotationInfo)
 {
   getfun = annotationInfo$getfun
   numObj = annotationInfo$numObjects
+  tabID   = annotationInfo$tabID
   
-  stopifnot( !is.null(getfun), !is.null(numObj), is.numeric(numObj), length(numObj)==1, !is.na(numObj) )
+  stopifnot( !is.null(getfun),
+             !is.null(numObj), is.numeric(numObj), length(numObj)==1, !is.na(numObj),
+             !is.null(tabID), is.character(tabID), length(tabID)==1, !is.na(tabID) )
+  
   series = annotationInfo$getfun(doc)
   
   ## TODO - this should never happen
@@ -39,20 +43,17 @@ aqm.highlight = function(doc, annotationInfo)
   }
 
   if (length(series)>0)
-    for(i in 0:(length(series)-1))
+    for(pel in 0:(length(series)-1))
       {
-        ## For now, we use directly the integers 'i' to refer to the objects.
-        ## This is OK since SVGAnnotation does not do anything more sophisticated anyway.
-        ## Once the SVG files produced from R contain real identifiers for the plot objects (lines, points)
-        ##   we should use these.
-        ops = c("onclick" = sprintf("top.clickPlotElement(%d)", i %% numObj),
-            "onmouseover" = sprintf("top.showTip(%d)", i %% numObj),
-            "onmouseout"  = "top.hideTip()" )
+        ## Use integer 'pel' to refer to the plot elements (line or symbol; in this package: corresponding to an array).
+        ops = c("onclick" = sprintf("top.clickPlotElement(%d)", pel %% numObj),
+            "onmouseover" = sprintf("top.showTip('%s', %d)", tabID, pel %% numObj),
+             "onmouseout" = sprintf("top.hideTip('%s')", tabID ))
         
-        node = series[[i+1]]     ## some pain dealing with 0 versus 1 based arrays...
-        xmlAttrs(node) = c(id = sprintf("aqm%d", i), ops)
+        node = series[[pel+1]]     ## some pain dealing with 0 versus 1 based arrays...
+        xmlAttrs(node) = c(id = sprintf("aqm%d", pel), ops)
         convertCSSStylesToSVG(node)
-        series[[i+1]] = node
+        series[[pel+1]] = node
       }
   return(TRUE)
 }

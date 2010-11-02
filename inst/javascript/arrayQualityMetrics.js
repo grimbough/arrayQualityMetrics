@@ -3,23 +3,17 @@
 
 // script parameters - these are set by 'writeReport' when copying the 
 //   template from arrayQualityMetrics/inst/scripts into the report.
-var svgObjectIds = [ @SVGOBJECTIDS@ ];
+
 var highlightArraysInitial = [ @HIGHLIGHTARRAYSINITIAL@ ];
+var arrayMetadata = [ @ARRAYMETADATA@ ];
+var svgObjectIds  = [ @SVGOBJECTIDS@ ];
+var tableIds      = [ @TABLEIDS@ ];
 var strokeOpacity = [ @STROKEOPACITY@ ];
 var strokeWidth   = [ @STROKEWIDTH@ ];
 
-// var svgObjectIds = ["svg1", "svg2"];
-// var highlightArraysInitial = [ false, true ];
-// var strokeOpacity = [ [0.4, 1], [0.4, 1] ];
-// var strokeWidth   = [ [1, 3], [1, 6] ];
-// var strokeColor   = ["rgb(0%,0%,0%)", "rgb(100%,0%,0%)"];
-
-
-var latestArray;        // info about the most recently selected array
 var svgObjects;         // array of all the SVG objects on the page
+var tables;             // array of all the associated ('tooltips') tables on the page
 var checkboxes;         // location of the checkboxes
-var tipObject;          // tooltips
-
 
 function reportinit() {
  
@@ -35,9 +29,14 @@ function reportinit() {
     svgObjects = new Array(svgObjectIds.length);
     for(i=0; i<svgObjectIds.length; i++) 
     {
-        svgObjects[i] = document.getElementById(svgObjectIds[i]);
-        if(svgObjects[i]==null)
-            throw new Error("Id "+ svgObjectIds[i] + " not found.");
+        svgObjects[i] = safeGetElementById(svgObjectIds[i]);
+    }
+
+    /*--------find associated tables and cache their locations------*/
+    tables = new Array(tableIds.length);
+    for(i=0; i<tableIds.length; i++) 
+    {
+        tables[i] = safeGetElementById(tableIds[i]);
     }
 
     // checkboxes[a] is (expected to be) of class HTMLInputElement
@@ -46,14 +45,21 @@ function reportinit() {
 	checkboxes[a].checked = highlightArraysInitial[a];
         setAllPlots(a, checkboxes[a].checked);
     }
-
-    tipObject = document.getElementById("arraytooltip");
-    if(tipObject==null)
-        throw new Error("Id 'arraytooltip' not found.");
  
 }
 
-// array - numeric (integer) index of the array to be updated
+
+safeGetElementById = function(id)
+{
+    res = document.getElementById(id);
+    if(res == null)
+        throw new Error("Id '"+ id + "' not found.");
+    return(res)
+}
+
+// Callback for 'onchange' events of the checkboxes.
+// Arguments:
+// array:  numeric (integer) index of the array to be updated
 function checkboxEvent(array)
 {
     var status;
@@ -61,7 +67,21 @@ function checkboxEvent(array)
     setAllPlots(array, status);
 }
 
-// array - numeric (integer) index of the array to be updated
+// Callback for 'onclick' events of the plot elements
+// Arguments:
+// array:  numeric (integer) index of the array to be updated
+function clickPlotElement(array)
+{
+    var status;
+    status = !checkboxes[array].checked;
+    checkboxes[array].checked = status;
+    setAllPlots(array, status);
+}
+
+// This function iterates over all SVG objects and updates the plot element.
+// Arguments:
+// array: numeric (integer) index of the array to be updated
+// status: logical, indicating whether to highlight
 function setAllPlots(array, status)
 {
     var i, idx_status;
@@ -70,7 +90,7 @@ function setAllPlots(array, status)
 
     idx_status = (0+status); // convert from logical (FALSE, TRUE) to integer (0, 1)
 
-    for(i=0; i<svgObjectIds.length; i++) 
+    for(i=0; i<svgObjects.length; i++) 
     {
 	id = "aqm" + array;
 	el = svgObjects[i].contentDocument.getElementById(id);
@@ -85,39 +105,46 @@ function setAllPlots(array, status)
     }
 }
 
-function clickPlotElement(array)
+
+// From table ID (e.g. 'Tab:density'), find its numeric index in the 'tables' array.
+function geti(tabID) 
 {
-    var status;
-    status = !checkboxes[array].checked;
-    checkboxes[array].checked = status;
-    setAllPlots(array, status);
+    var i;
+    for(i=0; i<tableIds.length; i++)
+    {
+        if(tableIds[i] == tabID)
+	{
+	    return(i);
+	}
+    }
+    throw new Error("Did not find '" + tabID + "'.");
 }
 
-
-
-function showTip(array) 
+// From table ID (e.g. 'Tab:density'), find the table rows
+function getrows(tabID)
 {
-    var curX =100;
-    var curY = 100;
-
-    var offsetxpoint = -60; // Customize x offset of tooltip
-    var offsetypoint =  20;  // Customize y offset of tooltip
- 
-    thetext = "blabla";
-    tipObject.innerHTML = thetext;
-    tipObject.style.left = curX + offsetxpoint + "px";
-    tipObject.style.top = curY + offsetypoint+"px"
-    tipObject.style.visibility = "visible"
-
-    return false
+    var rows = tables[geti(tabID)].rows;
+    return(rows);
 }
 
-function hideTip()
-{
-    tipObject.style.visibility = "hidden";
+function showTip(tabID, array) {   
+
+    rows = getrows(tabID);
+    if(rows.length != arrayMetadata[array].length)
+	throw new Error("rows.length=" + rows.length+"  !=  arrayMetadata[array].length=" + arrayMetadata[array].length);
+
+    for(i=0; i<rows.length; i++) 
+    {
+	rows[i].cells[1].innerHTML = arrayMetadata[array][i];
+    }
 }
 
-
-
-
+function hideTip(tabID)
+{
+    rows = getrows(tabID); 
+    for(i=0; i<rows.length; i++) 
+    {
+	rows[i].cells[1].innerHTML = "";
+    }
+}
 
