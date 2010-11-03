@@ -117,7 +117,7 @@ qm = list("Boxplot" = bo, "Density" = de)
 We now can write a small report containing those two metrics.
 <<shortReport>>=
 outdir = tempdir()
-aqm.writereport(modules = qm, reporttitle = "My example", outdir = ".", arrayTable = data.frame())
+aqm.writereport(modules = qm, reporttitle = "My example", outdir = ".", arrayTable = pData(CCl4))
 outdir
 @ 
 

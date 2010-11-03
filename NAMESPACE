@@ -69,8 +69,8 @@ importFrom(RColorBrewer, brewer.pal.info)
 
 importFrom(XML, addAttributes, "xmlAttrs<-", xmlParse, xmlRoot, newXMLNode, saveXML)
 
-importFrom(SVGAnnotation, addECMAScripts, addCSS, convertCSSStylesToSVG, enlargeSVGViewBox,
-           getMatplotSeries, getViewBox)
+importFrom(SVGAnnotation, addECMAScripts, convertCSSStylesToSVG, 
+           getMatplotSeries, getPlotPoints, getViewBox)
 
 ##--------------------------------------------------
 ## export

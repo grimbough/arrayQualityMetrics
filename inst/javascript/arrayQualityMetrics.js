@@ -1,8 +1,7 @@
-
 // (C) Wolfgang Huber 1.11.2010
 
-// script parameters - these are set by 'writeReport' when copying the 
-//   template from arrayQualityMetrics/inst/scripts into the report.
+// script parameters - these are set up by R in the function 'writeReport' when copying the 
+//   template for this script from arrayQualityMetrics/inst/scripts into the report.
 
 var highlightArraysInitial = [ @HIGHLIGHTARRAYSINITIAL@ ];
 var arrayMetadata = [ @ARRAYMETADATA@ ];
@@ -11,9 +10,12 @@ var tableIds      = [ @TABLEIDS@ ];
 var strokeOpacity = [ @STROKEOPACITY@ ];
 var strokeWidth   = [ @STROKEWIDTH@ ];
 
+
+// global variables - these are set up below by 'reportinit'
+
 var svgObjects;         // array of all the SVG objects on the page
 var tables;             // array of all the associated ('tooltips') tables on the page
-var checkboxes;         // location of the checkboxes
+var checkboxes;         // the checkboxes
 
 function reportinit() {
  
@@ -78,7 +80,12 @@ function clickPlotElement(array)
     setAllPlots(array, status);
 }
 
-// This function iterates over all SVG objects and updates the plot element.
+// This function iterates over all SVG objects and updates the plot element
+// with id 'aqm'+array. It also attempts to update the plots elements
+// with ids 'aqm'+(array+n), 'aqm'+(array+2*n), ..., this is used e.g.
+// in the density plots for two-colour arrays, where we have three lines
+// per array. 
+
 // Arguments:
 // array: numeric (integer) index of the array to be updated
 // status: logical, indicating whether to highlight

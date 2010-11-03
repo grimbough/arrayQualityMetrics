@@ -92,7 +92,9 @@ aqm.make.index = function(modules, p)
 }
 
 ##--------------------------------------------------
-annotationTable = function(aTab, id, width=300){
+## 'tooltips' table for the mouseover events
+##--------------------------------------------------
+annotationTable = function(aTab, id, width=300) {
   name = paste(id, "cell", sep=":")
   mat  = cbind(paste("<td>", c("rowname", colnames(aTab)), "</td>", sep=""), "<td name='", name,"'></td>")
   rows = paste("<tr>", apply(mat, 1, paste, collapse=""), "</tr>", sep="")
@@ -214,7 +216,6 @@ scores = function(obj)
 aqm.make.table = function(arrayTable, p) {
 
    ## TO DO: add outlier detection
-   ## Add on click events
   
   arrayTable = cbind(
     highlight = sprintf("<input type=\"checkbox\" name=\"ArrayCheckBoxes\" value=\"aqm_%d\" onchange=\"checkboxEvent(%d)\"/>",
@@ -231,24 +232,37 @@ aqm.make.table = function(arrayTable, p) {
   
 }
 
+
+##--------------------------------------------------
+##   write the report
+##--------------------------------------------------
+
 aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
   {
     
     svgdata = sapply(modules, slot, "svg")
     svgdata = svgdata[ listLen(svgdata) > 0 ]
 
+    ## Extract strokeopacity and strokewidth from the list 'svgdata' and format for Javascript
+    ##   (second part could also be done by RJSONIO)
     formatStrokeParameters = function(w)
       paste("[", apply(sapply(svgdata, "[[", w), 2, paste, collapse=", "), "]", collapse=", ")
 
-    ## use RSONIO?
-    df = cbind(rowname = rownames(arrayTable), arrayTable, stringsAsFactors=FALSE)
+    ## To avoid dealing with this pathologic special case downstream in the HTML
+    if(nrow(arrayTable)==0)
+      stop("'arrayTable' must not be empty.")
+    
+    ## Could also use RJSONIO here
+    df = cbind( " " = rownames(arrayTable), arrayTable, stringsAsFactors=FALSE)
     pDataJS = sapply(df, function(x) paste("'", x, "'", sep=""))
     pDataJS = paste("[", apply(pDataJS, 1, paste, collapse=", "), "]", sep="", collapse=", ")
-    
+
+    ## Open and set up the HTML page
+    ## Inject report-specific variables into the JavaScript
     p = aqm.make.title(
       reporttitle = reporttitle,
       outdir = outdir,
-      params = c(
+      params = c(                            ## TODO: this should be the outliers
         HIGHLIGHTARRAYSINITIAL = paste(c("false", "true")[1+(runif(nrow(arrayTable))<0.2)], collapse=", "),
         ARRAYMETADATA          = pDataJS,
         SVGOBJECTIDS           = paste("'Fig:", names(svgdata), "'", sep="", collapse=", "),

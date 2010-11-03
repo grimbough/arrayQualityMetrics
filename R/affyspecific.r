@@ -36,7 +36,7 @@ aqm.rnadeg = function(expressionset, x)
         legend  = legend,
         shape   = list("h" = 5.5, "w" =7),
         svg     =  if(x$usesvg)
-        list(getfun = aqm.getMatplotSeries, numObjects = x$numArrays,
+        list(getfun = getMatplotSeries, numObjects = x$numArrays,
              strokewidth = c(1,3), strokeopacity = c(0.4, 1)) else list())
    }
 

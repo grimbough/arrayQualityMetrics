@@ -8,37 +8,33 @@ annotateSvgPlot = function(infile, outfile, outdir, annotationInfo)
     svg = xmlRoot(doc)
     vb  = getViewBox(doc)
     
-    annotateOK = aqm.highlight(doc, annotationInfo)
+    annotateOK = annotatePlotObjects(doc, annotationInfo)
     
-    ## Did it work?
-    if(annotateOK)
-      {
-        oldwd = setwd(outdir)  ## the following function needs this
-        addECMAScripts(doc, scripts = "arrayQualityMetrics.js", insertJS = FALSE)
-        setwd(oldwd)
-      }
     saveXML(doc, file.path(outdir, outfile))
     return(list(size=diff(vb), annotateOK = annotateOK))
   }
 
-## The following is adapted from the functions
-## highlightMatplot and highlightMatplotSeries in the package
-## SVGAnnotation
-aqm.highlight = function(doc, annotationInfo)
+## --------------------------------------------------------------------------
+## Find the individual objects (lines, points) in the plot and add the events
+## --------------------------------------------------------------------------
+annotatePlotObjects = function(doc, annotationInfo)
 {
+  ## extract and check arguments 
   getfun = annotationInfo$getfun
   numObj = annotationInfo$numObjects
-  tabID   = annotationInfo$tabID
+  tabID  = annotationInfo$tabID
+  stopifnot( !is.null(getfun), is.function(getfun),
+             !is.null(numObj), is.numeric(numObj),  length(numObj)==1, !is.na(numObj),
+             !is.null(tabID),  is.character(tabID), length(tabID)==1,  !is.na(tabID) )
   
-  stopifnot( !is.null(getfun),
-             !is.null(numObj), is.numeric(numObj), length(numObj)==1, !is.na(numObj),
-             !is.null(tabID), is.character(tabID), length(tabID)==1, !is.na(tabID) )
-  
+  ## This part is brittle - 'getfun' will be 'getMatplotSeries' or 'getPlotPoints' from
+  ## SVGAnnotation, which rely on conventions used by libcairo to produce the SVG
+  ## from the R plot, on simple pattern matching and on hope that the found patterns
+  ## align with the intended plot objects (i.e. not on any explicit identification).
   series = annotationInfo$getfun(doc)
   
-  ## TODO - this should never happen
+  ## Catch some of the brittleness
   if( (length(series) %% numObj) != 0) {
-    ## browser()
     return(FALSE)
   }
 
@@ -58,16 +54,10 @@ aqm.highlight = function(doc, annotationInfo)
   return(TRUE)
 }
 
-## This is one instance of a function that can be used for 'getfun'
-## in aqm.highlight. It is based upon SVGAnnotation::getMatplotSeries.
-## It used by aqm.density and aqm.rnadeg, which show "matplot"-like lines.
-## aqm.pca, which shows a scatterplot with points, uses SVGAnnotation:::getPlotPoints
-aqm.getMatplotSeries = function(doc)
-    SVGAnnotation::getMatplotSeries(doc,
-         paths = XML::getNodeSet(doc, "//x:g[starts-with(@id, 'surface')]//x:path", "x"))
-
-
-## check the 'usesvg' parameter, and the available infrastructure, and if appropriate, emit warning.
+##-----------------------------------------------------------------
+## Check the 'usesvg' parameter, and the available infrastructure,
+## and if appropriate, emit a warning.
+##-----------------------------------------------------------------
 checkUsesvg = function(usesvg) {
 
   if(missing(usesvg)){

@@ -22,7 +22,7 @@ aqm.pca = function(x) {
       legend  = legend,
       shape   = list("h" = 6, "w" =6),
       svg     = if(x$usesvg)
-      list(getfun = SVGAnnotation:::getPlotPoints, numObjects = x$numArrays,
+      list(getfun = getPlotPoints, numObjects = x$numArrays,
            strokewidth = c(1,6), strokeopacity = c(1, 1)) else list())
 }
 
