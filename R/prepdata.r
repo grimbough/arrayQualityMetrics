@@ -38,7 +38,6 @@ function(expressionset, do.logtransform){
   A = 0.5*(rc+gc)
   
   colnames(dat) = seq(along = sampleNames(expressionset))
-  numArrays = ncol(rc)
   
   if("dyeswap" %in% colnames(phenoData(expressionset)))
     {
@@ -81,8 +80,6 @@ setMethod("platformspecific",
           signature(expressionset = "BeadLevelList"),
 function(expressionset, do.logtransform){
             
-  numArrays = as.numeric(dim(expressionset)[1])
-
   switch(expressionset@arrayInfo$channels,
    "single" =  {
      summaryES = createBeadSummaryData(expressionset, imagesPerArray = 1, log = do.logtransform)

@@ -1,6 +1,6 @@
 arrayQualityMetrics = function(
   expressionset,
-  outdir = getwd(),
+  outdir = reporttitle,
   force = FALSE,
   do.logtransform = FALSE,
   intgroup = NULL,

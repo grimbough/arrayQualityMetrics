@@ -8,10 +8,15 @@
 }
 
 \usage{
-arrayQualityMetrics(expressionset, outdir = getwd(), force = FALSE,
-    do.logtransform = FALSE, intgroup = NULL, grouprep, spatial = TRUE,
-    reporttitle = paste("Quality metrics report for", deparse(substitute(expressionset))),
-    usesvg)
+arrayQualityMetrics(expressionset,
+  outdir = reporttitle,
+  force = FALSE,
+  do.logtransform = FALSE,
+  intgroup = NULL,
+  grouprep,
+  spatial = TRUE,
+  reporttitle = paste("Quality metrics report for", deparse(substitute(expressionset))),
+  usesvg)
 }
 
 \arguments{

@@ -3,13 +3,13 @@
 // script parameters - these are set up by R in the function 'writeReport' when copying the 
 //   template for this script from arrayQualityMetrics/inst/scripts into the report.
 
-var highlightArraysInitial = [ @HIGHLIGHTARRAYSINITIAL@ ];
-var arrayMetadata = [ @ARRAYMETADATA@ ];
-var svgObjectIds  = [ @SVGOBJECTIDS@ ];
-var tableIds      = [ @TABLEIDS@ ];
-var strokeOpacity = [ @STROKEOPACITY@ ];
-var strokeWidth   = [ @STROKEWIDTH@ ];
-
+var highlightInitial = [ @HIGHLIGHTINITIAL@ ];
+var arrayMetadata    = [ @ARRAYMETADATA@ ];
+var svgObjectIds     = [ @SVGOBJECTIDS@ ];
+var tableIds         = [ @TABLEIDS@ ];
+var idFuns           = [ @IDFUNS@ ];
+var strokeOpacity    = [ @STROKEOPACITY@ ];
+var strokeWidth      = [ @STROKEWIDTH@ ];
 
 // global variables - these are set up below by 'reportinit'
 

@@ -17,7 +17,7 @@ aqm.density = function(x)
   
   cl = intgroupColours(x)
   lwd = lty = 1
- 
+  
   if(x$nchannels == 2)
     {  
       den1 = dens(x$rc)
@@ -29,10 +29,35 @@ aqm.density = function(x)
         labels = c("a. Red Channel", "b. Green Channel", "c. Log2(Ratio)"))
       formula = y ~ x | panels
       lay = c(3,1)
+
+      ## the mappings between report objects (arrays) and plot objects (lines)
+      idFun = sprintf(
+"[ // report object id -> plot object id
+   function(x) {
+     var a = parseInt(x.replace('^ro:', ''));
+     var n = %d;
+     ['po:' + a, 'po:' + (a+n), 'po:' + (a+2*n)];
+   },
+   // plot object id -> report object id
+   function(x) {
+     var r = parseInt(x.replace('^po:', ''));
+     'ro:' + (r-1) %% %d + 1;
+   }
+]", x$numArrays, x$numArrays)
+
+      svgPar = if(x$usesvg)
+        new("svgParameters",
+              defined = TRUE,
+              numPlotObjects = 3*x$numArrays,
+              idFun = idFun) else new("svgParameters")
     } else {  ## nchannels==1
       ddf = dens(x$dat)
       formula = y ~ x
       lay = c(1,1)
+      svgPar = if(x$usesvg)
+        new("svgParameters",
+              defined = TRUE,
+              numPlotObjects = x$numArrays) else new("svgParameters")
     }
 
   
@@ -51,8 +76,6 @@ aqm.density = function(x)
       "title"   = "Density plots",
       "legend"  = legend,
       "shape"   = list("h" = 5, "w" = 3+3*lay[1]),
-      "svg"     = if(x$usesvg)
-      list(getfun = getMatplotSeries, numObjects = x$numArrays,
-           strokewidth = c(1,3), strokeopacity = c(0.4, 1)) else
-      list())
+      "svg"     = svgPar
+      ) ## new
 }

@@ -125,6 +125,8 @@ aqm.report.qm = function(p, qm, f, name, arrayTable, outdir)
              svg(file = svgtemp, h = h, w = w)
              aqm.plot(qm)
              dev.off()
+
+              -------- Here we need to continue cleaning up -----
              annRes = annotateSvgPlot(infile=svgtemp, outfile=nameimg, outdir=outdir,
                annotationInfo = c(qm@svg, tabID = tabID)) 
              if(!annRes$annotateOK)
@@ -239,19 +241,19 @@ aqm.make.table = function(arrayTable, p) {
 
 aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
   {
-    
-    svgdata = sapply(modules, slot, "svg")
-    svgdata = svgdata[ listLen(svgdata) > 0 ]
+    ## To avoid dealing with this pathologic special case downstream in the HTML
+    if(nrow(arrayTable)==0)
+      stop("'arrayTable' must not be empty.")
+
+    ## For all report modules, extra the 'svg' slot, then subset only those that are defined.
+    svgdata = lapply(modules, slot, "svg")
+    svgdata = svgdata[ sapply(svgdata, slot, "defined") ]
 
     ## Extract strokeopacity and strokewidth from the list 'svgdata' and format for Javascript
     ##   (second part could also be done by RJSONIO)
     formatStrokeParameters = function(w)
-      paste("[", apply(sapply(svgdata, "[[", w), 2, paste, collapse=", "), "]", collapse=", ")
+      paste("[", apply(sapply(svgdata, slot, w), 2, paste, collapse=", "), "]", collapse=", ")
 
-    ## To avoid dealing with this pathologic special case downstream in the HTML
-    if(nrow(arrayTable)==0)
-      stop("'arrayTable' must not be empty.")
-    
     ## Could also use RJSONIO here
     df = cbind( " " = rownames(arrayTable), arrayTable, stringsAsFactors=FALSE)
     pDataJS = sapply(df, function(x) paste("'", x, "'", sep=""))
@@ -262,13 +264,14 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
     p = aqm.make.title(
       reporttitle = reporttitle,
       outdir = outdir,
-      params = c(                            ## TODO: this should be the outliers
-        HIGHLIGHTARRAYSINITIAL = paste(c("false", "true")[1+(runif(nrow(arrayTable))<0.2)], collapse=", "),
-        ARRAYMETADATA          = pDataJS,
-        SVGOBJECTIDS           = paste("'Fig:", names(svgdata), "'", sep="", collapse=", "),
-        TABLEIDS               = paste("'Tab:", names(svgdata), "'", sep="", collapse=", "),
-        STROKEOPACITY          = formatStrokeParameters("strokeopacity"),
-        STROKEWIDTH            = formatStrokeParameters("strokewidth")))
+      params = c(          ## TODO: this should be the outliers
+        HIGHLIGHTINITIAL = paste(rep(c("false", "true"), ceiling(nrow(arrayTable)/2))[seq_len(nrow(arrayTable))], collapse=", "),
+        ARRAYMETADATA    = pDataJS,
+        SVGOBJECTIDS     = paste("'Fig:", names(svgdata), "'", sep="", collapse=", "),
+        TABLEIDS         = paste("'Tab:", names(svgdata), "'", sep="", collapse=", "),
+        IDFUNS           = paste(sapply(svgdata, slot, "idFun"), collapse=", "),
+        STROKEOPACITY    = formatStrokeParameters("strokeopacity"),
+        STROKEWIDTH      = formatStrokeParameters("strokewidth")))
 
     aqm.make.table(arrayTable, p)
     
