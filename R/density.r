@@ -37,15 +37,17 @@ aqm.density = function(x)
 [
    // report object id -> plot object id
    function(x) {
-     var a = parseInt(x.replace('^r:', ''));
-     if(isNan(a)) throw new Error('Invalid report object id ' + x);
-     var prefix = 'p:';
-     var n = %d;
-     return [prefix + a, prefix + (a+n), prefix + (a+2*n)];
+     var a = parseInt(x.replace(/^r:/, ''));
+     var i, res;
+     if(isNaN(a)) throw new Error('Invalid report object id ' + x);
+     res = new Array(3);
+     for(i=0; i++; i<res.length)
+       res[i] = 'p:' + (i * %d) + a;
+     return res;
    },
    // plot object id -> report object id
    function(x) {
-     var j = parseInt(x.replace('^p:', ''));
+     var j = parseInt(x.replace(/^p:/, ''));
      return 'r:' + ((j-1) %% %d + 1);
    }
 ]", n, n)

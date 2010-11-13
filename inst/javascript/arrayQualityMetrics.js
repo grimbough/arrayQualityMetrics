@@ -68,7 +68,7 @@ function setAllPlotObjsInAllPlots(reportObjId, status)
 
     for(i=0; i<svgObjects.length; i++) 
     {
-	plotObjIds = idFuns[i][1](reportObjId);
+	plotObjIds = idFuns[i][0](reportObjId);
         for(j=0; j<plotObjIds.length; j++) 
 	    setOnePlotObjInOnePlot(i, plotObjIds[j], status)
 
@@ -92,19 +92,19 @@ function setOnePlotObjInOnePlot(i, plotObjId, status)
 
 function getIndexFromReportObjId(reportObjId)
 {
-   var a = parseInt(reportObjId.replace('^r:', ''));
-   if(isNan(a)) 
+   var a = parseInt(reportObjId.replace(/^r:/, ''));
+   if(isNaN(a)) 
        throw new Error('Invalid report object id ' + reportObjId);
-   return a;
+   return (a-1);
 }
 
 function showTipTable(tableIndex, reportObjId)
 {
     var rows = tables[tableIndex].rows;
-    if(rows.length != arrayMetadata[array].length)
-	throw new Error("rows.length=" + rows.length+"  !=  arrayMetadata[array].length=" + arrayMetadata[array].length);
-
     var a = getIndexFromReportObjId(reportObjId);
+
+    if(rows.length != arrayMetadata[a].length)
+	throw new Error("rows.length=" + rows.length+"  !=  arrayMetadata[array].length=" + arrayMetadata[a].length);
 
     for(i=0; i<rows.length; i++) 
  	rows[i].cells[1].innerHTML = arrayMetadata[a][i];
