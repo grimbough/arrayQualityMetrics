@@ -42,7 +42,7 @@ aqm.make.title = function(reporttitle, outdir, params)
     
     copySubstitute(src = filelocs, dest = outdir, recursive = TRUE, symbolValues = params)
                 
-    p = aqm.hwriteOpenPage(file.path(outdir, 'QMreport.html'),
+    p = aqm.hwriteOpenPage(file.path(outdir, 'index.html'),
       link.javascript = filenames[2],
       link.css        = filenames[1],
       body.attributes = c("onload" = "reportinit()"))
@@ -217,7 +217,7 @@ reportTable = function(p, arrayTable)
   ## TO DO: add outlier detection
   
   arrayTable = cbind(
-    highlight = sprintf("<input type='checkbox' name='ReportObjectCheckBoxes' value='r:%s' onchange='checkboxEvent(\"%s\")'/>",
+    highlight = sprintf("<input type='checkbox' name='ReportObjectCheckBoxes' value='r:%s' onchange='checkboxEvent(\"r:%s\")'/>",
                         seq_len(nrow(arrayTable)), seq_len(nrow(arrayTable))),
     arrayTable, stringsAsFactors = FALSE)
   
@@ -256,7 +256,8 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
     arrayTable = if(is.numeric(rown))  ## check whether or not the row.names are 'automatic'
       cbind(row = paste(rown), arrayTable, stringsAsFactors = FALSE) else
       cbind(row = paste(seq(along=rown)), " " = paste(rown), arrayTable, stringsAsFactors = FALSE) 
-
+    rownames(arrayTable) = NULL
+             
     ## Could also use RJSONIO here
     pDataJS = sapply(arrayTable, function(x) paste("'", x, "'", sep=""))
     pDataJS = paste("[", apply(pDataJS, 1, paste, collapse=", "), "]", sep="", collapse=", ")

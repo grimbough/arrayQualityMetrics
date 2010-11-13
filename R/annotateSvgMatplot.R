@@ -27,12 +27,15 @@ annotateSvgPlot = function(infile, outfile, outdir, annotationInfo, name)
         {
           poid = paste("p", i, sep=":")
           roid = annotationInfo@getReportObjIdFromPlotObjId(poid)
-        
+          stopifnot(length(roid)==1)
+          
+          callbacks = sprintf("top.plotObjRespond('%s', '%s', '%s', %s')", c("click", "show", "hide"), poid, roid, name)
+          
           xmlAttrs(series[[i]]) = c(
             "id"          = poid,
-            "onclick"     = sprintf("top.clickPlotElement('%s')", roid),
-            "onmouseover" = sprintf("top.showTip('%s', '%s')", roid, name),
-            "onmouseout"  = sprintf("top.hideTip('%s', '%s')", roid, name))
+            "onclick"     = callbacks[1],
+            "onmouseover" = callbacks[2],
+            "onmouseout"  = callbacks[3])
                     
           ## convertCSSStylesToSVG(series[[i]])
       } ## for
