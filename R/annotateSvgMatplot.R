@@ -1,58 +1,57 @@
 ## --------------------------------------------------
 ## Postprocess an SVG file to add mouse events
 ## --------------------------------------------------
-annotateSvgPlot = function(infile, outfile, outdir, annotationInfo) 
+annotateSvgPlot = function(infile, outfile, outdir, annotationInfo, name) 
   {
      
     doc = xmlParse(infile)
     svg = xmlRoot(doc)
     vb  = getViewBox(doc)
     
-    annotateOK = annotatePlotObjects(doc, annotationInfo)
-    
-    saveXML(doc, file.path(outdir, outfile))
-    return(list(size=diff(vb), annotateOK = annotateOK))
-  }
-
-## --------------------------------------------------------------------------
-## Find the individual objects (lines, points) in the plot and add the events
-## --------------------------------------------------------------------------
-annotatePlotObjects = function(doc, annotationInfo)
-{
-  ## extract and check arguments 
-  getfun = annotationInfo$getfun
-  numObj = annotationInfo$numObjects
-  tabID  = annotationInfo$tabID
-  stopifnot( !is.null(getfun), is.function(getfun),
-             !is.null(numObj), is.numeric(numObj),  length(numObj)==1, !is.na(numObj),
-             !is.null(tabID),  is.character(tabID), length(tabID)==1,  !is.na(tabID) )
+    ## extract and check arguments 
+    stopifnot(is(annotationInfo, "svgParameters"))
   
-  ## This part is brittle - 'getfun' will be 'getMatplotSeries' or 'getPlotPoints' from
-  ## SVGAnnotation, which rely on conventions used by libcairo to produce the SVG
-  ## from the R plot, on simple pattern matching and on hope that the found patterns
-  ## align with the intended plot objects (i.e. not on any explicit identification).
-  series = annotationInfo$getfun(doc)
+    ## This part is brittle - 'getPlotObjNodes' will be 'getMatplotSeries' or 'getPlotPoints' from
+    ## 'SVGAnnotation', which rely on conventions used by libcairo to produce the SVG
+    ## from the R plot, on simple pattern matching and on hope that the found patterns
+    ## align with the intended plot objects (i.e. not on any explicit identification).
+    series = annotationInfo@getPlotObjNodes(doc)
   
-  ## Catch some of the brittleness
-  if( (length(series) %% numObj) != 0) {
-    return(FALSE)
-  }
+    ## Catch some of the brittleness
+    if( (length(series) %% annotationInfo@numPlotObjects) != 0) {
+      annotateOK = FALSE
+    } else {
+      annotateOK = TRUE
 
-  if (length(series)>0)
-    for(pel in 0:(length(series)-1))
-      {
-        ## Use integer 'pel' to refer to the plot elements (line or symbol; in this package: corresponding to an array).
-        ops = c("onclick" = sprintf("top.clickPlotElement(%d)", pel %% numObj),
-            "onmouseover" = sprintf("top.showTip('%s', %d)", tabID, pel %% numObj),
-             "onmouseout" = sprintf("top.hideTip('%s')", tabID ))
+      for(i in seq(along=series))
+        {
+          poid = paste("p", i, sep=":")
+          roid = annotationInfo@getReportObjIdFromPlotObjId(poid)
         
-        node = series[[pel+1]]     ## some pain dealing with 0 versus 1 based arrays...
-        xmlAttrs(node) = c(id = sprintf("aqm%d", pel), ops)
-        convertCSSStylesToSVG(node)
-        series[[pel+1]] = node
-      }
-  return(TRUE)
+          xmlAttrs(series[[i]]) = c(
+            "id"          = poid,
+            "onclick"     = sprintf("top.clickPlotElement('%s')", roid),
+            "onmouseover" = sprintf("top.showTip('%s', '%s')", roid, name),
+            "onmouseout"  = sprintf("top.hideTip('%s', '%s')", roid, name))
+                    
+          ## convertCSSStylesToSVG(series[[i]])
+      } ## for
+    } ## else
+
+    saveXML(doc, file.path(outdir, outfile))
+    return(list(size = diff(vb), annotateOK = annotateOK))
+  }
+
+##--------------------------------------------------
+## HTML table to show 'tooltips' for mouseover events
+##--------------------------------------------------
+annotationTable = function(x, name, width=300) {
+  ## Create a table with 2 columns and as many rows as 'x' has columns.
+  ## The first column will contain the rownames of 'x', the second column will be empty
+  tab  = paste("<tr><td>", colnames(x), "</td><td></td></tr>", sep="", collapse="\n")
+  tab  = paste("<table id='", paste("Tab", name, sep=":"), "' width=", width, ">", tab, "</table>", sep="")
 }
+
 
 ##-----------------------------------------------------------------
 ## Check the 'usesvg' parameter, and the available infrastructure,

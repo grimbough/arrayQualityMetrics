@@ -28,41 +28,46 @@
 
 setClass("svgParameters",
   representation(
-    ## Objects of this class can defined (in which case the following slots
-    ## contain useful information) or undefined.
-    defined             = "logical",             
-    numPlotObjects      = "integer",             
+    ## 'name' is used to construct the ID of Figures and Tables             
+    name            = "character",
+                 
     ## An R function that finds the nodes in the SVG document corresponding to the plot objects.
     ## It should hold that length(getPlotObjNodes(doc)) == numPlotObjects            
-    getPlotObjNodes     = "function",
-    ## An array of two JavaScript functions:
-    ## The first, when given a report object ID (e.g. "ro:1") returns all associated plot
-    ## object IDs. The seccond is the inverse. The functions take a single string argument.
-    ## The return a string array. In the simplest case, this is a vector of length 1, but it can also
-    ## have length 0 (if the object is not represented on this plot) or >1 (if there
-    ## are more than 1 lines, points etc. for this report object).
-    idFun               = "character",
-    tableID             = "character",
-    strokewidth         = "numeric",    ## vector of length 2: stroke-width without and with highlighting
-    strokeopacity       = "numeric"),   ## vector of length 2: stroke-opacity without and with highlighting
+    getPlotObjNodes = "function",
+    numPlotObjects  = "integer",
+                 
+    ## An array of two JavaScript functions: The first, when given a
+    ## report object ID (e.g. "r:1") returns all associated plot
+    ## object IDs (e.g. "p:1". The seccond is the inverse. The
+    ## functions take a single string argument.  The return a string
+    ## array. In the simplest case (which is what is this in the
+    ## prototype definition below) this is a vector of length
+    ## 1. However, it can also have length 0 (if the object is not
+    ## represented on this plot) or >1 (if there are more than 1
+    ## lines, points etc. for this report object).
+    idFun           = "character",
+    getReportObjIdFromPlotObjId = "function", 
+                 
+    ## vector of length 2: stroke-width without and with highlighting
+    strokewidth     = "numeric",
+                 
+    ## vector of length 2: stroke-opacity without and with highlighting             
+    strokeopacity   = "numeric"),   
          
   prototype(
-    defined          = FALSE,
-    numPlotObjects   = NA_integer_,             
-    getPlotObjNodes  = getMatplotSeries,
-    idFun            = "[function(x) { [x.replace('^r', 'p')] }, function(x) { [x.replace('^p', 'r')] }]",
-    tableID          = NA_character_,
-    strokewidth      = c(1, 3),
-    strokeopacity    = c(0.4, 1)),
+    name            = NA_character_,
+    getPlotObjNodes = getMatplotSeries,
+    numPlotObjects  = NA_integer_,             
+    idFun           = sprintf("[function(x) { [x.replace('^r:', 'p:')] }, function(x) { [x.replace('^p:', 'r:')] }]"),
+    getReportObjIdFromPlotObjId = function(x) sub("^p:", "r:", x),
+    strokewidth     = c(1, 3),
+    strokeopacity   = c(0.4, 1)),
          
-  validity = function(x) {
-    if(length(x@defined)!=1) return("Invalid slot 'defined'.")
-    if(x@defined){
-      if(length(x@numPlotObjects)!=1) return("Invalid slot 'numPlotObjects'.")
-      if(length(x@tableID)       !=1) return("Invalid slot 'tableID'.")
-      if(length(x@strokewidth)   !=2) return("Invalid slot 'strokewidth'.")
-      if(length(x@strokeopacity) !=2) return("Invalid slot 'strokeopacity'.")
-    }
+  validity = function(object) {
+    if(length(object@name)          !=1) return("Invalid slot 'name'.")
+    if(length(object@numPlotObjects)!=1) return("Invalid slot 'numPlotObjects'.")
+    if(length(object@strokewidth)   !=2) return("Invalid slot 'strokewidth'.")
+    if(length(object@strokeopacity) !=2) return("Invalid slot 'strokeopacity'.")
     return(TRUE)
   }         
 )
@@ -91,9 +96,9 @@ setClass("aqmReportModule",
     outliers  = integer(0),       
     svg       = new("svgParameters")),
 
-  validity = function(x) {
+  validity = function(object) {
     for(s in c("section", "title", "legend"))
-      if(length(slot(x, s))!=1) return(sprintf("Invalid slot '%s'.", s))
+      if(length(slot(object, s))!=1) return(sprintf("Invalid slot '%s'.", s))
   }
 )
 

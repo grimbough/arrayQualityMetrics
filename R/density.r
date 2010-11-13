@@ -17,6 +17,7 @@ aqm.density = function(x)
   
   cl = intgroupColours(x)
   lwd = lty = 1
+  name = "density"
   
   if(x$nchannels == 2)
     {  
@@ -31,33 +32,46 @@ aqm.density = function(x)
       lay = c(3,1)
 
       ## the mappings between report objects (arrays) and plot objects (lines)
-      idFun = sprintf(
-"[ // report object id -> plot object id
+      n = x$numArrays
+      idFun = sprintf("
+[
+   // report object id -> plot object id
    function(x) {
-     var a = parseInt(x.replace('^ro:', ''));
+     var a = parseInt(x.replace('^r:', ''));
+     var prefix = 'p:';
      var n = %d;
-     ['po:' + a, 'po:' + (a+n), 'po:' + (a+2*n)];
+     return [prefix + a, prefix + (a+n), prefix + (a+2*n)];
    },
    // plot object id -> report object id
    function(x) {
-     var r = parseInt(x.replace('^po:', ''));
-     'ro:' + (r-1) %% %d + 1;
+     var j = parseInt(x.replace('^p:', ''));
+     return 'r:' + ((j-1) %% %d + 1);
    }
-]", x$numArrays, x$numArrays)
+]", n, n)
+
+      getReportObjIdFromPlotObjId = function(x) {
+        j = as.integer(sub("^p:", "", x))
+        stopifnot(length(j)==1, !is.na(j), j>0)
+        paste("r", (j-1) %% n + 1, sep = ":")
+      }
 
       svgPar = if(x$usesvg)
         new("svgParameters",
-              defined = TRUE,
-              numPlotObjects = 3*x$numArrays,
-              idFun = idFun) else new("svgParameters")
+              name           = name,
+              numPlotObjects = 3L*x$numArrays,
+              idFun          = idFun,
+              getReportObjIdFromPlotObjId = getReportObjIdFromPlotObjId)
+      else new("svgParameters")
+      
     } else {  ## nchannels==1
       ddf = dens(x$dat)
       formula = y ~ x
       lay = c(1,1)
       svgPar = if(x$usesvg)
         new("svgParameters",
-              defined = TRUE,
-              numPlotObjects = x$numArrays) else new("svgParameters")
+              name = name,
+              numPlotObjects = x$numArrays)
+      else new("svgParameters")
     }
 
   

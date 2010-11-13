@@ -91,78 +91,73 @@ aqm.make.index = function(modules, p)
   hwrite("</UL></UL>", p)
 }
 
-##--------------------------------------------------
-## 'tooltips' table for the mouseover events
-##--------------------------------------------------
-annotationTable = function(aTab, id, width=300) {
-  name = paste(id, "cell", sep=":")
-  mat  = cbind(paste("<td>", c("rowname", colnames(aTab)), "</td>", sep=""), "<td name='", name,"'></td>")
-  rows = paste("<tr>", apply(mat, 1, paste, collapse=""), "</tr>", sep="")
-  tab  = paste(rows, collapse="\n")
-  tab  = paste("<table id='", id, "' width=", width, ">", tab, "</table>", sep="") 
-}
+##---------------------------------------------------------
+## Create a module  of the report with figures and legend
+##---------------------------------------------------------
+reportModule = function(p, module, integerIndex, name, arrayTable, outdir)
+{
+    stopifnot(is(module, "aqmReportModule"))
 
-## Create a part of report with figures and legend
-aqm.report.qm = function(p, qm, f, name, arrayTable, outdir)
-  {
-    stopifnot(is(qm, "aqmReportModule"))
+    h = module@shape$h
+    w = module@shape$w
+    stopifnot(length(h)==1, is.numeric(h), !is.na(h),
+              length(w)==1, is.numeric(w), !is.na(w))
 
-    h = qm@shape$h
-    w = qm@shape$w
+    stopifnot(length(integerIndex)==1, is.integer(integerIndex), !is.na(integerIndex))
+    
+    imageformat =  if(is.na(module@svg@name)) "png" else "svg"
+    svgwarn = FALSE
     dpi = 72
 
-    imageformat =  if(length(qm@svg)>0) "svg" else "png"
-    svgwarn = FALSE
-
-    figID = paste("Fig", name, sep=":")
-    tabID = paste("Tab", name, sep=":")
-    
     ## The two cases, png and svg, need to be treated differently 
     switch(imageformat,
-           svg = {
-             nameimg = paste(name, ".svg", sep = "")
-             svgtemp = tempfile()
-             svg(file = svgtemp, h = h, w = w)
-             aqm.plot(qm)
-             dev.off()
+        svg = {
+          nameimg = paste(name, ".svg", sep = "")
+          svgtemp = tempfile()
+          svg(file = svgtemp, h = h, w = w)
+          aqm.plot(module)
+          dev.off()
+          
+          annRes = annotateSvgPlot(infile = svgtemp, outfile = nameimg, outdir = outdir,
+            annotationInfo = module@svg, name = name)
+          
+          if(!annRes$annotateOK)
+            svgwarn = "Note: the figure is static - enhancement with interactive effects failed. This is likely due to a version incompatibility of the 'SVGAnnotation' R package and the 'libcairo' system library. Please contact the maintainter to report this problem."
+          
+          sizes = paste(annRes$size)
+          img = hwrite(c(aqm.hwriteImage(nameimg, width=sizes[1], height=sizes[2], id=paste("Fig", name, sep=":")),
+                         annotationTable(arrayTable, name = name)))
+        },
+        png = {
+          nameimg = paste(name, ".png", sep = "")
+          png(file = file.path(outdir, nameimg), h = h*dpi, w = w*dpi)
+          aqm.plot(module)
+          dev.off()
+          img = aqm.hwriteImage(nameimg, id=paste("Fig", name, sep=":"))
+        },
+        stop(sprintf("Invalid value of 'imageformat': %s", imageformat))
+    ) ## switch
 
-              -------- Here we need to continue cleaning up -----
-             annRes = annotateSvgPlot(infile=svgtemp, outfile=nameimg, outdir=outdir,
-               annotationInfo = c(qm@svg, tabID = tabID)) 
-             if(!annRes$annotateOK)
-               svgwarn = "Note: the figure is static - enhancement with interactive effects failed. This is likely due to a version incompatibility of the arrayQualityMetrics package and libcairo. Please contact the Bioconductor mailing list to report this problem." 
-             sizes = paste(annRes$size)
-             img = hwrite(c(aqm.hwriteImage(nameimg, width=sizes[1], height=sizes[2], id=figID),
-                            annotationTable(arrayTable, id=tabID)))
-           },
-           png = {
-             nameimg = paste(name, ".png", sep = "")
-             png(file = file.path(outdir, nameimg), h = h*dpi, w = w*dpi)
-             aqm.plot(qm)
-             dev.off()
-             img = aqm.hwriteImage(nameimg, id=figID)
-           },
-           stop(sprintf("Invalid value of 'imageformat': %s", imageformat))
-           )
-    
+    ## Also make a PDF file
     namepdf = paste(name, ".pdf", sep = "")
     pdf(file = file.path(outdir, namepdf), h = h, w = w)
-    aqm.plot(qm)
+    aqm.plot(module)
     dev.off()
     link = list(namepdf, NA)
-      
+
+    ## TODO - use CSS instead of hard-coded fonts here
     linkpdf = hwrite("PDF file.",
       style='font-weight:bold;text-align:center;font-family:helvetica',
       border = 0, link = namepdf)
     
-    hwrite(c(img, paste("Figure ", f, ": ", qm@title,". ", linkpdf, sep="")),
+    hwrite(c(img, paste("Figure ", integerIndex, ": ", module@title,". ", linkpdf, sep="")),
            p,
            dim=c(2,1),
            style='font-weight:bold;text-align:center;font-family:helvetica',
            border=0)
 
 
-    hwrite(paste("<br>", gsub("The figure <!-- FIG -->", paste("<b>Figure", f, "</b>"), qm@legend, ignore.case = TRUE)), 
+    hwrite(paste("<br>", gsub("The figure <!-- FIG -->", paste("<b>Figure", integerIndex, "</b>"), module@legend, ignore.case = TRUE)), 
            p,
            style='text-align:justify;font-family:Lucida Grande;font-size:10pt')
 
@@ -215,13 +210,15 @@ scores = function(obj)
     return(df)
   }
 
-aqm.make.table = function(arrayTable, p) {
 
-   ## TO DO: add outlier detection
+reportTable = function(p, arrayTable)
+{
+
+  ## TO DO: add outlier detection
   
   arrayTable = cbind(
-    highlight = sprintf("<input type=\"checkbox\" name=\"ArrayCheckBoxes\" value=\"aqm_%d\" onchange=\"checkboxEvent(%d)\"/>",
-                        0:(nrow(arrayTable)-1),  0:(nrow(arrayTable)-1)),
+    highlight = sprintf("<input type='checkbox' name='ReportObjectCheckBoxes' value='r:%s' onchange='checkboxEvent(\"%s\")'/>",
+                        seq_len(nrow(arrayTable)), seq_len(nrow(arrayTable))),
     arrayTable, stringsAsFactors = FALSE)
   
   hwrite(arrayTable, p, border=0,
@@ -245,18 +242,23 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
     if(nrow(arrayTable)==0)
       stop("'arrayTable' must not be empty.")
 
-    ## For all report modules, extra the 'svg' slot, then subset only those that are defined.
+    ## For all report modules, extract the 'svg' slot, then subset only those that are defined.
     svgdata = lapply(modules, slot, "svg")
-    svgdata = svgdata[ sapply(svgdata, slot, "defined") ]
+    svgdata = svgdata[ !is.na(sapply(svgdata, slot, "name")) ]
 
     ## Extract strokeopacity and strokewidth from the list 'svgdata' and format for Javascript
-    ##   (second part could also be done by RJSONIO)
+    ##   (some of this should perhaps better be done by RJSONIO)
     formatStrokeParameters = function(w)
       paste("[", apply(sapply(svgdata, slot, w), 2, paste, collapse=", "), "]", collapse=", ")
 
+    ## Add rownames and numeric indices to 'arrayTable'
+    rown = row.names(arrayTable)
+    arrayTable = if(is.numeric(rown))  ## check whether or not the row.names are 'automatic'
+      cbind(row = paste(rown), arrayTable, stringsAsFactors = FALSE) else
+      cbind(row = paste(seq(along=rown)), " " = paste(rown), arrayTable, stringsAsFactors = FALSE) 
+
     ## Could also use RJSONIO here
-    df = cbind( " " = rownames(arrayTable), arrayTable, stringsAsFactors=FALSE)
-    pDataJS = sapply(df, function(x) paste("'", x, "'", sep=""))
+    pDataJS = sapply(arrayTable, function(x) paste("'", x, "'", sep=""))
     pDataJS = paste("[", apply(pDataJS, 1, paste, collapse=", "), "]", sep="", collapse=", ")
 
     ## Open and set up the HTML page
@@ -267,15 +269,14 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
       params = c(          ## TODO: this should be the outliers
         HIGHLIGHTINITIAL = paste(rep(c("false", "true"), ceiling(nrow(arrayTable)/2))[seq_len(nrow(arrayTable))], collapse=", "),
         ARRAYMETADATA    = pDataJS,
-        SVGOBJECTIDS     = paste("'Fig:", names(svgdata), "'", sep="", collapse=", "),
-        TABLEIDS         = paste("'Tab:", names(svgdata), "'", sep="", collapse=", "),
+        SVGOBJECTNAMES   = paste("'", names(svgdata), "'", sep="", collapse=", "),
         IDFUNS           = paste(sapply(svgdata, slot, "idFun"), collapse=", "),
         STROKEOPACITY    = formatStrokeParameters("strokeopacity"),
         STROKEWIDTH      = formatStrokeParameters("strokewidth")))
 
-    aqm.make.table(arrayTable, p)
+    reportTable(p = p, arrayTable = arrayTable)
     
-    aqm.make.index(modules, p)
+    aqm.make.index(modules, p = p)
     lasttype = "Something Else"
     sec = 1
 
@@ -283,10 +284,11 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
       {
         if(modules[[i]]@section != lasttype)
           {
-            aqm.make.section(p, s = sec, qm = modules[[i]])
+            aqm.make.section(p = p, s = sec, qm = modules[[i]])
             sec = sec+1
           }
-        aqm.report.qm(p, qm=modules[[i]], f=i, name=names(modules)[i], arrayTable=arrayTable, outdir=outdir)
+        reportModule(p = p, module = modules[[i]], integerIndex = i,
+                     name = names(modules)[i], arrayTable = arrayTable, outdir=outdir)
         lasttype = modules[[i]]@section
       }
      

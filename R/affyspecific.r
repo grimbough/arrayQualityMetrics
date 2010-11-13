@@ -37,7 +37,7 @@ aqm.rnadeg = function(expressionset, x)
         shape   = list("h" = 5.5, "w" =7),
         svg     =  if(x$usesvg)
         new("svgParameters",
-              defined = TRUE,
+              name = "rnadeg",
               numPlotObjects = x$numArrays) else new("svgParameters")
         ) ## new
    }

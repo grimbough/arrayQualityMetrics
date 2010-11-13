@@ -1,17 +1,15 @@
-// (C) Wolfgang Huber 1.11.2010
+// (C) Wolfgang Huber 13.11.2010
 
-// script parameters - these are set up by R in the function 'writeReport' when copying the 
+// Script parameters - these are set up by R in the function 'writeReport' when copying the 
 //   template for this script from arrayQualityMetrics/inst/scripts into the report.
-
 var highlightInitial = [ @HIGHLIGHTINITIAL@ ];
 var arrayMetadata    = [ @ARRAYMETADATA@ ];
-var svgObjectIds     = [ @SVGOBJECTIDS@ ];
-var tableIds         = [ @TABLEIDS@ ];
+var svgObjectNames   = [ @SVGOBJECTNAMES@ ];
 var idFuns           = [ @IDFUNS@ ];
 var strokeOpacity    = [ @STROKEOPACITY@ ];
 var strokeWidth      = [ @STROKEWIDTH@ ];
 
-// global variables - these are set up below by 'reportinit'
+// Global variables - these are set up below by 'reportinit'
 
 var svgObjects;         // array of all the SVG objects on the page
 var tables;             // array of all the associated ('tooltips') tables on the page
@@ -31,14 +29,14 @@ function reportinit() {
     svgObjects = new Array(svgObjectIds.length);
     for(i=0; i<svgObjectIds.length; i++) 
     {
-        svgObjects[i] = safeGetElementById(svgObjectIds[i]);
+        svgObjects[i] = safeGetElementById("Fig:"+svgObjectNames[i]);
     }
 
     /*--------find associated tables and cache their locations------*/
     tables = new Array(tableIds.length);
     for(i=0; i<tableIds.length; i++) 
     {
-        tables[i] = safeGetElementById(tableIds[i]);
+        tables[i] = safeGetElementById("Tab:"+svgObjectNames[i]);
     }
 
     // checkboxes[a] is (expected to be) of class HTMLInputElement

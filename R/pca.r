@@ -23,7 +23,7 @@ aqm.pca = function(x) {
       shape   = list("h" = 6, "w" =6),
       svg     = if(x$usesvg)
         new("svgParameters",
-              defined = TRUE,
+              name = "pca",
               numPlotObjects = x$numArrays,
               getPlotObjNodes = getPlotPoints,
               strokewidth   = c(1, 6),
