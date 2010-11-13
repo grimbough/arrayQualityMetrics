@@ -15,9 +15,10 @@ var svgObjects;         // array of all the SVG objects on the page
 var tables;             // array of all the associated ('tooltips') tables on the page
 var checkboxes;         // the checkboxes
 
-function reportinit() {
+function reportinit() 
+{
  
-    var a, i;
+    var a, i, status;
 
     /*--------find checkboxes and set them to start values------*/
     checkboxes = document.getElementsByName("ReportObjectCheckBoxes");
@@ -39,17 +40,17 @@ function reportinit() {
         tables[i] = safeGetElementById("Tab:"+svgObjectNames[i]);
     }
 
-    // checkboxes[a] is (expected to be) of class HTMLInputElement
+    /*------- checkboxes[a] is (expected to be) of class HTMLInputElement ---*/
     for(a=0; a<checkboxes.length; a++)
     {
 	checkboxes[a].checked = highlightInitial[a];
-        setAllPlots("r:"+(a+1), checkboxes[a].checked);
+        status = (0+checkboxes[a].checked);  // convert from logical to integer
+        setAllPlotObjsInAllPlots("r:"+(a+1), status);
     }
- 
 }
 
 
-safeGetElementById = function(id)
+function safeGetElementById(id)
 {
     res = document.getElementById(id);
     if(res == null)
@@ -58,53 +59,55 @@ safeGetElementById = function(id)
 }
 
 /*------------------------------------------------------------
- This function iterates over all SVG objects and updates the 
- plot elements corresponding to report object 'ro'. 
- Arguments:
- reportObjId: character with the id of the report object to be updated
- status: logical, indicating whether to highlight
+   Highlighting of Plot Objects 
+   status: integer 0 oder 1
  ---------------------------------------------------------------*/
-function setAllPlots(reportObjId, status)
+function setAllPlotObjsInAllPlots(reportObjId, status)
 {
-    var i, idx_status, el, id;
-
-    idx_status = (0+status); // convert from logical (FALSE, TRUE) to integer (0, 1)
+    var i, j, plotObjIds;
 
     for(i=0; i<svgObjects.length; i++) 
     {
-	id = idFuns[i][1](reportObjId);
-        for(j=0; j<id.length; j++)
-	{
-	    el = svgObjects[i].contentDocument.getElementById(id[j]);
-	    if(!el) 
-	    { 
-		throw new Error("Did not find Id '" + id[j] + "'");
-	    }
-	    el.setAttribute('stroke-opacity', strokeOpacity[i][idx_status]); 
-	    el.setAttribute('stroke-width',   strokeWidth[i][idx_status]); 
-	} // for j
+	plotObjIds = idFuns[i][1](reportObjId);
+        for(j=0; j<plotObjIds.length; j++) 
+	    setOnePlotObjInOnePlot(i, plotObjIds[j], status)
 
         showTipTable(i, reportObjId);
-    } // for i
-
+    } 
 }
 
+function setOnePlotObjInOnePlot(i, plotObjId, status)
+{
+    var el = svgObjects[i].contentDocument.getElementById(plotObjId);
+    if(!el) 
+	throw new Error("Did not find Id '" + plotObjId + "'");
+
+    el.setAttribute('stroke-opacity', strokeOpacity[i][status]); 
+    el.setAttribute('stroke-width',   strokeWidth[i][status]); 
+}
 
 /*------------------------------------------------------------
+   Display of the Metadata Table
   ------------------------------------------------------------*/
+
+function getIndexFromReportObjId(reportObjId)
+{
+   var a = parseInt(reportObjId.replace('^r:', ''));
+   if(isNan(a)) 
+       throw new Error('Invalid report object id ' + reportObjId);
+   return a;
+}
+
 function showTipTable(tableIndex, reportObjId)
 {
     var rows = tables[tableIndex].rows;
     if(rows.length != arrayMetadata[array].length)
 	throw new Error("rows.length=" + rows.length+"  !=  arrayMetadata[array].length=" + arrayMetadata[array].length);
 
-    var a = parseInt(reportObjId.replace('^r:', ''));
-    if(isNan(a)) throw new Error('Invalid report object id ' + x);
+    var a = getIndexFromReportObjId(reportObjId);
 
     for(i=0; i<rows.length; i++) 
-    {
-	rows[i].cells[1].innerHTML = arrayMetadata[a][i];
-    }
+ 	rows[i].cells[1].innerHTML = arrayMetadata[a][i];
 }
 
 function hideTipTable(tableIndex)
@@ -112,41 +115,50 @@ function hideTipTable(tableIndex)
     var rows = tables[tableIndex].rows;
 
     for(i=0; i<rows.length; i++) 
-    {
-	rows[i].cells[1].innerHTML = "";
-    }
+ 	rows[i].cells[1].innerHTML = "";
 }
 
 
 /*------------------------------------------------------------
-  From 'name' (e.g. 'density'), find numeric index in the 
+  From module 'name' (e.g. 'density'), find numeric index in the 
   'svgObjectNames' array.
   ------------------------------------------------------------*/
-function geti(name) 
+function getIndexFromName(name) 
 {
     var i;
     for(i=0; i<svgObjectNames.length; i++)
-    {
         if(svgObjectNames[i] == name)
-	{
 	    return i;
-	}
-    }
+
     throw new Error("Did not find '" + name + "'.");
 }
 
 
 /*------------------------------------------------------------
+  SVG plot object callbacks
   ------------------------------------------------------------*/
-function showTip(plotObjId, name) 
-{   
-    var i = geti(name);
-    var reportObjId = idFuns[i][2](plotObjId);
-    showTipTable(i, reportObjId);
-}
-
-function hideTip(plotObjId, name)
+function plotObjRespond(what, plotObjId, reportObjId, name)
 {
-    hideTipTable(geti(name));
+
+    var a, i, status;
+
+    switch(what) {
+    case "show":
+	i = getIndexFrom(name);
+	showTipTable(i, reportObjId);
+	break;
+    case "hide":
+	i = getIndexFrom(name);
+	hideTipTable(i);
+	break;
+    case "click":
+        a = getIndexFromReportObjId(reportObjId)
+	status = !checkboxes[a].checked;
+	checkboxes[a].checked = status;
+	setAllPlots(reportObjId, status);
+	break;
+    default:
+	throw new Error("Invalid 'what': "+what)
+    }
 }
 
