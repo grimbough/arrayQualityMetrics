@@ -1,4 +1,4 @@
-## Creation of the outdir
+## Creation of the output directory
 dircreation = function(outdir = getwd(), force = FALSE)
   {
     if(file.exists(outdir)){
@@ -18,8 +18,8 @@ dircreation = function(outdir = getwd(), force = FALSE)
   }
 
 
-## Produce the plots 
-aqm.plot = function(x) {
+## Produce a plots 
+makePlot = function(x) {
   if (is(x@plot, "trellis") || is(x@plot, "list")) ## TODO remove 'list' once maplot is fixed
     print(x@plot) else
   if (is(x@plot, "function"))
@@ -28,7 +28,7 @@ aqm.plot = function(x) {
 }
 
 ## Create the title
-aqm.make.title = function(reporttitle, outdir, params)
+makeTitle = function(reporttitle, outdir, params)
   {
     if(!(is.character(reporttitle)&&(length(reporttitle)==1)))
       stop("'reporttitle' must be a character of length 1.")
@@ -55,20 +55,18 @@ aqm.make.title = function(reporttitle, outdir, params)
 
 
 ## Create a new section
-aqm.make.section = function(p, s, qm)
+makeSection = function(p, sectionNumber, module)
   {
     hwrite("<hr>", p)
-    sec = paste("<a name= 'S",s,"'>Section ", s, ": ", qm@section,"</a>", sep = "")
+    sec = paste("<a name= 'S", sectionNumber,"'>Section ", sectionNumber, ": ", module@section,"</a>", sep = "")
     hwrite(sec, p, heading=2)
   }
 
 ## Create the index
-aqm.make.index = function(modules, p)
+makeIndex = function(p, modules)
 {
   s = 1
-  hwrite("<hr>", p)
   hwrite("Index", p, heading=2, style='font-family:helvetica,arial,sans-serif')
-  hwrite("Note: bitmap figures shown in this HTML report are also linked to PDF files, to provide better figure quality, or to provide multi-page files in cases where in  this HTML report only the first page is presented.", p, style='font-family:helvetica;font-size:11pt;color:#808080;font-style:italic;')
 
   hwrite("<UL>", p)
   lasttype = "FAKE"
@@ -79,13 +77,11 @@ aqm.make.index = function(modules, p)
           if(s != 1) ## end the previous section
             hwrite("</UL>", p)
 
-          hwrite(paste("<br><LI>Section ", s,": ", modules[[i]]@section, "<UL>",sep=""), p,
-                 link = paste("#S",s,sep=""),
-                 style = 'font-weight:bold;font-family:helvetica;font-size:12pt')
+          hwrite(paste("<br><LI><div class='tocsection'>Section ", s,": ", modules[[i]]@section, "</div><UL>",sep=""), p,
+                 link = paste("#S",s,sep=""))
           s = s+1
         }
-      hwrite(paste("<LI>", modules[[i]]@title,sep=""), p,
-             style = 'font-weight:normal;font-family:helvetica;font-size:11pt')
+      hwrite(paste("<LI><div class='tocmodule'>", modules[[i]]@title, "</div>", sep=""), p)
       lasttype = modules[[i]]@section
     }
   hwrite("</UL></UL>", p)
@@ -115,7 +111,7 @@ reportModule = function(p, module, integerIndex, name, arrayTable, outdir)
           nameimg = paste(name, ".svg", sep = "")
           svgtemp = tempfile()
           svg(file = svgtemp, h = h, w = w)
-          aqm.plot(module)
+          makePlot(module)
           dev.off()
           
           annRes = annotateSvgPlot(infile = svgtemp, outfile = nameimg, outdir = outdir,
@@ -131,7 +127,7 @@ reportModule = function(p, module, integerIndex, name, arrayTable, outdir)
         png = {
           nameimg = paste(name, ".png", sep = "")
           png(file = file.path(outdir, nameimg), h = h*dpi, w = w*dpi)
-          aqm.plot(module)
+          makePlot(module)
           dev.off()
           img = aqm.hwriteImage(nameimg, id=paste("Fig", name, sep=":"))
         },
@@ -141,7 +137,7 @@ reportModule = function(p, module, integerIndex, name, arrayTable, outdir)
     ## Also make a PDF file
     namepdf = paste(name, ".pdf", sep = "")
     pdf(file = file.path(outdir, namepdf), h = h, w = w)
-    aqm.plot(module)
+    makePlot(module)
     dev.off()
     link = list(namepdf, NA)
 
@@ -169,7 +165,7 @@ reportModule = function(p, module, integerIndex, name, arrayTable, outdir)
   }
 
 ## End the report
-aqm.make.ending = function(p)
+makeEnding = function(p)
   {
     z = sessionInfo("arrayQualityMetrics")
     version = z$otherPkgs[[1]]$Version
@@ -214,20 +210,20 @@ scores = function(obj)
 reportTable = function(p, arrayTable)
 {
 
-  ## TO DO: add outlier detection
-  
+  ## TODO: add outlier detection
+
+  s = seq_len(nrow(arrayTable))
   arrayTable = cbind(
-    highlight = sprintf("<input type='checkbox' name='ReportObjectCheckBoxes' value='r:%s' onchange='checkboxEvent(\"r:%s\")'/>",
-                        seq_len(nrow(arrayTable)), seq_len(nrow(arrayTable))),
-    arrayTable, stringsAsFactors = FALSE)
-  
-  hwrite(arrayTable, p, border=0,
+    highlight =
+      sprintf("<input type='checkbox' name='ReportObjectCheckBoxes' value='r:%s' onchange='checkboxEvent(\"r:%s\")'/>", s, s),
+    arrayTable,
+    stringsAsFactors = FALSE)
+
+  hwrite("<hr>", p)
+  hwrite(arrayTable, p, 
          row.bgcolor = rep(list("#ffffff", c("#d0d0ff", "#e0e0f0")), ceiling(nrow(arrayTable)/2)),
-         cellpadding = 2, cellspacing = 5,
-         row.style = list('font-weight:bold'))
-
-  hwrite("<div id=\"arraytooltip\"></div>", p)
-
+         table.style = "margin-left:auto;font-size:normal",
+         row.style = list("font-weight:bold"))
   
 }
 
@@ -264,7 +260,7 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
 
     ## Open and set up the HTML page
     ## Inject report-specific variables into the JavaScript
-    p = aqm.make.title(
+    p = makeTitle(
       reporttitle = reporttitle,
       outdir = outdir,
       params = c(          ## TODO: this should be the outliers
@@ -275,9 +271,9 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
         STROKEOPACITY    = formatStrokeParameters("strokeopacity"),
         STROKEWIDTH      = formatStrokeParameters("strokewidth")))
 
+    makeIndex(p = p, modules = modules)
     reportTable(p = p, arrayTable = arrayTable)
     
-    aqm.make.index(modules, p = p)
     lasttype = "Something Else"
     sec = 1
 
@@ -285,7 +281,7 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
       {
         if(modules[[i]]@section != lasttype)
           {
-            aqm.make.section(p = p, s = sec, qm = modules[[i]])
+            makeSection(p = p, sectionNumber = sec, module = modules[[i]])
             sec = sec+1
           }
         reportModule(p = p, module = modules[[i]], integerIndex = i,
@@ -293,7 +289,7 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
         lasttype = modules[[i]]@section
       }
      
-    aqm.make.ending(p)
+    makeEnding(p)
                     
     ## TODO is there a more elegant way to do this?
     invisible(list(modules=modules, arrayTable=arrayTable, reporttitle=reporttitle, outdir=outdir))

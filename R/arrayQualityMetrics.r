@@ -41,6 +41,27 @@ arrayQualityMetrics = function(
   ##  as well as some generally useful derived statistics of the data
   x = prepdata(expressionset, intgroup=intgroup, do.logtransform=do.logtransform, usesvg=usesvg) 
   
+  ##---------Generic modules------
+  m$boxplot   = aqm.boxplot(x)
+  m$density   = aqm.density(x)
+  m$pca       = aqm.pca    (x)
+  m$heatmap   = aqm.heatmap(x)
+  m$maplot    = aqm.maplot (x)
+  m$meansd    = aqm.meansd (x)
+  m$probesmap = aqm.probesmap(x)
+
+  ##--------Affymetrix specific modules------------
+  if(inherits(expressionset, "AffyBatch")) {
+    m$rnadeg  = aqm.rnadeg(expressionset, x)
+    affyproc  = prepaffy(expressionset)
+    m$rle     = aqm.rle(x,  affyproc = affyproc)
+    m$nuse    = aqm.nuse(x, affyproc = affyproc)
+    if(length(grep("exon", cdfName(expressionset), ignore.case=TRUE)) == 0)
+      m$qcstats =  aqm.qcstats(expressionset)
+    
+    m$pmmm = aqm.pmmm(expressionset)
+  }
+  
   ##---------Spatial intensity distributions------
   if (spatial) {
     hasxy = all(c("X", "Y") %in% rownames(featureData(expressionset)@varMetadata)) 
@@ -56,27 +77,6 @@ arrayQualityMetrics = function(
         m$spatialbg =  aqm.spatialbg(expressionset = expressionset, dataprep = x, scale = "Rank")
       }
     }
-  }
-  
-  ##---------Generic modules------
-  m$maplot    = aqm.maplot (x)
-  m$boxplot   = aqm.boxplot(x)
-  m$density   = aqm.density(x)
-  m$heatmap   = aqm.heatmap(x)
-  m$pca       = aqm.pca    (x)
-  m$meansd    = aqm.meansd (x)
-  m$probesmap = aqm.probesmap(x)
-
-  ##--------Affymetrix specific modules------------
-  if(inherits(expressionset, "AffyBatch")) {
-    m$rnadeg  = aqm.rnadeg(expressionset, x)
-    affyproc  = prepaffy(expressionset)
-    m$rle     = aqm.rle(x,  affyproc = affyproc)
-    m$nuse    = aqm.nuse(x, affyproc = affyproc)
-    if(length(grep("exon", cdfName(expressionset), ignore.case=TRUE)) == 0)
-      m$qcstats =  aqm.qcstats(expressionset)
-    
-    m$pmmm = aqm.pmmm(expressionset)
   }
   
   aqm.writereport(modules = m, arrayTable = x$pData, reporttitle = reporttitle, outdir = outdir)

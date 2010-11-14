@@ -1,22 +1,21 @@
 body { 
-    padding-top: 10px; padding-left: 5%; padding-right: 5%;
+    padding-top: 10px; padding-left: 2%; padding-right: 2%;
     font-family: Palatino; 
     background-color: #ffffff 
 }
 
 table {
-    border-collapse: collapse ; 
-    margin-left: auto;
+    border-collapse: collapse; 
+    margin-left: 0px;
     margin-right: auto;
     background-color: #ffffff;
     border-color: #ffffff;
-    font-family: helvetica,arial,sans-serif;
+    font-family: Palatino;
     font-size: small
 }
 
-
 table td {
-    padding-top: 2px; padding-bottom: 2px ; padding-left: 2px; padding-right: 2px;
+    padding-top: 0px; padding-bottom: 0px ; padding-left: 2px; padding-right: 2px;
     border-color: gray
 }
 
@@ -29,3 +28,13 @@ h2 {
    font-family:helvetica,arial,sans-serif
 }
 
+tocsection {
+   font-weight:bold;
+   font-family:helvetica,arial,sans-serif;
+   font-size:12pt
+}
+tocmodule {
+   font-weight:normal;
+   font-family:helvetica,arial,sans-serif;
+   font-size:11pt
+}
