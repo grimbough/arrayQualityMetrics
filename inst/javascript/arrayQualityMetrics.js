@@ -155,10 +155,20 @@ function plotObjRespond(what, plotObjId, reportObjId, name)
         a = getIndexFromReportObjId(reportObjId)
 	status = !checkboxes[a].checked;
 	checkboxes[a].checked = status;
-	setAllPlots(reportObjId, status);
+	setAllPlotObjsInAllPlots(reportObjId, status);
 	break;
     default:
 	throw new Error("Invalid 'what': "+what)
     }
+}
+
+/*------------------------------------------------------------
+  checkboxes 'onchange' event
+------------------------------------------------------------*/
+function checkboxEvent(reportObjId)
+{
+    var a = getIndexFromReportObjId(reportObjId);
+    var status = checkboxes[a].checked;
+    setAllPlotObjsInAllPlots(reportObjId, status);
 }
 

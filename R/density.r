@@ -37,12 +37,9 @@ aqm.density = function(x)
    // report object id -> plot object id
    function(r) {
      var a = parseInt(r.replace(/^r:/, ''));
-     var i;
+     var n = %d;
      if(isNaN(a)) throw new Error('Invalid report object id ' + x);
-     p = new Array(3);
-     for(i=0; i<3; i++)
-       p[i] = 'p:' + ((i * %d) + a);
-     return(p);
+     return(['p:' + a, 'p:' + (a+n), 'p:' + (a+2*n)]);
    }", n)
 
       getReportObjIdFromPlotObjId = function(x) {
