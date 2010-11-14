@@ -271,7 +271,7 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
         HIGHLIGHTINITIAL = paste(rep(c("false", "true"), ceiling(nrow(arrayTable)/2))[seq_len(nrow(arrayTable))], collapse=", "),
         ARRAYMETADATA    = pDataJS,
         SVGOBJECTNAMES   = paste("'", names(svgdata), "'", sep="", collapse=", "),
-        IDFUNS           = paste(sapply(svgdata, slot, "idFun"), collapse=", "),
+        IDFUNS           = paste(sapply(svgdata, slot, "getPlotObjIdFromReportObjId"), collapse=", "),
         STROKEOPACITY    = formatStrokeParameters("strokeopacity"),
         STROKEWIDTH      = formatStrokeParameters("strokewidth")))
 

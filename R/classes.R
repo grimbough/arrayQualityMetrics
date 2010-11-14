@@ -36,16 +36,18 @@ setClass("svgParameters",
     getPlotObjNodes = "function",
     numPlotObjects  = "integer",
                  
-    ## An array of two JavaScript functions: The first, when given a
-    ## report object ID (e.g. "r:1") returns all associated plot
-    ## object IDs (e.g. "p:1". The seccond is the inverse. The
-    ## functions take a single string argument.  The return a string
-    ## array. In the simplest case (which is what is this in the
-    ## prototype definition below) this is a vector of length
-    ## 1. However, it can also have length 0 (if the object is not
-    ## represented on this plot) or >1 (if there are more than 1
-    ## lines, points etc. for this report object).
-    idFun           = "character",
+    ## Two functions: The first, in JavaScript, when given a report
+    ## object ID 'r' (e.g. "r:1") returns all associated plot object
+    ## IDs 'p' (e.g. "p:1"). In the simplest case (which is what is
+    ## this in the prototype definition below) this is a vector of
+    ## length 1. However, it can also have length 0 (if the object is
+    ## not represented on this plot) or >1 (if there are more than 1
+    ## lines, points etc. for this report object). See the
+    ## 'aqm.density' function for an example.
+    ##
+    ## The second function, in R, is the inverse. It is expected to
+    ## always return a vector of length 1.
+    getPlotObjIdFromReportObjId = "character",
     getReportObjIdFromPlotObjId = "function", 
                  
     ## vector of length 2: stroke-width without and with highlighting
@@ -58,7 +60,7 @@ setClass("svgParameters",
     name            = NA_character_,
     getPlotObjNodes = getMatplotSeries,
     numPlotObjects  = NA_integer_,             
-    idFun           = sprintf("[function(x) { [x.replace(/^r:/, 'p:')] }, function(x) { [x.replace(/^p:/, 'r:')] }]"),
+    getPlotObjIdFromReportObjId = "function(r) { r.replace(/^r:/, 'p:') }",
     getReportObjIdFromPlotObjId = function(x) sub("^p:", "r:", x),
     strokewidth     = c(1, 3),
     strokeopacity   = c(0.4, 1)),

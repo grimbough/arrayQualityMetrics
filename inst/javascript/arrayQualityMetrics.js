@@ -68,7 +68,7 @@ function setAllPlotObjsInAllPlots(reportObjId, status)
 
     for(i=0; i<svgObjects.length; i++) 
     {
-	plotObjIds = idFuns[i][0](reportObjId);
+	plotObjIds = idFuns[i](reportObjId);
         for(j=0; j<plotObjIds.length; j++) 
 	    setOnePlotObjInOnePlot(i, plotObjIds[j], status)
 
