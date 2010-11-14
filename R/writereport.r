@@ -143,9 +143,10 @@ reportModule = function(p, module, integerIndex, name, arrayTable, outdir)
 
     hwrite(img, p)
     hwrite("<br>", p)
-    hwrite(paste("Figure ", integerIndex, ": ", module@title,". ", sep=""), p, style="font-weight:bold;font-size:large;text-align:center")
-    hwrite("(PDF file)", p, link = namepdf)
-    hwrite("</br>", p)
+    hwrite( paste(hwrite(paste("Figure ", integerIndex, ": ", module@title,". ", sep=""), style="font-weight:bold;font-size:larger"),
+                  hwrite("(PDF file)", link = namepdf)),
+            style = "text-align:center", p)
+    hwrite("<br>", p)
 
     hwrite(gsub("The figure <!-- FIG -->", paste("<b>Figure", integerIndex, "</b>"), module@legend, ignore.case = TRUE), p)
 

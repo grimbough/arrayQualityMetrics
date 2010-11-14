@@ -1,8 +1,8 @@
 body { 
-    padding-top: 10px; 
+    padding-top: 11px; 
     padding-left: 2%; 
     padding-right: 2%;
-    font-family: Palatino, Lucida Grande; 
+    font-family: helvetica, arial, sans-serif;
     font-size: 10pt;
     background-color: #ffffff;
     text-align: justify;
