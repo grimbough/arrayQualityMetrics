@@ -77,11 +77,11 @@ makeIndex = function(p, modules)
           if(s != 1) ## end the previous section
             hwrite("</UL>", p)
 
-          hwrite(paste("<br><LI><div class='tocsection'>Section ", s,": ", modules[[i]]@section, "</div><UL>",sep=""), p,
+          hwrite(paste("<br><li class='tocsection'>Section ", s,": ", modules[[i]]@section, "</li><UL>",sep=""), p,
                  link = paste("#S",s,sep=""))
           s = s+1
         }
-      hwrite(paste("<LI><div class='tocmodule'>", modules[[i]]@title, "</div>", sep=""), p)
+      hwrite(paste("<li class='tocmodule'>", modules[[i]]@title, "</li>", sep=""), p)
       lasttype = modules[[i]]@section
     }
   hwrite("</UL></UL>", p)
@@ -141,26 +141,16 @@ reportModule = function(p, module, integerIndex, name, arrayTable, outdir)
     dev.off()
     link = list(namepdf, NA)
 
-    ## TODO - use CSS instead of hard-coded fonts here
-    linkpdf = hwrite("PDF file.",
-      style='font-weight:bold;text-align:center;font-family:helvetica',
-      border = 0, link = namepdf)
-    
-    hwrite(c(img, paste("Figure ", integerIndex, ": ", module@title,". ", linkpdf, sep="")),
-           p,
-           dim=c(2,1),
-           style='font-weight:bold;text-align:center;font-family:helvetica',
-           border=0)
+    hwrite(img, p)
+    hwrite("<br>", p)
+    hwrite(paste("Figure ", integerIndex, ": ", module@title,". ", sep=""), p, style="font-weight:bold;font-size:large;text-align:center")
+    hwrite("(PDF file)", p, link = namepdf)
+    hwrite("</br>", p)
 
-
-    hwrite(paste("<br>", gsub("The figure <!-- FIG -->", paste("<b>Figure", integerIndex, "</b>"), module@legend, ignore.case = TRUE)), 
-           p,
-           style='text-align:justify;font-family:Lucida Grande;font-size:10pt')
+    hwrite(gsub("The figure <!-- FIG -->", paste("<b>Figure", integerIndex, "</b>"), module@legend, ignore.case = TRUE), p)
 
     if(!identical(svgwarn, FALSE))
-       hwrite(svgwarn,
-           p,
-           style='text-align:justify;font-family:Lucida Grande;font-size:10pt;color:blue')
+       hwrite(svgwarn, p)
     
   }
 
@@ -172,7 +162,7 @@ makeEnding = function(p)
     rversion = sessionInfo()$R.version$version.string
     session = paste("This report has been created with arrayQualityMetrics", version, "under", rversion)
     hwrite("<hr>", p)
-    hwrite(session, p, style ='font-family:Lucida Grande;font-size:8pt')
+    hwrite(session, p, style ='font-size:8pt')
     hwrite("<hr>", p)
     closePage(p)
   }
@@ -214,15 +204,14 @@ reportTable = function(p, arrayTable)
 
   s = seq_len(nrow(arrayTable))
   arrayTable = cbind(
-    highlight =
-      sprintf("<input type='checkbox' name='ReportObjectCheckBoxes' value='r:%s' onchange='checkboxEvent(\"r:%s\")'/>", s, s),
+    " " = sprintf("<input type='checkbox' name='ReportObjectCheckBoxes' value='r:%s' onchange='checkboxEvent(\"r:%s\")'/>", s, s),
     arrayTable,
     stringsAsFactors = FALSE)
 
   hwrite("<hr>", p)
   hwrite(arrayTable, p, 
          row.bgcolor = rep(list("#ffffff", c("#d0d0ff", "#e0e0f0")), ceiling(nrow(arrayTable)/2)),
-         table.style = "margin-left:auto;font-size:normal",
+         table.style = "margin-left:auto;font-size:100%;text-align:right;",
          row.style = list("font-weight:bold"))
   
 }
@@ -251,7 +240,7 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
     rown = row.names(arrayTable)
     arrayTable = if(is.numeric(rown))  ## check whether or not the row.names are 'automatic'
       cbind(row = paste(rown), arrayTable, stringsAsFactors = FALSE) else
-      cbind(row = paste(seq(along=rown)), " " = paste(rown), arrayTable, stringsAsFactors = FALSE) 
+      cbind(row = paste(seq(along=rown)), sampleNames = paste(rown), arrayTable, stringsAsFactors = FALSE) 
     rownames(arrayTable) = NULL
              
     ## Could also use RJSONIO here

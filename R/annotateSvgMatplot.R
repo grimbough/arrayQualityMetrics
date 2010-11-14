@@ -51,7 +51,7 @@ annotateSvgPlot = function(infile, outfile, outdir, annotationInfo, name)
 annotationTable = function(x, name, width=300) {
   ## Create a table with 2 columns and as many rows as 'x' has columns.
   ## The first column will contain the rownames of 'x', the second column will be empty
-  tab  = paste("<tr><td>", colnames(x), "</td><td></td></tr>", sep="", collapse="\n")
+  tab  = paste("<tr><td style='font-weight:bold'>", colnames(x), "</td><td></td></tr>", sep="", collapse="\n")
   tab  = paste("<table id='", paste("Tab", name, sep=":"), "' width=", width, ">", tab, "</table>", sep="")
 }
 
