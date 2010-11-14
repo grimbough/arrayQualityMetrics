@@ -37,7 +37,7 @@ annotateSvgPlot = function(infile, outfile, outdir, annotationInfo, name)
             "onmouseover" = callbacks[2],
             "onmouseout"  = callbacks[3])
                     
-          ## convertCSSStylesToSVG(series[[i]])
+          convertCSSStylesToSVG(series[[i]])
       } ## for
     } ## else
 

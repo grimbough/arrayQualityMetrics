@@ -1,4 +1,4 @@
-// (C) Wolfgang Huber 13.11.2010
+// (C) Wolfgang Huber 14.11.2010
 
 // Script parameters - these are set up by R in the function 'writeReport' when copying the 
 //   template for this script from arrayQualityMetrics/inst/scripts into the report.
@@ -44,7 +44,7 @@ function reportinit()
     for(a=0; a<checkboxes.length; a++)
     {
 	checkboxes[a].checked = highlightInitial[a];
-        status = (0+checkboxes[a].checked);  // convert from logical to integer
+        status = checkboxes[a].checked; 
         setAllPlotObjsInAllPlots("r:"+(a+1), status);
     }
 }
@@ -60,7 +60,6 @@ function safeGetElementById(id)
 
 /*------------------------------------------------------------
    Highlighting of Plot Objects 
-   status: integer 0 oder 1
  ---------------------------------------------------------------*/
 function setAllPlotObjsInAllPlots(reportObjId, status)
 {
@@ -81,9 +80,10 @@ function setOnePlotObjInOnePlot(i, plotObjId, status)
     var el = svgObjects[i].contentDocument.getElementById(plotObjId);
     if(!el) 
 	throw new Error("Did not find Id '" + plotObjId + "'");
-
-    el.setAttribute('stroke-opacity', strokeOpacity[i][status]); 
-    el.setAttribute('stroke-width',   strokeWidth[i][status]); 
+  
+    // '0+' converts integer to boolean
+    el.setAttribute('stroke-opacity', strokeOpacity[i][0+status]); 
+    el.setAttribute('stroke-width',   strokeWidth[i][0+status]); 
 }
 
 /*------------------------------------------------------------
@@ -144,11 +144,11 @@ function plotObjRespond(what, plotObjId, reportObjId, name)
 
     switch(what) {
     case "show":
-	i = getIndexFrom(name);
+	i = getIndexFromName(name);
 	showTipTable(i, reportObjId);
 	break;
     case "hide":
-	i = getIndexFrom(name);
+	i = getIndexFromName(name);
 	hideTipTable(i);
 	break;
     case "click":
