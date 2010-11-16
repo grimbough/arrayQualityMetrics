@@ -72,6 +72,8 @@ importFrom(XML, addAttributes, "xmlAttrs<-", xmlParse, xmlRoot, newXMLNode, save
 importFrom(SVGAnnotation, addECMAScripts, convertCSSStylesToSVG, 
            getMatplotSeries, getPlotPoints, getViewBox)
 
+importFrom(RJSONIO, toJSON)
+
 ##--------------------------------------------------
 ## export
 ##--------------------------------------------------

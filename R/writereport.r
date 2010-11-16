@@ -218,6 +218,15 @@ reportTable = function(p, arrayTable)
 }
 
 
+## We will use this function to create JSON representations for R vectors and matrices of
+## character or numeric, which should remain of that type in JavaScript. They are 'naked'
+## in the sense that names and dimnames attributes are dropped.
+toJSONnaked = function(x) { names(x) = dimnames(x) = NULL; return(toJSON(x)) }
+
+## We will use this function to create JSON representations of Arrays of other types
+## (function, logical) from their definition as JavaScript code.
+toJS = function(x) paste("[", paste(x, collapse=", "), "]")
+
 ##--------------------------------------------------
 ##   write the report
 ##--------------------------------------------------
@@ -232,11 +241,6 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
     svgdata = lapply(modules, slot, "svg")
     svgdata = svgdata[ !is.na(sapply(svgdata, slot, "name")) ]
 
-    ## Extract strokeopacity and strokewidth from the list 'svgdata' and format for Javascript
-    ##   (some of this should perhaps better be done by RJSONIO)
-    formatStrokeParameters = function(w)
-      paste("[", apply(sapply(svgdata, slot, w), 2, paste, collapse=", "), "]", collapse=", ")
-
     ## Add rownames and numeric indices to 'arrayTable'
     rown = row.names(arrayTable)
     arrayTable = if(is.numeric(rown))  ## check whether or not the row.names are 'automatic'
@@ -244,22 +248,18 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
       cbind(row = paste(seq(along=rown)), sampleNames = paste(rown), arrayTable, stringsAsFactors = FALSE) 
     rownames(arrayTable) = NULL
              
-    ## Could also use RJSONIO here
-    pDataJS = sapply(arrayTable, function(x) paste("'", x, "'", sep=""))
-    pDataJS = paste("[", apply(pDataJS, 1, paste, collapse=", "), "]", sep="", collapse=", ")
-
     ## Open and set up the HTML page
-    ## Inject report-specific variables into the JavaScript
     p = makeTitle(
       reporttitle = reporttitle,
       outdir = outdir,
+      ## Inject report-specific variables into the JavaScript
       params = c(          ## TODO: this should be the outliers
-        HIGHLIGHTINITIAL = paste(rep(c("false", "true"), ceiling(nrow(arrayTable)/2))[seq_len(nrow(arrayTable))], collapse=", "),
-        ARRAYMETADATA    = pDataJS,
-        SVGOBJECTNAMES   = paste("'", names(svgdata), "'", sep="", collapse=", "),
-        IDFUNS           = paste(sapply(svgdata, slot, "getPlotObjIdFromReportObjId"), collapse=", "),
-        STROKEOPACITY    = formatStrokeParameters("strokeopacity"),
-        STROKEWIDTH      = formatStrokeParameters("strokewidth")))
+        HIGHLIGHTINITIAL = toJS(ifelse(seq_len(nrow(arrayTable)) %in% 3:4, "true", "false")),
+        ARRAYMETADATA    = toJSONnaked(as.matrix(arrayTable)),
+        SVGOBJECTNAMES   = toJSONnaked(names(svgdata)),
+        IDFUNS           = toJS(sapply(svgdata, slot, "getPlotObjIdFromReportObjId")),
+        STROKEOPACITY    = toJSONnaked(t(sapply(svgdata, slot, "strokeopacity"))),
+        STROKEWIDTH      = toJSONnaked(t(sapply(svgdata, slot, "strokewidth")))))
 
     makeIndex(p = p, modules = modules)
     reportTable(p = p, arrayTable = arrayTable)
