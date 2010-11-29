@@ -16,15 +16,8 @@
 ## shows *three* lines per array (one for red, one for green, one for
 ## the log-ratio), and N_p=3*N_r. Similarly, sometimes maybe we want
 ## to omit some arrays from a plot. To represent such mappings in
-## general, the below functions are used.
-##
-## Needed interactivity:
-## - table refers to report objects. Checkbox update events receive
-##   a report object id, and need to know how to update the related
-##   plot object ids.
-## - plots contain plot objects. Click and mouse over events receive
-##   a plot object id, and need to know how to update the related
-##   report object id(s) [for the table] and plot object ids.
+## general, the below functions 'getPlotObjIdFromReportObjId' and
+## 'getReportObjIdFromPlotObjId' are used.
 
 setClass("svgParameters",
   representation(
@@ -49,6 +42,9 @@ setClass("svgParameters",
     ## always return a vector of length 1.
     getPlotObjIdFromReportObjId = "character",
     getReportObjIdFromPlotObjId = "function", 
+
+    ## TODO: all slots of the following sort could just be collected into a named
+    ## 2 x n matrix, this would be more flexible.
                  
     ## vector of length 2: stroke-width without and with highlighting
     strokewidth     = "numeric",
