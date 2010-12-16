@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{Working with arrayQualityMetrics report sections}
+%\VignetteIndexEntry{Customizing arrayQualityMetrics reports}
 %\VignetteDepends{}
 
 \documentclass[11pt]{article}
@@ -17,65 +17,43 @@
 
 \begin{document}
 
-\title{Working with arrayQualityMetrics report modules}
+\title{Customizing arrayQualityMetrics reports}
 \author{Audrey Kauffmann}
 \maketitle
 \tableofcontents
-\pagebreak
 
 \section*{Introduction}
-In the other vignette of this package, \emph{Quality assessment with
+In the other vignette of this package, \emph{Microarray quality assessment with
   arrayQualityMetrics}, you can learn how to use the
-\Rfunction{arrayQualityMetrics} function to create a full report. In this
-vignette, we show how to produce individual report modules and
-how to add your own modules to customize the report.
-%
+\Rfunction{arrayQualityMetrics} function to create an array quality report. If
+you are new to this package, then that is what you should consult.
 
-\section{Functions to format the data for aqm functions usage}
+This vignette addresses a more advanced topic: how to customize the
+report by selecting specific modules and sections, or adding your own
+ones.
 
-There are two functions to prepare the data. They compute intermediate
-results that are then processed by the \Rfunction{aqm.xxx}
-functions. They are greedy for memory and slow, but they only need to
-run once, and this modular design allows us more flexibility and
-extensibility with the report generation.
+\paragraph{Sections and modules:} In the documentation of this package, we refer
+to a \emph{module} as a self-contained element of a report, which usually consists of a 
+figure, some explanatory text, and potentially a set of flags for the arrays in
+datasets that classifies some of them as outliers. We refer to a \emph{section} as a
+collection of one or more modules that are thematically related.
 
-\begin{itemize}
-\item \Rfunction{prepdata}: generates a \Rclass{aqmobj.prepdata} object which can be the input of all the \Rfunction{aqm.xxx} functions.
-\item \Rfunction{prepaffy}: generates a \Rclass{aqmobj.prepaffy} object which is the input for some of the Affymetrix specific functions.
-\end{itemize}
 
-\section{Metrics available in the report}
-\subsection{Functions with outlier detection}
-The functions that compute quality metrics are the following:
-\begin{itemize}
-\item \Rfunction{aqm.maplot}: computes the M versus A plot and generates an object \Rclass{aqmobj.ma}.
-\item \Rfunction{aqm.spatial}: computes the spatial distribution of the ranks for the foreground intensities and generates an object \Rclass{aqmobj.spatial}.
-\item \Rfunction{aqm.boxplot}: computes the boxplots of the intensities and generates an object \Rclass{aqmobj.box}.
-\item \Rfunction{aqm.heatmap}: computes the heatmap of the between-array distances and generates an object \Rclass{aqmobj.heatmap}.
-\end{itemize}
+\section{Data preparation}
 
-The output objects contain the plot, the legend, the title, the name of the section it belongs to in the report, the scores per array that are used to perform the outlier detection and the array names that are detected as outliers.
+Some of the computations that are needed for the modules are common
+between several modules, and thus we perform them once,
+beforehand. These functions are called \Rfunction{prepdata} and
+\Rfunction{prepaffy}, and we refer to their manual page for 
+details.
 
-\subsection{Functions without outlier detection}
-The following functions also compute quality metrics: 
-\begin{itemize}
-\item \Rfunction{aqm.spatialbg}: represents the spatial distribution of the rank background intensities and generates an object \Rclass{aqmobj.spatialbg}.
-\item \Rfunction{aqm.density}: performs the density plots of the intensities and generates an object \Rclass{aqmobj.dens}.
-\item \Rfunction{aqm.meansd}: compares the mean of the intensities to their standard deviation and generates an object \Rclass{aqmobj.msd}.
-\item \Rfunction{aqm.probesmap}: draws density plots of two classes of probes as annotated in the "hasTarget" column of the \Rclass{featureData} and generates an object \Rclass{aqmobj.probesmap}.
-\end{itemize}
+\section{Module generating functions}
+The package contains a variety of functions that compute modules, and they are
+listed on a manual page which you can access by typing:
+<<eval=FALSE>>=
+?aqm.boxplot
+@ 
 
-The output objects contain the plot, the legend, the title and the name of the section it belongs to in the report. No outlier detection is computed for those metrics.
-
-\subsection{Functions for Affymetrix data}
-The functions available for Affymetrix datasets are:
-\begin{itemize}
-\item \Rfunction{aqm.rnadeg}: is used to represent the RNA degradation plot and creates the object \Rclass{aqmobj.rnadeg}.
-\item \Rfunction{aqm.rle}: performs Relative Log Expression boxplots and formats the output with outliers in the \Rclass{aqmobj.rle} object.
-\item \Rfunction{aqm.nuse}: computes Normalised Unscaled Standard Error boxplots and outlier detection on it and formats the output as an object \Rclass{aqmobj.nuse}.
-\item \Rfunction{aqm.qcstats}: draws the QCStats plot from the \Rpackage{simpleaffy} package and creates an object of class \Rclass{aqmobj.qcs}.
-\item \Rfunction{aqm.pmmm}:  draws density plots of the perfect match probes and the mismatch probes and generates an object\Rclass{aqmobj.pmmm}.
-\end{itemize}
 
 \section{Rendering of the output in a report}
 The functions available to render the output:

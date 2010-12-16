@@ -1,5 +1,5 @@
 %\VignetteIndexEntry{Quality assessment with arrayQualityMetrics}
-%\VignetteDepends{CCl4, ALLMLL, vsn}
+%\VignetteDepends{arrayQualityMetrics,CCl4, ALLMLL, vsn}
 %\VignettePackage{arrayQualityMetrics}
 
 \documentclass[11pt]{article}
@@ -31,8 +31,8 @@ about a microarray
 dataset~\cite{Kauffmann:2009a:Bioinf,Kauffmann:2010:Genomics,McCall2010}.
 The quality metrics are mainly on the \emph{per-array} level,
 i.\,e.\ they can be used to assess the relative quality of different
-arrays within a data set. Some of the metrics can also be used to
-diagnose batch effects, and thus the quality of the overall data set.
+arrays within a dataset. Some of the metrics can also be used to
+diagnose batch effects, and thus the quality of the overall dataset.
 
 The report can be extended to contain further diagnostics through
 additional arguments, and we will see examples below.
@@ -40,30 +40,31 @@ additional arguments, and we will see examples below.
 The aim of the \Rpackage{arrayQualityMetrics} package is to produce
 information that is relevant for your decision making - not, to make
 the decision. It will often be applied to two, somewhat distinct, use
-cases: (i) assessing quality of a ``raw'' data set, in order to get
+cases: (i) assessing quality of a ``raw'' dataset, in order to get
 feedback on the experimental procedures that produced the data; (ii)
-assessing quality of a normalised data set, in order to decide whether
-and how to use the data set (or subsets of arrays in it) for subsequent
+assessing quality of a normalised dataset, in order to decide whether
+and how to use the dataset (or subsets of arrays in it) for subsequent
 data analysis.
 
-Each type of microarray data (one colour, two colour, Affymetrix,
-Illumina...) is represented by a class of object in
-Bioconductor. However, the interface to the function
-\Rfunction{arrayQualityMetrics} is the same for all of them. Please
-consult its manual page for its argments.
+Different types of microarray data (one colour, two colour,
+Affymetrix, Illumina...) are represented by different object classes
+in Bioconductor. The function \Rfunction{arrayQualityMetrics} will
+work in the same way for all of them. Further information about
+its arguments can be found in its manual page.
 
 When the function \Rfunction{arrayQualityMetrics} is finished, a
-report named \texttt{QMreport.html} is produced in the subdirectory
-specified by the function's \texttt{outdir} argument.
-The report contains a series of plots explained by text.
-For the web presentation, the plots are produced as bitmaps (\texttt{.png}).
-They are also linked to \texttt{.pdf} files in order to
-provide high resolution images e.\,g.\ for publication. 
+report is produced in the subdirectory specified by the function's
+\texttt{outdir} argument (the name of the central HTML page that can
+be opened by a browser is \texttt{index.html}).  The report contains a
+series of plots explained by text.  The plots are provided as bitmaps
+(PNG format) or as vector graphics (SVG format). In the former case,
+the figures are also linked to PDF files that provide high resolution
+versions e.\,g.\ for publication.
 
 In the case of \Rclass{AffyBatch} input, some Affymetrix specific
-plots are added to the standard report. As explained in the Section
-\ref{ext}, other plots can be added to the standard report if some
-specific columns are present in the input object.
+sections are added to the standard report. Also for other types of
+arrays, sections can be added to the standard report if certain
+metadata are present in the input object (see Section~\ref{ext}).
 
 The function \Rfunction{arrayQualityMetrics} also produces an R object
 (essentially, a very big list) with all the information contained in
@@ -77,9 +78,9 @@ options(error = recover, warn = 2)
 @
 %
 
-\subsection{Affymetrix data - before preprocessing}w
-If you are working with Affymetrix chips, an \Rclass{AffyBatch} object
-is the most appropriate to import your raw data into Bioconductor.
+\subsection{Affymetrix data - before preprocessing}
+If you are working with Affymetrix GeneChips, an \Rclass{AffyBatch} object
+is the most appropriate way to import your raw data into Bioconductor.
 Starting from CEL files, this is typically done using the function
 \Rfunction{ReadAffy} from the \Rpackage{affy} package\footnote{For 
 more information on how to produce an \Rclass{AffyBatch} from your data, please see
@@ -115,7 +116,7 @@ files of this directory (\texttt{force}). Finally, we set
 %--------------------------------------------------
 \subsection{Affymetrix data - after preprocessing}
 %--------------------------------------------------
-We call the RMA algorithm on \emph{MLL.A} to obtain a preprocessed
+We can call the RMA algorithm on \emph{MLL.A} to obtain a preprocessed
 dataset.  The preprocessing includes background correction, between
 array intensity adjustment (normalisation) and probeset
 summarisation. The resulting object \Robject{nMLL} is of class
@@ -153,7 +154,7 @@ If you are working on two colour chips, you can create an
 colour arrays, and will produce objects of class \Rclass{RGList},
 \Rclass{MAList}. \Rfunction{arrayQualityMetrics} also understands these.
 
-Here, we consider the data set \Robject{CCl4} from the data package
+Here, we consider the dataset \Robject{CCl4} from the data package
 \Rpackage{CCl4} and normalize it using the variance stabilization
 method available in the package \Rpackage{vsn}.
 
@@ -191,8 +192,8 @@ A useful feature of \Rfunction{arrayQualityMetrics} is the possibility
 to show the results in the context of an experimental factor of
 interest, i.\,e.\ a categorical variable associated with the arrays
 such as \emph{hybridisation date}, \emph{treatment level} or
-\emph{replicate number}. Specifying a factor does not change 
-how the quality metrics are computed. By setting the argument
+\emph{replicate number}. Specifying a factor does \emph{not} change 
+how the quality metrics are computed. However, by setting the argument
 \Rfunction{intgroup} to contain the names of one or multiple columns
 of the data object's \Rclass{phenoData} slot\footnote{This is where
   Bioconductor objects store array annotation}, a bar on the side of
@@ -201,7 +202,7 @@ Similarly, the colours of the boxplots and density plots reflect the
 levels of the first of the factors named by \Rfunction{intgroup}.
 
 We use the \emph{nMLL} example again, and create artificial
-(nonsensical) array metadata factors \Robject{condition} and
+array metadata factors \Robject{condition} and
 \Robject{batch} (see Section~\ref{sec:rin} for a more realistic example).
 
 %
@@ -237,7 +238,7 @@ columns should be named "X" and "Y". If the arrays are split into
 blocks, rows and columns, then the function \Rfunction{addXYfromGAL}
 (please check its manual page for details) can used to convert the
 row, column and blocks indices into absolute "X" and "Y" coordinates on the
-array. In the example of the data set \emph{CCl4}, the coordinates of
+array. In the example of the dataset \Robject{CCl4}, the coordinates of
 the spots are in the columns named "Row" and "Column" of the
 featureData (the slot of the object containing the annotation of the
 probes). We copy this information into columns named "X"
@@ -319,7 +320,7 @@ toLatex(sessionInfo())
 @
 %
 
-\bibliographystyle{natbib}
+\bibliographystyle{unsrt}
 \bibliography{arrayQualityMetrics}
 
 \end{document}

@@ -17,13 +17,13 @@
 \alias{aqmReportModule}
 \alias{aqmReportModule-class}
 
-\title{Compute quality report sections.}
+\title{Compute quality report modules.}
 
 \description{
   These functions produce objects of class \code{aqmReportModule}
   containing the data (plots, text, and
-  if applicable, outlier detection) of the various sections of the
-  quality report. The report sections are rendered by the
+  if applicable, outlier detection) of the various modules of the
+  quality report. Given a list of modules, the report is rendered by the
   \code{\link{aqm.writereport}} function.
 }
 
