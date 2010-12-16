@@ -1,5 +1,5 @@
 %\VignetteIndexEntry{Quality assessment with arrayQualityMetrics}
-%\VignetteDepends{arrayQualityMetrics,CCl4, ALLMLL, vsn}
+%\VignetteDepends{arrayQualityMetrics,CCl4,ALLMLL,vsn}
 %\VignettePackage{arrayQualityMetrics}
 
 \documentclass[11pt]{article}
@@ -13,6 +13,7 @@
 \newcommand{\Rpackage}[1]{\textit{#1}}
 \newcommand{\Rclass}[1]{\textit{#1}}
 \newcommand{\Rfunction}[1]{{\small\texttt{#1}}}
+\parindent0cm
 
 \SweaveOpts{keep.source=TRUE,eps=FALSE,include=FALSE,width=4,height=4.5}
 
@@ -111,7 +112,10 @@ arrayQualityMetrics(expressionset = MLL.A[, 1:5],
 This is the simplest way of calling the function. We give a name to
 the directory (\texttt{outdir}) and we overwrite the possibly existing
 files of this directory (\texttt{force}). Finally, we set
-\texttt{do.logtransform} to logarithm transform the intensities.
+\texttt{do.logtransform} to logarithm transform the intensities. You
+can then view the report by directing your browser to the file
+\texttt{index.html} in the directory whose name is indicated by
+\Robject{outdir}.
 
 %--------------------------------------------------
 \subsection{Affymetrix data - after preprocessing}

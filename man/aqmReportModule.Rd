@@ -20,11 +20,10 @@
 \title{Compute quality report modules.}
 
 \description{
-  These functions produce objects of class \code{aqmReportModule}
-  containing the data (plots, text, and
-  if applicable, outlier detection) of the various modules of the
-  quality report. Given a list of modules, the report is rendered by the
-  \code{\link{aqm.writereport}} function.
+  These functions produce objects of class
+  \code{aqmReportModule} representing the various modules of the quality
+  report (see Section \emph{Value}). Given a list of modules, the report
+  is rendered by the \code{\link{aqm.writereport}} function.
 }
 
 \usage{
@@ -55,13 +54,24 @@ aqm.nuse(x, affyproc)
 }
 
 \value{
-An object of class \code{aqmReportModule}. For a simple example of the
-\code{aqm.*} functions, have a look at the source code of the
-\code{aqm.pca} function. 
-}
+An object of class \code{aqmReportModule}. The object contains the code
+needed to render the plot, a textual legend, a title, the name of
+the section that the module should be part of, and, if applicable,
+the results of the outlier detection for this modules.
+The interpretation of the plot is explained in the legend.}
 
 \details{
-See the vignette \emph{Working with arrayQualityMetrics report sections}.
+For a simple example of the
+\code{aqm.*} functions, have a look at the source code of the
+\code{aqm.pca} function.
+
+Some, but not all of these modules, provide an outlier detection. These are:
+\Rfunction{aqm.maplot},
+\Rfunction{aqm.spatial},
+\Rfunction{aqm.boxplot},
+\Rfunction{aqm.heatmap}.
+
+See also the vignette \emph{Customizing arrayQualityMetrics reports}.
 }
 
 \author{Audrey Kauffmann, Wolfgang Huber}
