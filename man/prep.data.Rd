@@ -21,8 +21,8 @@ prepaffy(expressionset)
 }
 
 \description{\code{prepdata} computes summary statistics that are useful
-  for all platforms; \code{prepaffy} Affymetrix-specific ones. This is a
-  helper function used by \code{\link{arrayQualityMetrics}}.}
+  for all platforms; \code{prepaffy} computes Affymetrix-specific ones. These are
+  helper functions used by \code{\link{arrayQualityMetrics}}.}
 
 \value{A list with various derived values.}
 
