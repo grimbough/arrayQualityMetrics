@@ -97,6 +97,8 @@ de = aqm.density(dataprep)
 qm = list("Boxplot" = bo, "Density" = de)
 @ 
 
+If you want to create your own modules, please have a look at the code
+for the various existing functions for this purpose, and adapt it.
 
 %--------------------------------------------------
 \section{Rendering the report}

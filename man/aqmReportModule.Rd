@@ -65,11 +65,11 @@ For a simple example of the
 \code{aqm.*} functions, have a look at the source code of the
 \code{aqm.pca} function.
 
-Some, but not all of these modules, provide an outlier detection. These are:
-\Rfunction{aqm.maplot},
-\Rfunction{aqm.spatial},
-\Rfunction{aqm.boxplot},
-\Rfunction{aqm.heatmap}.
+Some, but not all of these modules, provide outlier detection. These are:
+\code{aqm.maplot},
+\code{aqm.spatial},
+\code{aqm.boxplot} and
+\code{aqm.heatmap}.
 
 See also the vignette \emph{Customizing arrayQualityMetrics reports}.
 }
