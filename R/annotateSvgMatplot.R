@@ -18,29 +18,32 @@ annotateSvgPlot = function(infile, outfile, outdir, annotationInfo, name)
     series = annotationInfo@getPlotObjNodes(doc)
   
     ## Catch some of the brittleness
-    if( (length(series) %% annotationInfo@numPlotObjects) != 0) {
-      annotateOK = FALSE
-    } else {
-      annotateOK = TRUE
-
-      for(i in seq(along=series))
-        {
-          poid = paste("p", i, sep=":")
-          roid = annotationInfo@getReportObjIdFromPlotObjId(poid)
-          stopifnot(length(roid)==1)
-          
-          callbacks = sprintf("top.plotObjRespond('%s', '%s', '%s', '%s')", c("click", "show", "hide"), poid, roid, name)
-          
-          xmlAttrs(series[[i]]) = c(
-            "id"          = poid,
-            "onclick"     = callbacks[1],
-            "onmouseover" = callbacks[2],
-            "onmouseout"  = callbacks[3])
-                    
-          convertCSSStylesToSVG(series[[i]])
-      } ## for
-    } ## else
-
+    if (length(series) != annotationInfo@numPlotObjects)
+      {
+        annotateOK = FALSE
+      }
+    else
+      {
+        annotateOK = TRUE
+        
+        for(i in seq(along=series))
+          {
+            poid = paste("p", i, sep=":")
+            roid = annotationInfo@getReportObjIdFromPlotObjId(poid)
+            stopifnot(length(roid)==1)
+            
+            callbacks = sprintf("top.plotObjRespond('%s', '%s', '%s', '%s')", c("click", "show", "hide"), poid, roid, name)
+            
+            xmlAttrs(series[[i]]) = c(
+                      "id"          = poid,
+                      "onclick"     = callbacks[1],
+                      "onmouseover" = callbacks[2],
+                      "onmouseout"  = callbacks[3])
+            
+            convertCSSStylesToSVG(series[[i]])
+          } ## for
+      } ## else
+    
     saveXML(doc, file.path(outdir, outfile))
     return(list(size = diff(vb), annotateOK = annotateOK))
   }

@@ -118,7 +118,7 @@ reportModule = function(p, module, integerIndex, name, arrayTable, outdir)
             annotationInfo = module@svg, name = name)
           
           if(!annRes$annotateOK)
-            svgwarn = "Note: the figure is static - enhancement with interactive effects failed. This is likely due to a version incompatibility of the 'SVGAnnotation' R package and the 'libcairo' system library. Please contact the maintainter to report this problem."
+            svgwarn = "Note: the figure is static - enhancement with interactive effects failed. This is likely due to a version incompatibility of the 'SVGAnnotation' R package and the 'libcairo' system library. Please contact the maintainer of 'arrayQualityMetrics' to report this problem."
           
           sizes = paste(annRes$size)
           img = hwrite(c(aqm.hwriteImage(nameimg, width=sizes[1], height=sizes[2], id=paste("Fig", name, sep=":")),
@@ -205,7 +205,7 @@ reportTable = function(p, arrayTable)
 
   s = seq_len(nrow(arrayTable))
   arrayTable = cbind(
-    " " = sprintf("<input type='checkbox' name='ReportObjectCheckBoxes' value='r:%s' onchange='checkboxEvent(\"r:%s\")'/>", s, s),
+    " " = sprintf("<input type='checkbox' name='ReportObjectCheckBoxes' value='r:%s' onchange='checkboxEvent(\"r:%s\")'>", s, s),
     arrayTable,
     stringsAsFactors = FALSE)
 
@@ -221,7 +221,7 @@ reportTable = function(p, arrayTable)
 ## We will use this function to create JSON representations for R vectors and matrices of
 ## character or numeric, which should remain of that type in JavaScript. They are 'naked'
 ## in the sense that names and dimnames attributes are dropped.
-toJSONnaked = function(x) { names(x) = dimnames(x) = NULL; return(toJSON(x)) }
+toJSONnaked = function(x) { names(x) = dimnames(x) = NULL; return(toJSON(x, container = TRUE)) }
 
 ## We will use this function to create JSON representations of Arrays of other types
 ## (function, logical) from their definition as JavaScript code.
@@ -281,6 +281,5 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
      
     makeEnding(p)
                     
-    ## TODO is there a more elegant way to do this?
     invisible(list(modules=modules, arrayTable=arrayTable, reporttitle=reporttitle, outdir=outdir))
   }
