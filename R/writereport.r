@@ -1,4 +1,6 @@
-## Creation of the output directory
+##---------------------------------------------------------
+## Create the output directory
+##---------------------------------------------------------
 dircreation = function(outdir = getwd(), force = FALSE)
   {
     if(file.exists(outdir)){
@@ -18,7 +20,9 @@ dircreation = function(outdir = getwd(), force = FALSE)
   }
 
 
-## Produce a plots 
+##---------------------------------------------------------
+## Produce a plot
+##---------------------------------------------------------
 makePlot = function(x) {
   if (is(x@plot, "trellis") || is(x@plot, "list")) ## TODO remove 'list' once maplot is fixed
     print(x@plot) else
@@ -27,7 +31,9 @@ makePlot = function(x) {
   else stop(sprintf("Invalid 'x@plot' of class '%s'.", paste(class(x@plot), collapse=", ")))
 }
 
+##---------------------------------------------------------
 ## Create the title
+##---------------------------------------------------------
 makeTitle = function(reporttitle, outdir, params)
   {
     if(!(is.character(reporttitle)&&(length(reporttitle)==1)))
@@ -54,7 +60,9 @@ makeTitle = function(reporttitle, outdir, params)
   }
 
 
+##---------------------------------------------------------
 ## Create a new section
+##---------------------------------------------------------
 makeSection = function(p, sectionNumber, module)
   {
     hwrite("<hr>", p)
@@ -62,7 +70,9 @@ makeSection = function(p, sectionNumber, module)
     hwrite(sec, p, heading=2)
   }
 
+##---------------------------------------------------------
 ## Create the index
+##---------------------------------------------------------
 makeIndex = function(p, modules)
 {
   s = 1
@@ -242,10 +252,11 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
     svgdata = svgdata[ !is.na(sapply(svgdata, slot, "name")) ]
 
     ## Add rownames and numeric indices to 'arrayTable'
-    rown = row.names(arrayTable)
-    arrayTable = if(is.numeric(rown))  ## check whether or not the row.names are 'automatic'
-      cbind(row = paste(rown), arrayTable, stringsAsFactors = FALSE) else
-      cbind(row = paste(seq(along=rown)), sampleNames = paste(rown), arrayTable, stringsAsFactors = FALSE) 
+    rowchar = as.character(row.names(arrayTable))
+    rownum  = paste(seq_len(nrow(arrayTable)))
+    arrayTable = cbind(row = rownum, sampleNames = rowchar, arrayTable, stringsAsFactors = FALSE)
+    if(identical(rownum, rowchar))
+      arrayTable$sampleNames = NULL
     rownames(arrayTable) = NULL
              
     ## Open and set up the HTML page
@@ -254,7 +265,7 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
       outdir = outdir,
       ## Inject report-specific variables into the JavaScript
       params = c(          ## TODO: this should be the outliers
-        HIGHLIGHTINITIAL = toJS(ifelse(seq_len(nrow(arrayTable)) %in% 3:4, "true", "false")),
+        HIGHLIGHTINITIAL = toJS(rep("false", nrow(arrayTable))),
         ARRAYMETADATA    = toJSONnaked(as.matrix(arrayTable)),
         SVGOBJECTNAMES   = toJSONnaked(names(svgdata)),
         IDFUNS           = toJS(sapply(svgdata, slot, "getPlotObjIdFromReportObjId")),
