@@ -31,20 +31,25 @@ options(error=recover)
 %--------------------------------------------------
 \section{Introduction}
 %--------------------------------------------------
-In the other vignette of this package, \emph{Microarray quality assessment with
-  arrayQualityMetrics}, you can learn how to use the
-\Rfunction{arrayQualityMetrics} function to create an array quality report. If
-you are new to this package, then that is what you should consult.
-
-This vignette addresses a more advanced topic: how to customize the
+This vignette addresses an advanced topic: how to customize the
 report by selecting specific modules and sections, or adding your own
 ones.
 
-\paragraph{Sections and modules:} In the documentation of this package, we refer
-to a \emph{module} as a self-contained element of a report, which usually consists of a 
-figure, some explanatory text, and potentially a set of flags for the arrays in
-datasets that classifies some of them as outliers. We refer to a \emph{section} as a
-collection of one or more modules that are thematically related.
+If you are new to this package, then please consult the vignette
+\emph{Microarray quality assessment with arrayQualityMetrics}.
+There, you can learn the basic usage of the
+\Rpackage{arrayQualityMetrics} package: how to use the 
+\Rfunction{arrayQualityMetrics} function to create an array quality report
+for a set of microarrays. 
+
+\emph{Sections and modules:} In the documentation of this package, we
+refer to a \emph{module} as a self-contained element of a report that
+investigates one particular quality metric. A module consists of a
+figure, some explanatory text, and potentially a set of flags that
+classifies a subset of the arrays in the dataset as outliers
+(according to the particular metric investigated in the module).  We
+refer to a \emph{section} as a collection of one or more modules that
+are thematically related.
 
 For the following examples, let us load the needed packages and some data.
 
@@ -99,6 +104,7 @@ qm = list("Boxplot" = bo, "Density" = de)
 
 If you want to create your own modules, please have a look at the code
 for the various existing functions for this purpose, and adapt it.
+The function \Rfunction{aqm.pca} is a good place to start.
 
 %--------------------------------------------------
 \section{Rendering the report}
@@ -109,9 +115,12 @@ of \Rclass{aqmReportModule} objects.
 
 <<shortReport>>=
 outdir = tempdir()
-aqm.writereport(modules = qm, reporttitle = "My example", outdir = outdir, arrayTable = pData(CCl4))
+aqm.writereport(modules = qm, reporttitle = "My example", outdir = outdir, 
+                arrayTable = pData(CCl4))
 outdir
 @ 
+
+Point your browser to the \texttt{index.html} file in that directory.
 
 %--------------------------------------------------
 \subsection*{Session Info}
