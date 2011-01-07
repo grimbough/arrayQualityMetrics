@@ -1,5 +1,6 @@
 ##---------------------------------------------------------------
 ## Simple distribution-based outlier detection using KS-statistic
+##  (not: the p-value)
 ##---------------------------------------------------------------
 ksOutliers = function(x, subsamp = 300, theta = 2){
   if (nrow(x)>subsamp)
@@ -43,7 +44,7 @@ aqm.boxplot = function(x, subsample = 10000) {
     lay = c(1,1)
     legspe = ""
   }
-  xAsterisk = quantile(x$dat[ss,], probs = 0.01)
+  xAsterisk = quantile(x$dat[ss,], probs=0.01, na.rm=TRUE)
   
   cl = intgroupColours(x)
 
@@ -57,7 +58,7 @@ aqm.boxplot = function(x, subsample = 10000) {
         scales = list(x=list(relation="free"), y=list(axs="i")),
         ylim = c(x$numArrays+0.7,0.3),
         prepanel = function(x, y) {
-          list(xlim = quantile(x, probs = c(0.01, 0.99)))
+          list(xlim = quantile(x, probs = c(0.01, 0.99), na.rm=TRUE))
         },
         panel.groups = function(x, y, ...) {
           panel.bwplot(x, y, ...)
