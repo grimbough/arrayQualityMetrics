@@ -2,11 +2,16 @@
 ## Simple distribution-based outlier detection using KS-statistic
 ##  (not: the p-value)
 ##---------------------------------------------------------------
-ksOutliers = function(x, subsamp = 300, theta = 2){
+ksOutliers = function(x, subsamp = 300, theta = 2)
+{
   if (nrow(x)>subsamp)
-    x = x[sample(nrow(x), subsamp), ] 
-  s = apply(x, 2, function(v)
-    suppressWarnings(ks.test(v, x, alternative="two.sided")$statistic))
+    x = x[sample(nrow(x), subsamp), ]
+
+  fx = ecdf(as.vector(x))
+  
+  s = suppressWarnings(apply(x, 2, function(v)
+    ks.test(v, y = fx, alternative="two.sided")$statistic))
+
   list(statistic = s,
        outliers = which( (s-mean(s)) / sd(s) > theta ))
 }
