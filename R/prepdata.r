@@ -1,4 +1,3 @@
-
 logtransform = function(x) {
   if (is.null(x)) {
     NULL
@@ -21,10 +20,12 @@ setMethod("platformspecific",
           signature(expressionset = "NChannelSet"),
 function(expressionset, do.logtransform){
   
-  rc  = assayData(expressionset)$R
-  gc  = assayData(expressionset)$G
-  rcb = assayData(expressionset)$Rb
-  gcb = assayData(expressionset)$Gb
+  rc  = assayData(expressionset)$R   ## red channel foreground
+  gc  = assayData(expressionset)$G   ## green channel foreground
+  rcb = assayData(expressionset)$Rb  ## red channel background
+  gcb = assayData(expressionset)$Gb  ## green channel background
+  sx  = featureData(expressionset)$X ## spatial x-coordinate
+  sy  = featureData(expressionset)$Y ## spatial y-coordinate
 
   if(do.logtransform)
     {
@@ -52,7 +53,7 @@ function(expressionset, do.logtransform){
     }
   
   list(
-     "rc" = rc, "gc" = gc, "rcb" = rcb, "gcb" = gcb,
+     "rc" = rc, "gc" = gc, "rcb" = rcb, "gcb" = gcb, sx = sx, sy = sy,
      "M" = M, "A" = A, "dat" = dat,
      "nchannels" = 2, pData = pData(expressionset), fData = fData(expressionset))
 })

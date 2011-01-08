@@ -8,6 +8,9 @@ spatialplot = function(expressionset, dataprep, channel, label, scale, imageMat 
     
     colourRamp = colorRampPalette(rgb(seq(0,1,l=256),seq(0,1,l=256),seq(1,0,l=256)))
 
+
+sx, sy
+    
     if(dataprep$classori %in% c("ExpressionSet", "NChannelSet"))
       {
         r = featureData(expressionset)$X

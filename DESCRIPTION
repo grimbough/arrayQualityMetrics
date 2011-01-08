@@ -1,13 +1,13 @@
 Package: arrayQualityMetrics
 Title: Quality metrics on microarray data sets
-Version: 3.3.29
+Version: 3.3.31
 Author: Audrey Kauffmann, Wolfgang Huber
 Maintainer: Audrey Kauffmann <kauffmann@bergonie.org>
-Depends: affyPLM
+Depends: 
 Suggests: ALLMLL, CCl4
-Imports: Biobase, RColorBrewer, affy, beadarray, genefilter,
-         grDevices, graphics, hwriter, lattice, latticeExtra,
-         limma, marray, methods, RJSONIO, simpleaffy, stats, stats4,
+Imports: affy, affyPLM, beadarray, Biobase, genefilter,
+         graphics, grDevices, Hmisc, hwriter, lattice, latticeExtra,
+         limma, marray, methods, RColorBrewer, RJSONIO, simpleaffy, stats,
          SVGAnnotation (>= 0.7.2), utils, vsn, XML
 Description: This package generates microarray quality metrics reports for 
   data in Bioconductor microarray data containers (ExpressionSet, NChannelSet, 

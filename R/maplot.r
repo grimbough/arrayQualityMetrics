@@ -1,52 +1,66 @@
-aqm.maplot = function(x) {
+aqm.maplot = function(x, subsample=1000, Dthresh=0.15) {
 
   M = x$M
   A = x$A
+  stopifnot(identical(dim(M), dim(A)), identical(x$numArrays, ncol(M)))
 
-  ## TODO Fit a quadratic model M ~ A, then sort by size of the coefficients (from bad to good).
-  ## Do outlier detection on that.
-  mamean = colMeans(abs(M), na.rm=TRUE)
-  mastat = boxplot.stats(mamean)
-  maout  = integer(0) ## sapply(seq_len(length(mastat$out)), function(x) which(mamean == mastat$out[x]))
-  
-  app = 4 + 2*(sum(x$numArrays>c(4,6)))
-  nfig = ceiling(x$numArrays/8)
+  if(nrow(M)>subsample)
+    {
+      sel = sample(nrow(M), subsample)
+      sM = M[sel, ]
+      sA = A[sel, ]
+    } else {
+      sM = M
+      sA = A
+    }
+
+  ## For each array j, compute the D statistic from Hoeffding's test for independence 
+  ## and sort / detect outlier arrays by the value of the test statistic.
+  Dstat = sapply(seq_len(x$numArrays), function(j)
+    {
+      hoeffd(sA[,j], sM[,j])$D[1,2]
+    })
+  maout = which(Dstat > Dthresh)
     
-  xlimMA = quantile(A, probs=1e-4*c(1,-1)+c(0,1), na.rm=TRUE)
-  ylimMA = quantile(M, probs=1e-4*c(1,-1)+c(0,1), na.rm=TRUE)
+  ## Plot maximally 8 scatterplots
+  if(x$numArrays<=8)
+    {
+      whj = seq_len(x$numArrays)
+      lay = c(ceiling(x$numArrays/2), 2)
+      legHoeffd = ""
+    } else {
+      whj = order(Dstat, decreasing=TRUE)[c(1:4, x$numArrays+c(-3:0))]
+      lay = c(4, 2)
+      legHoeffd = "Shown are the 4 arrays with the highest value of D (top row), and the 4 arrays with the lowest value (bottom row). "
+    }
+    
+  xlim = quantile(A, probs=1e-4*c(1,-1)+c(0,1), na.rm=TRUE)
+  ylim = quantile(M, probs=1e-4*c(1,-1)+c(0,1), na.rm=TRUE)
+  panelNames = sprintf("array %d (D=%4.2f)", whj, Dstat[whj]) 
 
-  i = seq_len(x$numArrays)
+  i = seq(along=whj)
   dummy.df = data.frame(
     i = factor(i, levels = i),
     px = i,
     py = i)
   
-  trobj = xyplot(py ~ px | i, dummy.df,
-    xlim = xlimMA,
-    ylim = ylimMA,
+  ma = xyplot(py ~ px | i, dummy.df,
+    xlim = xlim,
+    ylim = ylim,
     xlab = "A",
     ylab = "M",
-    panel = function(x, y, ...) panel.smoothScatter(x=A[, x], y=M[, y], nbin = 250, raster=TRUE, ...),
+    panel = function(x, y, ...) panel.smoothScatter(x=A[, whj[x]], y=M[, whj[y]], nbin = 200, raster=TRUE, ...),
     as.table = TRUE,      
-    layout = c(app/2, 2, 1),
+    layout = lay,
     asp = "iso",
-    strip = function(..., bg) strip.default(..., bg ="#cce6ff")
+    strip = function(..., bg, factor.levels) {strip.default(..., bg ="#cce6ff", factor.levels = panelNames)}
     )
   
-  id.firstpage = seq_len(app)
-  
-  ma = lapply(seq_len(nfig), function(i)
-    {
-      id.thispage = (i-1) * app + id.firstpage
-      id.thispage = id.thispage[id.thispage <= x$numArrays]
-      update(trobj, index.cond = list(id.thispage))
-    })
-  
-  legspe1 = if(x$nchannels == 1) "where I<sub>1</sub> is the intensity of the array studied, and I<sub>2</sub> is the intensity of a \"pseudo\"-array that consists of the median across arrays." else "where I<sub>1</sub> and I<sub>2</sub> are the intensities of the two channels."
+  legRef = if(x$nchannels == 1)
+    "where I<sub>1</sub> is the intensity of the array studied, and I<sub>2</sub> is the intensity of a \"pseudo\"-array that consists of the median across arrays." else
+    "where I<sub>1</sub> and I<sub>2</sub> are the intensities of the two channels."
     
-  legspe2 = if(x$classori == "BeadLevelList") "The calculations are done on the summarized data obtained by using the function createBeadSummaryData from the package beadarray." else ""
-    
-  legend = sprintf("The figure <!-- FIG --> shows the MA plot for each array. M and A are defined as :<br>M = log<sub>2</sub>(I<sub>1</sub>) - log<sub>2</sub>(I<sub>2</sub>)<br>A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>)),<br>%s %s Typically, we expect the mass of the distribution in an MA plot to be concentrated along the M = 0 axis, and there should be no trend in M as a function of A. If there is a trend in the lower range of A, this often indicates that the arrays have different background intensities; this may be addressed by background correction. A trend in the upper range of A can indicate saturation of the measurements; in mild cases, this may be addressed by non-linear normalisation (e.g. quantile normalisation).", legspe1, legspe2)
+  legend = sprintf("The figure <!-- FIG --> shows the MA plot for each array. M and A are defined as :<br>M = log<sub>2</sub>(I<sub>1</sub>) - log<sub>2</sub>(I<sub>2</sub>)<br>A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>)),<br>%s Typically, we expect the mass of the distribution in an MA plot to be concentrated along the M = 0 axis, and there should be no trend in M as a function of A. If there is a trend in the lower range of A, this often indicates that the arrays have different background intensities; this may be addressed by background correction. A trend in the upper range of A can indicate saturation of the measurements; in mild cases, this may be addressed by non-linear normalisation (e.g. quantile normalisation).<br>Outlier detection has been performed by computing Hoeffding's D-statistic on the joint distribution of A and M for each array. %sThe value of D is shown in the panel headings. %d arrays had D>%g and were marked as outliers. For more information on Hoeffing's D statistic, please see the manual page of the function <tt>hoeffd</tt> in the <tt>Hmisc</tt> package.", legRef, legHoeffd, length(maout), Dthresh)
 
   
   new("aqmReportModule",

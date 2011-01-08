@@ -1,4 +1,4 @@
-// (C) Wolfgang Huber 14.11.2010
+// (C) Wolfgang Huber 2010-2011
 
 // Script parameters - these are set up by R in the function 'writeReport' when copying the 
 //   template for this script from arrayQualityMetrics/inst/scripts into the report.
@@ -6,8 +6,8 @@ var highlightInitial = @HIGHLIGHTINITIAL@;
 var arrayMetadata    = @ARRAYMETADATA@;
 var svgObjectNames   = @SVGOBJECTNAMES@;
 var idFuns           = @IDFUNS@;
-var strokeOpacity    = @STROKEOPACITY@;
-var strokeWidth      = @STROKEWIDTH@;
+var strokeAttrs      = @STROKEATTRS@;
+var strokeValues     = @STROKEVALUES@;
 
 // Global variables - these are set up below by 'reportinit'
 
@@ -77,13 +77,16 @@ function setAllPlotObjsInAllPlots(reportObjId, status)
 
 function setOnePlotObjInOnePlot(i, plotObjId, status)
 {
+    var att;
     var el = svgObjects[i].contentDocument.getElementById(plotObjId);
     if(!el) 
 	throw new Error("Did not find Id '" + plotObjId + "'");
-  
-    // '0+' converts integer to boolean
-    el.setAttribute('stroke-opacity', strokeOpacity[i][0+status]); 
-    el.setAttribute('stroke-width',   strokeWidth[i][0+status]); 
+    
+    for(att=0; att<strokeAttrs[i].length; att++)
+    {
+	el.setAttribute('stroke-' + strokeAttrs[i][att], 
+                        strokeValues[i][att][0+status]);    // '0+' converts integer to boolean
+    } 
 }
 
 /*------------------------------------------------------------

@@ -156,16 +156,19 @@ reportModule = function(p, module, integerIndex, name, arrayTable, outdir)
     hwrite( paste(hwrite(paste("Figure ", integerIndex, ": ", module@title,". ", sep=""), style="font-weight:bold;font-size:larger"),
                   hwrite("(PDF file)", link = namepdf)),
             style = "text-align:center", p)
-    hwrite("<br>", p)
+    hwrite("<br><br>", p)
 
     hwrite(gsub("The figure <!-- FIG -->", paste("<b>Figure", integerIndex, "</b>"), module@legend, ignore.case = TRUE), p)
+    hwrite("<br>", p)
 
     if(!identical(svgwarn, FALSE))
        hwrite(svgwarn, p)
     
   }
 
+##----------------------------------------------------------
 ## End the report
+##----------------------------------------------------------
 makeEnding = function(p)
   {
     z = sessionInfo("arrayQualityMetrics")
@@ -178,41 +181,11 @@ makeEnding = function(p)
     closePage(p)
   }
 
-## Score table formatting
-scores = function(obj)
-  {
-    titles = c(
-      "maplot"  = "MA plots",
-      "spatial" = "Spatial",
-      "boxplot" = "Distribution",
-      "heatmap" = "Heatmap",
-      "rle"     = "RLE",
-      "nuse"    = "NUSE")
-
-    mt = match(names(obj), names(titles))
-
-    df = data.frame(
-      "Array #"    = seq_len(length(sN)),
-      "Array Name" = sN,
-      stringsAsFactors = FALSE)
-
-    ## TODO - this should go into vignette, explain how to put this into the pData.
-    if(!is.null(protocolData(expressionset)$ScanDate))
-      df$"Scan Dates" = protocolData(expressionset)$ScanDate
-    
-    for(i in which(!is.na(mt)))      
-      df[[titles[mt[i]]]] =
-        ifelse(seq(along=sN) %in% obj[[i]]@outliers, "*", "")
-
-    return(df)
-  }
-
-
-reportTable = function(p, arrayTable)
+##----------------------------------------------------------
+##   write the HTML for 'arrayTable', including checkboxes
+##----------------------------------------------------------
+reportTable = function(p, arrayTable, tableLegend)
 {
-
-  ## TODO: add outlier detection
-
   s = seq_len(nrow(arrayTable))
   arrayTable = cbind(
     " " = sprintf("<input type='checkbox' name='ReportObjectCheckBoxes' value='r:%s' onchange='checkboxEvent(\"r:%s\")'>", s, s),
@@ -224,73 +197,109 @@ reportTable = function(p, arrayTable)
          row.bgcolor = rep(list("#ffffff", c("#d0d0ff", "#e0e0f0")), ceiling(nrow(arrayTable)/2)),
          table.style = "margin-left:auto;font-size:100%;text-align:right;",
          row.style = list("font-weight:bold"))
-  
+
+  hwrite(paste("<br>", tableLegend, "<br>", sep=""), p)
 }
 
 
-## We will use this function to create JSON representations for R vectors and matrices of
-## character or numeric, which should remain of that type in JavaScript. They are 'naked'
-## in the sense that names and dimnames attributes are dropped.
-toJSONnaked = function(x) { names(x) = dimnames(x) = NULL; return(toJSON(x, container = TRUE)) }
+##----------------------------------------------------------
+## Create JSON representation of R vectors and matrices of character or numeric.
+## Names and dimnames attributes are stripped. The 'container' argument to
+## RJSONIO::toJSON makes sure that an Array is created also for vectors of length 1.
+##----------------------------------------------------------
+toJSON_strip = function(x)
+{
+  names(x) = dimnames(x) = NULL; return(toJSON(x, container = TRUE))
+}
 
-## We will use this function to create JSON representations of Arrays of other types
-## (function, logical) from their definition as JavaScript code.
-toJS = function(x) paste("[", paste(x, collapse=", "), "]")
+##----------------------------------------------------------
+## Create JSON representation of an Array whose elements are defined by an R
+## character vector containing the JSON representation of the elements
+##----------------------------------------------------------
+toJSON_fromchar = function(x)
+{
+  paste("[", paste(x, collapse=", "), "]")
+}
 
 ##--------------------------------------------------
 ##   write the report
 ##--------------------------------------------------
-
 aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
-  {
-    ## To avoid dealing with this pathologic special case downstream in the HTML
-    if(nrow(arrayTable)==0)
-      stop("'arrayTable' must not be empty.")
+{
+  ## To avoid dealing with this pathologic special case downstream in the HTML
+  if(nrow(arrayTable)==0)
+    stop("'arrayTable' must not be empty.")
+  
+  ## For all report modules, extract the 'svg' slot, then subset only those that are defined.
+  svgdata = lapply(modules, slot, "svg")
+  svgdata = svgdata[ !is.na(sapply(svgdata, slot, "name")) ]
+  
+  ## Determine which subset of the modules have computed outliers ('wh'). For each, define 
+  ## a corresponding column in the logical matrix 'outliers'.
+  ## Further below, a textual representation of 'outliers', ifelse(outliers, "x", "") is added to arrayTable,
+  ## and the row-wise OR (more precisely: 'apply(outliers, 1, any)') is used to determine
+  ## which arrays to highlight initially.
+  out = lapply(modules, slot, "outliers")
+  wh  = which(!sapply(out, identical, y =  NA_integer_))
 
-    ## For all report modules, extract the 'svg' slot, then subset only those that are defined.
-    svgdata = lapply(modules, slot, "svg")
-    svgdata = svgdata[ !is.na(sapply(svgdata, slot, "name")) ]
+  outliers = matrix(NA, nrow = nrow(arrayTable), ncol = length(wh),
+    dimnames = list(NULL, sprintf("C%d", seq(along=wh))))
+  outlierExplanations = sprintf("C%d: outlier detection by %s", seq(along=wh), sapply(modules, slot, "title")[wh])
+  outlierExplanations = paste("The columns named <i>C1</i>, <i>C2</i>, ... indicate the calls from the different outlier detection methods:<ol>", paste(sprintf("<LI>%s</LI>", outlierExplanations), collapse=""), "</ol>", sep="")
 
-    ## Add rownames and numeric indices to 'arrayTable'
-    rowchar = as.character(row.names(arrayTable))
-    rownum  = paste(seq_len(nrow(arrayTable)))
-    arrayTable = cbind(row = rownum, sampleNames = rowchar, arrayTable, stringsAsFactors = FALSE)
-    if(identical(rownum, rowchar))
-      arrayTable$sampleNames = NULL
-    rownames(arrayTable) = NULL
-             
-    ## Open and set up the HTML page
-    p = makeTitle(
-      reporttitle = reporttitle,
-      outdir = outdir,
-      ## Inject report-specific variables into the JavaScript
-      params = c(          ## TODO: this should be the outliers
-        HIGHLIGHTINITIAL = toJS(rep("false", nrow(arrayTable))),
-        ARRAYMETADATA    = toJSONnaked(as.matrix(arrayTable)),
-        SVGOBJECTNAMES   = toJSONnaked(names(svgdata)),
-        IDFUNS           = toJS(sapply(svgdata, slot, "getPlotObjIdFromReportObjId")),
-        STROKEOPACITY    = toJSONnaked(t(sapply(svgdata, slot, "strokeopacity"))),
-        STROKEWIDTH      = toJSONnaked(t(sapply(svgdata, slot, "strokewidth")))))
+  for(j in seq(along = wh))
+    {
+      o = out[[wh[j]]]
+      stopifnot(!any(is.na(o)), all( (o>=1) & (o<=nrow(arrayTable))))
+      outliers[,j] = seq_len(nrow(arrayTable)) %in% o
+    }
 
-    makeIndex(p = p, modules = modules)
-    reportTable(p = p, arrayTable = arrayTable)
-    
-    lasttype = "Something Else"
-    sec = 1
 
-    for(i in seq(along = modules))
-      {
-        if(modules[[i]]@section != lasttype)
-          {
-            makeSection(p = p, sectionNumber = sec, module = modules[[i]])
-            sec = sec+1
-          }
-        reportModule(p = p, module = modules[[i]], integerIndex = i,
-                     name = names(modules)[i], arrayTable = arrayTable, outdir=outdir)
-        lasttype = modules[[i]]@section
-      }
-     
-    makeEnding(p)
-                    
-    invisible(list(modules=modules, arrayTable=arrayTable, reporttitle=reporttitle, outdir=outdir))
-  }
+  ## Add numeric indices, rownames and outlier annotation to 'arrayTable'
+  rowchar = as.character(row.names(arrayTable))
+  rownum  = paste(seq_len(nrow(arrayTable)))
+  arrayTable = cbind(row = rownum,
+                     sampleNames = rowchar,
+                     ifelse(outliers, "x", ""), 
+                     arrayTable,
+                     stringsAsFactors = FALSE)
+  if(identical(rownum, rowchar))
+    arrayTable$sampleNames = NULL
+  rownames(arrayTable) = NULL
+
+  
+  ## Open and set up the HTML page
+  p = makeTitle(
+    reporttitle = reporttitle,
+    outdir = outdir,
+    ## Inject report-specific variables into the JavaScript
+    params = c(          
+      HIGHLIGHTINITIAL = toJSON_fromchar(ifelse(apply(outliers, 1, any), "true", "false")), 
+      ARRAYMETADATA    = toJSON_strip(as.matrix(arrayTable)),
+      SVGOBJECTNAMES   = toJSON_strip(names(svgdata)),
+      IDFUNS           = toJSON_fromchar(sapply(svgdata, slot, "getPlotObjIdFromReportObjId")),
+      STROKEVALUES     = toJSON_fromchar(lapply(svgdata, function(x) toJSON_strip(t(x@stroke)))),
+      STROKEATTRS      = toJSON_strip(t(sapply(svgdata, function(x) colnames(x@stroke))))))
+  
+  makeIndex(p = p, modules = modules)
+  reportTable(p = p, arrayTable = arrayTable,
+              tableLegend = outlierExplanations)
+  
+  lasttype = "Something Else"
+  sec = 1
+  
+  for(i in seq(along = modules))
+    {
+      if(modules[[i]]@section != lasttype)
+        {
+          makeSection(p = p, sectionNumber = sec, module = modules[[i]])
+          sec = sec+1
+        }
+      reportModule(p = p, module = modules[[i]], integerIndex = i,
+                   name = names(modules)[i], arrayTable = arrayTable, outdir=outdir)
+      lasttype = modules[[i]]@section
+    }
+  
+  makeEnding(p)
+  invisible(list(modules=modules, arrayTable=arrayTable, reporttitle=reporttitle, outdir=outdir))
+}

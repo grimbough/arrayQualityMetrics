@@ -47,8 +47,8 @@ aqm.rnadeg = function(expressionset, x)
 aqm.rle = function(x, affyproc)
   {   
     if (affyproc$dataPLM@model.description$R.model$which.parameter.types[3] == 1){
-      medianchip = apply(coefs(affyproc$dataPLM), 1, median)
-      dat = sweep(coefs(affyproc$dataPLM), 1, medianchip, FUN='-')
+      medianchip = apply(affyPLM::coefs(affyproc$dataPLM), 1, median)
+      dat = sweep(affyPLM::coefs(affyproc$dataPLM), 1, medianchip, FUN='-')
     } else {
       stop("It doesn't appear that a model with sample effects was used.")
     }
@@ -62,7 +62,7 @@ aqm.rle = function(x, affyproc)
     
     rle@title = "Relative Log Expression plot"
     rle@section = "Affymetrix specific plots"
-    rle@outliers = integer(0)
+    rle@outliers = NA_integer_
 
     ## TODO: Fix the outlier computation
     ## rle2 = try(Mbox(affyproc$dataPLM, plot = FALSE))
@@ -108,7 +108,7 @@ aqm.nuse = function(x, affyproc)
 
   nuse@title = "Normalized Unscaled Standard Error (NUSE) plot"
   nuse@section = "Affymetrix specific plots"
-  nuse@outliers = integer(0)
+  nuse@outliers = NA_integer_
 
   return(nuse)
 }

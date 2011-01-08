@@ -13,13 +13,15 @@ importClassesFrom(methods, ANY, character, list, logical, matrix,
 ##--------------------------------------------------
 ## methods
 ##--------------------------------------------------
+importMethodsFrom(affy, Mbox, mm, pm)
+
+importMethodsFrom(affyPLM, se, indexProbesProcessed)
+
+importMethodsFrom(beadarray, arrayNames, getArrayData)
+
 importMethodsFrom(Biobase, assayData, channel, dims, exprs,
                   featureData, pData, phenoData, rowMedians,
                   sampleNames)
-
-importMethodsFrom(affy, Mbox, mm, pm)
-
-importMethodsFrom(beadarray, arrayNames, getArrayData)
 
 importMethodsFrom(genefilter, plot)
 
@@ -27,25 +29,25 @@ importMethodsFrom(marray, boxplot, lines)
 
 importMethodsFrom(simpleaffy, qc)
 
-importMethodsFrom(stats4, update)
-
 importMethodsFrom(vsn, meanSdPlot)
 
 ##--------------------------------------------------
 ## ordinary functions & objects
 ##--------------------------------------------------
-importFrom(RColorBrewer, brewer.pal)
-
 importFrom(affy, AffyRNAdeg, plotAffyRNAdeg)
+
+importFrom(affyPLM, preprocess, fitPLM)
 
 importFrom(beadarray, createBeadSummaryData)
 
 importFrom(genefilter, dist2)
 
+importFrom(graphics, legend)
+
 importFrom(grDevices, boxplot.stats, colorRampPalette, dev.off, pdf,
            png, rgb)
 
-importFrom(graphics, legend)
+importFrom(Hmisc, hoeffd)
 
 importFrom(hwriter, closePage, hwrite, hmakeTag, hwriteImage, openPage)
 
@@ -58,21 +60,21 @@ importFrom(latticeExtra, dendrogramGrob)
 
 importFrom(methods, as, is)
 
+importFrom(RColorBrewer, brewer.pal, brewer.pal.info)
+
+importFrom(RJSONIO, toJSON)
+
 importFrom(simpleaffy, plot.qc.stats)
 
 importFrom(stats, as.dendrogram, as.dist, density, fft, hclust,
            order.dendrogram, quantile)
 
-importFrom(utils, read.table, sessionInfo)
-
-importFrom(RColorBrewer, brewer.pal.info)
-
-importFrom(XML, addAttributes, "xmlAttrs<-", xmlParse, xmlRoot, newXMLNode, saveXML)
-
 importFrom(SVGAnnotation, addECMAScripts, convertCSSStylesToSVG, 
            getMatplotSeries, getPlotPoints, getViewBox)
 
-importFrom(RJSONIO, toJSON)
+importFrom(utils, read.table, sessionInfo)
+
+importFrom(XML, addAttributes, "xmlAttrs<-", xmlParse, xmlRoot, newXMLNode, saveXML)
 
 ##--------------------------------------------------
 ## export

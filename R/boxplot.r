@@ -77,9 +77,7 @@ aqm.boxplot = function(x, subsample = 10000) {
   shape = list("h" = 2.5 + x$numArrays * 0.1 +  1/x$numArrays, 
                "w" = 3+3*lay[1])
   
-  outliertext = if(length(ks$outliers)>0) "Outliers -according to the Kolmogorov-Smirnov statistic between each array's distribution and the distribution of the pooled data- are marked by an asterisk (*). " else ""
-  
-  legend = sprintf("The figure <!-- FIG --> presents boxplots representing summaries of the signal intensity distributions of the arrays. %sEach box corresponds to one array. Typically, one expects the boxes to have similar positions and widths. If the distribution of an array is very different from the others, this may indicate an experimental problem. %s", legspe, outliertext)
+  legend = sprintf("The figure <!-- FIG --> presents boxplots representing summaries of the signal intensity distributions of the arrays. %sEach box corresponds to one array. Typically, one expects the boxes to have similar positions and widths. If the distribution of an array is very different from the others, this may indicate an experimental problem.<br>Outlier detection has been performed by computing the Kolmogorov-Smirnov statistic between each array's distribution and the distribution of the pooled data. For %d arrays, this value was larger than the mean plus %g times the standard deviation across the values of all arrays, and they were marked as outliers.", legspe, length(ks$outliers), as.list(ksOutliers)$theta)
 
   title = "Boxplots"
   section = "Array intensity distributions"

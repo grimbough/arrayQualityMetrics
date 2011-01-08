@@ -7,8 +7,8 @@ arrayQualityMetrics = function(
   grouprep,
   spatial = TRUE,
   reporttitle = paste("Quality metrics report for", deparse(substitute(expressionset))),
-  usesvg) {
-    
+  usesvg)
+{
   ## Argument checking: 
   if(!missing(grouprep))
     .Deprecated(msg = paste("The argument 'grouprep' of the function 'arrayQualityMetrics'",

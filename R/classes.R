@@ -43,14 +43,12 @@ setClass("svgParameters",
     getPlotObjIdFromReportObjId = "character",
     getReportObjIdFromPlotObjId = "function", 
 
-    ## TODO: all slots of the following sort could just be collected into a named
-    ## 2 x n matrix, this would be more flexible.
-                 
-    ## vector of length 2: stroke-width without and with highlighting
-    strokewidth     = "numeric",
-                 
-    ## vector of length 2: stroke-opacity without and with highlighting             
-    strokeopacity   = "numeric"),   
+    ## 2 x n matrix that contains stroke attributes such as stroke-width,
+    ## stroke-opacity. Colnames of the matrix identify the attribute (e.g.
+    ## colname 'opacity' corresponds to stroke-opacity). The matrix' first
+    ## row corresponds to the value used for non-highlighted, the second
+    ## row to those for highlighted objects.
+    stroke     = "matrix"),   
          
   prototype(
     name            = NA_character_,
@@ -58,14 +56,12 @@ setClass("svgParameters",
     numPlotObjects  = NA_integer_,             
     getPlotObjIdFromReportObjId = "function(r) { return([r.replace(/^r:/, 'p:')]); }",
     getReportObjIdFromPlotObjId = function(x) sub("^p:", "r:", x),
-    strokewidth     = c(1, 3),
-    strokeopacity   = c(0.4, 1)),
+    stroke          = matrix(c("1", "3", "0.4", "1"), nrow=2, dimnames = list(NULL, c("width", "opacity")))),
          
   validity = function(object) {
     if(length(object@name)          !=1) return("Invalid slot 'name'.")
     if(length(object@numPlotObjects)!=1) return("Invalid slot 'numPlotObjects'.")
-    if(length(object@strokewidth)   !=2) return("Invalid slot 'strokewidth'.")
-    if(length(object@strokeopacity) !=2) return("Invalid slot 'strokeopacity'.")
+    if(nrow(object@stroke)          !=2) return("Invalid slot 'stroke'.")
     return(TRUE)
   }         
 )
@@ -91,7 +87,7 @@ setClass("aqmReportModule",
     title     = NA_character_,
     legend    = NA_character_,
     shape     = list(),
-    outliers  = integer(0),       
+    outliers  = NA_integer_,       
     svg       = new("svgParameters")),
 
   validity = function(object) {

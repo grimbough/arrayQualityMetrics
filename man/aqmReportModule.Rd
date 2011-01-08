@@ -27,11 +27,11 @@
 }
 
 \usage{
-aqm.boxplot(x, subsample = 10000)
+aqm.boxplot(x, subsample=10000)
 aqm.density(x)
 aqm.heatmap(x)
 aqm.pca(x)
-aqm.maplot(x)
+aqm.maplot(x, subsample=1000, Dthresh=0.15)
 aqm.meansd(x)
 aqm.probesmap(x)
 
@@ -48,9 +48,12 @@ aqm.nuse(x, affyproc)
   \item{expressionset}{An object of class \code{AffyBatch}.}
    \item{affyproc}{The object resulting from a call to
      \code{\link{prepaffy}(expressionset)}.}
-  \item{subsample}{For the boxplot computations, if the arrays have more
-    features than indicated by this number, then randomly subsample that
-    number of them.}
+  \item{subsample}{For efficiency, some computations are performed not
+  on the full set of features (which can be hundreds of thousands on
+  some arrays), but on a randomly subset whose size is indicated by this
+  number.}
+  \item{Dthresh}{In \code{maplot}, the arrays with a Hoeffing D
+  statistic larger than this value are called \emph{outliers}. See also \code{\link[Hmisc:hoeffd]{hoeffd}}.}
 }
 
 \value{
