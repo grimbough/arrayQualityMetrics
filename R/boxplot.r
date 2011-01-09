@@ -22,20 +22,20 @@ ksOutliers = function(x, subsamp = 300, theta = 2)
 ##----------------------------------------
 aqm.boxplot = function(x, subsample = 10000) {
   
-  ks = ksOutliers(x$dat)
+  ks = ksOutliers(x$M)
   
-  if (nrow(x$dat)>subsample) {
-    ss = sample(nrow(x$dat), subsample)
+  if (nrow(x$M)>subsample) {
+    ss = sample(nrow(x$M), subsample)
     nr = length(ss)
   } else {
     ss = TRUE
-    nr = nrow(x$dat)
+    nr = nrow(x$M)
   }
   
   sample_id = rep( seq_len(x$numArrays), each = nr )
   
   if(x$nchannels == 2)  {
-    values    = with(x, c(rc[ss,], gc[ss,], dat[ss,]))
+    values    = with(x, c(R[ss,], G[ss,], M[ss,]))
     sample_id = rep(sample_id, times = 3)
     panels    = factor(rep(1:3, each = nr * x$numArrays),
                    levels = 1:3,
@@ -44,12 +44,12 @@ aqm.boxplot = function(x, subsample = 10000) {
     lay = c(3,1)
     legspe = "Three panels are shown: left, red channel; middle, green channel; right, log<sub>2</sub>(ratio). Outlier detection  was performed on the distribution of log<sub>2</sub>(ratio). "
    } else {
-    values  = as.numeric(x$dat[ss, ])
+    values  = as.numeric(x$M[ss, ])
     formula = sample_id ~ values
     lay = c(1,1)
     legspe = ""
   }
-  xAsterisk = quantile(x$dat[ss,], probs=0.01, na.rm=TRUE)
+  xAsterisk = quantile(x$M[ss,], probs=0.01, na.rm=TRUE)
   
   cl = intgroupColours(x)
 

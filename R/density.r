@@ -24,9 +24,9 @@ aqm.density = function(x)
   
   if(x$nchannels == 2)
     {  
-      den1 = dens(x$rc)
-      den2 = dens(x$gc)
-      den3 = dens(x$dat)
+      den1 = dens(x$R)
+      den2 = dens(x$G)
+      den3 = dens(x$M)
       ddf  = rbind(den1, den2, den3)
       panels = factor(rep(1:3, each = c(nrow(den1), nrow(den2), nrow(den3))),
         levels = 1:3,
@@ -60,7 +60,7 @@ aqm.density = function(x)
       else new("svgParameters")
       
     } else {  ## nchannels==1
-      ddf = dens(x$dat)
+      ddf = dens(x$M)
       formula = y ~ x
       lay = c(1,1)
       svgPar = if(x$usesvg)

@@ -89,8 +89,7 @@ export("aqm.writereport")
 export("aqm.boxplot", "aqm.maplot",  "aqm.density", "aqm.probesmap",
        "aqm.meansd",  "aqm.heatmap", "aqm.pca",
        "aqm.rle",     "aqm.nuse",    "aqm.rnadeg", "aqm.qcstats",
-       "aqm.pmmm",
-       "aqm.spatial", "aqm.spatialbg")
+       "aqm.pmmm",    "aqm.spatial")
 
 export("addXYfromGAL")
 export("ksOutliers")

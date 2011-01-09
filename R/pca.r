@@ -2,7 +2,7 @@ aqm.pca = function(x) {
 
   cl  = intgroupColours(x, withOpacity = FALSE)
   
-  pca = prcomp(t(na.omit(x$dat)))
+  pca = prcomp(t(na.omit(x$M)))
  
   key = cl$key
   if(!is.null(key))

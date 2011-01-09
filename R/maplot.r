@@ -1,8 +1,16 @@
 aqm.maplot = function(x, subsample=1000, Dthresh=0.15) {
 
-  M = x$M
-  A = x$A
-  stopifnot(identical(dim(M), dim(A)), identical(x$numArrays, ncol(M)))
+  if(x$nchannels==1)
+    {
+      stopifnot(identical(x$M, x$A))
+      medArray = rowMedians(x$M, na.rm=TRUE)
+      M =  x$M - medArray
+      A = (x$M + medArray)/2
+    } else {
+      M = x$M
+      A = x$A
+      stopifnot(identical(dim(M), dim(A)))
+    }
 
   if(nrow(M)>subsample)
     {
@@ -49,7 +57,7 @@ aqm.maplot = function(x, subsample=1000, Dthresh=0.15) {
     ylim = ylim,
     xlab = "A",
     ylab = "M",
-    panel = function(x, y, ...) panel.smoothScatter(x=A[, whj[x]], y=M[, whj[y]], nbin = 200, raster=TRUE, ...),
+    panel = function(x, y, ...) panel.smoothScatter(x=A[, whj[x]], y=M[, whj[y]], raster=TRUE, nbin=250, ...),
     as.table = TRUE,      
     layout = lay,
     asp = "iso",
@@ -60,8 +68,7 @@ aqm.maplot = function(x, subsample=1000, Dthresh=0.15) {
     "where I<sub>1</sub> is the intensity of the array studied, and I<sub>2</sub> is the intensity of a \"pseudo\"-array that consists of the median across arrays." else
     "where I<sub>1</sub> and I<sub>2</sub> are the intensities of the two channels."
     
-  legend = sprintf("The figure <!-- FIG --> shows the MA plot for each array. M and A are defined as :<br>M = log<sub>2</sub>(I<sub>1</sub>) - log<sub>2</sub>(I<sub>2</sub>)<br>A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>)),<br>%s Typically, we expect the mass of the distribution in an MA plot to be concentrated along the M = 0 axis, and there should be no trend in M as a function of A. If there is a trend in the lower range of A, this often indicates that the arrays have different background intensities; this may be addressed by background correction. A trend in the upper range of A can indicate saturation of the measurements; in mild cases, this may be addressed by non-linear normalisation (e.g. quantile normalisation).<br>Outlier detection has been performed by computing Hoeffding's D-statistic on the joint distribution of A and M for each array. %sThe value of D is shown in the panel headings. %d arrays had D>%g and were marked as outliers. For more information on Hoeffing's D statistic, please see the manual page of the function <tt>hoeffd</tt> in the <tt>Hmisc</tt> package.", legRef, legHoeffd, length(maout), Dthresh)
-
+  legend = sprintf("The figure <!-- FIG --> shows the MA plot for each array. M and A are defined as :<br>M = log<sub>2</sub>(I<sub>1</sub>) - log<sub>2</sub>(I<sub>2</sub>)<br>A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>)),<br>%s Typically, we expect the mass of the distribution in an MA plot to be concentrated along the M = 0 axis, and there should be no trend in M as a function of A. If there is a trend in the lower range of A, this often indicates that the arrays have different background intensities; this may be addressed by background correction. A trend in the upper range of A can indicate saturation of the measurements; in mild cases, this may be addressed by non-linear normalisation (e.g. quantile normalisation).<br>Outlier detection has been performed by computing Hoeffding's D-statistic on the joint distribution of A and M for each array. %sThe value of D is shown in the panel headings. %s had D>%g and %s marked as outliers. For more information on Hoeffing's D statistic, please see the manual page of the function <tt>hoeffd</tt> in the <tt>Hmisc</tt> package.", legRef, legHoeffd, if(length(maout)==1) "One array" else paste(length(maout), "arrays"), Dthresh, if(length(maout)==1) "was" else "were")
   
   new("aqmReportModule",
       plot = ma, 

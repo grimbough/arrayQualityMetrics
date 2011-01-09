@@ -5,10 +5,10 @@ aqm.probesmap = function(x)
     return(NULL)
   
   df = data.frame(
-    "hasTarget" = rep(x$fData$hasTarget, ncol(x$dat)),
-    "dat"       = as.vector(x$dat))
+    "hasTarget" = rep(x$fData$hasTarget, ncol(x$A)),
+    "A"         = as.vector(x$A))
 
-  den = densityplot( ~ dat,
+  den = densityplot( ~ A,
     data = df,
     groups = hasTarget,
     plot.points = FALSE,
@@ -20,7 +20,7 @@ aqm.probesmap = function(x)
   new("aqmReportModule",
       plot = den,
       section = "Feature stratification",
-      title = "Feature stratification",
+      title   = "Feature stratification",
       legend = legend,
       shape = list("h"=6,"w"=6))
 }

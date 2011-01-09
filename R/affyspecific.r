@@ -48,12 +48,12 @@ aqm.rle = function(x, affyproc)
   {   
     if (affyproc$dataPLM@model.description$R.model$which.parameter.types[3] == 1){
       medianchip = apply(affyPLM::coefs(affyproc$dataPLM), 1, median)
-      dat = sweep(affyPLM::coefs(affyproc$dataPLM), 1, medianchip, FUN='-')
+      M = sweep(affyPLM::coefs(affyproc$dataPLM), 1, medianchip, FUN='-')
     } else {
       stop("It doesn't appear that a model with sample effects was used.")
     }
 
-    rle = aqm.boxplot(list(dat=dat, intgroup=x$intgroup, nchannels=1, numArrays=x$numArrays))
+    rle = aqm.boxplot(list(M=M, intgroup=x$intgroup, nchannels=1, numArrays=x$numArrays))
 
     rle@legend = paste(phrase$fig("Relative Log Expression (RLE)"),
       phrase$preproc("RLE"),
@@ -99,7 +99,7 @@ aqm.nuse = function(x, affyproc)
     grp.rma.rel.se1.mtx <- sweep(ses,1,grp.rma.se1.median,FUN='/')
   }
 
-  nuse = aqm.boxplot(list(dat=grp.rma.rel.se1.mtx, intgroup=x$intgroup, nchannels=1, numArrays=x$numArrays))
+  nuse = aqm.boxplot(list(M=grp.rma.rel.se1.mtx, intgroup=x$intgroup, nchannels=1, numArrays=x$numArrays))
 
   nuse@legend = paste(phrase$fig("Normalized Unscaled Standard Error (NUSE)"),
     phrase$preproc("NUSE"),

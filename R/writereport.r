@@ -24,7 +24,7 @@ dircreation = function(outdir = getwd(), force = FALSE)
 ## Produce a plot
 ##---------------------------------------------------------
 makePlot = function(x) {
-  if (is(x@plot, "trellis") || is(x@plot, "list")) ## TODO remove 'list' once maplot is fixed
+  if (is(x@plot, "trellis")) 
     print(x@plot) else
   if (is(x@plot, "function"))
     do.call(x@plot, args = list())
@@ -104,57 +104,62 @@ reportModule = function(p, module, integerIndex, name, arrayTable, outdir)
 {
     stopifnot(is(module, "aqmReportModule"))
 
-    h = module@shape$h
-    w = module@shape$w
-    stopifnot(length(h)==1, is.numeric(h), !is.na(h),
-              length(w)==1, is.numeric(w), !is.na(w))
-
-    stopifnot(length(integerIndex)==1, is.integer(integerIndex), !is.na(integerIndex))
-    
-    imageformat =  if(is.na(module@svg@name)) "png" else "svg"
     svgwarn = FALSE
-    dpi = 72
+    if(!is.null(module@plot))
+      {
+        h = module@shape$h
+        w = module@shape$w
+        stopifnot(length(h)==1, is.numeric(h), !is.na(h),
+                  length(w)==1, is.numeric(w), !is.na(w))
 
-    ## The two cases, png and svg, need to be treated differently 
-    switch(imageformat,
-        svg = {
-          nameimg = paste(name, ".svg", sep = "")
-          svgtemp = tempfile()
-          svg(file = svgtemp, h = h, w = w)
-          makePlot(module)
-          dev.off()
+        stopifnot(length(integerIndex)==1, is.integer(integerIndex), !is.na(integerIndex))
+    
+        imageformat =  if(is.na(module@svg@name)) "png" else "svg"
+        dpi = 72
+        
+        ## The two cases, png and svg, need to be treated differently 
+        switch(imageformat,
+               svg = {
+                 nameimg = paste(name, ".svg", sep = "")
+                 svgtemp = tempfile()
+                 svg(file = svgtemp, h = h, w = w)
+                 makePlot(module)
+                 dev.off()
+                 
+                 annRes = annotateSvgPlot(infile = svgtemp, outfile = nameimg, outdir = outdir,
+                   annotationInfo = module@svg, name = name)
+                 
+                 if(!annRes$annotateOK)
+                   svgwarn = "Note: the figure is static - enhancement with interactive effects failed. This is likely due to a version incompatibility of the 'SVGAnnotation' R package and the 'libcairo' system library. Please contact the maintainer of 'arrayQualityMetrics' to report this problem."
           
-          annRes = annotateSvgPlot(infile = svgtemp, outfile = nameimg, outdir = outdir,
-            annotationInfo = module@svg, name = name)
-          
-          if(!annRes$annotateOK)
-            svgwarn = "Note: the figure is static - enhancement with interactive effects failed. This is likely due to a version incompatibility of the 'SVGAnnotation' R package and the 'libcairo' system library. Please contact the maintainer of 'arrayQualityMetrics' to report this problem."
-          
-          sizes = paste(annRes$size)
-          img = hwrite(c(aqm.hwriteImage(nameimg, width=sizes[1], height=sizes[2], id=paste("Fig", name, sep=":")),
-                         annotationTable(arrayTable, name = name)))
-        },
-        png = {
-          nameimg = paste(name, ".png", sep = "")
-          png(file = file.path(outdir, nameimg), h = h*dpi, w = w*dpi)
-          makePlot(module)
-          dev.off()
-          img = aqm.hwriteImage(nameimg, id=paste("Fig", name, sep=":"))
-        },
-        stop(sprintf("Invalid value of 'imageformat': %s", imageformat))
-    ) ## switch
+                 sizes = paste(annRes$size)
+                 img = hwrite(c(aqm.hwriteImage(nameimg, width=sizes[1], height=sizes[2], id=paste("Fig", name, sep=":")),
+                   annotationTable(arrayTable, name = name)))
+               },
+               png = {
+                 nameimg = paste(name, ".png", sep = "")
+                 png(file = file.path(outdir, nameimg), h = h*dpi, w = w*dpi)
+                 makePlot(module)
+                 dev.off()
+                 img = aqm.hwriteImage(nameimg, id=paste("Fig", name, sep=":"))
+               },
+               stop(sprintf("Invalid value of 'imageformat': %s", imageformat))
+               ) ## switch
 
-    ## Also make a PDF file
-    namepdf = paste(name, ".pdf", sep = "")
-    pdf(file = file.path(outdir, namepdf), h = h, w = w)
-    makePlot(module)
-    dev.off()
-    link = list(namepdf, NA)
-
-    hwrite(img, p)
+        ## Also make a PDF file
+        namepdf = paste(name, ".pdf", sep = "")
+        pdf(file = file.path(outdir, namepdf), h = h, w = w)
+        makePlot(module)
+        dev.off()
+        
+        hwrite(img, p)
+      } else {
+        namepdf = NA
+      }
+    
     hwrite("<br>", p)
     hwrite( paste(hwrite(paste("Figure ", integerIndex, ": ", module@title,". ", sep=""), style="font-weight:bold;font-size:larger"),
-                  hwrite("(PDF file)", link = namepdf)),
+                  if(!is.na(namepdf)) hwrite("(PDF file)", link = namepdf) ),
             style = "text-align:center", p)
     hwrite("<br><br>", p)
 
@@ -245,7 +250,7 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
   outliers = matrix(NA, nrow = nrow(arrayTable), ncol = length(wh),
     dimnames = list(NULL, sprintf("C%d", seq(along=wh))))
   outlierExplanations = sprintf("C%d: outlier detection by %s", seq(along=wh), sapply(modules, slot, "title")[wh])
-  outlierExplanations = paste("The columns named <i>C1</i>, <i>C2</i>, ... indicate the calls from the different outlier detection methods:<ol>", paste(sprintf("<LI>%s</LI>", outlierExplanations), collapse=""), "</ol>", sep="")
+  outlierExplanations = paste("The columns named C1, C2, ... indicate the calls from the different outlier detection methods:<ol>", paste(sprintf("<LI>%s</LI>", outlierExplanations), collapse=""), "</ol>", sep="")
 
   for(j in seq(along = wh))
     {

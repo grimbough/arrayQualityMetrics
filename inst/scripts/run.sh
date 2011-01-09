@@ -7,5 +7,8 @@ TEMP=$HOME/tmp
 
 svn export --force $SVNSRC/arrayQualityMetrics $TEMP/arrayQualityMetrics
 R CMD INSTALL $TEMP/arrayQualityMetrics
-echo "Stangle('$TEMP/arrayQualityMetrics/inst/doc/arrayQualityMetrics.Rnw'); source('arrayQualityMetrics.R')" | R --no-save
+echo "Stangle('$TEMP/arrayQualityMetrics/inst/doc/arrayQualityMetrics.Rnw')" | R --no-save
+echo "R"
+echo "source('arrayQualityMetrics.R')"
+
 

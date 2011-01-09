@@ -46,7 +46,6 @@ arrayQualityMetrics = function(
   m$density   = aqm.density(x)
   m$pca       = aqm.pca    (x)
   m$heatmap   = aqm.heatmap(x)
-  m$maplot    = aqm.maplot (x)
   m$meansd    = aqm.meansd (x)
   m$probesmap = aqm.probesmap(x)
 
@@ -62,22 +61,10 @@ arrayQualityMetrics = function(
     m$pmmm = aqm.pmmm(expressionset)
   }
   
-  ##---------Spatial intensity distributions------
-  if (spatial) {
-    hasxy = all(c("X", "Y") %in% rownames(featureData(expressionset)@varMetadata)) 
-    if( inherits(expressionset, 'BeadLevelList') ||
-        inherits(expressionset, 'AffyBatch') ||
-        hasxy ) {
-      
-      m$spatial = aqm.spatial(expressionset = expressionset, dataprep = x, scale = "Rank")
-    
-      if((inherits(expressionset, 'NChannelSet') &&
-        all(c("Gb"," Rb") %in% colnames(dims(expressionset)))) ||
-         inherits(expressionset,'BeadLevelList')) {
-        m$spatialbg =  aqm.spatialbg(expressionset = expressionset, dataprep = x, scale = "Rank")
-      }
-    }
-  }
+  ##---------MA plots and spatial intensity distributions------
+  m$maplot = aqm.maplot (x)
+  if (spatial) 
+    m = append(m, aqm.spatial(x))
   
   aqm.writereport(modules = m, arrayTable = x$pData, reporttitle = reporttitle, outdir = outdir)
 }

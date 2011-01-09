@@ -5,6 +5,7 @@
 \alias{aqm.heatmap}
 \alias{aqm.pca}
 \alias{aqm.maplot}
+\alias{aqm.spatial}
 \alias{aqm.meansd}
 \alias{aqm.probesmap}
 \alias{aqm.qcstats}
@@ -32,6 +33,7 @@ aqm.density(x)
 aqm.heatmap(x)
 aqm.pca(x)
 aqm.maplot(x, subsample=1000, Dthresh=0.15)
+aqm.spatial(x, scale="rank", channels = c("M", "R", "G"))
 aqm.meansd(x)
 aqm.probesmap(x)
 
@@ -53,8 +55,15 @@ aqm.nuse(x, affyproc)
   some arrays), but on a randomly subset whose size is indicated by this
   number.}
   \item{Dthresh}{In \code{maplot}, the arrays with a Hoeffing D
-  statistic larger than this value are called \emph{outliers}. See also \code{\link[Hmisc:hoeffd]{hoeffd}}.}
-}
+  statistic larger than this value are called \emph{outliers}. See also
+  \code{\link[Hmisc:hoeffd]{hoeffd}}.}
+  \item{scale, channels}{In \code{aqm.spatial}, \code{scale} determines the choice of the false colour scale in the
+  spatial plots. If the value is \code{"rank"}, then the colour is proportional to the
+  ranks of the values; if it is \code{"direct"}, then it is proportional
+  to the values themselves. \code{channels} determines for which elements of
+  \code{x} spatial plots are made.}
+ }
+
 
 \value{
 An object of class \code{aqmReportModule}. The object contains the code

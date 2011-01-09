@@ -96,9 +96,3 @@ setClass("aqmReportModule",
   }
 )
 
-
-##
-## This is used by method definitions for 'prepdata' and 'spatial':
-##
-
-setClassUnion("oneColourArray", c("ExpressionSet", "AffyBatch"))
