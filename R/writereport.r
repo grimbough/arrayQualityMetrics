@@ -64,35 +64,36 @@ makeTitle = function(reporttitle, outdir, params)
 ## Create a new section
 ##---------------------------------------------------------
 makeSection = function(p, sectionNumber, module)
-  {
-    hwrite("<hr>", p)
-    sec = paste("<a name= 'S", sectionNumber,"'>Section ", sectionNumber, ": ", module@section,"</a>", sep = "")
-    hwrite(sec, p, heading=2)
-  }
+{
+  hwrite("<hr>", p)
+  sec = paste("<a name= 'S", sectionNumber,"'>Section ", sectionNumber, ": ",
+    module@section,"</a>", sep = "")
+  hwrite(sec, p, heading=2)
+}
 
 ##---------------------------------------------------------
 ## Create the index
 ##---------------------------------------------------------
 makeIndex = function(p, modules)
 {
-  s = 1
-  hwrite("Index", p, heading=2, style='font-family:helvetica,arial,sans-serif')
+  currentSectionNumber = 1
+  currentSectionName   = "Something else"
 
   hwrite("<UL>", p)
-  lasttype = "FAKE"
   for(i in seq_len(length(modules)))
     {
-      if(modules[[i]]@section != lasttype)
+      if(modules[[i]]@section != currentSectionName)
         {
-          if(s != 1) ## end the previous section
+          if(currentSectionNumber != 1) ## end the previous section
             hwrite("</UL>", p)
 
-          hwrite(paste("<br><li class='tocsection'>Section ", s,": ", modules[[i]]@section, "</li><UL>",sep=""), p,
-                 link = paste("#S",s,sep=""))
-          s = s+1
+          hwrite(paste("<br><li class='tocsection'>Section ", currentSectionNumber,": ",
+                       modules[[i]]@section, "</li><UL>", sep=""), p,
+                 link = paste("#S", currentSectionNumber, sep=""))
+          currentSectionNumber = currentSectionNumber+1
         }
       hwrite(paste("<li class='tocmodule'>", modules[[i]]@title, "</li>", sep=""), p)
-      lasttype = modules[[i]]@section
+      currentSectionName = modules[[i]]@section
     }
   hwrite("</UL></UL>", p)
 }
@@ -290,19 +291,19 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
   reportTable(p = p, arrayTable = arrayTable,
               tableLegend = outlierExplanations)
   
-  lasttype = "Something Else"
+  currentSectionName = "Something Else"
   sec = 1
   
   for(i in seq(along = modules))
     {
-      if(modules[[i]]@section != lasttype)
+      if(modules[[i]]@section != currentSectionName)
         {
           makeSection(p = p, sectionNumber = sec, module = modules[[i]])
           sec = sec+1
         }
       reportModule(p = p, module = modules[[i]], integerIndex = i,
                    name = names(modules)[i], arrayTable = arrayTable, outdir=outdir)
-      lasttype = modules[[i]]@section
+      currentSectionName = modules[[i]]@section
     }
   
   makeEnding(p)

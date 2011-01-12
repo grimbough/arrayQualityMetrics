@@ -67,9 +67,6 @@ aqm.heatmap = function(x)
   shape = list("h" = 6 + x$numArrays * 0.1, 
                "w" = 5 + x$numArrays * 0.1)
   
-  ##-- no svg annotation: is not especially helpful, and does not scale well for large arrays
-  ##  "svg" = list(annotation=annotation, getfun = function(doc) heatmapRectangles(doc, n=numArrays)))
-
   new("aqmReportModule",
       "plot"     = hfig,
       "section"  = section,
@@ -78,30 +75,5 @@ aqm.heatmap = function(x)
       "shape"    = shape)
 }
 
-## Find the numArrays x numArrays rectangles of the heatmap
-##   (there is some subtlety since there are also other rectangles in the plot, from the
-##    colour key, the sidebar, the legend; we avoid these by selecting 'getPlotRegionNodes')
-
-heatmapRectangles = function(doc, n) {
-  
-  prn = SVGAnnotation::getPlotRegionNodes(doc)[[1]]
-
-  ## Do some testing: are these really the n*n rectangles of the heatmap?
-  ## see the man page of getBoundingBox in the SVGAnnotate package
-  bb = XML::xmlSApply(prn, function(x) SVGAnnotation::getBoundingBox(x))
-  
-  good = ((is.matrix(bb) && (nrow(bb)==4) && (ncol(bb)==n^2) && all(colnames(bb)=="path")))
-  if(good){
-    ## rearrange bounding coordinates for easier comparison
-    dx = array(t(bb), dim=c(n, n, 4))
-    for(i in 1:2) good = good && all(diff(t(dx[,,i]))==0)
-    for(i in 3:4) good = good && all(diff(  dx[,,i] )==0)
-  }
-  if(!good)
-    stop("Error in identifying the heatmap elements in the SVG document while trying to add interactive annotation.")
-
-  ## Now we are happy and can move on.
-  return(XML::xmlChildren(prn))
-}
 
 
