@@ -11,12 +11,10 @@ prepdata = function(expressionset, intgroup, do.logtransform, usesvg)
   x = platformspecific(expressionset, do.logtransform)  # see below
 
   x = append(x, list(
-    outM            = as.dist(dist2(x$M)),
     numArrays       = ncol(x$M),
     intgroup        = intgroup,
     do.logtransform = do.logtransform,
-    usesvg          = usesvg,
-    expressionset   = expressionset))
+    usesvg          = usesvg))
   
   return(x)
 }

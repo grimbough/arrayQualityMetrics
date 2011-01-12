@@ -1,6 +1,6 @@
 Package: arrayQualityMetrics
 Title: Quality metrics on microarray data sets
-Version: 3.3.33
+Version: 3.3.34
 Author: Audrey Kauffmann, Wolfgang Huber
 Maintainer: Audrey Kauffmann <kauffmann@bergonie.org>
 Depends: 
@@ -17,5 +17,5 @@ License: LGPL (>= 2)
 biocViews: Microarray, QualityControl, OneChannel, TwoChannel, ReportWriting
 Collate: classes.R affyspecific.r annotateSvgMatplot.R arrayQualityMetrics.r
   boxplot.r density.r heatmap.r hwritesvg.R makeColours.R maplot.r meansd.r
-  pca.r prepdata.r probesmap.r spatial.r writereport.r XYfromGAL.r
+  outlier.R pca.r prepdata.r probesmap.r spatial.r writereport.r XYfromGAL.r
 

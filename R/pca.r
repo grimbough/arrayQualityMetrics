@@ -11,7 +11,7 @@ aqm.pca = function(x) {
   pcafig = xyplot(PC2 ~ PC1 , data=as.data.frame(pca$x), pch=19, cex=1, col=cl$arrayColours,
     main = if(!is.null(cl$key)) draw.key(key = cl$key))
 
-  legfactortip = if(length(x$intgroup)==0) " (You can indicate such a factor by colour using the 'intgroup' argument.)" else ""
+  legfactortip = if(length(x$intgroup)==0) " (you can indicate such a factor by colour using the 'intgroup' argument)" else ""
 
   legend = sprintf("The figure <!-- FIG --> shows a scatterplot of the arrays along the first two principal components. You can use this plot to explore if the arrays cluster, and whether this is according to an intended experimental factor%s, or according to unintended causes such as &quot;batch effects&quot;. Move the mouse over the points to see the sample names.", legfactortip)
   

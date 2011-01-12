@@ -1,32 +1,44 @@
-\name{ksOutliers}
+\name{outliers}
+\alias{outliers}
 \alias{ksOutliers}
 
-\title{Function for outlier determing potential outliers}
+\title{Functions for determining outliers}
 
 \description{
-  \code{ksOutliers} determines potential outlier arrays based on
-  the value of the \code{\link[stats:ks.test]{ks.test}} test statistic between each
-  array and the pooled distribution of all arrays.
+  \code{outliers} uses a criterion similar to that used in
+  \code{\link[grDevices:boxplot.stats]{grDevices:boxplot.stats}} to
+  detect outliers in a set of real numbers. The main difference is that
+  in  \code{outliers}, only the outliers to the right
+  (i.e. extraordinarily large values) are detected.
+  \code{ksOutliers}: see Details.
+ }
+
+\usage{
+outliers = function (x, coef = 1.5) 
+ksOutliers(exprs, subsamp = 300)
 }
 
-\usage{ksOutliers(x, subsamp = 300, theta = 2)}
-
 \arguments{
-  \item{x}{A matrix whose columns correspond to arrays, rows the array features.}
+  \item{x}{A vector of real numbers.}
+  \item{coef}{A number is called an outlier if it is larger than the
+    upper hinge plus \code{coef} times the interquartile range.
+    Upper hinge and interquartile range are computed by
+    \code{\link[stats:fivenum]{fivenum}}.
+  }
+  \item{exprs}{A matrix whose columns correspond to arrays, rows to the array features.}
   \item{subsamp}{If \code{x} has more than \code{subsamp} rows, use only
     a random subsample of size \code{subsamp} for calling \code{\link[stats:ks.test]{ks.test}}.}
-  \item{theta}{An array is called an outlier if its
-  \code{\link{ks.test}} test statistic is more than \code{theta}
-  standard deviations larger than the test statistics.}
  }
 
 \value{An integer vector of indices (see \code{\link[base:which]{which}}).}
 
 \details{
-The function is very simple, have a look at its code.
+ \code{ksOutliers} determines outlier arrays based on
+  the value of the \code{\link[stats:ks.test]{ks.test}} test statistic between each
+  arrays distribution of intensities and the pooled distribution of
+ intensities from all arrays.
 }
 
 \author{Wolfgang Huber <whuber@embl.de> }
 
-\seealso{\code{\link[stats:ks.test]{ks.test}}.}
 

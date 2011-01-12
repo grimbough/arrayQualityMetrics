@@ -13,11 +13,7 @@ aqm.spatial = function(x, scale="rank", channels = c("M", "R", "G"))
     {
       lapply(channels, spatialplot, x=x, scale=scale)
     } else {
-      list(new("aqmReportModule",
-          plot = NULL,
-          section = "Individual array quality",
-          title = paste("Spatial intensity distribution", if(length(channels)>1) "s" else "", sep=""),
-          legend = "Spatial distributions could not be plotted. Please provide columns <tt>sx</tt> and <tt>sy</tt> with the features' spatial coordinates in the <tt>featureData</tt> slot of the data object."))
+      NULL
     }
 }
 

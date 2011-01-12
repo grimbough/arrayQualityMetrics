@@ -42,10 +42,12 @@ arrayQualityMetrics = function(
   x = prepdata(expressionset, intgroup=intgroup, do.logtransform=do.logtransform, usesvg=usesvg) 
   
   ##---------Generic modules------
+  m$heatmap   = aqm.heatmap(x)
+  m$pca       = aqm.pca    (x)
+
   m$boxplot   = aqm.boxplot(x)
   m$density   = aqm.density(x)
-  m$pca       = aqm.pca    (x)
-  m$heatmap   = aqm.heatmap(x)
+  
   m$meansd    = aqm.meansd (x)
   m$probesmap = aqm.probesmap(x)
 

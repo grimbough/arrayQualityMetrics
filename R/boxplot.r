@@ -1,21 +1,3 @@
-##---------------------------------------------------------------
-## Simple distribution-based outlier detection using KS-statistic
-##  (not: the p-value)
-##---------------------------------------------------------------
-ksOutliers = function(x, subsamp = 300, theta = 2)
-{
-  if (nrow(x)>subsamp)
-    x = x[sample(nrow(x), subsamp), ]
-
-  fx = ecdf(as.vector(x))
-  
-  s = suppressWarnings(apply(x, 2, function(v)
-    ks.test(v, y = fx, alternative="two.sided")$statistic))
-
-  list(statistic = s,
-       outliers = which( (s-mean(s)) / sd(s) > theta ))
-}
-
 
 ##----------------------------------------
 ## aqm.boxplot
@@ -42,12 +24,12 @@ aqm.boxplot = function(x, subsample = 10000) {
                    labels = c("a. Red Channel", "b. Green Channel", "c. Log2(Ratio)"))
     formula = sample_id ~ values | panels
     lay = c(3,1)
-    legspe = "Three panels are shown: left, red channel; middle, green channel; right, log<sub>2</sub>(ratio). Outlier detection  was performed on the distribution of log<sub>2</sub>(ratio). "
+    legPanels = "Three panels are shown: left, red channel; middle, green channel; right, log<sub>2</sub>(ratio). Outlier detection  was performed on the distribution of log<sub>2</sub>(ratio). "
    } else {
     values  = as.numeric(x$M[ss, ])
     formula = sample_id ~ values
     lay = c(1,1)
-    legspe = ""
+    legPanels = ""
   }
   xAsterisk = quantile(x$M[ss,], probs=0.01, na.rm=TRUE)
   
@@ -77,8 +59,15 @@ aqm.boxplot = function(x, subsample = 10000) {
   shape = list("h" = 2.5 + x$numArrays * 0.1 +  1/x$numArrays, 
                "w" = 3+3*lay[1])
   
-  legend = sprintf("The figure <!-- FIG --> presents boxplots representing summaries of the signal intensity distributions of the arrays. %sEach box corresponds to one array. Typically, one expects the boxes to have similar positions and widths. If the distribution of an array is very different from the others, this may indicate an experimental problem.<br>Outlier detection has been performed by computing the Kolmogorov-Smirnov statistic between each array's distribution and the distribution of the pooled data. For %d arrays, this value was larger than the mean plus %g times the standard deviation across the values of all arrays, and they were marked as outliers.", legspe, length(ks$outliers), as.list(ksOutliers)$theta)
+  legend = paste("The figure <!-- FIG --> presents boxplots representing summaries of the signal intensity distributions of the arrays. ", legPanels, "Each box corresponds to one array. Typically, one expects the boxes to have similar positions and widths. If the distribution of an array is very different from the others, this may indicate an experimental problem.<br>Outlier detection has been performed by computing the Kolmogorov-Smirnov statistic between each array's distribution and the distribution of the pooled data.", sep="")
 
+  o = (length(ks$outliers)>0)
+  legend = paste(legend, 
+    sprintf("For %s arrays, this value was larger than the mean plus %g times the standard deviation across the values of all arrays%s.",
+            if(o) paste(length(ks$outliers)) else "none of the",
+            as.list(ksOutliers)$theta,
+            if(o) ", and they were marked as outliers" else ""))
+    
   title = "Boxplots"
   section = "Array intensity distributions"
 

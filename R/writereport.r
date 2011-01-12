@@ -251,7 +251,7 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
   outliers = matrix(NA, nrow = nrow(arrayTable), ncol = length(wh),
     dimnames = list(NULL, sprintf("C%d", seq(along=wh))))
   outlierExplanations = sprintf("C%d: outlier detection by %s", seq(along=wh), sapply(modules, slot, "title")[wh])
-  outlierExplanations = paste("The columns named C1, C2, ... indicate the calls from the different outlier detection methods:<ol>", paste(sprintf("<LI>%s</LI>", outlierExplanations), collapse=""), "</ol>", sep="")
+  outlierExplanations = paste("The columns named C1, C2, ... indicate the calls from the different outlier detection methods:<ol>", paste(sprintf("<LI>%s</LI>", outlierExplanations), collapse=""), "</ol>The outlier detection criteria are explained below in the respective sections. Arrays that were called outliers by at least one criterion are selected in this table and indicated by highlighted lines or points in some of the plots below. By clicking the checkboxes in the table, or on the corresponds points/lines in the plots, you can modify the selection. To reset the selection, reload the HTML page in your browser.", sep="")
 
   for(j in seq(along = wh))
     {

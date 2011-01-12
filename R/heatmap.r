@@ -4,16 +4,14 @@ aqm.heatmap = function(x)
   colourRange = rgb(seq(0, 1, l=256),
                     seq(0, 1, l=256),
                     seq(1, 0, l=256))
+
+  m = dist2(x$M)
+  out = outliers(rowSums(m, na.rm=TRUE))
   
-  m = as.matrix(x$outM)
-  madsum  = rowSums(m, na.rm=TRUE)
-  madstat = boxplot.stats(madsum)
-  outliers =  which(madsum %in% madstat$out)
-  
-  dend = as.dendrogram(hclust(x$outM, method = "single"))
+  dend = as.dendrogram(hclust(as.dist(m), method = "single"))
   ord = order.dendrogram(dend)
 
-  colnames(m) = rownames(m) = paste(ifelse(seq_len(x$numArrays) %in% outliers, "* ", ""),
+  colnames(m) = rownames(m) = paste(ifelse(seq_len(x$numArrays) %in% out, "* ", ""),
                                     seq_len(x$numArrays), sep="")
 
   if(length(x$intgroup)>0) {
@@ -59,7 +57,7 @@ aqm.heatmap = function(x)
     xlab="", ylab="",
     col.regions=colourRange, main = foo)
         
-  legend = "The figure <!-- FIG --> shows a false colour heatmap of between array distances. The colour scale is chosen to cover the range of distances encountered in the dataset. Arrays for which the sum of the distances to the others is much different from the others are detected as outlier arrays (marked by &quot;*&quot;). The dendrogram on this plot can help to find batch effects, as well as reveal clustering of the arrays according to biological effects.<br>The distance <i>d<sub>xy</sub></i> between arrays <i>x</i> and <i>y</i> is the mean absolute difference (L<sub>1</sub>-distance) between the vectors of M-values of the arrays (computed on the data from all probes without filtering). In formula, <i>d<sub>xy</sub> =  mean|M<sub>xi</sub>-M<sub>yi</sub>|</i>. Here, <i>M<sub>xi</sub></i> is the M-value of the <i>i</i>-th probe on the <i>x</i>-th array."
+  legend = paste("The figure <!-- FIG --> shows a false colour heatmap of between array distances. The colour scale is chosen to cover the range of distances encountered in the dataset. The dendrogram on this plot can help to find batch effects, as well as reveal clustering of the arrays according to biological effects. The distance <i>d<sub>xy</sub></i> between two arrays <i>x</i> and <i>y</i> is computed as the mean absolute difference (L<sub>1</sub>-distance) between the vectors of M-values of the arrays (using the data from all probes without filtering). In formula, <i>d<sub>xy</sub> =  mean|M<sub>xi</sub>-M<sub>yi</sub>|</i>. Here, <i>M<sub>xi</sub></i> is the M-value of the <i>i</i>-th probe on the <i>x</i>-th array. Outlier detection was performed by looking for arrays for which the sum of the distances to all other arrays was exceptionally large.", if(length(out)>0) paste(if(length(out)>1) paste(length(out), "such arrays were detected, and they are") else "One such array was detected, and it is", "marked by &quot;*&quot;.") else "No such arrays were detected.") 
     
   title = "Heatmap representation of the distances between arrays"
   section = "Between array comparison"
@@ -72,7 +70,8 @@ aqm.heatmap = function(x)
       "section"  = section,
       "title"    = title,
       "legend"   = legend,
-      "shape"    = shape)
+      "shape"    = shape,
+      "outliers" = out)
 }
 
 
