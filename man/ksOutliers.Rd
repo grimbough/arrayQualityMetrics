@@ -6,7 +6,7 @@
 
 \description{
   \code{outliers} uses a criterion similar to that used in
-  \code{\link[grDevices:boxplot.stats]{grDevices:boxplot.stats}} to
+  \code{\link[grDevices:boxplot.stats]{boxplot.stats}} to
   detect outliers in a set of real numbers. The main difference is that
   in  \code{outliers}, only the outliers to the right
   (i.e. extraordinarily large values) are detected.
@@ -26,11 +26,14 @@ ksOutliers(exprs, subsamp = 300)
     \code{\link[stats:fivenum]{fivenum}}.
   }
   \item{exprs}{A matrix whose columns correspond to arrays, rows to the array features.}
-  \item{subsamp}{If \code{x} has more than \code{subsamp} rows, use only
+  \item{subsamp}{If \code{exprs} has more than \code{subsamp} rows, use only
     a random subsample of size \code{subsamp} for calling \code{\link[stats:ks.test]{ks.test}}.}
  }
 
-\value{An integer vector of indices (see \code{\link[base:which]{which}}).}
+\value{For \code{outliers}, an integer vector of indices
+  (see \code{\link[base:which]{which}}).
+For \code{ksOutliers}, a list with two elements: the KS test statistics
+\code{s} and the value of \code{outliers(s)}.}
 
 \details{
  \code{ksOutliers} determines outlier arrays based on

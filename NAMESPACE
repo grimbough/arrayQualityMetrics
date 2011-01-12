@@ -38,6 +38,8 @@ importFrom(affy, AffyRNAdeg, plotAffyRNAdeg)
 
 importFrom(affyPLM, preprocess, fitPLM)
 
+importFrom(Biobase, copySubstitute)
+
 importFrom(beadarray, createBeadSummaryData)
 
 importFrom(genefilter, dist2)

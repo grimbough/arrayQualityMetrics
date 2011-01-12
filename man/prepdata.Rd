@@ -19,7 +19,7 @@ prepaffy(expressionset, x)
   bead arrays.}
   \item{intgroup, do.logtransform, usesvg}{as in
     \code{\link{arrayQualityMetrics}}.}
-  \item{x}{A List, typically the result from a prior call to \code{prepdata}.}
+  \item{x}{A list, typically the result from a prior call to \code{prepdata}.}
 }
 
 \description{\code{prepdata} computes summary statistics that are useful
