@@ -1,9 +1,13 @@
 ## Methods to prepare the data
-prepaffy = function(expressionset)
+prepaffy = function(expressionset, x)
 {
-  pp1 = preprocess(expressionset)
-  dataPLM = fitPLM(pp1, background = FALSE, normalize = FALSE)
-  list("dataPLM" = dataPLM)
+  pp = preprocess(expressionset)
+
+  x$pm = pm(expressionset)
+  x$mm = mm(expressionset)
+  x$mmOK = (identical(dim(x$pm), dim(x$mm)) && !any(is.na(x$mm)))
+  x$dataPLM = fitPLM(pp, background = FALSE, normalize = FALSE)
+  return(x)
 }
 
 ## phrase book
@@ -44,11 +48,11 @@ aqm.rnadeg = function(expressionset, x)
 
 
 ## RLE
-aqm.rle = function(x, affyproc)
+aqm.rle = function(x)
   {   
-    if (affyproc$dataPLM@model.description$R.model$which.parameter.types[3] == 1){
-      medianchip = apply(affyPLM::coefs(affyproc$dataPLM), 1, median)
-      M = sweep(affyPLM::coefs(affyproc$dataPLM), 1, medianchip, FUN='-')
+    if (x$dataPLM@model.description$R.model$which.parameter.types[3] == 1){
+      medianchip = apply(affyPLM::coefs(x$dataPLM), 1, median)
+      M = sweep(affyPLM::coefs(x$dataPLM), 1, medianchip, FUN='-')
     } else {
       stop("It doesn't appear that a model with sample effects was used.")
     }
@@ -65,7 +69,7 @@ aqm.rle = function(x, affyproc)
     rle@outliers = NA_integer_
 
     ## TODO: Fix the outlier computation
-    ## rle2 = try(Mbox(affyproc$dataPLM, plot = FALSE))
+    ## rle2 = try(Mbox(x$dataPLM, plot = FALSE))
     ## rlemed = rle2$stats[3,]
     ## rleout = which(abs(rlemed) > 0.1)
 
@@ -73,23 +77,23 @@ aqm.rle = function(x, affyproc)
   }
 
 ## NUSE
-aqm.nuse = function(x, affyproc)
+aqm.nuse = function(x)
 { 
   ## bwplot for PLMset
   ## TODO: Use 'colSums' - it's faster
   compute.nuse <- function(which){
-    1/sqrt(apply(affyproc$dataPLM@weights[[1]][which,,drop=FALSE], 2, sum))
+    1/sqrt(apply(x$dataPLM@weights[[1]][which,,drop=FALSE], 2, sum))
   }
   
-  model <- affyproc$dataPLM@model.description$modelsettings$model
-  if ((affyproc$dataPLM@model.description$R.model$which.parameter.types[3] == 1) &&
-      (affyproc$dataPLM@model.description$R.model$which.parameter.types[1] == 0) ){
-    grp.rma.se1.median  = apply(se(affyproc$dataPLM), 1,median,na.rm=TRUE)
-    grp.rma.rel.se1.mtx = sweep(se(affyproc$dataPLM),1,grp.rma.se1.median,FUN='/')
+  model <- x$dataPLM@model.description$modelsettings$model
+  if ((x$dataPLM@model.description$R.model$which.parameter.types[3] == 1) &&
+      (x$dataPLM@model.description$R.model$which.parameter.types[1] == 0) ){
+    grp.rma.se1.median  = apply(se(x$dataPLM), 1,median,na.rm=TRUE)
+    grp.rma.rel.se1.mtx = sweep(se(x$dataPLM),1,grp.rma.se1.median,FUN='/')
   } else {
-    which <- indexProbesProcessed(affyproc$dataPLM)
+    which <- indexProbesProcessed(x$dataPLM)
     ses   <- matrix(0, length(which), 4)
-    if (affyproc$dataPLM@model.description$R.model$response.variable == 1){
+    if (x$dataPLM@model.description$R.model$response.variable == 1){
       for (i in seq(along=which))
         ses[i,] <- compute.nuse(which[[i]])
     } else {
@@ -135,25 +139,31 @@ aqm.qcstats = function(expressionset) {
 }
 
 ## PM / MM
-aqm.pmmm = function(expressionset)
-{  
-  PM = density(as.matrix(log2(pm(expressionset))))
-  MM = density(as.matrix(log2(mm(expressionset))))
+aqm.pmmm = function(x)
+{
+  if(x$mmOK)
+    {
+      PM = density(as.matrix(log2(x$pm)))
+      MM = density(as.matrix(log2(x$mm)))
 
-  PMMM = function(){
-    plot(MM, col = "grey", xlab = "log(Intensity)", main="")
-    lines(PM, col = "blue")
-    legend("topright", c("PM","MM"), lty=1, lwd=2, col= c("blue","grey"), bty = "n")
-  }
+      PMMM = function(){
+        plot(MM, col = "grey", xlab = "log(Intensity)", main="")
+        lines(PM, col = "blue")
+        legend("topright", c("PM", "MM"), lty=1, lwd=2, col=c("blue","grey"), bty="n")
+      }
   
-  legend = "Figure <!-- FIG --> shows the density distributions of the log<sub>2</sub> intensities grouped by the matching type of the probes. The blue line shows a density estimate (smoothed histogram) from intensities of perfect match probes (PM), the grey line, one from the mismatch probes (MM). We expect that MM probes have poorer hybridization than PM probes, and thus that the PM curve be to the right of the MM curve."
+      legend = "Figure <!-- FIG --> shows the density distributions of the log<sub>2</sub> intensities grouped by the matching type of the probes. The blue line shows a density estimate (smoothed histogram) from intensities of perfect match probes (PM), the grey line, one from the mismatch probes (MM). We expect that MM probes have poorer hybridization than PM probes, and thus that the PM curve be to the right of the MM curve."
 
-  new("aqmReportModule",
-      plot = PMMM,
-      section = "Affymetrix specific plots",
-      title = "Perfect matches and mismatches",
-      legend = legend,
-      shape = list("h" = 6, "w" = 6))
+      new("aqmReportModule",
+          plot = PMMM,
+          section = "Affymetrix specific plots",
+          title = "Perfect matches and mismatches",
+          legend = legend,
+          shape = list("h" = 6, "w" = 6))
+      
+    } else {
+      NULL
+    }
 }
 
 

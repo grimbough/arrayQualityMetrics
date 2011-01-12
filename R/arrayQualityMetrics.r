@@ -53,14 +53,12 @@ arrayQualityMetrics = function(
 
   ##--------Affymetrix specific modules------------
   if(inherits(expressionset, "AffyBatch")) {
+    x         = prepaffy(expressionset, x)
+    m$rle     = aqm.rle(x)
+    m$nuse    = aqm.nuse(x)
     m$rnadeg  = aqm.rnadeg(expressionset, x)
-    affyproc  = prepaffy(expressionset)
-    m$rle     = aqm.rle(x,  affyproc = affyproc)
-    m$nuse    = aqm.nuse(x, affyproc = affyproc)
-    if(length(grep("exon", cdfName(expressionset), ignore.case=TRUE)) == 0)
-      m$qcstats =  aqm.qcstats(expressionset)
-    
-    m$pmmm = aqm.pmmm(expressionset)
+    m$qcstats = aqm.qcstats(expressionset)
+    m$pmmm    = aqm.pmmm(x)
   }
   
   ##---------MA plots and spatial intensity distributions------

@@ -6,7 +6,7 @@
 
 \usage{
 prepdata(expressionset, intgroup, do.logtransform, usesvg)
-prepaffy(expressionset)
+prepaffy(expressionset, x)
 }
 
 \arguments{
@@ -17,14 +17,19 @@ prepaffy(expressionset)
   \code{\link[Biobase:class.NChannelSet]{NChannelSet}} for two colour arrays, or
   \code{\link[beadarray:class-BeadLevelList]{BeadLevelList}} for Illumina
   bead arrays.}
-  \item{intgroup, do.logtransform, usesvg}{as in \code{\link{arrayQualityMetrics}}.}
+  \item{intgroup, do.logtransform, usesvg}{as in
+    \code{\link{arrayQualityMetrics}}.}
+  \item{x}{A List, typically the result from a prior call to \code{prepdata}.}
 }
 
 \description{\code{prepdata} computes summary statistics that are useful
   for all platforms; \code{prepaffy} computes Affymetrix-specific ones. These are
   helper functions used by \code{\link{arrayQualityMetrics}}.}
 
-\value{A list with various derived values.}
+\value{A list with various derived quantities. In the case of
+  \code{prepaffy}, the returned list is \code{x} with the additional
+  elements appended.
+}
 
 \details{
 See the vignette \emph{Working with arrayQualityMetrics report sections}.

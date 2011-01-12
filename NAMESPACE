@@ -20,7 +20,7 @@ importMethodsFrom(affyPLM, se, indexProbesProcessed)
 importMethodsFrom(beadarray, arrayNames, getArrayData)
 
 importMethodsFrom(Biobase, assayData, channel, dims, exprs,
-                  featureData, pData, phenoData, rowMedians,
+                  fData, featureData, pData, phenoData, rowMedians,
                   sampleNames)
 
 importMethodsFrom(genefilter, plot)
