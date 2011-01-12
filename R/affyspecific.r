@@ -79,11 +79,10 @@ aqm.rle = function(x)
 ## NUSE
 aqm.nuse = function(x)
 { 
-  ## bwplot for PLMset
-  ## TODO: Use 'colSums' - it's faster
-  compute.nuse <- function(which){
-    1/sqrt(apply(x$dataPLM@weights[[1]][which,,drop=FALSE], 2, sum))
-  }
+  compute.nuse <- function(which)
+    {
+      1/sqrt(colSums(x$dataPLM@weights[[1]][which,,drop=FALSE], na.rm=TRUE))
+    }
   
   model <- x$dataPLM@model.description$modelsettings$model
   if ((x$dataPLM@model.description$R.model$which.parameter.types[3] == 1) &&
@@ -121,21 +120,27 @@ aqm.nuse = function(x)
 ## QCStats
 aqm.qcstats = function(expressionset) {                
 
-  qcStats = function() {
-    plot.qc.stats(qc(expressionset))
-  }
+  qcObj = try(qc(expressionset))
+
+  if(!inherits(expressionset, "try-error"))
+    {
+      qcStats = function() 
+        plot.qc.stats(qcObj)
+    
+      legend =  paste(phrase$fig("the Affymetrix recommended diagnostic"),
+        "Please see the vignette of the package <i>simpleaffy</i> for a full explanation of the elements shown in this plot. Any metrics that is shown in red is outside the manufacturer's specified boundaries and suggests a potential problem; metrics shown in blue are considered acceptable.")
   
-  legend =  paste(phrase$fig("the Affymetrix recommended diagnostic"),
-    "Please see the vignette of the package <i>simpleaffy</i> for a full explanation of the elements shown in this plot. Any metrics that is shown in red is outside the manufacturer's specified boundaries and suggests a potential problem; metrics shown in blue are considered acceptable.")
+      shape = list("h" = 4 + ncol(exprs(expressionset)) * 0.1 + 1/ncol(exprs(expressionset)),  "w" = 6)
   
-  shape = list("h" = 4 + ncol(exprs(expressionset)) * 0.1 + 1/ncol(exprs(expressionset)),  "w" = 6)
-  
-  new("aqmReportModule",
-      plot = qcStats,
-      section = "Affymetrix specific plots",
-      title = "Diagnostic plot recommended by Affymetrix",
-      legend = legend,
-      shape = shape)
+      new("aqmReportModule",
+          plot = qcStats,
+          section = "Affymetrix specific plots",
+          title = "Diagnostic plot recommended by Affymetrix",
+          legend = legend,
+          shape = shape)
+    } else {
+      NULL
+    }
 }
 
 ## PM / MM

@@ -39,17 +39,15 @@ aqm.probesmap(x)
 
 # Affymetrix specific sections
 aqm.qcstats(expressionset)
-aqm.pmmm(expressionset)
+aqm.pmmm(x)
 aqm.rnadeg(expressionset, x)
-aqm.rle(x, affyproc)
-aqm.nuse(x, affyproc)
+aqm.rle(x)
+aqm.nuse(x)
 }
 
 \arguments{
-  \item{x}{The object resulting from a call to \code{\link{prepdata}(expressionset)}.}
+  \item{x}{An object resulting from a call to \code{\link{prepdata}(expressionset)}.}
   \item{expressionset}{An object of class \code{AffyBatch}.}
-   \item{affyproc}{The object resulting from a call to
-     \code{\link{prepaffy}(expressionset)}.}
   \item{subsample}{For efficiency, some computations are performed not
   on the full set of features (which can be hundreds of thousands on
   some arrays), but on a randomly subset whose size is indicated by this
@@ -73,16 +71,15 @@ the results of the outlier detection for this modules.
 The interpretation of the plot is explained in the legend.}
 
 \details{
-For a simple example of the
-\code{aqm.*} functions, have a look at the source code of the
-\code{aqm.pca} function.
-
+For a simple example of the \code{aqm.*} functions, have a look at the
+source code of the \code{aqm.pca} function.
 Some, but not all of these modules, provide outlier detection. These are:
+\code{aqm.heatmap},
+\code{aqm.boxplot},
 \code{aqm.maplot},
 \code{aqm.spatial},
-\code{aqm.boxplot} and
-\code{aqm.heatmap}.
-
+\code{aqm.rle},
+\code{aqm.nuse}.
 See also the vignette \emph{Customizing arrayQualityMetrics reports}.
 }
 
