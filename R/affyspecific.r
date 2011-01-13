@@ -116,59 +116,60 @@ aqm.nuse = function(x)
   return(nuse)
 }
 
-
-## QCStats
+##--------------------------------------------------
+## simpleaffy 
+## If fail, silently return NULL
+##--------------------------------------------------
 aqm.qcstats = function(expressionset) {                
 
   qcObj = try(qc(expressionset))
 
-  if(!inherits(expressionset, "try-error"))
-    {
-      qcStats = function() 
-        plot.qc.stats(qcObj)
+  if(inherits(qcObj, "try-error"))
+    return(NULL)
+  
+  qcStats = function() 
+    plot.qc.stats(qcObj)
     
-      legend =  paste(phrase$fig("the Affymetrix recommended diagnostic"),
-        "Please see the vignette of the package <i>simpleaffy</i> for a full explanation of the elements shown in this plot. Any metrics that is shown in red is outside the manufacturer's specified boundaries and suggests a potential problem; metrics shown in blue are considered acceptable.")
+  legend =  paste(phrase$fig("the Affymetrix recommended diagnostic"),
+    "Please see the vignette of the package <i>simpleaffy</i> for a full explanation of the elements shown in this plot. Any metrics that is shown in red is outside the manufacturer's specified boundaries and suggests a potential problem; metrics shown in blue are considered acceptable.")
   
-      shape = list("h" = 4 + ncol(exprs(expressionset)) * 0.1 + 1/ncol(exprs(expressionset)),  "w" = 6)
+  shape = list("h" = 4 + ncol(exprs(expressionset)) * 0.1 + 1/ncol(exprs(expressionset)),  "w" = 6)
   
-      new("aqmReportModule",
-          plot = qcStats,
-          section = "Affymetrix specific plots",
-          title = "Diagnostic plot recommended by Affymetrix",
-          legend = legend,
-          shape = shape)
-    } else {
-      NULL
-    }
+  new("aqmReportModule",
+      plot = qcStats,
+      section = "Affymetrix specific plots",
+      title = "Diagnostic plot recommended by Affymetrix",
+      legend = legend,
+      shape = shape)
 }
 
+##--------------------------------------------------
 ## PM / MM
+## If fail, silently return NULL
+##--------------------------------------------------
 aqm.pmmm = function(x)
 {
-  if(x$mmOK)
-    {
-      PM = density(as.matrix(log2(x$pm)))
-      MM = density(as.matrix(log2(x$mm)))
+  if(!x$mmOK)
+    return(NULL)
 
-      PMMM = function(){
-        plot(MM, col = "grey", xlab = "log(Intensity)", main="")
-        lines(PM, col = "blue")
-        legend("topright", c("PM", "MM"), lty=1, lwd=2, col=c("blue","grey"), bty="n")
-      }
+  PM = density(as.matrix(log2(x$pm)))
+  MM = density(as.matrix(log2(x$mm)))
   
-      legend = "Figure <!-- FIG --> shows the density distributions of the log<sub>2</sub> intensities grouped by the matching type of the probes. The blue line shows a density estimate (smoothed histogram) from intensities of perfect match probes (PM), the grey line, one from the mismatch probes (MM). We expect that MM probes have poorer hybridization than PM probes, and thus that the PM curve be to the right of the MM curve."
-
-      new("aqmReportModule",
-          plot = PMMM,
-          section = "Affymetrix specific plots",
-          title = "Perfect matches and mismatches",
-          legend = legend,
-          shape = list("h" = 6, "w" = 6))
-      
-    } else {
-      NULL
-    }
+  PMMM = function(){
+    plot(MM, col = "grey", xlab = "log(Intensity)", main="")
+    lines(PM, col = "blue")
+    legend("topright", c("PM", "MM"), lty=1, lwd=2, col=c("blue","grey"), bty="n")
+  }
+  
+  legend = "Figure <!-- FIG --> shows the density distributions of the log<sub>2</sub> intensities grouped by the matching type of the probes. The blue line shows a density estimate (smoothed histogram) from intensities of perfect match probes (PM), the grey line, one from the mismatch probes (MM). We expect that MM probes have poorer hybridization than PM probes, and thus that the PM curve be to the right of the MM curve."
+  
+  new("aqmReportModule",
+      plot = PMMM,
+      section = "Affymetrix specific plots",
+      title = "Perfect matches and mismatches",
+      legend = legend,
+      shape = list("h" = 6, "w" = 6))
+  
 }
 
 
