@@ -1,37 +1,35 @@
-
 ##----------------------------------------
 ## aqm.boxplot
 ##----------------------------------------
-aqm.boxplot = function(x, subsample = 10000) {
-  
-  ks = ksOutliers(x$M)
+aqm.boxplot = function(x, subsample=10000, outlierMethod = "KS") {
   
   if (nrow(x$M)>subsample) {
-    ss = sample(nrow(x$M), subsample)
-    nr = length(ss)
+    ss  = sample(nrow(x$M), subsample)
+    Mss = x$M[ss,,drop=FALSE]
   } else {
-    ss = TRUE
-    nr = nrow(x$M)
+    ss  = TRUE
+    Mss = x$M
   }
+  out = outliers(Mss, method=outlierMethod)
   
-  sample_id = rep( seq_len(x$numArrays), each = nr )
+  sample_id = rep( seq_len(x$numArrays), each = nrow(Mss) )
   
   if(x$nchannels == 2)  {
-    values    = with(x, c(R[ss,], G[ss,], M[ss,]))
+    values    = with(x, c(R[ss,], G[ss,], Mss))
     sample_id = rep(sample_id, times = 3)
-    panels    = factor(rep(1:3, each = nr * x$numArrays),
+    panels    = factor(rep(1:3, each = nrow(Mss) * x$numArrays),
                    levels = 1:3,
                    labels = c("a. Red Channel", "b. Green Channel", "c. Log2(Ratio)"))
     formula = sample_id ~ values | panels
     lay = c(3,1)
     legPanels = "Three panels are shown: left, red channel; middle, green channel; right, log<sub>2</sub>(ratio). Outlier detection  was performed on the distribution of log<sub>2</sub>(ratio). "
    } else {
-    values  = as.numeric(x$M[ss, ])
+    values  = as.numeric(Mss)
     formula = sample_id ~ values
     lay = c(1,1)
     legPanels = ""
   }
-  xAsterisk = quantile(x$M[ss,], probs=0.01, na.rm=TRUE)
+  xAsterisk = quantile(Mss, probs=0.01, na.rm=TRUE)
   
   cl = intgroupColours(x)
 
@@ -51,7 +49,7 @@ aqm.boxplot = function(x, subsample = 10000) {
           panel.bwplot(x, y, ...)
           if(lattice:::packet.number()==lay[1]) {
             whArray = list(...)$group.value
-            if (whArray %in% ks$outliers)
+            if (whArray %in% out$outliers)
               ltext(xAsterisk, whArray, "*", font=2, cex=2, adj=c(0.5, 0.75))
           }
         })
@@ -59,15 +57,8 @@ aqm.boxplot = function(x, subsample = 10000) {
   shape = list("h" = 2.5 + x$numArrays * 0.1 +  1/x$numArrays, 
                "w" = 3+3*lay[1])
   
-  legend = paste("The figure <!-- FIG --> presents boxplots representing summaries of the signal intensity distributions of the arrays. ", legPanels, "Each box corresponds to one array. Typically, one expects the boxes to have similar positions and widths. If the distribution of an array is very different from the others, this may indicate an experimental problem.<br>Outlier detection has been performed by computing the Kolmogorov-Smirnov statistic between each array's distribution and the distribution of the pooled data.", sep="")
-
-  o = (length(ks$outliers)>0)
-  legend = paste(legend, 
-    sprintf("For %s arrays, this value was larger than the mean plus %g times the standard deviation across the values of all arrays%s.",
-            if(o) paste(length(ks$outliers)) else "none of the",
-            as.list(ksOutliers)$theta,
-            if(o) ", and they were marked as outliers" else ""))
-    
+  legend = paste("The figure <!-- FIG --> shows boxplots representing summaries of the signal intensity distributions of the arrays. ", legPanels, "Each box corresponds to one array. Typically, one expects the boxes to have similar positions and widths. If the distribution of an array is very different from the others, this may indicate an experimental problem. ", outlierPhrase(outlierMethod, length(out$outliers)), sep="")
+  
   title = "Boxplots"
   section = "Array intensity distributions"
 
@@ -76,6 +67,6 @@ aqm.boxplot = function(x, subsample = 10000) {
       section = section,
       title = title,
       legend = legend,
-      outliers = ks$outliers,
+      outliers = out$outliers,
       shape = shape)
 }

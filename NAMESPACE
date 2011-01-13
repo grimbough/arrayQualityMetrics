@@ -15,7 +15,7 @@ importClassesFrom(methods, ANY, character, list, logical, matrix,
 ##--------------------------------------------------
 importMethodsFrom(affy, Mbox, mm, pm)
 
-importMethodsFrom(affyPLM, se, indexProbesProcessed)
+# importMethodsFrom(affyPLM, se, indexProbesProcessed)
 
 importMethodsFrom(beadarray, arrayNames, getArrayData)
 
@@ -36,7 +36,7 @@ importMethodsFrom(vsn, meanSdPlot)
 ##--------------------------------------------------
 importFrom(affy, AffyRNAdeg, plotAffyRNAdeg)
 
-importFrom(affyPLM, preprocess, fitPLM)
+importFrom(affyPLM, fitPLM, RLE, NUSE)
 
 importFrom(Biobase, copySubstitute)
 
@@ -94,6 +94,6 @@ export("aqm.boxplot", "aqm.maplot",  "aqm.density", "aqm.probesmap",
        "aqm.pmmm",    "aqm.spatial")
 
 export("addXYfromGAL")
-export("ksOutliers")
+export("outliers", "findOutliers")
 
 

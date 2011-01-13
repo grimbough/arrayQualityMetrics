@@ -53,19 +53,19 @@ spatialplot = function(whichChannel, x, scale)
          
   legend = sprintf("The figure <!-- FIG --> shows false colour representations of the arrays' spatial distributions of feature intensities. Normally, when the features are distributed randomly on the arrays, one expects to see a uniform distribution; sets of control features with particularly high or low intensities may stand out. The colour scale is proportional to %sthe probe intensities, and it is shown in the panel on the right.", switch(scale, rank = "the ranks of ", direct = ""))
 
-  if(scale=="rank") legend = paste(legend, "Note that the rank scale has the potential to amplify patterns that are small in amplitude but systematic within an array. It is possible to switch off the rank scaling by modifying the argument 'scale' in the call of the 'aqm.spatial' function.") 
+  if(scale=="rank") legend = paste(legend, "Note that the rank scale has the potential to amplify patterns that are small in amplitude but systematic within an array. It is possible to switch off the rank scaling by modifying the argument <tt>scale</tt> in the call of the <tt>aqm.spatial</tt> function.") 
   
   ## Outlier detection
-  loc = scoresspat(x, whichChannel)
-  locstat = boxplot.stats(loc)
-  locout  = which(loc %in% locstat$out)
+  #loc = scoresspat(x, whichChannel)
+  #locstat = boxplot.stats(loc)
+  #locout  = which(loc %in% locstat$out)
   
   new("aqmReportModule",
       plot = spat,
       section = "Individual array quality",
       title = paste("Spatial distribution of", whichChannel),
       legend = legend,
-      outliers = locout,
+      # outliers = locout
       shape = list("h"=6,"w"=6))
 }
 

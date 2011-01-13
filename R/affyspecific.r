@@ -1,21 +1,24 @@
-## Methods to prepare the data
+##--------------------------------------------------
+## Phrases
+##--------------------------------------------------
+figurePhrase = function(x)
+  sprintf("The figure <!-- FIG --> shows the <i>%s</i> plot.", x)
+
+##--------------------------------------------------
+## Prepare the data
+##--------------------------------------------------
 prepaffy = function(expressionset, x)
 {
-  pp = preprocess(expressionset)
+  ## pp = preprocess(expressionset)
+  ## x$dataPLM = fitPLM(pp, background = FALSE, normalize = FALSE)
+
+  x$dataPLM = fitPLM(expressionset)
 
   x$pm = pm(expressionset)
   x$mm = mm(expressionset)
-  x$mmOK = (identical(dim(x$pm), dim(x$mm)) && !any(is.na(x$mm)))
-  x$dataPLM = fitPLM(pp, background = FALSE, normalize = FALSE)
+  x$mmOK = !any(is.na(x$mm))
   return(x)
 }
-
-## phrase book
-phrase = list(
-  fig = function(x) sprintf("The figure <!-- FIG --> shows the <i>%s</i> plot.", x),
-  preproc = function(x) sprintf("%s values are computed from the preprocessed data (after background correction and quantile normalisation).", x),
-  affyPLM = "This diagnostic plot is based on tools provided in the <i>affyPLM</i> package."
-  )
 
 ## RNA digestion
 aqm.rnadeg = function(expressionset, x)
@@ -28,10 +31,8 @@ aqm.rnadeg = function(expressionset, x)
                      lwd = 1, col = cl$arrayColours)
     }
     
-    legend = paste(phrase$fig("RNA digestion"),
-                   phrase$preproc("Shown"),
-       "In this plot each array is represented by a single line; move the mouse over the lines to see their corresponding sample names. The plot can be used to identify array(s) that have a slope very different from the others. This could indicate that the RNA used for that array has been handled differently from what was done for the other arrays.",
-                   phrase$affyPLM)
+    legend = paste(figurePhrase("RNA digestion"),
+      "The shown values are computed from the preprocessed data (after background correction and quantile normalisation). Each array is represented by a single line; move the mouse over the lines to see their corresponding sample names. The plot can be used to identify array(s) that have a slope very different from the others. This could indicate that the RNA used for that array has been handled differently from what was done for the other arrays.")
 
     new("aqmReportModule",
         plot    = rnaDeg,
@@ -46,74 +47,42 @@ aqm.rnadeg = function(expressionset, x)
         ) ## new
    }
 
-
+##--------------------------------------------------
 ## RLE
+##--------------------------------------------------
 aqm.rle = function(x)
-  {   
-    if (x$dataPLM@model.description$R.model$which.parameter.types[3] == 1){
-      medianchip = apply(affyPLM::coefs(x$dataPLM), 1, median)
-      M = sweep(affyPLM::coefs(x$dataPLM), 1, medianchip, FUN='-')
-    } else {
-      stop("It doesn't appear that a model with sample effects was used.")
-    }
+{
+  outlierMethod = "KS"
+  values = RLE(x$dataPLM, type="values")
+  rv = aqm.boxplot(list(M=values, intgroup=x$intgroup, nchannels=1, numArrays=x$numArrays), outlierMethod=outlierMethod)
 
-    rle = aqm.boxplot(list(M=M, intgroup=x$intgroup, nchannels=1, numArrays=x$numArrays))
-
-    rle@legend = paste(phrase$fig("Relative Log Expression (RLE)"),
-      phrase$preproc("RLE"),
-      "Arrays whose boxes have larger spread or are centered away from M = 0 are potentially problematic.",
-      phrase$affyPLM)
-    
-    rle@title = "Relative Log Expression plot"
-    rle@section = "Affymetrix specific plots"
-    rle@outliers = NA_integer_
-
-    ## TODO: Fix the outlier computation
-    ## rle2 = try(Mbox(x$dataPLM, plot = FALSE))
-    ## rlemed = rle2$stats[3,]
-    ## rleout = which(abs(rlemed) > 0.1)
-
-    return(rle)
-  }
-
-## NUSE
-aqm.nuse = function(x)
-{ 
-  compute.nuse <- function(which)
-    {
-      1/sqrt(colSums(x$dataPLM@weights[[1]][which,,drop=FALSE], na.rm=TRUE))
-    }
+  rv@title = "Relative Log Expression (RLE)"
+  rv@section = "Affymetrix specific plots"
   
-  model <- x$dataPLM@model.description$modelsettings$model
-  if ((x$dataPLM@model.description$R.model$which.parameter.types[3] == 1) &&
-      (x$dataPLM@model.description$R.model$which.parameter.types[1] == 0) ){
-    grp.rma.se1.median  = apply(se(x$dataPLM), 1,median,na.rm=TRUE)
-    grp.rma.rel.se1.mtx = sweep(se(x$dataPLM),1,grp.rma.se1.median,FUN='/')
-  } else {
-    which <- indexProbesProcessed(x$dataPLM)
-    ses   <- matrix(0, length(which), 4)
-    if (x$dataPLM@model.description$R.model$response.variable == 1){
-      for (i in seq(along=which))
-        ses[i,] <- compute.nuse(which[[i]])
-    } else {
-      stop("Sorry, I don't know how to compute NUSE values for this PLMset object")
-    }
-    grp.rma.se1.median <- apply(ses, 1,median)
-    grp.rma.rel.se1.mtx <- sweep(ses,1,grp.rma.se1.median,FUN='/')
-  }
+  rv@legend = paste(figurePhrase(rv@title),
+    "Arrays whose boxes are centered away from 0 and/or are more spread out are potentially problematic.",
+    outlierPhrase(outlierMethod, length(rv@outliers)))
 
-  nuse = aqm.boxplot(list(M=grp.rma.rel.se1.mtx, intgroup=x$intgroup, nchannels=1, numArrays=x$numArrays))
+  return(rv)
+}
 
-  nuse@legend = paste(phrase$fig("Normalized Unscaled Standard Error (NUSE)"),
-    phrase$preproc("NUSE"),
-    "Potential low quality arrays are those whose box is substantially elevated or more spread out relative to the other arrays. NUSE values are comparable within one data set, but usually not across different data sets.",
-    phrase$affyPLM)
+##--------------------------------------------------
+## NUSE
+##--------------------------------------------------
+aqm.nuse = function(x)
+{
+  outlierMethod = "median"
+  values = NUSE(x$dataPLM, type="values")
+  rv = aqm.boxplot(list(M=values, intgroup=x$intgroup, nchannels=1, numArrays=x$numArrays), outlierMethod=outlierMethod)
 
-  nuse@title = "Normalized Unscaled Standard Error (NUSE) plot"
-  nuse@section = "Affymetrix specific plots"
-  nuse@outliers = NA_integer_
+  rv@title = "Normalized Unscaled Standard Error (NUSE)"
+  rv@section = "Affymetrix specific plots"
 
-  return(nuse)
+  rv@legend = paste(figurePhrase(rv@title),
+    "For each array, the boxes should be centered around 1. An array were the values elevated relative to the other arrays is typically of lower quality.",
+    outlierPhrase(outlierMethod, length(rv@outliers)))
+
+  return(rv)
 }
 
 ##--------------------------------------------------
@@ -130,7 +99,7 @@ aqm.qcstats = function(expressionset) {
   qcStats = function() 
     plot.qc.stats(qcObj)
     
-  legend =  paste(phrase$fig("the Affymetrix recommended diagnostic"),
+  legend =  paste(figurePhrase("diagnostics suggested by Affymetrix"),
     "Please see the vignette of the package <i>simpleaffy</i> for a full explanation of the elements shown in this plot. Any metrics that is shown in red is outside the manufacturer's specified boundaries and suggests a potential problem; metrics shown in blue are considered acceptable.")
   
   shape = list("h" = 4 + ncol(exprs(expressionset)) * 0.1 + 1/ncol(exprs(expressionset)),  "w" = 6)

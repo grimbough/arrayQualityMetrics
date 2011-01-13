@@ -1,6 +1,6 @@
 \name{outliers}
 \alias{outliers}
-\alias{ksOutliers}
+\alias{findOutliers}
 
 \title{Functions for determining outliers}
 
@@ -14,8 +14,8 @@
  }
 
 \usage{
-outliers = function (x, coef = 1.5) 
-ksOutliers(exprs, subsamp = 300)
+findOutliers = function (x, coef = 1.5) 
+outliers(exprs, method = c("KS", "mean", "median"))
 }
 
 \arguments{
@@ -25,23 +25,25 @@ ksOutliers(exprs, subsamp = 300)
     Upper hinge and interquartile range are computed by
     \code{\link[stats:fivenum]{fivenum}}.
   }
-  \item{exprs}{A matrix whose columns correspond to arrays, rows to the array features.}
-  \item{subsamp}{If \code{exprs} has more than \code{subsamp} rows, use only
-    a random subsample of size \code{subsamp} for calling \code{\link[stats:ks.test]{ks.test}}.}
+  \item{exprs}{A matrix whose columns correspond to arrays, rows to the
+    array features.}
+  \item{method}{A character string specifying the summary statistic to
+  be used for each column of \code{exprs}. See details.}
  }
 
-\value{For \code{outliers}, an integer vector of indices
+\value{For \code{findOutliers}, an integer vector of indices
   (see \code{\link[base:which]{which}}).
-For \code{ksOutliers}, a list with two elements: the KS test statistics
-\code{s} and the value of \code{outliers(s)}.}
+For \code{outliers}, a list with two elements: the per array summary statistics
+\code{s} and the value of \code{findOutliers(s)}.}
 
 \details{
- \code{ksOutliers} determines outlier arrays based on
-  the value of the \code{\link[stats:ks.test]{ks.test}} test statistic between each
-  arrays distribution of intensities and the pooled distribution of
- intensities from all arrays.
+ With \code{method="KS"}, the \code{outliers} computes for each array
+  the value of the \code{\link[stats:ks.test]{ks.test}} test statistic
+  between its distribution of intensities and the pooled distribution of
+  intensities from all arrays.
+ With \code{"mean"} and \code{"median"}, it computes the mean or median.
 }
 
-\author{Wolfgang Huber <whuber@embl.de> }
+\author{Wolfgang Huber}
 
 

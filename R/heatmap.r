@@ -6,7 +6,7 @@ aqm.heatmap = function(x)
                     seq(1, 0, l=256))
 
   m = dist2(x$M)
-  out = outliers(rowSums(m, na.rm=TRUE))
+  out = outliers(m, method = "sum")$outliers
   
   dend = as.dendrogram(hclust(as.dist(m), method = "single"))
   ord = order.dendrogram(dend)

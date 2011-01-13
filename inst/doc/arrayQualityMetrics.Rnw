@@ -30,7 +30,7 @@ The \Rpackage{arrayQualityMetrics} package produces, through a single
 function call, a comprehensive HTML report of \emph{quality metrics}
 about a microarray
 dataset~\cite{Kauffmann:2009a:Bioinf,Kauffmann:2010:Genomics,McCall2010}.
-The quality metrics are mainly on the \emph{per-array} level,
+The quality metrics are mainly on the \emph{per array} level,
 i.\,e.\ they can be used to assess the relative quality of different
 arrays within a dataset. Some of the metrics can also be used to
 diagnose batch effects, and thus the quality of the overall dataset.
@@ -55,12 +55,13 @@ its arguments can be found in its manual page.
 
 When the function \Rfunction{arrayQualityMetrics} is finished, a
 report is produced in the subdirectory specified by the function's
-\texttt{outdir} argument (the name of the central HTML page that can
-be opened by a browser is \texttt{index.html}).  The report contains a
-series of plots explained by text.  The plots are provided as bitmaps
-(PNG format) or as vector graphics (SVG format). In the former case,
-the figures are also linked to PDF files that provide high resolution
-versions e.\,g.\ for publication.
+\texttt{outdir} argument. By default, a subdirectory with a suitable
+name is created in the current working directory. This directory
+contains an HTML page \texttt{index.html} that can be opened by a
+browser. The report contains a series of plots explained by text.  The
+plots are provided as bitmaps (PNG format) or as vector graphics (SVG
+format). In the former case, the figures are also linked to PDF files
+that provide high resolution versions e.\,g.\ for publication.
 
 In the case of \Rclass{AffyBatch} input, some Affymetrix specific
 sections are added to the standard report. Also for other types of
@@ -197,7 +198,7 @@ to show the results in the context of an experimental factor of
 interest, i.\,e.\ a categorical variable associated with the arrays
 such as \emph{hybridisation date}, \emph{treatment level} or
 \emph{replicate number}. Specifying a factor does \emph{not} change 
-how the quality metrics are computed. However, by setting the argument
+how the quality metrics are computed. By setting the argument
 \Rfunction{intgroup} to contain the names of one or multiple columns
 of the data object's \Rclass{phenoData} slot\footnote{This is where
   Bioconductor objects store array annotation}, a bar on the side of
@@ -230,6 +231,7 @@ you need to make sure that this information is provided in your input
 object.  We use the \emph{nCCl4} example again.
 
 \subsection{Spatial layout of the array}
+\label{sec:spatial}
 
 To plot the spatial distributions of the intensities of the arrays,
 \Rfunction{arrayQualityMetrics} needs the spatial coordinates of the
@@ -246,14 +248,16 @@ array. In the example of the dataset \Robject{CCl4}, the coordinates of
 the spots are in the columns named "Row" and "Column" of the
 featureData (the slot of the object containing the annotation of the
 probes). We copy this information into columns named "X"
-and "Y" respectively, so that these coordinates are taken into account
-and the spatial distribution of the intensities can be drawn.
-
+and "Y" respectively
 %
 <<XYcoordinates>>=
 featureData(nCCl4)$X = featureData(nCCl4)$Row
 featureData(nCCl4)$Y = featureData(nCCl4)$Column
-@
+@ 
+The next call to \Rfunction{arrayQualityMetrics} with this refined version of
+\Robject{nCCl4} (see Section~\ref{sec:rin}) will now
+include this information in the report, and the spatial distribution
+of the intensities will be shown.
 %
 
 \subsection{Mapping of the reporters}
@@ -270,7 +274,11 @@ indicate whether the name begins with "NM".
 featureData(nCCl4)$hasTarget = (regexpr("^NM", featureData(nCCl4)$Name) > 0)
 table(featureData(nCCl4)$hasTarget)
 @
-%
+The next call to \Rfunction{arrayQualityMetrics} with this refined version of
+\Robject{nCCl4} (see Section~\ref{sec:rin}) will now
+include this information in the report, and the spatial distribution
+of the intensities will be shown.
+
 
 %\subsection{GC content of the reporters}
 %If the GC content of the reporters is known, then it is possible to
@@ -297,7 +305,7 @@ pd
 %
 The RIN is always 9 for the reference (DMSO), the relevant value is that
 for the test sample (CCl4).
-<<>>=
+<<RIN>>=
 RIN = with(pd, ifelse( Cy3=="CCl4", RIN.Cy3, RIN.Cy5))
 fRIN = factor(RIN)
 levels(fRIN) = c("poor", "medium", "good")

@@ -28,7 +28,7 @@
 }
 
 \usage{
-aqm.boxplot(x, subsample=10000)
+aqm.boxplot(x, subsample=10000, outlierMethod = "KS")
 aqm.density(x)
 aqm.heatmap(x)
 aqm.pca(x)
@@ -52,6 +52,7 @@ aqm.nuse(x)
   on the full set of features (which can be hundreds of thousands on
   some arrays), but on a randomly subset whose size is indicated by this
   number.}
+  \item{outlierMethod}{As in \code{\link{outliers}}.}
   \item{Dthresh}{In \code{maplot}, the arrays with a Hoeffding D
   statistic larger than this value are called \emph{outliers}. See also
   \code{\link[Hmisc:hoeffd]{hoeffd}}.}

@@ -170,6 +170,7 @@ reportModule = function(p, module, integerIndex, name, arrayTable, outdir)
     if(!identical(svgwarn, FALSE))
        hwrite(svgwarn, p)
     
+    hwrite("<br><br>", p)
   }
 
 ##----------------------------------------------------------
