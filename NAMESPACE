@@ -15,7 +15,7 @@ importClassesFrom(methods, ANY, character, list, logical, matrix,
 ##--------------------------------------------------
 importMethodsFrom(affy, Mbox, mm, pm)
 
-# importMethodsFrom(affyPLM, se, indexProbesProcessed)
+importMethodsFrom(affyPLM, image)
 
 importMethodsFrom(beadarray, arrayNames, getArrayData)
 

@@ -38,12 +38,23 @@ outliers = function(exprs, method = c("KS", "mean", "median"))
 }
 
 outlierMethodExplanation = c(
-  KS     = "Kolmogorov-Smirnov statistic between each array's distribution and the distribution of the pooled data",
-  median = "median of these values from each array")
+  KS     = "Kolmogorov-Smirnov statistic between each array's distribution and the distribution of the pooled data.",
+  median = "median of these values from each array.")
 
-outlierPhrase = function(method, n)
-  sprintf("Outlier detection was performed by computing the %s. For %s, this value was exceptionally large (see the manual page of <tt>findOutliers</tt> for details)%s.",
-    outlierMethodExplanation[method],
-    if (n==0) "none of the arrays" else if (n==1) "one array" else paste(n, "arrays"),
-    if (n==0) "" else if (n==1) ", and it was marked as an outlier" else ", and they were marked as outliers")
+outlierPhrase = function(method=FALSE, n)
+  {
+    rv = if(!identical(method, FALSE))
+      {
+        stopifnot(method%in%names(outlierMethodExplanation))
+        paste("Outlier detection was performed by computing the", outlierMethodExplanation[method])
+      } else {
+        ""
+      }
+
+    rv = paste(rv, sprintf("For %s, this value was exceptionally large (see the manual page of <tt>findOutliers</tt> for details)%s.",
+      if (n==0) "none of the arrays" else if (n==1) "one array" else paste(n, "arrays"),
+      if (n==0) "" else if (n==1) ", and it was marked as an outlier" else ", and they were marked as outliers"))
+
+    return(rv)
+  }
 

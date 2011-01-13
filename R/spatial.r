@@ -21,15 +21,42 @@ aqm.spatial = function(x, scale="rank", channels = c("M", "R", "G"))
 ##--------------------------------------------------------------------------------
 ## Spatial distribution plot for one channel 
 ##--------------------------------------------------------------------------------
-spatialplot = function(whichChannel, x, scale) 
+spatialplot = function(whichChannel, x, scale, outlierMethod = "KS") 
 {
     
   colourRamp = colorRampPalette(rgb(seq(0,1,l=256),seq(0,1,l=256),seq(1,0,l=256)))
+  maxx = max(x$sx, na.rm=TRUE)
+  maxy = max(x$sy, na.rm=TRUE)
 
-  dat = x[[whichChannel]]
+  ## Outlier detection: compute a measure for large scale spatial structures
+  stat = numeric(x$numArrays)
+  for(a in seq_len(x$numArrays))
+    {
+      mat = matrix(NA_real_, nrow=maxy, ncol=maxx)
+      mat[ cbind(x$sy, x$sx) ] = x[[wh]][, a]
+      apg = abs(fft(mat))       ## absolute values of the periodogram
+      lowFreq    = apg[1:4, 1:4]
+      lowFreq[1,1] = 0          ## drop the constant component
+      stat[a] = sum(lowFreq)
+    }
+  out = findOutliers(stat)
+  
+  ## Plot maximally 8 scatterplots
+  if(x$numArrays<=8)
+    {
+      whj = seq_len(x$numArrays)
+      lay = c(ceiling(x$numArrays/2), 2)
+      legOrder = ""
+    } else {
+      whj = order(stat, decreasing=TRUE)[c(1:4, x$numArrays+c(-3:0))]
+      lay = c(4, 2)
+      legOrder = "Shown are the 4 arrays with the highest value of <i>S</i> (top row), and the 4 arrays with the lowest value (bottom row)."
+    }
+    
+  dat = x[[whichChannel]][, whj, drop=FALSE]
   stopifnot(length(x$sx)==nrow(dat),
             length(x$sy)==nrow(dat))  ## this should always be true, given the definition of prepdata
-  
+
   if(scale=="rank")
     dat = apply(dat, 2, rank)
   
@@ -38,58 +65,34 @@ spatialplot = function(whichChannel, x, scale)
     "ch"     = as.vector(dat),
     "row"    = x$sy,
     "column" = x$sx)
-  
+
+  panelNames = sprintf("array %d (S=%4.2f)", whj, stat[whj]) 
+
   spat = levelplot(ch ~ column*row | Array,
-            data = df,
-            axis = function (...) list(tick="no"),
-            asp = "iso",
-            col.regions = colourRamp,
-            as.table = TRUE,
-            strip = function(..., bg) strip.default(..., bg ="#cce6ff"),
-            xlab = whichChannel,
-            ylab = "",
-            panel = "panel.levelplot.raster",
-            colorkey = (scale!="rank"))
-         
+    data = df,
+    axis = function (...) list(tick="no"),
+    xlab = whichChannel,
+    ylab = "",
+    panel = "panel.levelplot.raster",
+    col.regions = colourRamp,
+    as.table = TRUE,
+    layout = lay,  
+    asp = "iso",
+    strip = function(..., bg) strip.default(..., bg ="#cce6ff", factor.levels = panelNames),
+    colorkey = (scale!="rank"))
+  
   legend = sprintf("The figure <!-- FIG --> shows false colour representations of the arrays' spatial distributions of feature intensities. Normally, when the features are distributed randomly on the arrays, one expects to see a uniform distribution; sets of control features with particularly high or low intensities may stand out. The colour scale is proportional to %sthe probe intensities, and it is shown in the panel on the right.", switch(scale, rank = "the ranks of ", direct = ""))
 
   if(scale=="rank") legend = paste(legend, "Note that the rank scale has the potential to amplify patterns that are small in amplitude but systematic within an array. It is possible to switch off the rank scaling by modifying the argument <tt>scale</tt> in the call of the <tt>aqm.spatial</tt> function.") 
-  
-  ## Outlier detection
-  #loc = scoresspat(x, whichChannel)
-  #locstat = boxplot.stats(loc)
-  #locout  = which(loc %in% locstat$out)
+
+  legend = paste(legend, "<br>Outlier detection has been performed by computing <i>S</i>, the sum of the absolutes value of low frequency Fourier coefficients, as a measure of large scale spatial structures.", legOrder, "The value of <i>S</i> is shown in the panel headings. ", outlierPhrase(outlierMethod, length(out)), sep="")
   
   new("aqmReportModule",
       plot = spat,
       section = "Individual array quality",
       title = paste("Spatial distribution of", whichChannel),
       legend = legend,
-      # outliers = locout
-      shape = list("h"=6,"w"=6))
+      shape = list("h"=10*lay[2]/lay[1]*maxy/maxx, "w"=10))
 }
 
   
-## Scores computation
-scoresspat = function(x, wh)
-{
-
-  loc = numeric(x$numArrays)
-  maxx = max(x$sx, na.rm=TRUE)
-  maxy = max(x$sy, na.rm=TRUE)
-  
-  for(a in seq_len(x$numArrays))
-    {
-      mat = matrix(NA_real_, nrow=maxy, ncol=maxx)
-      mat[ cbind(x$sy, x$sx) ] = x[[wh]][, a]
-      apg = abs(fft(mat))       ## absolute values of the periodogram
-      lowFreq      = apg[1:4, 1:4]
-      lowFreq[1,1] = 0          ## drop the constant component
-      highFreq     = c(apg[-(1:4), ], apg[1:4, -(1:4)])
-      loc[a] = sum(lowFreq)/sum(highFreq)
-    }
-  return(loc)
-}
-
-
-

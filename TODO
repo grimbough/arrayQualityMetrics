@@ -1,22 +1,24 @@
-* The function 'aqm.boxplot' opens a graphics device (through its
-  dependence on draw.key). Avoid that.
+* work with new beadarray data objects; including the spatial plot.
 
-* Remove printing of empty lists onto console when the MA plots are written
-  into the pdf file. 
+* vignette should advise to reduce the size of 'pData', if it is large, before calling arrayQualityMetrics
 
-* When heatmap gets large (e.g. >50 arrays), array names tend not to be very 
-  readable.
+* check density estimation / bandwidth for nCCl4 - should not be wiggly.
 
-* Duplicate correlation: If featureData contains a factor that
+* check the robustness of the behaviour if 'svg' device is missing.
+
+* meanSdPlot should use 'smoothScatter' (this is something that should
+  be done in the vsn package) instead of drawing individual dots.
+
+* smoothScatter in MA-plot sometimes gives warnings / fails with an error message about grid size. Fix that.
+
+
+
+
+* for AffyBatch, the spatial plots could show the affyPLM residuals instead 
+  of the intensities themselves. However, currently, I don't seem to be able to access
+  the image method from affyPLM, and it looks messy. 
+
+* duplicate correlation: If featureData contains a factor that
   identifies features containing the same reporter sequence, we can
   check for that (scatterplots, standard deviation)
 
-* affyspecific.r: 
-  - Fix the outlier computation (see 'TODO')
-  - Use 'colSums' - it's faster  (see 'TODO')
-
-* writereport.r:
-  Use style sheet rather than hard-coding font descriptions all over the place into the code.
-
-* maplot.r:
-  better outlier computation, and ordering of the plots
