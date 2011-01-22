@@ -101,7 +101,7 @@ makeIndex = function(p, modules)
 ##---------------------------------------------------------
 ## Create a module  of the report with figures and legend
 ##---------------------------------------------------------
-reportModule = function(p, module, integerIndex, name, arrayTable, outdir)
+reportModule = function(p, module, integerIndex, arrayTable, outdir)
 {
     stopifnot(is(module, "aqmReportModule"))
 
@@ -114,47 +114,46 @@ reportModule = function(p, module, integerIndex, name, arrayTable, outdir)
                   length(w)==1, is.numeric(w), !is.na(w))
 
         stopifnot(length(integerIndex)==1, is.integer(integerIndex), !is.na(integerIndex))
-    
-        imageformat =  if(is.na(module@svg@name)) "png" else "svg"
         dpi = 72
-        
-        ## The two cases, png and svg, need to be treated differently 
-        switch(imageformat,
-               svg = {
-                 nameimg = paste(name, ".svg", sep = "")
-                 svgtemp = tempfile()
-                 svg(file = svgtemp, h = h, w = w)
-                 makePlot(module)
-                 dev.off()
+
+        if(is.na(module@svg@name))
+          {
+            ## no svg - use png
+            name    = paste("fig", integerIndex, sep = "")
+            nameimg = paste(name, ".png", sep = "")
+            png(file = file.path(outdir, nameimg), h = h*dpi, w = w*dpi)
+            makePlot(module)
+            dev.off()
+            img = aqm.hwriteImage(nameimg, id=paste("Fig", name, sep=":"))
+          } else {
+            ## svg
+            name    = module@svg@name
+            nameimg = paste(name, ".svg", sep = "")
+            svgtemp = tempfile()
+            svg(file = svgtemp, h = h, w = w)
+            makePlot(module)
+            dev.off()
                  
-                 annRes = annotateSvgPlot(infile = svgtemp, outfile = nameimg, outdir = outdir,
-                   annotationInfo = module@svg, name = name)
+            annRes = annotateSvgPlot(infile = svgtemp, outfile = nameimg, outdir = outdir,
+              annotationInfo = module@svg, name = name)
                  
-                 if(!annRes$annotateOK)
-                   svgwarn = "Note: the figure is static - enhancement with interactive effects failed. This is likely due to a version incompatibility of the 'SVGAnnotation' R package and the 'libcairo' system library. Please contact the maintainer of 'arrayQualityMetrics' to report this problem."
+            if(!annRes$annotateOK)
+              svgwarn = "Note: the figure is static - enhancement with interactive effects failed. This is likely due to a version incompatibility of the 'SVGAnnotation' R package and the 'libcairo' system library. Please contact the maintainer of 'arrayQualityMetrics' to report this problem."
           
-                 sizes = paste(annRes$size)
-                 img = hwrite(c(aqm.hwriteImage(nameimg, width=sizes[1], height=sizes[2], id=paste("Fig", name, sep=":")),
-                   annotationTable(arrayTable, name = name)))
-               },
-               png = {
-                 nameimg = paste(name, ".png", sep = "")
-                 png(file = file.path(outdir, nameimg), h = h*dpi, w = w*dpi)
-                 makePlot(module)
-                 dev.off()
-                 img = aqm.hwriteImage(nameimg, id=paste("Fig", name, sep=":"))
-               },
-               stop(sprintf("Invalid value of 'imageformat': %s", imageformat))
-               ) ## switch
+            sizes = paste(annRes$size)
+            img = hwrite(c(aqm.hwriteImage(nameimg, width=sizes[1], height=sizes[2], id=paste("Fig", name, sep=":")),
+              annotationTable(arrayTable, name = name)))
+          } ## if
 
         ## Also make a PDF file
         namepdf = paste(name, ".pdf", sep = "")
         pdf(file = file.path(outdir, namepdf), h = h, w = w)
         makePlot(module)
         dev.off()
-        
         hwrite(img, p)
       } else {
+
+        ## No plot
         namepdf = NA
       }
     
@@ -303,7 +302,7 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
           sec = sec+1
         }
       reportModule(p = p, module = modules[[i]], integerIndex = i,
-                   name = names(modules)[i], arrayTable = arrayTable, outdir=outdir)
+                   arrayTable = arrayTable, outdir=outdir)
       currentSectionName = modules[[i]]@section
     }
   

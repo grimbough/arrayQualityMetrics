@@ -39,7 +39,7 @@ spatialplot = function(whichChannel, x, scale)
       lowFreq[1,1] = 0          ## drop the constant component
       stat[a] = sum(lowFreq)
     }
-  out = findOutliers(stat)
+  outliers = findOutliers(stat)
   
   ## Plot maximally 8 images
   if(x$numArrays<=8)
@@ -50,7 +50,7 @@ spatialplot = function(whichChannel, x, scale)
     } else {
       whj = order(stat, decreasing=TRUE)[c(1:4, x$numArrays+c(-3:0))]
       lay = c(4, 2)
-      legOrder = "Shown are the 4 arrays with the highest value of <i>S</i> (top row), and the 4 arrays with the lowest value (bottom row)."
+      legOrder = " Shown are the 4 arrays with the highest value of <i>S</i> (top row), and the 4 arrays with the lowest value (bottom row)."
     }
     
   dat = x[[whichChannel]][, whj, drop=FALSE]
@@ -85,14 +85,17 @@ spatialplot = function(whichChannel, x, scale)
 
   if(scale=="rank") legend = paste(legend, "Note that the rank scale has the potential to amplify patterns that are small in amplitude but systematic within an array. It is possible to switch off the rank scaling by modifying the argument <tt>scale</tt> in the call of the <tt>aqm.spatial</tt> function.") 
 
-  legend = paste(legend, "<br>Outlier detection has been performed by computing <i>S</i>, the sum of the absolutes value of low frequency Fourier coefficients, as a measure of large scale spatial structures.", legOrder, "The value of <i>S</i> is shown in the panel headings. ", outlierPhrase(FALSE, length(out)), sep="")
+  legend = paste(legend, "<br>Outlier detection has been performed by computing <i>S</i>, the sum of the absolutes value of low frequency Fourier coefficients, as a measure of large scale spatial structures.", legOrder, " The value of <i>S</i> is shown in the panel headings. ", outlierPhrase(FALSE, length(outliers)), sep="")
+
+browser()
   
   new("aqmReportModule",
       plot = spat,
       section = "Individual array quality",
       title = paste("Spatial distribution of", whichChannel),
       legend = legend,
-      shape = list("h"=10*lay[2]/lay[1]*maxy/maxx, "w"=10))
+      outliers = outliers,
+      shape = list("h"=10*lay[2]/lay[1]*maxy/maxx + 0.5*lay[2], "w"=10))
 }
 
   
