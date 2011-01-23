@@ -87,8 +87,6 @@ spatialplot = function(whichChannel, x, scale)
 
   legend = paste(legend, "<br>Outlier detection has been performed by computing <i>S</i>, the sum of the absolutes value of low frequency Fourier coefficients, as a measure of large scale spatial structures.", legOrder, " The value of <i>S</i> is shown in the panel headings. ", outlierPhrase(FALSE, length(outliers)), sep="")
 
-browser()
-  
   new("aqmReportModule",
       plot = spat,
       section = "Individual array quality",
