@@ -15,8 +15,6 @@ importClassesFrom(methods, ANY, character, list, logical, matrix,
 ##--------------------------------------------------
 importMethodsFrom(affy, Mbox, mm, pm)
 
-importMethodsFrom(affyPLM, image)
-
 importMethodsFrom(beadarray, arrayNames, getArrayData)
 
 importMethodsFrom(Biobase, assayData, channel, dims, exprs,
