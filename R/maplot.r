@@ -1,4 +1,4 @@
-aqm.maplot = function(x, subsample=1000, Dthresh=0.15) {
+aqm.maplot = function(x, subsample=20000, Dthresh=0.15) {
 
   if(x$nchannels==1)
     {
@@ -12,6 +12,9 @@ aqm.maplot = function(x, subsample=1000, Dthresh=0.15) {
       stopifnot(identical(dim(M), dim(A)))
     }
 
+  ## For each array j, compute the D statistic from Hoeffding's test for independence 
+  ## and sort / detect outlier arrays by the value of the test statistic. We do subsampling
+  ## to save time
   if(nrow(M)>subsample)
     {
       sel = sample(nrow(M), subsample)
@@ -21,9 +24,6 @@ aqm.maplot = function(x, subsample=1000, Dthresh=0.15) {
       sM = M
       sA = A
     }
-
-  ## For each array j, compute the D statistic from Hoeffding's test for independence 
-  ## and sort / detect outlier arrays by the value of the test statistic.
   stat = sapply(seq_len(x$numArrays), function(j)
     {
       hoeffd(sA[,j], sM[,j])$D[1,2]

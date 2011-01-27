@@ -1,7 +1,7 @@
 ##----------------------------------------
 ## aqm.boxplot
 ##----------------------------------------
-aqm.boxplot = function(x, subsample=10000, outlierMethod = "KS") {
+aqm.boxplot = function(x, subsample=20000, outlierMethod = "KS") {
   
   if (nrow(x$M)>subsample) {
     ss  = sample(nrow(x$M), subsample)

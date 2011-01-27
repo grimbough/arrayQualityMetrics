@@ -28,11 +28,11 @@
 }
 
 \usage{
-aqm.boxplot(x, subsample=10000, outlierMethod = "KS")
+aqm.boxplot(x, subsample=20000, outlierMethod = "KS")
 aqm.density(x)
 aqm.heatmap(x)
 aqm.pca(x)
-aqm.maplot(x, subsample=1000, Dthresh=0.15)
+aqm.maplot(x, subsample=20000, Dthresh=0.15)
 aqm.spatial(x, scale="rank", channels = c("M", "R", "G"))
 aqm.meansd(x)
 aqm.probesmap(x)
