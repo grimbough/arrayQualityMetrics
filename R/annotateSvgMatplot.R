@@ -67,13 +67,14 @@ checkUsesvg = function(usesvg) {
 
   if(missing(usesvg)){
     ## Note: assignment within the if-condition
-    if(! (usesvg <- capabilities()["cairo"]) )
-      warning("capabilities()[\"cairo\"] is FALSE - all graphics will be static. Please install the cairo library for your R to obtain interactive SVG graphics.") 
+    if(! (usesvg <- capabilities("cairo")) )
+      warning("capabilities(\"cairo\") is FALSE - all graphics will be static. Please install the cairo library for your R to obtain interactive SVG graphics.") 
   } else {
-    if( is.logical(usesvg) && (length(usesvg)==1) && !is.na(usesvg) )
+    if(is.logical(usesvg))
+      if((length(usesvg)!=1) || is.na(usesvg))
       stop("'usesvg' must be TRUE or FALSE")
-    if(usesvg && (!capabilities()["cairo"]))
-      stop("capabilities()[\"cairo\"] is FALSE - cannot produce interactive SVG graphics. Please install the cairo library for your R.") 
+    if(usesvg && (!capabilities("cairo")))
+      stop("capabilities(\"cairo\") is FALSE - cannot produce interactive SVG graphics. Please install the cairo library for your R.") 
   }
   
   return(usesvg)

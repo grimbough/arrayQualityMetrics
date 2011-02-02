@@ -25,7 +25,7 @@ importMethodsFrom(genefilter, plot)
 
 importMethodsFrom(marray, boxplot, lines)
 
-importMethodsFrom(simpleaffy, qc)
+## importMethodsFrom(simpleaffy, qc)
 
 importMethodsFrom(vsn, meanSdPlot)
 
@@ -64,7 +64,7 @@ importFrom(RColorBrewer, brewer.pal, brewer.pal.info)
 
 importFrom(RJSONIO, toJSON)
 
-importFrom(simpleaffy, plot.qc.stats)
+## importFrom(simpleaffy, plot.qc.stats)
 
 importFrom(stats, as.dendrogram, as.dist, density, fft, hclust,
            order.dendrogram, quantile)
@@ -88,7 +88,7 @@ export("aqm.writereport")
 
 export("aqm.boxplot", "aqm.maplot",  "aqm.density", "aqm.probesmap",
        "aqm.meansd",  "aqm.heatmap", "aqm.pca",
-       "aqm.rle",     "aqm.nuse",    "aqm.rnadeg", "aqm.qcstats",
+       "aqm.rle",     "aqm.nuse",    "aqm.rnadeg", ## "aqm.qcstats",
        "aqm.pmmm",    "aqm.spatial")
 
 export("addXYfromGAL")

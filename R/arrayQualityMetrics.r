@@ -57,7 +57,7 @@ arrayQualityMetrics = function(
     m$rle     = aqm.rle(x)
     m$nuse    = aqm.nuse(x)
     m$rnadeg  = aqm.rnadeg(expressionset, x)
-    m$qcstats = aqm.qcstats(expressionset)
+    ## m$qcstats = aqm.qcstats(expressionset)  -- Not sure any one cares about this function, anyway. It can be resurrected if there is overwhelming demand.
     m$pmmm    = aqm.pmmm(x)
   }
   

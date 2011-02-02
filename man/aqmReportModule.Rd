@@ -8,7 +8,7 @@
 \alias{aqm.spatial}
 \alias{aqm.meansd}
 \alias{aqm.probesmap}
-\alias{aqm.qcstats}
+% \alias{aqm.qcstats}
 \alias{aqm.pmmm}
 \alias{aqm.rnadeg}
 \alias{aqm.rle}
@@ -38,7 +38,7 @@ aqm.meansd(x)
 aqm.probesmap(x)
 
 # Affymetrix specific sections
-aqm.qcstats(expressionset)
+% aqm.qcstats(expressionset)
 aqm.pmmm(x)
 aqm.rnadeg(expressionset, x)
 aqm.rle(x)

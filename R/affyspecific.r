@@ -89,28 +89,28 @@ aqm.nuse = function(x)
 ## simpleaffy 
 ## If fail, silently return NULL
 ##--------------------------------------------------
-aqm.qcstats = function(expressionset) {                
+## aqm.qcstats = function(expressionset) {                
 
-  qcObj = try(qc(expressionset))
+##   qcObj = try(qc(expressionset))
 
-  if(inherits(qcObj, "try-error"))
-    return(NULL)
+##   if(inherits(qcObj, "try-error"))
+##     return(NULL)
   
-  qcStats = function() 
-    plot.qc.stats(qcObj)
+##   qcStats = function() 
+##     plot.qc.stats(qcObj)
     
-  legend =  paste(figurePhrase("diagnostics suggested by Affymetrix"),
-    "Please see the vignette of the package <i>simpleaffy</i> for a full explanation of the elements shown in this plot. Any metrics that is shown in red is outside the manufacturer's specified boundaries and suggests a potential problem; metrics shown in blue are considered acceptable.")
+##   legend =  paste(figurePhrase("diagnostics suggested by Affymetrix"),
+##     "Please see the vignette of the package <i>simpleaffy</i> for a full explanation of the elements shown in this plot. Any metrics that is shown in red is outside the manufacturer's specified boundaries and suggests a potential problem; metrics shown in blue are considered acceptable.")
   
-  shape = list("h" = 4 + ncol(exprs(expressionset)) * 0.1 + 1/ncol(exprs(expressionset)),  "w" = 6)
+##   shape = list("h" = 4 + ncol(exprs(expressionset)) * 0.1 + 1/ncol(exprs(expressionset)),  "w" = 6)
   
-  new("aqmReportModule",
-      plot = qcStats,
-      section = "Affymetrix specific plots",
-      title = "Diagnostic plot recommended by Affymetrix",
-      legend = legend,
-      shape = shape)
-}
+##   new("aqmReportModule",
+##       plot = qcStats,
+##       section = "Affymetrix specific plots",
+##       title = "Diagnostic plot recommended by Affymetrix",
+##       legend = legend,
+##       shape = shape)
+## }
 
 ##--------------------------------------------------
 ## PM / MM
