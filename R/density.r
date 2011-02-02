@@ -28,7 +28,7 @@ aqm.density = function(x)
       den2 = dens(x$G)
       den3 = dens(x$M)
       ddf  = rbind(den1, den2, den3)
-      panels = factor(rep(1:3, each = c(nrow(den1), nrow(den2), nrow(den3))),
+      panels = factor(rep(1:3, times = c(nrow(den1), nrow(den2), nrow(den3))),
         levels = 1:3,
         labels = c("a. Red Channel", "b. Green Channel", "c. Log2(Ratio)"))
       formula = y ~ x | panels
