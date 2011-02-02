@@ -21,12 +21,10 @@ aqm.pca = function(x) {
       title   = "Principal Component Analysis",
       legend  = legend,
       shape   = list("h" = 6, "w" =6),
-      svg     = if(x$usesvg)
-        new("svgParameters",
-              name = "pca",
-              numPlotObjects = x$numArrays,
-              getPlotObjNodes = getPlotPoints,
-              stroke = matrix(c("1", "6", "1", "1"), nrow=2, dimnames = list(NULL, c("width", "opacity")))) else new("svgParameters")
-      ) ## new
+      svg     = new("svgParameters",
+           name = "pca",
+           numPlotObjects = x$numArrays,
+           getPlotObjNodes = getPlotPoints,
+           stroke = matrix(c("1", "6", "1", "1"), nrow=2, dimnames = list(NULL, c("width", "opacity")))))
 }
 

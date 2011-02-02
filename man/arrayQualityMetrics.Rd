@@ -15,8 +15,7 @@ arrayQualityMetrics(expressionset,
   intgroup = NULL,
   grouprep,
   spatial = TRUE,
-  reporttitle = paste("Quality metrics report for", deparse(substitute(expressionset))),
-  usesvg)
+  reporttitle = paste("Quality metrics report for", deparse(substitute(expressionset))))
 }
 
 \arguments{
@@ -57,12 +56,6 @@ arrayQualityMetrics(expressionset,
   hgu133Plus2) when CPU time and RAM resources of the machine would be limiting. }
 
 \item{reporttitle}{title for the report (character of length 1).}
-
-\item{usesvg}{a logical of length 1, indicating whether 
-  graphics should be produced with interactive tooltips and highlighting
-  on mouseover through using JavaScripted SVG. If missing, the value of \code{capabilities()["cairo"]}
-  is used. Use of this option is recommended: some of the graphics will be much less useful without
-  JavaScripted SVG.}
 }
 
 
@@ -77,6 +70,6 @@ arrayQualityMetrics(expressionset,
   the report elements for subsequent programmatic processing.  }
 
 \author{
-  Audrey Kauffmann.
+  Audrey Kauffmann and Wolfgang Huber.
 }
 

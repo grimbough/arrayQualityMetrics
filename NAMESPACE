@@ -40,6 +40,8 @@ importFrom(Biobase, copySubstitute)
 
 importFrom(beadarray, createBeadSummaryData)
 
+importFrom(Cairo, Cairo)
+
 importFrom(genefilter, dist2)
 
 importFrom(graphics, legend)

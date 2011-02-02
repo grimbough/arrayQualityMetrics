@@ -9,18 +9,16 @@ figurePhrase = function(x)
 ##--------------------------------------------------
 prepaffy = function(expressionset, x)
 {
-  ## pp = preprocess(expressionset)
-  ## x$dataPLM = fitPLM(pp, background = FALSE, normalize = FALSE)
-
   x$dataPLM = fitPLM(expressionset)
-
-  x$pm = pm(expressionset)
-  x$mm = mm(expressionset)
-  x$mmOK = !any(is.na(x$mm))
+  x$pm      = pm(expressionset)
+  x$mm      = mm(expressionset)
+  x$mmOK    = !any(is.na(x$mm))
   return(x)
 }
 
+##--------------------------------------------------
 ## RNA digestion
+##--------------------------------------------------
 aqm.rnadeg = function(expressionset, x)
   {
  
@@ -40,11 +38,10 @@ aqm.rnadeg = function(expressionset, x)
         title   = "RNA digestion plot",
         legend  = legend,
         shape   = list("h" = 5.5, "w" =7),
-        svg     =  if(x$usesvg)
-        new("svgParameters",
-              name = "rnadeg",
-              numPlotObjects = x$numArrays) else new("svgParameters")
-        ) ## new
+        svg     =  new("svgParameters",
+                       name = "rnadeg",
+                       numPlotObjects = x$numArrays) )
+
    }
 
 ##--------------------------------------------------

@@ -1,4 +1,4 @@
-prepdata = function(expressionset, intgroup, do.logtransform, usesvg)
+prepdata = function(expressionset, intgroup, do.logtransform)
 {
   cls = class(expressionset)
   if (any(cls %in% c("RGList", "MAList", "marrayRaw", "marrayNorm")))
@@ -13,8 +13,7 @@ prepdata = function(expressionset, intgroup, do.logtransform, usesvg)
   x = append(x, list(
     numArrays       = ncol(x$M),
     intgroup        = intgroup,
-    do.logtransform = do.logtransform,
-    usesvg          = usesvg))
+    do.logtransform = do.logtransform))
   
   return(x)
 }

@@ -8,7 +8,7 @@ annotateSvgPlot = function(infile, outfile, outdir, annotationInfo, name)
     svg = xmlRoot(doc)
     vb  = getViewBox(doc)
     
-    ## extract and check arguments 
+    ## Extract and check arguments 
     stopifnot(is(annotationInfo, "svgParameters"))
   
     ## This part is brittle - 'getPlotObjNodes' will be 'getMatplotSeries' or 'getPlotPoints' from
@@ -17,7 +17,7 @@ annotateSvgPlot = function(infile, outfile, outdir, annotationInfo, name)
     ## align with the intended plot objects (i.e. not on any explicit identification).
     series = annotationInfo@getPlotObjNodes(doc)
   
-    ## Catch some of the brittleness
+    ## Try to catch some of the brittleness
     if (length(series) != annotationInfo@numPlotObjects)
       {
         annotateOK = FALSE
@@ -48,36 +48,13 @@ annotateSvgPlot = function(infile, outfile, outdir, annotationInfo, name)
     return(list(size = diff(vb), annotateOK = annotateOK))
   }
 
-##--------------------------------------------------
+##--------------------------------------------------------------------------------------
 ## HTML table to show 'tooltips' for mouseover events
-##--------------------------------------------------
+## The function creates a table with 2 columns and as many rows as 'x' has columns.
+## The first column will contain the rownames of 'x', the second column will be empty
+##---------------------------------------------------------------------------------------
 annotationTable = function(x, name, width=300) {
-  ## Create a table with 2 columns and as many rows as 'x' has columns.
-  ## The first column will contain the rownames of 'x', the second column will be empty
   tab  = paste("<tr><td>", colnames(x), "</td><td style='font-weight:bold'></td></tr>", sep="", collapse="\n")
   tab  = paste("<table id='", paste("Tab", name, sep=":"), "' width=", width, ">", tab, "</table>", sep="")
 }
 
-
-##-----------------------------------------------------------------
-## Check the 'usesvg' parameter, and the available infrastructure,
-## and if appropriate, emit a warning.
-##-----------------------------------------------------------------
-checkUsesvg = function(usesvg) {
-
-  if(missing(usesvg)){
-    ## Note: assignment within the if-condition
-    if(! (usesvg <- capabilities("cairo")) )
-      warning("capabilities(\"cairo\") is FALSE - all graphics will be static. Please install the cairo library for your R to obtain interactive SVG graphics.") 
-  } else {
-    if(is.logical(usesvg))
-      if((length(usesvg)!=1) || is.na(usesvg))
-      stop("'usesvg' must be TRUE or FALSE")
-    if(usesvg && (!capabilities("cairo")))
-      stop("capabilities(\"cairo\") is FALSE - cannot produce interactive SVG graphics. Please install the cairo library for your R.") 
-  }
-  
-  return(usesvg)
-}
-
-  

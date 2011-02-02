@@ -129,8 +129,9 @@ reportModule = function(p, module, integerIndex, arrayTable, outdir)
             ## svg
             name    = module@svg@name
             nameimg = paste(name, ".svg", sep = "")
-            svgtemp = tempfile()
-            svg(file = svgtemp, h = h, w = w)
+            svgtemp = paste(tempfile(), ".svg", sep = "")
+            # svg(file = svgtemp, h = h, w = w)
+            Cairo(file = svgtemp, type = "svg", h = h, w = w, units = "in", dpi = dpi)
             makePlot(module)
             dev.off()
                  

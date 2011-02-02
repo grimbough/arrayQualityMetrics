@@ -74,14 +74,13 @@ details. For example,
 <<DataPreparation>>=
 dataprep = prepdata(expressionset = nCCl4, 
                     intgroup = c(), 
-                    do.logtransform = FALSE, 
-                    usesvg = capabilities()["cairo"])
+                    do.logtransform = FALSE)
 @ 
 
-The arguments \Robject{intgroup}, \Robject{do.logtransform} and
-\Robject{usesvg} are the same as for \Rfunction{arrayQualityMetrics},
-but in \Rfunction{prepdata} they have no defaults, so we need to set
-them explicitely.
+The arguments \Robject{intgroup} and \Robject{do.logtransform} are the
+same as for \Rfunction{arrayQualityMetrics}, but in
+\Rfunction{prepdata} they have no defaults, so we need to set them
+explicitely.
 
 %--------------------------------------------------
 \section{Module generating functions}

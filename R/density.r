@@ -51,23 +51,20 @@ aqm.density = function(x)
         paste("r", (j-1) %% n + 1, sep = ":")
       }
 
-      svgPar = if(x$usesvg)
-        new("svgParameters",
-              name           = name,
-              numPlotObjects = 3L*x$numArrays,
-              getPlotObjIdFromReportObjId = getPlotObjIdFromReportObjId,
-              getReportObjIdFromPlotObjId = getReportObjIdFromPlotObjId)
-      else new("svgParameters")
+      svgPar = new("svgParameters",
+                   name           = name,
+                   numPlotObjects = 3L*x$numArrays,
+                   getPlotObjIdFromReportObjId = getPlotObjIdFromReportObjId,
+                   getReportObjIdFromPlotObjId = getReportObjIdFromPlotObjId)
+
       
     } else {  ## nchannels==1
       ddf = dens(x$M)
       formula = y ~ x
       lay = c(1,1)
-      svgPar = if(x$usesvg)
-        new("svgParameters",
-              name = name,
-              numPlotObjects = x$numArrays)
-      else new("svgParameters")
+      svgPar = new("svgParameters",
+                   name = name,
+                   numPlotObjects = x$numArrays)
     }
 
   

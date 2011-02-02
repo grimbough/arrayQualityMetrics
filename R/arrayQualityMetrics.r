@@ -6,8 +6,7 @@ arrayQualityMetrics = function(
   intgroup = NULL,
   grouprep,
   spatial = TRUE,
-  reporttitle = paste("Quality metrics report for", deparse(substitute(expressionset))),
-  usesvg)
+  reporttitle = paste("Quality metrics report for", deparse(substitute(expressionset))))
 {
   ## Argument checking: 
   if(!missing(grouprep))
@@ -29,8 +28,6 @@ arrayQualityMetrics = function(
       stop("all elements of 'intgroup' should match column names of 'phenoData(expressionset)'.")
   }
 
-  usesvg = checkUsesvg( usesvg )
-  
   ## output directory
   dircreation(outdir, force)
 
@@ -39,7 +36,7 @@ arrayQualityMetrics = function(
   
   ## create a comprehensive data object 'x', with the original data,
   ##  as well as some generally useful derived statistics of the data
-  x = prepdata(expressionset, intgroup=intgroup, do.logtransform=do.logtransform, usesvg=usesvg) 
+  x = prepdata(expressionset, intgroup=intgroup, do.logtransform=do.logtransform) 
   
   ##---------Generic modules------
   m$heatmap   = aqm.heatmap(x)
