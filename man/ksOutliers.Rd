@@ -31,10 +31,10 @@ outliers(exprs, method = c("KS", "mean", "median"))
   be used for each column of \code{exprs}. See details.}
  }
 
-\value{For \code{findOutliers}, an integer vector of indices
-  (see \code{\link[base:which]{which}}).
-For \code{outliers}, a list with two elements: the per array summary statistics
-\code{s} and the value of \code{findOutliers(s)}.}
+\value{For \code{findOutliers}, a list with two elements:
+  \code{thresh}, the threshold against which \code{x} was compared, and
+  \code{outliers}, an integer vector of indices.
+  For \code{outliers}, an object of class \code{outlierDetection}.}
 
 \details{
  With \code{method="KS"}, the \code{outliers} computes for each array

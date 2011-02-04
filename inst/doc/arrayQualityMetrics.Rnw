@@ -54,8 +54,8 @@ work in the same way for all of them. Further information about
 its arguments can be found in its manual page.
 
 When the function \Rfunction{arrayQualityMetrics} is finished, a
-report is produced in the subdirectory specified by the function's
-\texttt{outdir} argument. By default, a subdirectory with a suitable
+report is produced in the directory specified by the function's
+\texttt{outdir} argument. By default, a directory with a suitable
 name is created in the current working directory. This directory
 contains an HTML page \texttt{index.html} that can be opened by a
 browser. The report contains a series of plots explained by text.  The
@@ -63,13 +63,20 @@ plots are provided as bitmaps (PNG format) or as vector graphics (SVG
 format). In the former case, the figures are also linked to PDF files
 that provide high resolution versions e.\,g.\ for publication.
 
+Metadata about the arrays is shown at the top of the report as a
+table.  It is extracted from the \Robject{phenoData} slot of the data
+object supplied to \Rfunction{arrayQualityMetrics}.  It can be useful
+to adjust the contents this slot before producing the report, and to
+make sure it contains the right quantity of information to make an
+informative report - not too much, not too little.
+
 In the case of \Rclass{AffyBatch} input, some Affymetrix specific
 sections are added to the standard report. Also for other types of
 arrays, sections can be added to the standard report if certain
 metadata are present in the input object (see Section~\ref{ext}).
 
 The function \Rfunction{arrayQualityMetrics} also produces an R object
-(essentially, a very big list) with all the information contained in
+(essentially, a big list) with all the information contained in
 the report, and this object can be used by downstream tools for
 programmatic analysis of the report.
 
@@ -144,13 +151,19 @@ arrayQualityMetrics(expressionset = nMLL,
 We do not need to set \texttt{do.logtransform} as after
 \Rfunction{rma} the data are already logarithm transformed.
 
+%----------------------------------------------------
+\subsection{ExpressionSet and ExpressionSetIllumina}
+%----------------------------------------------------
 If you are working on one colour arrays other than Affymetrix
 genechips, you can load your data into Bioconductor as an
 \Rclass{ExpressionSet} object \footnote{See the documentation of the
-  \Rpackage{Biobase} package.} and proceed exactly as above.
+  \Rpackage{Biobase} package.}, or if you work with Illumina data and the
+\Rpackage{beadarray} package, as an \Rclass{ExpressionSetIllumina} object.
+You can then proceed exactly as above.
 
+%--------------------------------------------------
 \subsection{Two colour arrays}
-
+%--------------------------------------------------
 If you are working on two colour chips, you can create an
 \Rclass{NChannelSet} to contain your data. The documentation of the
 \Rpackage{Biobase} package gives instructions on how to build a
@@ -175,13 +188,9 @@ arrayQualityMetrics(expressionset = nCCl4,
 @
 %
 
-\subsection{Illumina beadarrays}
-
-For Illumina bead arrays, you can build a
-\Rclass{BeadLevelList}, which is explained in the \Rpackage{beadarray}
-package, and again run the function \Rfunction{arrayQualityMetrics}.  
-
+%--------------------------------------------------
 \subsection{Loading data from ArrayExpress}
+%--------------------------------------------------
 
 You can use the \Rpackage{ArrayExpress}
 package~\cite{Kauffmann:2009b:Bioinf} to download datasets from the

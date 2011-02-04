@@ -28,7 +28,10 @@ aqm.maplot = function(x, subsample=20000, Dthresh=0.15) {
     {
       hoeffd(sA[,j], sM[,j])$D[1,2]
     })
-  maout = which(stat > Dthresh)
+  out = new("outlierDetection",
+    statistic = stat,
+    threshold = Dthresh,
+    which = which(stat > Dthresh))
     
   ## Plot maximally 8 scatterplots
   if(x$numArrays<=8)
@@ -64,10 +67,11 @@ aqm.maplot = function(x, subsample=20000, Dthresh=0.15) {
     asp = "iso",
     strip = function(..., bg, factor.levels) strip.default(..., bg ="#cce6ff", factor.levels = panelNames))
 
-
-  vv = if(length(maout)==1) c("One array", "was", "") else c(paste(length(maout), "arrays"), "were", "s")
-  outliertext = sprintf("%s had <i>D</i>&gt;%g and %s marked as outlier%s." 
-    vv[1], Dthresh, vv[2], vv[3])
+  vv = if(length(out@which)==1)
+    c("One array", "was", "") else
+    c(paste(length(out@which), "arrays"), "were", "s")
+  outliertext = sprintf("%s had <i>D</i>&gt;%g and %s marked as outlier%s.", 
+                         vv[1],           Dthresh, vv[2],             vv[3])
   
   legend = paste("The figure <!-- FIG --> shows the MA plot for each array. M and A are defined as:<br>",
     "M = log<sub>2</sub>(I<sub>1</sub>) - log<sub>2</sub>(I<sub>2</sub>)<br>",
@@ -92,7 +96,7 @@ aqm.maplot = function(x, subsample=20000, Dthresh=0.15) {
       section = "Individual array quality",
       title = "MA plots",
       legend = legend,
-      outliers = maout,
+      outliers = out,
       size = c(w=10, h=6))
 }
 

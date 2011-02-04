@@ -49,21 +49,21 @@ aqm.boxplot = function(x, subsample=20000, outlierMethod = "KS") {
           panel.bwplot(x, y, ...)
           if(lattice:::packet.number()==lay[1]) {
             whArray = list(...)$group.value
-            if (whArray %in% out$outliers)
+            if (whArray %in% out@which)
               ltext(xAsterisk, whArray, "*", font=2, cex=2, adj=c(0.5, 0.75))
           }
         })
   
-  legend = paste("The figure <!-- FIG --> shows boxplots representing summaries of the signal intensity distributions of the arrays. ", legPanels, "Each box corresponds to one array. Typically, one expects the boxes to have similar positions and widths. If the distribution of an array is very different from the others, this may indicate an experimental problem. ", outlierPhrase(outlierMethod, length(out$outliers)), sep="")
+  legend = paste("The figure <!-- FIG --> shows boxplots representing summaries of the signal intensity distributions of the arrays. ",
+    legPanels, "Each box corresponds to one array. Typically, one expects the boxes to have similar positions and widths. If the ",
+    "distribution of an array is very different from the others, this may indicate an experimental problem. ",
+    outlierPhrase(outlierMethod, length(out@which)), sep="")
   
-  title = "Boxplots"
-  section = "Array intensity distributions"
-
   new("aqmReportModule",
       plot = box,
-      section = section,
-      title = title,
+      section = "Array intensity distributions",
+      title = "Boxplots",
       legend = legend,
-      outliers = out$outliers,
+      outliers = out,
       size = c(w = 3+3*lay[1], h = 2.5 + x$numArrays * 0.1 +  1/x$numArrays))
 }

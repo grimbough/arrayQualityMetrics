@@ -44,6 +44,7 @@ arrayQualityMetrics = function(
   
   ##---------Generic modules------
   m$heatmap   = aqm.heatmap(x)
+  m$hmdists   = aqm.distances(x, m$heatmap)
   m$pca       = aqm.pca    (x)
 
   m$boxplot   = aqm.boxplot(x)

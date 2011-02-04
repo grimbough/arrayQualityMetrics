@@ -4,13 +4,10 @@
 ##----------------------------------------------------------------------------------
 findOutliers = function (x, coef = 1.5) 
 {
-    nna = !is.na(x)
     stats = stats::fivenum(x, na.rm = TRUE)
     iqr = diff(stats[c(2, 4)])
-    out = if (!is.na(iqr)) {
-            is.na(x) | (x > (stats[4] + coef * iqr))
-        }
-    which(out)
+    th = (stats[4] + coef * iqr)
+    list(threshold = th, which = which(x > th))
 }
 
 ##---------------------------------------------------------------
@@ -34,7 +31,12 @@ outliers = function(exprs, method = c("KS", "mean", "median"))
     },
     stop(sprintf("Invalid method '%s'", method))
     )
-  list(statistic = s, outliers = findOutliers(s))
+
+  fo = findOutliers(s)
+  new("outlierDetection",
+      statistic = s,
+      threshold = fo$threshold,
+      which     = fo$which)
 }
 
 outlierMethodExplanation = c(

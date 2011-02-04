@@ -66,20 +66,33 @@ setClass("svgParameters",
   }         
 )
 
+##
+## Parameters summarising an outlier detection
+##
+setClass("outlierDetection",
+  representation(
+    statistic   = "numeric",
+    threshold   = "numeric",
+    which       = "integer",
+    description = "character"),
+  prototype(
+    statistic   = numeric(0),
+    threshold   = NA_real_,
+    which       = NA_integer_,
+    description = NA_character_))
 
 ##
 ## An object of this class contains everything needed to render a report module
 ##
-
 setClass("aqmReportModule",
   representation(
-    plot     = "ANY",
-    size     = "numeric",     ## size of the plot in inch
-    section  = "character",
-    title    = "character",
-    legend   = "character",
-    outliers = "integer",
-    svg      = "svgParameters"),
+    plot      = "ANY",
+    size      = "numeric",     ## size of the plot in inch
+    section   = "character",
+    title     = "character",
+    legend    = "character",
+    outliers  = "outlierDetection",
+    svg       = "svgParameters"),
 
   prototype(
     plot      = new("namedList"),
@@ -87,7 +100,7 @@ setClass("aqmReportModule",
     section   = NA_character_,
     title     = NA_character_,
     legend    = NA_character_,
-    outliers  = NA_integer_,       
+    outliers  = new("outlierDetection"),
     svg       = new("svgParameters")),
 
   validity = function(object) {

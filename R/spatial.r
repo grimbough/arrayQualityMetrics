@@ -39,8 +39,12 @@ spatialplot = function(whichChannel, x, scale)
       npg[1,1] = 0         ## drop the constant component
       stat[a] = sqrt(sum(npg[1:4, 1:4]) / sum(npg))   # low frequency power
     }
-  outliers = findOutliers(stat)
-  
+  fo = findOutliers(stat)
+  outliers = new("outlierDetection",
+      statistic = stat,
+      threshold = fo$threshold,
+      which     = fo$which)
+    
   ## Plot maximally 8 images
   if(x$numArrays<=8)
     {
@@ -94,14 +98,16 @@ spatialplot = function(whichChannel, x, scale)
            direct = ", and it is shown in the panel on the right."), 
     "<br>Outlier detection has been performed by computing <i>S</i>, the sum of the absolutes value of low frequency Fourier coefficients, as a measure of large scale spatial structures.", legOrder, " The value of <i>S</i> is shown in the panel headings. ", outlierPhrase(FALSE, length(outliers)), sep="")
 
-  fac = 1 / (arrayQualityMetricsGlobalParameters$dpi * 3)
+          
+  fac = 0.3 * sqrt(maxx*maxy)/arrayQualityMetricsGlobalParameters$dpi
+  
   new("aqmReportModule",
       plot = spat,
       section = "Individual array quality",
       title = paste("Spatial distribution of", whichChannel),
       legend = legend,
       outliers = outliers,
-      size = c(w = maxy * fac * lay[1], h = (maxx*fac + 0.25) * lay[2]))
+      size = c(w = fac * lay[1], h = (fac + 0.25) * lay[2]))
 }
 
   

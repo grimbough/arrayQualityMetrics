@@ -58,7 +58,7 @@ aqm.rle = function(x)
   
   rv@legend = paste(figurePhrase(rv@title),
     "Arrays whose boxes are centered away from 0 and/or are more spread out are potentially problematic.",
-    outlierPhrase(outlierMethod, length(rv@outliers)))
+    outlierPhrase(outlierMethod, length(rv@outliers@which)))
 
   return(rv)
 }
@@ -77,7 +77,7 @@ aqm.nuse = function(x)
 
   rv@legend = paste(figurePhrase(rv@title),
     "For each array, the boxes should be centered around 1. An array were the values elevated relative to the other arrays is typically of lower quality.",
-    outlierPhrase(outlierMethod, length(rv@outliers)))
+    outlierPhrase(outlierMethod, length(rv@outliers@which)))
 
   return(rv)
 }

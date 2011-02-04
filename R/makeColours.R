@@ -48,21 +48,3 @@ addOpacity = function(cols, n){
   paste(cols, opacity, sep="")
 }
 
-##----------------------------------------
-## 'outlierColours' returns a list with:
-##   arrayColors:  color code for each array
-##----------------------------------------
-outlierColours = function(outliers, n, withOpacity = FALSE)
-{
-
-  colours = c("outliers"="#ff0000", "non-outliers"="#000000")
-  if(withOpacity) colours[2] = addOpacity(colours[2], n) 
-  cols = ifelse(seq_len(n) %in% outliers, colours[1], colours[2])
-    
-  key = list(
-    rect = list(col = colours),
-    text = list(names(colours)),
-    rep = FALSE)
-  
-  list(arrayColours = cols, key = key)
-}

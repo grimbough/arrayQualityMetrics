@@ -109,6 +109,8 @@ reportModule = function(p, module, integerIndex, arrayTable, outdir)
     svgwarn = FALSE
     if(!is.null(module@plot))
       {
+        hwrite(sprintf("<a name=\"%s\"></a>", cleanstring(module@title)), p)
+
         stopifnot(!any(is.na(module@size)))
         h = module@size["h"]
         w = module@size["w"]
@@ -151,7 +153,7 @@ reportModule = function(p, module, integerIndex, arrayTable, outdir)
         pdf(file = file.path(outdir, namepdf), h = h, w = w)
         makePlot(module)
         dev.off()
-        hwrite(img, p)
+        hwrite(paste("<center>", img, "</center>"), p)
       } else {
 
         ## No plot
@@ -159,7 +161,7 @@ reportModule = function(p, module, integerIndex, arrayTable, outdir)
       }
     
     hwrite("<br>", p)
-    hwrite( paste(hwrite(paste("Figure ", integerIndex, ": ", module@title,". ", sep=""), style="font-weight:bold;font-size:larger"),
+    hwrite(paste(hwrite(paste("Figure ", integerIndex, ": ", module@title,". ", sep=""), style="font-weight:bold;font-size:larger"),
                   if(!is.na(namepdf)) hwrite("(PDF file)", link = namepdf) ),
             style = "text-align:center", p)
     hwrite("<br><br>", p)
@@ -228,6 +230,14 @@ toJSON_fromchar = function(x)
   paste("[", paste(x, collapse=", "), "]")
 }
 
+##----------------------------------------------------------
+## remove spaces and punctuation characters
+## character vector containing the JSON representation of the elements
+##----------------------------------------------------------
+cleanstring = function(x)
+  gsub("[[:punct:]|[:space:]]", "", x)
+
+
 ##--------------------------------------------------
 ##   write the report
 ##--------------------------------------------------
@@ -246,34 +256,45 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
   ## Further below, a textual representation of 'outliers', ifelse(outliers, "x", "") is added to arrayTable,
   ## and the row-wise OR (more precisely: 'apply(outliers, 1, any)') is used to determine
   ## which arrays to highlight initially.
-  out = lapply(modules, slot, "outliers")
-  wh  = which(!sapply(out, identical, y =  NA_integer_))
+  wh = which(sapply(modules, function(x) length(x@outliers@statistic)>0))
 
-  outliers = matrix(NA, nrow = nrow(arrayTable), ncol = length(wh),
-    dimnames = list(NULL, sprintf("C%d", seq(along=wh))))
-  outlierExplanations = sprintf("C%d: outlier detection by %s", seq(along=wh), sapply(modules, slot, "title")[wh])
-  outlierExplanations = paste("The columns named C1, C2, ... indicate the calls from the different outlier detection methods:<ol>", paste(sprintf("<LI>%s</LI>", outlierExplanations), collapse=""), "</ol>The outlier detection criteria are explained below in the respective sections. Arrays that were called outliers by at least one criterion are selected in this table and indicated by highlighted lines or points in some of the plots below. By clicking the checkboxes in the table, or on the corresponding points/lines in the plots, you can modify the selection. To reset the selection, reload the HTML page in your browser.", sep="")
+  outlierMethodTitles = sapply(modules, slot, "title")[wh]
+  outlierMethodLinks  = paste("<a href=\"#", cleanstring(outlierMethodTitles), "\">", sep="")
+  
+  outlierExplanations = paste(
+    "The columns named C1, C2, ... indicate the calls from the different outlier detection methods:<OL>",
+    paste(sprintf("<LI>C%d: outlier detection by %s%s</a></LI>",
+                   seq(along = wh), outlierMethodLinks, outlierMethodTitles), collapse = ""),
+    "</OL>The outlier detection criteria are explained below in the respective sections. Arrays that were called outliers ",
+    "by at least one criterion are selected in this table and indicated by highlighted lines or points in some of the plots below. ",
+    "By clicking the checkboxes in the table, or on the corresponding points/lines in the plots, you can modify the selection. ",
+    "To reset the selection, reload the HTML page in your browser.", sep="")
+
+  outliers = matrix(NA, nrow = nrow(arrayTable),
+                        ncol = length(wh),
+                        dimnames = list(NULL, sprintf("%sC%d</a>", outlierMethodLinks, seq(along=wh))))
 
   for(j in seq(along = wh))
     {
-      o = out[[wh[j]]]
+      o = modules[[wh[j]]]@outliers@which
       stopifnot(!any(is.na(o)), all( (o>=1) & (o<=nrow(arrayTable))))
       outliers[,j] = seq_len(nrow(arrayTable)) %in% o
     }
 
 
   ## Add numeric indices, rownames and outlier annotation to 'arrayTable'
+  ## Make two versions of it:
+  ## - 'big', includes outlier status, is shown at the top of the report
+  ## - 'compact' , without outlier status, is shown next to the interactive plots
   rowchar = as.character(row.names(arrayTable))
   rownum  = paste(seq_len(nrow(arrayTable)))
-  arrayTable = cbind(row = rownum,
-                     sampleNames = rowchar,
-                     ifelse(outliers, "x", ""), 
-                     arrayTable,
-                     stringsAsFactors = FALSE)
-  if(identical(rownum, rowchar))
-    arrayTable$sampleNames = NULL
-  rownames(arrayTable) = NULL
+  left = if(identical(rowchar, rownum))
+    data.frame(array = rownum, sampleNames = rowchar, stringsAsFactors = FALSE) else
+    data.frame(array = rownum, stringsAsFactors = FALSE)
 
+  arrayTableBig     = cbind(left, ifelse(outliers, "x", ""), arrayTable, stringsAsFactors = FALSE)
+  arrayTableCompact = cbind(left, arrayTable, stringsAsFactors = FALSE)
+  rownames(arrayTableBig) = rownames(arrayTableCompact) = NULL
   
   ## Open and set up the HTML page
   p = makeTitle(
@@ -282,14 +303,14 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
     ## Inject report-specific variables into the JavaScript
     params = c(          
       HIGHLIGHTINITIAL = toJSON_fromchar(ifelse(apply(outliers, 1, any), "true", "false")), 
-      ARRAYMETADATA    = toJSON_strip(as.matrix(arrayTable)),
+      ARRAYMETADATA    = toJSON_strip(as.matrix(arrayTableCompact)),
       SVGOBJECTNAMES   = toJSON_strip(names(svgdata)),
       IDFUNS           = toJSON_fromchar(sapply(svgdata, slot, "getPlotObjIdFromReportObjId")),
       STROKEVALUES     = toJSON_fromchar(lapply(svgdata, function(x) toJSON_strip(t(x@stroke)))),
       STROKEATTRS      = toJSON_strip(t(sapply(svgdata, function(x) colnames(x@stroke))))))
   
   makeIndex(p = p, modules = modules)
-  reportTable(p = p, arrayTable = arrayTable,
+  reportTable(p = p, arrayTable = arrayTableBig,
               tableLegend = outlierExplanations)
   
   currentSectionName = "Something Else"
@@ -303,10 +324,10 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
           sec = sec+1
         }
       reportModule(p = p, module = modules[[i]], integerIndex = i,
-                   arrayTable = arrayTable, outdir=outdir)
+                   arrayTable = arrayTableCompact, outdir=outdir)
       currentSectionName = modules[[i]]@section
     }
   
   makeEnding(p)
-  invisible(list(modules=modules, arrayTable=arrayTable, reporttitle=reporttitle, outdir=outdir))
+  invisible(list(modules=modules, arrayTable=arrayTableBig, reporttitle=reporttitle, outdir=outdir))
 }
