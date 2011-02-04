@@ -63,12 +63,29 @@ aqm.maplot = function(x, subsample=20000, Dthresh=0.15) {
     layout = lay,
     asp = "iso",
     strip = function(..., bg, factor.levels) strip.default(..., bg ="#cce6ff", factor.levels = panelNames))
+
+
+  vv = if(length(maout)==1) c("One array", "was", "") else c(paste(length(maout), "arrays"), "were", "s")
+  outliertext = sprintf("%s had <i>D</i>&gt;%g and %s marked as outlier%s." 
+    vv[1], Dthresh, vv[2], vv[3])
   
-  legRef = if(x$nchannels == 1)
-    "where I<sub>1</sub> is the intensity of the array studied, and I<sub>2</sub> is the intensity of a \"pseudo\"-array that consists of the median across arrays." else
-    "where I<sub>1</sub> and I<sub>2</sub> are the intensities of the two channels."
-    
-  legend = sprintf("The figure <!-- FIG --> shows the MA plot for each array. M and A are defined as :<br>M = log<sub>2</sub>(I<sub>1</sub>) - log<sub>2</sub>(I<sub>2</sub>)<br>A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>)),<br>%s Typically, we expect the mass of the distribution in an MA plot to be concentrated along the M = 0 axis, and there should be no trend in M as a function of A. If there is a trend in the lower range of A, this often indicates that the arrays have different background intensities; this may be addressed by background correction. A trend in the upper range of A can indicate saturation of the measurements; in mild cases, this may be addressed by non-linear normalisation (e.g. quantile normalisation).<br>Outlier detection was performed by computing Hoeffding's <i>D</i>-statistic on the joint distribution of A and M for each array. %sThe value of <i>D</i> is shown in the panel headings. %s had <i>D</i>&gt;%g and %s marked as outliers. For more information on Hoeffing's <i>D</i> statistic, please see the manual page of the function <tt>hoeffd</tt> in the <tt>Hmisc</tt> package.", legRef, legOrder, if(length(maout)==1) "One array" else paste(length(maout), "arrays"), Dthresh, if(length(maout)==1) "was" else "were")
+  legend = paste("The figure <!-- FIG --> shows the MA plot for each array. M and A are defined as:<br>",
+    "M = log<sub>2</sub>(I<sub>1</sub>) - log<sub>2</sub>(I<sub>2</sub>)<br>",
+    "A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>)),<br>",
+    if(x$nchannels == 1)
+      "where I<sub>1</sub> is the intensity of the array studied, and I<sub>2</sub> is the intensity of a \"pseudo\"-array that consists of the median across arrays." else
+      "where I<sub>1</sub> and I<sub>2</sub> are the intensities of the two channels.",
+    " Typically, we expect the mass of the distribution in an MA plot to be concentrated along the M = 0 axis, ",
+    "and there should be no trend in M as a function of A. If there is a trend in the lower range of A, this often ",
+    "indicates that the arrays have different background intensities; this may be addressed by background correction. ",
+    "A trend in the upper range of A can indicate saturation of the measurements; in mild cases, this may be addressed ",
+    "by non-linear normalisation (e.g. quantile normalisation).<br>",
+    "Outlier detection was performed by computing Hoeffding's <i>D</i>-statistic on the joint distribution of A and M for each array. ",
+    legOrder,
+    "The value of <i>D</i> is shown in the panel headings. ",
+    outliertext,
+    "For more information on Hoeffing's <i>D</i> statistic, please see the manual page of the function <tt>hoeffd</tt> in the <tt>Hmisc</tt> package.",
+    sep="")
   
   new("aqmReportModule",
       plot = ma, 

@@ -92,7 +92,7 @@ function(expressionset, do.logtransform)
 ##----------------------------------------------------------
 ## Common parts of dealing with ExpressionSet and AffyBatch
 ##----------------------------------------------------------
-oneColourStuff = function(expressionset, do.logtransform)
+oneColour = function(expressionset, do.logtransform)
 {
   M = exprs(expressionset)    
   if(do.logtransform)
@@ -109,7 +109,7 @@ setMethod("platformspecific",
           signature(expressionset = "ExpressionSet"),
 function(expressionset, do.logtransform)
 {
-  rv = oneColourStuff(expressionset, do.logtransform)
+  rv = oneColour(expressionset, do.logtransform)
   rv$sx = featureData(expressionset)$X ## spatial x-coordinate
   rv$sy = featureData(expressionset)$Y ## spatial y-coordinate
   return(rv)
@@ -122,8 +122,7 @@ setMethod("platformspecific",
           signature(expressionset = "AffyBatch"),
 function(expressionset, do.logtransform)
 {
-  rv = oneColourStuff(expressionset, do.logtransform)
-
+  rv = oneColour(expressionset, do.logtransform)
   maxc = ncol(expressionset)
   maxr = nrow(expressionset)
   rv$sx = rep(seq_len(maxc), each = maxr) ## spatial x-coordinate
@@ -132,11 +131,11 @@ function(expressionset, do.logtransform)
 })
 
 ##----------------------------------------------------------
-## BeadLevelData and BeadLevelList
+## beadLevelData 
 ##----------------------------------------------------------
 setMethod("platformspecific",
           signature(expressionset = "beadLevelData"),
-function(expressionset)
+function(expressionset, do.logtransform)
 {
   stop("\n\narrayQualityMetrics does not support bead-level objects of class 'beadLevelData'. Please refer to the vignette 'Analysis of bead-level data using beadarray' of the beadarray package for the processing and quality assessment of such objects. After summarisation of the bead-level data to an object of class 'ExpressionSetIllumina', you can use arrayQualityMetrics on that.\n")
 })
@@ -146,29 +145,6 @@ function(expressionset)
 ##----------------------------------------------------------
 setMethod("platformspecific",
           signature(expressionset = "ExpressionSetIllumina"),
-function(expressionset, do.logtransform){
-            
-  switch(expressionset@arrayInfo$channels,
-   "single" =  {
-     summaryES = createBeadSummaryData(expressionset, imagesPerArray = 1, log = do.logtransform)
-     R = G = NULL
-     M = A = exprs(summaryES) 
-     nch = 1
-   },
-   "two" = {
-     summaryESRG = createBeadSummaryData(expressionset, what = "RG", imagesPerArray = 1, log = do.logtransform)
-     R = assayData(summaryESRG)$R                         
-     G = assayData(summaryESRG)$G                
-     summaryES = createBeadSummaryData(expressionset , what = "M", imagesPerArray = 1, log = do.logtransform)
-     M = exprs(summaryES)   
-     A = 0.5*(R +G)         ## TODO us there also a createBeadSummaryData function for this?
-     nch = 2
-   },
-   stop(sprintf("Invalid 'expressionset@arrayInfo$channels': %s", expressionset@arrayInfo$channels))    
-  ) ## switch
-  
-  list(R = R, G = G, M = M, A = A, 
-    nchannels = nch, pData = pData(expressionset), fData = fData(expressionset)) 
-})
+          oneColour)
 
 
