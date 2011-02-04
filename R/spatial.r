@@ -34,10 +34,10 @@ spatialplot = function(whichChannel, x, scale)
     {
       mat = matrix(NA_real_, nrow=maxy, ncol=maxx)
       mat[ cbind(x$sy, x$sx) ] = x[[whichChannel]][, a]
-      apg = abs(fft(mat))       ## absolute values of the periodogram
-      lowFreq = apg[1:4, 1:4]
-      lowFreq[1,1] = 0          ## drop the constant component
-      stat[a] = sum(lowFreq)
+      pg  = fft(mat)       ## periodogram
+      npg = Re(pg*Conj(pg))
+      npg[1,1] = 0         ## drop the constant component
+      stat[a] = sqrt(sum(npg[1:4, 1:4]) / sum(npg))   # low frequency power
     }
   outliers = findOutliers(stat)
   
@@ -81,21 +81,27 @@ spatialplot = function(whichChannel, x, scale)
     strip = function(..., bg, factor.levels) strip.default(..., bg ="#cce6ff", factor.levels = panelNames),
     colorkey = (scale!="rank"))
   
-  legend = sprintf("The figure <!-- FIG --> shows false colour representations of the arrays' spatial distributions of feature intensities. Normally, when the features are distributed randomly on the arrays, one expects to see a uniform distribution; sets of control features with particularly high or low intensities may stand out. The colour scale is proportional to %sthe probe intensities, and it is shown in the panel on the right.", switch(scale, rank = "the ranks of ", direct = ""))
+  legend = paste("The figure <!-- FIG --> shows false colour representations of the arrays' spatial distributions of",
+    " feature intensities. Normally, when the features are distributed randomly on the arrays, one expects to see a uniform",
+    " distribution; sets of control features with particularly high or low intensities may stand out. The colour scale is",
+    " proportional to ",
+    switch(scale,
+           rank = "the ranks of ",
+           direct = ""),
+    "the probe intensities",
+    switch(scale,
+           rank = ". Note that the rank scale has the potential to amplify patterns that are small in amplitude but systematic within an array. It is possible to switch off the rank scaling by modifying the argument <tt>scale</tt> in the call of the <tt>aqm.spatial</tt> function.",
+           direct = ", and it is shown in the panel on the right."), 
+    "<br>Outlier detection has been performed by computing <i>S</i>, the sum of the absolutes value of low frequency Fourier coefficients, as a measure of large scale spatial structures.", legOrder, " The value of <i>S</i> is shown in the panel headings. ", outlierPhrase(FALSE, length(outliers)), sep="")
 
-  if(scale=="rank") legend = paste(legend, "Note that the rank scale has the potential to amplify patterns that are small in amplitude but systematic within an array. It is possible to switch off the rank scaling by modifying the argument <tt>scale</tt> in the call of the <tt>aqm.spatial</tt> function.") 
-
-  legend = paste(legend, "<br>Outlier detection has been performed by computing <i>S</i>, the sum of the absolutes value of low frequency Fourier coefficients, as a measure of large scale spatial structures.", legOrder, " The value of <i>S</i> is shown in the panel headings. ", outlierPhrase(FALSE, length(outliers)), sep="")
-
-  dpi = arrayQualityMetricsGlobalParameters$dpi
-  
+  fac = 1 / (arrayQualityMetricsGlobalParameters$dpi * 6)
   new("aqmReportModule",
       plot = spat,
       section = "Individual array quality",
       title = paste("Spatial distribution of", whichChannel),
       legend = legend,
       outliers = outliers,
-      size = c(w = maxy/dpi*lay[1], h = (maxx/dpi+0.5)*lay[2]))
+      size = c(w = maxy * fac * lay[1], h = (maxx*fac + 0.25) * lay[2]))
 }
 
   
