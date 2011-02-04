@@ -104,18 +104,18 @@ makeIndex = function(p, modules)
 reportModule = function(p, module, integerIndex, arrayTable, outdir)
 {
     stopifnot(is(module, "aqmReportModule"))
-
+    validObject(module, test=FALSE)
+    
     svgwarn = FALSE
     if(!is.null(module@plot))
       {
-        h = module@shape$h
-        w = module@shape$w
-        stopifnot(length(h)==1, is.numeric(h), !is.na(h),
-                  length(w)==1, is.numeric(w), !is.na(w))
+        stopifnot(!any(is.na(module@size)))
+        h = module@size["h"]
+        w = module@size["w"]
 
         stopifnot(length(integerIndex)==1, is.integer(integerIndex), !is.na(integerIndex))
-        dpi = 72
-
+        dpi = arrayQualityMetricsGlobalParameters$dpi
+        
         if(is.na(module@svg@name))
           {
             ## no svg - use png
@@ -252,7 +252,7 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
   outliers = matrix(NA, nrow = nrow(arrayTable), ncol = length(wh),
     dimnames = list(NULL, sprintf("C%d", seq(along=wh))))
   outlierExplanations = sprintf("C%d: outlier detection by %s", seq(along=wh), sapply(modules, slot, "title")[wh])
-  outlierExplanations = paste("The columns named C1, C2, ... indicate the calls from the different outlier detection methods:<ol>", paste(sprintf("<LI>%s</LI>", outlierExplanations), collapse=""), "</ol>The outlier detection criteria are explained below in the respective sections. Arrays that were called outliers by at least one criterion are selected in this table and indicated by highlighted lines or points in some of the plots below. By clicking the checkboxes in the table, or on the corresponds points/lines in the plots, you can modify the selection. To reset the selection, reload the HTML page in your browser.", sep="")
+  outlierExplanations = paste("The columns named C1, C2, ... indicate the calls from the different outlier detection methods:<ol>", paste(sprintf("<LI>%s</LI>", outlierExplanations), collapse=""), "</ol>The outlier detection criteria are explained below in the respective sections. Arrays that were called outliers by at least one criterion are selected in this table and indicated by highlighted lines or points in some of the plots below. By clicking the checkboxes in the table, or on the corresponding points/lines in the plots, you can modify the selection. To reset the selection, reload the HTML page in your browser.", sep="")
 
   for(j in seq(along = wh))
     {

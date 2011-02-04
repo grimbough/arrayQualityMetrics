@@ -12,9 +12,9 @@ aqm.meansd = function(x) {
   section = "Variance mean dependence"
   
   new("aqmReportModule",
-      plot = msdplo,
+      plot    = msdplo,
       section = section,
-      title = title,
-      legend = legend,
-      shape = list("h"=6, "w"=6))
+      title   = title,
+      legend  = legend,
+      size    = c(w=6, h=6))
 }

@@ -37,7 +37,7 @@ aqm.rnadeg = function(expressionset, x)
         section = "Affymetrix specific plots",
         title   = "RNA digestion plot",
         legend  = legend,
-        shape   = list("h" = 5.5, "w" =7),
+        size    = c(w = 7, h = 5.5),
         svg     =  new("svgParameters",
                        name = "rnadeg",
                        numPlotObjects = x$numArrays) )
@@ -99,14 +99,12 @@ aqm.nuse = function(x)
 ##   legend =  paste(figurePhrase("diagnostics suggested by Affymetrix"),
 ##     "Please see the vignette of the package <i>simpleaffy</i> for a full explanation of the elements shown in this plot. Any metrics that is shown in red is outside the manufacturer's specified boundaries and suggests a potential problem; metrics shown in blue are considered acceptable.")
   
-##   shape = list("h" = 4 + ncol(exprs(expressionset)) * 0.1 + 1/ncol(exprs(expressionset)),  "w" = 6)
-  
 ##   new("aqmReportModule",
 ##       plot = qcStats,
 ##       section = "Affymetrix specific plots",
 ##       title = "Diagnostic plot recommended by Affymetrix",
 ##       legend = legend,
-##       shape = shape)
+##       size = c(w = 6, h = 4 + ncol(exprs(expressionset)) * 0.1 + 1/ncol(exprs(expressionset))))
 ## }
 
 ##--------------------------------------------------
@@ -134,7 +132,7 @@ aqm.pmmm = function(x)
       section = "Affymetrix specific plots",
       title = "Perfect matches and mismatches",
       legend = legend,
-      shape = list("h" = 6, "w" = 6))
+      size = c(w = 6, h = 6))
   
 }
 

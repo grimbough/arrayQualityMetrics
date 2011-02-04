@@ -53,9 +53,6 @@ aqm.boxplot = function(x, subsample=20000, outlierMethod = "KS") {
               ltext(xAsterisk, whArray, "*", font=2, cex=2, adj=c(0.5, 0.75))
           }
         })
-
-  shape = list("h" = 2.5 + x$numArrays * 0.1 +  1/x$numArrays, 
-               "w" = 3+3*lay[1])
   
   legend = paste("The figure <!-- FIG --> shows boxplots representing summaries of the signal intensity distributions of the arrays. ", legPanels, "Each box corresponds to one array. Typically, one expects the boxes to have similar positions and widths. If the distribution of an array is very different from the others, this may indicate an experimental problem. ", outlierPhrase(outlierMethod, length(out$outliers)), sep="")
   
@@ -68,5 +65,5 @@ aqm.boxplot = function(x, subsample=20000, outlierMethod = "KS") {
       title = title,
       legend = legend,
       outliers = out$outliers,
-      shape = shape)
+      size = c(w = 3+3*lay[1], h = 2.5 + x$numArrays * 0.1 +  1/x$numArrays))
 }

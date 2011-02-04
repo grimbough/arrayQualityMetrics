@@ -76,6 +76,6 @@ aqm.maplot = function(x, subsample=20000, Dthresh=0.15) {
       title = "MA plots",
       legend = legend,
       outliers = maout,
-      shape = list(h=6, w=10))
+      size = c(w=10, h=6))
 }
 

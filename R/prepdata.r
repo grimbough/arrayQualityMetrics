@@ -1,13 +1,17 @@
 prepdata = function(expressionset, intgroup, do.logtransform)
 {
   cls = class(expressionset)
-  if (any(cls %in% c("RGList", "MAList", "marrayRaw", "marrayNorm")))
+  if (is(expressionset, "RGList") ||
+      is(expressionset, "MAList") ||
+      is(expressionset, "marrayRaw") ||
+      is(expressionset, "marrayNorm"))
     {
       expressionset = try(as(expressionset, "NChannelSet"))
-      if(inherits(expressionset, "try-error"))
+      if(is(expressionset, "try-error"))
         stop(sprintf("Argument 'expressionset' is of class '%s', and its automatic conversion into 'NChannelSet' failed. Please try to convert it manually.\n", paste(cls, collapse=", ")))
     }
-  
+
+
   x = platformspecific(expressionset, do.logtransform)  # see below
 
   x = append(x, list(
@@ -128,11 +132,20 @@ function(expressionset, do.logtransform)
 })
 
 ##----------------------------------------------------------
-## BeadLevelList
-## TODO - this needs to be fixed; also need to extract x and y coordinates (sx, sy)
+## BeadLevelData and BeadLevelList
 ##----------------------------------------------------------
 setMethod("platformspecific",
-          signature(expressionset = "BeadLevelList"),
+          signature(expressionset = "beadLevelData"),
+function(expressionset)
+{
+  stop("\n\narrayQualityMetrics does not support bead-level objects of class 'beadLevelData'. Please refer to the vignette 'Analysis of bead-level data using beadarray' of the beadarray package for the processing and quality assessment of such objects. After summarisation of the bead-level data to an object of class 'ExpressionSetIllumina', you can use arrayQualityMetrics on that.\n")
+})
+
+##----------------------------------------------------------
+## ExpressionSetIllumina
+##----------------------------------------------------------
+setMethod("platformspecific",
+          signature(expressionset = "ExpressionSetIllumina"),
 function(expressionset, do.logtransform){
             
   switch(expressionset@arrayInfo$channels,

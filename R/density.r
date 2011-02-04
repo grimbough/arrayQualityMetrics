@@ -75,14 +75,14 @@ aqm.density = function(x)
     scales = list(relation="free"),
     col = cl$arrayColours, lwd = lwd, lty = lty)
   
-  legend = "The figure <!-- FIG --> shows density estimates (smoothed histograms) of the data. Typically, the distributions of the arrays should have similar shapes and ranges. Arrays whose distributions are very different from the others should be considered for possible problems. On raw data, a bimodal distribution can be indicative of an array containing a spatial artefact; a distribution shifted to the right of an array with abnormally high background intensities."
+  legend = "The figure <!-- FIG --> shows density estimates (smoothed histograms) of the data. Typically, the distributions of the arrays should have similar shapes and ranges. Arrays whose distributions are very different from the others should be considered for possible problems. Various features of the distributions can be indicative of quality related phenomena. For instance, high levels of background will shift an array's distribution to the right. Lack of signal diminishes its right right tail. A peak at the upper end of the intensity range could indicate signal saturation."
   
   new("aqmReportModule",
-      "plot"    = den,
-      "section" = "Array intensity distributions",
-      "title"   = "Density plots",
-      "legend"  = legend,
-      "shape"   = list("h" = 5, "w" = 3+3*lay[1]),
-      "svg"     = svgPar
+      plot    = den,
+      section = "Array intensity distributions",
+      title   = "Density plots",
+      legend  = legend,
+      size    = c(w = 3+3*lay[1], h = 5*lay[2]),
+      svg     = svgPar
       ) ## new
 }

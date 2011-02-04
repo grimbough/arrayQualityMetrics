@@ -68,31 +68,35 @@ setClass("svgParameters",
 
 
 ##
-## All data needed to render a report Module
-## 
+## An object of this class contains everything needed to render a report module
+##
 
 setClass("aqmReportModule",
   representation(
     plot     = "ANY",
+    size     = "numeric",     ## size of the plot in inch
     section  = "character",
     title    = "character",
     legend   = "character",
-    shape    = "list",
     outliers = "integer",
     svg      = "svgParameters"),
 
   prototype(
     plot      = new("namedList"),
+    size      = c(w=NA_real_, h=NA_real_),
     section   = NA_character_,
     title     = NA_character_,
     legend    = NA_character_,
-    shape     = list(),
     outliers  = NA_integer_,       
     svg       = new("svgParameters")),
 
   validity = function(object) {
     for(s in c("section", "title", "legend"))
-      if(length(slot(object, s))!=1) return(sprintf("Invalid slot '%s'.", s))
+      if (length(slot(object, s)) != 1)
+        return(sprintf("Invalid slot '%s'.", s))
+    if ((length(object@size)!=2) || !identical(names(object@size), c("w", "h")))
+      return("Invalid slot 'size'.")
+    validObject(object@svg, test=TRUE)
   }
 )
 

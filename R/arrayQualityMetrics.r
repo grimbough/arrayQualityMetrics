@@ -33,7 +33,11 @@ arrayQualityMetrics = function(
 
   ## list of report modules
   m = list()  
-  
+
+  ## to enforce deterministic behaviour (boxplot and maplot do 'random' subsampling)
+  old.seed = setRNG(kind = "default", seed = 28051968, normal.kind = "default")
+  on.exit(setRNG(old.seed))
+
   ## create a comprehensive data object 'x', with the original data,
   ##  as well as some generally useful derived statistics of the data
   x = prepdata(expressionset, intgroup=intgroup, do.logtransform=do.logtransform) 
@@ -49,12 +53,12 @@ arrayQualityMetrics = function(
   m$probesmap = aqm.probesmap(x)
 
   ##--------Affymetrix specific modules------------
-  if(inherits(expressionset, "AffyBatch")) {
+  if(is(expressionset, "AffyBatch")) {
     x         = prepaffy(expressionset, x)
     m$rle     = aqm.rle(x)
     m$nuse    = aqm.nuse(x)
     m$rnadeg  = aqm.rnadeg(expressionset, x)
-    ## m$qcstats = aqm.qcstats(expressionset)  -- Not sure any one cares about this function, anyway. It can be resurrected if there is overwhelming demand.
+    ## m$qcstats = aqm.qcstats(expressionset) -- Not sure any one cares about this function. It can be resurrected if there is overwhelming demand.
     m$pmmm    = aqm.pmmm(x)
   }
   

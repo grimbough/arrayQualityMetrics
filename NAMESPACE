@@ -4,11 +4,9 @@
 importClassesFrom(affy, AffyBatch)
 importClassesFrom(Biobase, NChannelSet)
 importClassesFrom(Biobase, ExpressionSet)
-importClassesFrom(beadarray, BeadLevelList)
+importClassesFrom(beadarray, beadLevelData, ExpressionSetIllumina)
 importClassesFrom(limma, MAList, RGList)
 importClassesFrom(marray, marrayNorm, marrayRaw)
-importClassesFrom(methods, ANY, character, list, logical, matrix,
-                  numeric)
 
 ##--------------------------------------------------
 ## methods
@@ -65,6 +63,8 @@ importFrom(methods, as, is)
 importFrom(RColorBrewer, brewer.pal, brewer.pal.info)
 
 importFrom(RJSONIO, toJSON)
+
+importFrom(setRNG, setRNG)
 
 ## importFrom(simpleaffy, plot.qc.stats)
 

@@ -87,13 +87,15 @@ spatialplot = function(whichChannel, x, scale)
 
   legend = paste(legend, "<br>Outlier detection has been performed by computing <i>S</i>, the sum of the absolutes value of low frequency Fourier coefficients, as a measure of large scale spatial structures.", legOrder, " The value of <i>S</i> is shown in the panel headings. ", outlierPhrase(FALSE, length(outliers)), sep="")
 
+  dpi = arrayQualityMetricsGlobalParameters$dpi
+  
   new("aqmReportModule",
       plot = spat,
       section = "Individual array quality",
       title = paste("Spatial distribution of", whichChannel),
       legend = legend,
       outliers = outliers,
-      shape = list("h"=10*lay[2]/lay[1]*maxy/maxx + 0.5*lay[2], "w"=10))
+      size = c(w = maxy/dpi*lay[1], h = (maxx/dpi+0.5)*lay[2]))
 }
 
   
