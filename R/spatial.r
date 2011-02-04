@@ -98,8 +98,9 @@ spatialplot = function(whichChannel, x, scale)
            direct = ", and it is shown in the panel on the right."), 
     "<br>Outlier detection has been performed by computing <i>S</i>, the sum of the absolutes value of low frequency Fourier coefficients, as a measure of large scale spatial structures.", legOrder, " The value of <i>S</i> is shown in the panel headings. ", outlierPhrase(FALSE, length(outliers)), sep="")
 
-          
-  fac = 0.3 * sqrt(maxx*maxy)/arrayQualityMetricsGlobalParameters$dpi
+  
+  ## we allow 3^2 square inch per array        
+  fac = 3 / sqrt(maxx*maxy)
   
   new("aqmReportModule",
       plot = spat,
@@ -107,7 +108,7 @@ spatialplot = function(whichChannel, x, scale)
       title = paste("Spatial distribution of", whichChannel),
       legend = legend,
       outliers = outliers,
-      size = c(w = fac * lay[1], h = (fac + 0.25) * lay[2]))
+      size = c(w = maxx * fac * lay[1], h = (maxy * fac + 0.25) * lay[2]))
 }
 
   

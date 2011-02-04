@@ -89,11 +89,12 @@ aqm.distances = function(x, previousModule)
   v  = rev(previousModule@outliers@statistic)
   th = previousModule@outliers@threshold
   colors = rev(intgroupColours(x)$arrayColours)
-  xlim = c(min(v, na.rm=TRUE), max(v, th, na.rm=TRUE))
+  ## xlim = c(min(v, na.rm=TRUE), max(v, th, na.rm=TRUE))
+  xlim = c(0, max(v, th, na.rm=TRUE))
   bp = function()
     {
       par(mai=c(0.6, 0.5, 0.1, 0.1))
-      b = barplot(v, col = colors, xaxs = "r",
+      b = barplot(v, col = colors, xaxs = "r", names.arg = "",
               xlab = "", ylab = "", horiz = TRUE, xlim = xlim)
       abline(v = th, lwd = 2)
       text(par("usr")[1], b, paste(rev(seq(along=v))), adj = c(1, 0.5), xpd=NA) 
