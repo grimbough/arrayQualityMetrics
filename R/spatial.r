@@ -86,8 +86,8 @@ spatialplot = function(whichChannel, x, scale)
     colorkey = (scale!="rank"))
   
   legend = paste("The figure <!-- FIG --> shows false colour representations of the arrays' spatial distributions of",
-    " feature intensities. Normally, when the features are distributed randomly on the arrays, one expects to see a uniform",
-    " distribution; sets of control features with particularly high or low intensities may stand out. The colour scale is",
+    " feature intensities (", whichChannel, "). Normally, when the features are distributed randomly on the arrays, one expects to see a uniform",
+    " distribution; control features with particularly high or low intensities may stand out. The colour scale is",
     " proportional to ",
     switch(scale,
            rank = "the ranks of ",

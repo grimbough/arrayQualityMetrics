@@ -97,7 +97,7 @@ aqm.distances = function(x, previousModule)
       b = barplot(v, col = colors, xaxs = "r", names.arg = "",
               xlab = "", ylab = "", horiz = TRUE, xlim = xlim)
       abline(v = th, lwd = 2)
-      text(par("usr")[1], b, paste(rev(seq(along=v))), adj = c(1, 0.5), xpd=NA) 
+      text(par("usr")[1], b, paste(rev(seq(along=v))), adj = c(1, 0.5), xpd=NA, cex=0.66) 
     }
   
   legend = paste("The figure <!-- FIG --> shows a bar chart of the ", previousModule@outliers@description, 
