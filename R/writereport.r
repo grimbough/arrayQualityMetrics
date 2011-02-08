@@ -101,7 +101,7 @@ makeIndex = function(p, modules)
 ##---------------------------------------------------------
 ## Create a module  of the report with figures and legend
 ##---------------------------------------------------------
-reportModule = function(p, module, integerIndex, arrayTable, outdir)
+reportModule = function(p, module, currentIndex, arrayTable, outdir)
 {
     stopifnot(is(module, "aqmReportModule"))
     validObject(module, test=FALSE)
@@ -115,13 +115,13 @@ reportModule = function(p, module, integerIndex, arrayTable, outdir)
         h = module@size["h"]
         w = module@size["w"]
 
-        stopifnot(length(integerIndex)==1, is.integer(integerIndex), !is.na(integerIndex))
+        stopifnot(length(currentIndex)==1, is.numeric(currentIndex), !is.na(currentIndex))
         dpi = arrayQualityMetricsGlobalParameters$dpi
         
         if(is.na(module@svg@name))
           {
             ## no svg - use png
-            name    = paste("fig", integerIndex, sep = "")
+            name    = paste("fig", currentIndex, sep = "")
             nameimg = paste(name, ".png", sep = "")
             png(file = file.path(outdir, nameimg), h = h*dpi, w = w*dpi)
             makePlot(module)
@@ -161,18 +161,27 @@ reportModule = function(p, module, integerIndex, arrayTable, outdir)
       }
     
     hwrite("<br>", p)
-    hwrite(paste(hwrite(paste("Figure ", integerIndex, ": ", module@title,". ", sep=""), style="font-weight:bold;font-size:larger"),
-                  if(!is.na(namepdf)) hwrite("(PDF file)", link = namepdf) ),
-            style = "text-align:center", p)
-    hwrite("<br><br>", p)
 
-    hwrite(gsub("The figure <!-- FIG -->", paste("<b>Figure", integerIndex, "</b>"), module@legend, ignore.case = TRUE), p)
+    if(!is.na(module@title))
+      hwrite(paste("Figure ", currentIndex, ": ", module@title,".<br><br>", sep=""), style="font-weight:bold;font-size:larger")
+
+    hwrite(gsub("The figure <!-- FIG -->",
+           paste("<b>Figure", currentIndex, "</b>", if(!is.na(namepdf)) hwrite("(PDF file)", link = namepdf)),
+                 module@legend, ignore.case = TRUE), p)
     hwrite("<br>", p)
 
     if(!identical(svgwarn, FALSE))
        hwrite(svgwarn, p)
     
     hwrite("<br><br>", p)
+
+    ## recursion, for the barplot with the outliers
+    if(!is.na(module@outliers@description)) {
+      currentIndex = currentIndex + 1
+      reportModule(p, aqm.outliers(module), currentIndex, arrayTable, outdir)
+    }
+
+    return(currentIndex + 1)
   }
 
 ##----------------------------------------------------------
@@ -266,7 +275,8 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
     paste(sprintf("<LI>C%d: outlier detection by %s%s</a></LI>",
                    seq(along = wh), outlierMethodLinks, outlierMethodTitles), collapse = ""),
     "</OL>The outlier detection criteria are explained below in the respective sections. Arrays that were called outliers ",
-    "by at least one criterion are selected in this table and indicated by highlighted lines or points in some of the plots below. ",
+    "by at least one criterion are marked by checkbox selection in this table, and are ",
+    "indicated by highlighted lines or points in some of the plots below. ",
     "By clicking the checkboxes in the table, or on the corresponding points/lines in the plots, you can modify the selection. ",
     "To reset the selection, reload the HTML page in your browser.", sep="")
 
@@ -314,17 +324,22 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
               tableLegend = outlierExplanations)
   
   currentSectionName = "Something Else"
-  sec = 1
+  currentIndex  = 1
+  currentSection = 1
   
   for(i in seq(along = modules))
     {
       if(modules[[i]]@section != currentSectionName)
         {
-          makeSection(p = p, sectionNumber = sec, module = modules[[i]])
-          sec = sec+1
+          makeSection(p = p, sectionNumber = currentSection, module = modules[[i]])
+          currentSection = currentSection+1
         }
-      reportModule(p = p, module = modules[[i]], integerIndex = i,
-                   arrayTable = arrayTableCompact, outdir=outdir)
+      currentIndex = reportModule(
+        p = p,
+        module = modules[[i]],
+        currentIndex = currentIndex,
+        arrayTable = arrayTableCompact,
+        outdir=outdir)
       currentSectionName = modules[[i]]@section
     }
   

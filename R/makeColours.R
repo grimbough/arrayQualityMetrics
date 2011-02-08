@@ -3,7 +3,6 @@
 ## side bar, density plots etc.
 ## -----------------------------------------------------------------
 
-
 ##----------------------------------------
 ## 'intgroupColours' returns a list with:
 ##   arrayColors:  color code for each array

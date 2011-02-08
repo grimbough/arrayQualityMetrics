@@ -11,7 +11,7 @@ aqm.boxplot = function(x, subsample=20000, outlierMethod = "KS") {
     Mss = x$M
   }
   out = outliers(Mss, method=outlierMethod)
-  
+
   sample_id = rep( seq_len(x$numArrays), each = nrow(Mss) )
   
   if(x$nchannels == 2)  {
@@ -22,12 +22,13 @@ aqm.boxplot = function(x, subsample=20000, outlierMethod = "KS") {
                    labels = c("a. Red Channel", "b. Green Channel", "c. Log2(Ratio)"))
     formula = sample_id ~ values | panels
     lay = c(3,1)
-    legPanels = "Three panels are shown: left, red channel; middle, green channel; right, log<sub>2</sub>(ratio). Outlier detection  was performed on the distribution of log<sub>2</sub>(ratio). "
+    legPanels = c("Three panels are shown: left, red channel; middle, green channel; right, log<sub>2</sub>(ratio). ",
+                  "on the distribution of Log<sub>2</sub>(Ratio). ")
    } else {
     values  = as.numeric(Mss)
     formula = sample_id ~ values
     lay = c(1,1)
-    legPanels = ""
+    legPanels = c("", "")
   }
   xAsterisk = quantile(Mss, probs=0.01, na.rm=TRUE)
   
@@ -55,10 +56,15 @@ aqm.boxplot = function(x, subsample=20000, outlierMethod = "KS") {
         })
   
   legend = paste("The figure <!-- FIG --> shows boxplots representing summaries of the signal intensity distributions of the arrays. ",
-    legPanels, "Each box corresponds to one array. Typically, one expects the boxes to have similar positions and widths. If the ",
-    "distribution of an array is very different from the others, this may indicate an experimental problem. ",
-    outlierPhrase(outlierMethod, length(out@which)), sep="")
-  
+    legPanels[1],
+    "Each box corresponds to one array. Typically, one expects the boxes to have similar positions and widths. If the ",
+    "distribution of an array is very different from the others, this may indicate an experimental problem.", 
+    "Outlier detection was performed ",
+    legPanels[2],
+    "by computing the Kolmogorov-Smirnov statistic <i>K<sub>a</sub></i> between each array's distribution and the distribution",
+    "of the pooled data",
+    sep="")
+
   new("aqmReportModule",
       plot = box,
       section = "Array intensity distributions",

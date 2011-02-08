@@ -74,12 +74,14 @@ setClass("outlierDetection",
     statistic   = "numeric",
     threshold   = "numeric",
     which       = "integer",
-    description = "character"),
+    description = "character",
+    colors      = "character"),   # conflation of content and rendering...
   prototype(
     statistic   = numeric(0),
     threshold   = NA_real_,
     which       = NA_integer_,
-    description = NA_character_))
+    description = NA_character_,
+    colors      = "#b0b0b0"))
 
 ##
 ## An object of this class contains everything needed to render a report module

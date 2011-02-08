@@ -70,7 +70,7 @@ spatialplot = function(whichChannel, x, scale)
     "row"    = x$sy,
     "column" = x$sx)
 
-  panelNames = sprintf("array %d (S=%4.2f)", whj, stat[whj]) 
+  panelNames = sprintf("array %d (F=%4.2f)", whj, stat[whj]) 
 
   spat = levelplot(ch ~ column*row | Array,
     data = df,
@@ -94,10 +94,13 @@ spatialplot = function(whichChannel, x, scale)
            direct = ""),
     "the probe intensities",
     switch(scale,
-           rank = ". Note that the rank scale has the potential to amplify patterns that are small in amplitude but systematic within an array. It is possible to switch off the rank scaling by modifying the argument <tt>scale</tt> in the call of the <tt>aqm.spatial</tt> function.",
+           rank = paste(". Note that the rank scale has the potential to amplify patterns that are small in amplitude",
+             "but systematic within an array. It is possible to switch off the rank scaling by modifying the argument",
+             "<tt>scale</tt> in the call of the <tt>aqm.spatial</tt> function."),
            direct = ", and it is shown in the panel on the right."), 
-    "<br>Outlier detection has been performed by computing <i>S</i>, the sum of the absolutes value of low frequency Fourier coefficients, as a measure of large scale spatial structures.", legOrder, " The value of <i>S</i> is shown in the panel headings. ", outlierPhrase(FALSE, length(outliers)), sep="")
-
+    "<br>Outlier detection was performed by computing <i>F<sub>a</sub></i> , the sum of the absolutes value of low frequency ",
+    "Fourier coefficients, as a measure of large scale spatial structures.", legOrder, " The value of <i>F</i> is shown ",
+    "in the panel headings. ", sep="")
   
   ## we allow 3^2 square inch per array        
   fac = 3 / sqrt(maxx*maxy)

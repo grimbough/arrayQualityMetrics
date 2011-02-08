@@ -44,12 +44,10 @@ arrayQualityMetrics = function(
   
   ##---------Generic modules------
   m$heatmap   = aqm.heatmap(x)
-  m$hmdists   = aqm.distances(x, m$heatmap)
   m$pca       = aqm.pca    (x)
 
   m$boxplot   = aqm.boxplot(x)
   m$density   = aqm.density(x)
-  
   m$meansd    = aqm.meansd (x)
   m$probesmap = aqm.probesmap(x)
 
@@ -58,6 +56,7 @@ arrayQualityMetrics = function(
     x         = prepaffy(expressionset, x)
     m$rle     = aqm.rle(x)
     m$nuse    = aqm.nuse(x)
+
     m$rnadeg  = aqm.rnadeg(expressionset, x)
     ## m$qcstats = aqm.qcstats(expressionset) -- Not sure any one cares about this function. It can be resurrected if there is overwhelming demand.
     m$pmmm    = aqm.pmmm(x)
