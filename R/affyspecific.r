@@ -79,8 +79,7 @@ aqm.nuse = function(x)
 
   rv@legend = paste(figurePhrase(rv@title),
     " For each array, the boxes should be centered around 1. An array were the values are elevated relative to the other arrays ",
-    "is typically of lower quality. "
-    "Outlier detection was performed ",
+    "is typically of lower quality. Outlier detection was performed ",
     "by computing the median <i>N<sub>a</sub></i> between each array's NUSE values and the pooled, overall distribution",
     "of NUSE values", sep="")
   return(rv)
