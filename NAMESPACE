@@ -13,8 +13,6 @@ importClassesFrom(marray, marrayNorm, marrayRaw)
 ##--------------------------------------------------
 importMethodsFrom(affy, Mbox, mm, pm)
 
-importMethodsFrom(beadarray, arrayNames, getArrayData)
-
 importMethodsFrom(Biobase, assayData, channel, dims, exprs,
                   fData, featureData, pData, phenoData, rowMedians,
                   sampleNames)
@@ -35,8 +33,6 @@ importFrom(affy, AffyRNAdeg, plotAffyRNAdeg)
 importFrom(affyPLM, fitPLM, RLE, NUSE)
 
 importFrom(Biobase, copySubstitute)
-
-importFrom(beadarray, createBeadSummaryData)
 
 importFrom(Cairo, Cairo)
 
