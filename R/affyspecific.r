@@ -22,11 +22,9 @@ prepaffy = function(expressionset, x)
 aqm.rnadeg = function(expressionset, x)
   {
  
-    cl = intgroupColours(x)
-    
     rnaDeg = function() {
       plotAffyRNAdeg(AffyRNAdeg(expressionset, log.it = TRUE),
-                     lwd = 1, col = cl$arrayColours)
+                     lwd = 1, col = x$arrayColours)
     }
     
     legend = paste(figurePhrase("RNA digestion"),
@@ -49,8 +47,8 @@ aqm.rnadeg = function(expressionset, x)
 ##--------------------------------------------------
 aqm.rle = function(x, outlierMethod = "KS")
 {
-  values = RLE(x$dataPLM, type="values")
-  rv = aqm.boxplot(list(M=values, intgroup=x$intgroup, nchannels=1, numArrays=x$numArrays), outlierMethod = outlierMethod)
+  x$M = RLE(x$dataPLM, type="values")
+  rv = aqm.boxplot(x, outlierMethod = outlierMethod)
 
   rv@title = "Relative Log Expression (RLE)"
   rv@section = "Affymetrix specific plots"
@@ -68,8 +66,8 @@ aqm.rle = function(x, outlierMethod = "KS")
 ##--------------------------------------------------
 aqm.nuse = function(x, outlierMethod = "upperquartile")
 {
-  values = NUSE(x$dataPLM, type="values")
-  rv = aqm.boxplot(list(M=values, intgroup=x$intgroup, nchannels=1, numArrays=x$numArrays), outlierMethod=outlierMethod)
+  x$M = NUSE(x$dataPLM, type="values")
+  rv = aqm.boxplot(x, outlierMethod = outlierMethod)
 
   rv@title = "Normalized Unscaled Standard Error (NUSE)"
   rv@section = "Affymetrix specific plots"

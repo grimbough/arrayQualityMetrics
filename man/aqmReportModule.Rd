@@ -42,7 +42,7 @@ aqm.probesmap(x)
 aqm.pmmm(x)
 aqm.rnadeg(expressionset, x)
 aqm.rle(x, outlierMethod = "KS")
-aqm.nuse(x, outlierMethod = "median")
+aqm.nuse(x, outlierMethod = "upperquartile")
 }
 
 \arguments{

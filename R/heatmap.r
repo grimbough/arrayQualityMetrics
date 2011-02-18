@@ -15,18 +15,14 @@ aqm.heatmap = function(x, maxDendrogramSize = 18)
   colnames(m) = rownames(m) = paste(ifelse(seq_len(x$numArrays) %in% out@which, "* ", ""),
                                     seq_len(x$numArrays), sep="")
 
-  ## Shall we do dendrograms?
-  doDend = (ncol(m)<=maxDendrogramSize)
-  thelegend = if(doDend)
+  ## Shall we draw a dendrogram?
+  if (ncol(m) <= maxDendrogramSize)
     {
-      list(right = list(fun=dendrogramGrob, args=list(x=dend, side="right")))
+      thelegend = list(right = list(fun=dendrogramGrob, args=list(x=dend, side="right")))
     } else {
-      dummy = list()
-      attr(dummy, "height") = attr(dend, "height")
-      attr(dummy, "position") = numeric(0)
-      list(right = list(fun=dendrogramGrob, args=list(x=dummy, ord=ord, side="right")))
+      thelegend = NULL
     }
-  
+
   ## Shall we draw side bars?
   ng = length(x$intgroup)
   if(ng > 0) {
@@ -35,6 +31,8 @@ aqm.heatmap = function(x, maxDendrogramSize = 18)
     palettes = rep(palettes, ceiling(ng/length(palettes))) ## make sure there are enough palettes, recycle if needed
 
     key = rects = vector(mode="list", length=ng)
+    names(rects) = rep("rect", ng)
+    
     for(i in seq_len(ng))
       {
         fac  = as.factor(x$pData[[x$intgroup[i]]])
@@ -43,35 +41,42 @@ aqm.heatmap = function(x, maxDendrogramSize = 18)
         cols = pal[as.integer(fac)]
         key[[i]] =  list(rect = list(col = pal),
                          text = list(levels(fac)))
-        rects[[i]] = list(rect = list(col = "transparent",
-                                 fill = cols,
-                                 type = "rectangle"))
+        rects[[i]] = list(col = "transparent",
+                          fill = cols[ord],
+                          type = "rectangle")
         if(i==1) out@colors = cols
       }
     
     key = unlist(key, recursive=FALSE)
     key$rep = FALSE
-    thekey = draw.key(key = key)
-    
-    if(is.null(thelegend))
+    thekey = draw.key(key = key) 
+
+    if(!is.null(thelegend))
       {
-        ## cf. dendrogramGrob
-        key.layout = grid.layout(nrow = 1, ncol = ng,
-            heights = unit(1, "null"), widths = unit(1, "lines"), respect = FALSE)
-        thelegend = frameGrob(layout = key.layout)
-        for (i in seq_len(ng)) {
-            addi = rects[[i]]
-            thelegend = placeGrob(thelegend,
-                           rectGrob(gp = do.call(gpar, addi)), row = 1, col = i)
-          }
-      } else {
         thelegend$right$args = append(thelegend$right$args,
           list(size.add=1, add = rects))
+      } else {
+        ## adapted from 'latticeExtra:dendrogramGrob'
+        lay= grid.layout(nrow = 1, ncol = ng,
+            heights = unit(1, "null"),
+            widths = unit(rep(1, length = ng), rep("lines", ng)), respect = FALSE)
+        g = frameGrob(layout = lay)
+        dy = 1/x$numArrays
+        y  = seq_len(x$numArrays)*dy 
+        for (i in seq_len(ng))
+          {
+            g = placeGrob(g,
+              rectGrob(y = y, height = dy, vjust =1,
+                       gp = do.call(gpar, rects[[i]])), row = 1, col = i)
+          }
+        idem = function(x) x
+        thelegend = list(right=list(fun=idem, args=list(x=g)))
       }
+    
   } else {  
     thekey = NULL
   } ## if (ng>0) 
-    
+
   hfig = levelplot(m[ord,ord],
     scales = list(x=list(rot=90)),
     legend = thelegend,
@@ -83,10 +88,8 @@ aqm.heatmap = function(x, maxDendrogramSize = 18)
   
   legend = paste("The figure <!-- FIG --> shows a false colour heatmap of the distances between arrays. ",
     "The colour scale is chosen to cover the range of distances encountered in the dataset. ",
-    "The presence of patterns in this plot",
-    if(doDend) ", as well as the dendrogram," else "",
-    " can indicate clustering of the arrays either because of intended biological or unintended experimental factors ",
-    "(batch effects). ",
+    "Patterns in this plot can indicate clustering of the arrays either because of intended biological or ",
+    "unintended experimental factors (batch effects). ",
     "The distance <i>d<sub>ab</sub></i> between two arrays <i>a</i> and <i>b</i> is computed as the mean absolute difference ",
     "(L<sub>1</sub>-distance) between the data of the arrays (using the data from all probes without filtering). ",
     "In formula, <i>d<sub>ab</sub></i> = mean | <i>M<sub>ai</sub> - M<sub>bi</sub></i> |, ",
@@ -102,7 +105,7 @@ aqm.heatmap = function(x, maxDendrogramSize = 18)
       section   = "Between array comparison",
       title     = "Distances between arrays",
       legend    = legend,
-      size      = c(w = 5 + x$numArrays * 0.1, h = 6 + x$numArrays * 0.1),
+      size      = c(w = 5 + x$numArrays * 0.1, h = 3 + x$numArrays * 0.1),
       outliers  = out)
 }
 

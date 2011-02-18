@@ -12,7 +12,8 @@ aqm.boxplot = function(x, subsample=20000, outlierMethod = "KS") {
   }
   out = outliers(Mss, method = outlierMethod)
   out@description = c("Kolmogorov-Smirnov statistic <i>K<sub>a</sub></i>", "data-driven")
-  
+  out@colors = x$arrayColours
+    
   sample_id = rep( seq_len(x$numArrays), each = nrow(Mss) )
   
   if(x$nchannels == 2)  {
@@ -33,15 +34,13 @@ aqm.boxplot = function(x, subsample=20000, outlierMethod = "KS") {
   }
   xAsterisk = quantile(Mss, probs=0.01, na.rm=TRUE)
   
-  cl = intgroupColours(x)
-
   box = bwplot(formula, groups = sample_id, layout = lay, as.table = TRUE,
         strip = function(..., bg) strip.default(..., bg ="#cce6ff"),
         horizontal = TRUE,
-        main = if(!is.null(cl$key)) draw.key(key = cl$key), 
+        main = if(!is.null(x$key)) draw.key(key = x$key), 
         pch = "|",  col = "black", do.out = FALSE, box.ratio = 2,
         xlab = "", ylab = "Array",
-        fill = cl$arrayColours, panel = panel.superpose, 
+        fill = x$arrayColours, panel = panel.superpose, 
         scales = list(x=list(relation="free"), y=list(axs="i")),
         ylim = c(x$numArrays+0.7,0.3),
         prepanel = function(x, y) {

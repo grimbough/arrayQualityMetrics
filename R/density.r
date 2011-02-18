@@ -1,10 +1,12 @@
-dens = function(obj)
+dens = function(x)
   {
-    dlist = apply(obj, 2, function(x){
-      rg = quantile(x, na.rm = TRUE, probs = c(0.01, 0.99))
-      density(x, na.rm = TRUE, from = rg[1], to = rg[2])
-    })
+    rg = quantile(x, na.rm = TRUE, probs = c(0.02, 0.98))
+    rg = rg + diff(rg)*c(-1,1)*0.04
+    x[ (x<rg[1]) | (x>rg[2]) ] = NA
+
+    dlist = apply(x, 2, density, na.rm = TRUE)
     names(dlist) = seq_along(dlist)
+    
     ddf = do.call(make.groups, lapply(dlist, function(l) with(l, data.frame(x = x, y = y))))
     return(ddf)
   }
@@ -18,7 +20,6 @@ namedEmptyList = function(n) {
 aqm.density = function(x)
 {
   
-  cl = intgroupColours(x)
   lwd = lty = 1
   name = "density"
   
@@ -70,10 +71,10 @@ aqm.density = function(x)
   
   den = xyplot(formula, ddf, groups = which, layout = lay,
     type = "l", ylab = "Density", xlab="",
-    main = if(!is.null(cl$key)) draw.key(key = cl$key),
+    main = if(!is.null(x$key)) draw.key(key = x$key),
     strip = function(..., bg) strip.default(..., bg ="#cce6ff"),
     scales = list(relation="free"),
-    col = cl$arrayColours, lwd = lwd, lty = lty)
+    col = x$arrayColours, lwd = lwd, lty = lty)
   
   legend = "The figure <!-- FIG --> shows density estimates (smoothed histograms) of the data. Typically, the distributions of the arrays should have similar shapes and ranges. Arrays whose distributions are very different from the others should be considered for possible problems. Various features of the distributions can be indicative of quality related phenomena. For instance, high levels of background will shift an array's distribution to the right. Lack of signal diminishes its right right tail. A bulge at the upper end of the intensity range often indicates signal saturation."
   

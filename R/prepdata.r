@@ -18,6 +18,8 @@ prepdata = function(expressionset, intgroup, do.logtransform)
     numArrays       = ncol(x$M),
     intgroup        = intgroup,
     do.logtransform = do.logtransform))
+
+  x = append(x, intgroupColours(x))
   
   return(x)
 }

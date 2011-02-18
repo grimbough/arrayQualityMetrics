@@ -1,14 +1,9 @@
-## ---------------------------------------------------------------
-## Functions for defining colours for boxplots, heatmap colour
-## side bar, density plots etc.
-## -----------------------------------------------------------------
-
 ##----------------------------------------
 ## 'intgroupColours' returns a list with:
 ##   arrayColors:  color code for each array
 ##   key: a key explaining the mapping of factor values to colours
 ##----------------------------------------
-intgroupColours = function(x, withOpacity = FALSE)
+intgroupColours = function(x)
 {
 
   n = x$numArrays
@@ -34,16 +29,6 @@ intgroupColours = function(x, withOpacity = FALSE)
       rep = FALSE)
   } # if
 
-  if(withOpacity)
-    cols = addOpacity(cols, n)
-
   list(arrayColours = cols, key = key)
-}
-
-addOpacity = function(cols, n){
-  stopifnot(all(nchar(cols)==7))  ## expecting something like #80d020
-  opacity = if(n > 50) 0.125 else (0.8-n*0.0135)  ## the more arrays, the more transparency
-  opacity = as.hexmode(as.integer(255 * opacity))
-  paste(cols, opacity, sep="")
 }
 
