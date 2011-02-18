@@ -43,7 +43,8 @@ spatialplot = function(whichChannel, x, scale)
   outliers = new("outlierDetection",
       statistic = stat,
       threshold = fo$threshold,
-      which     = fo$which)
+      which     = fo$which,
+      description = c("<i>F<sub>a</sub></i>", "data-driven"))
     
   ## Plot maximally 8 images
   if(x$numArrays<=8)
@@ -99,8 +100,8 @@ spatialplot = function(whichChannel, x, scale)
              "<tt>scale</tt> in the call of the <tt>aqm.spatial</tt> function."),
            direct = ", and it is shown in the panel on the right."), 
     "<br>Outlier detection was performed by computing <i>F<sub>a</sub></i> , the sum of the absolutes value of low frequency ",
-    "Fourier coefficients, as a measure of large scale spatial structures.", legOrder, " The value of <i>F</i> is shown ",
-    "in the panel headings. ", sep="")
+    "Fourier coefficients, as a measure of large scale spatial structures.", legOrder,
+    " The value of <i>F<sub>a</sub></i> is shown in the panel headings. ", sep="")
   
   ## we allow 3^2 square inch per array        
   fac = 3 / sqrt(maxx*maxy)

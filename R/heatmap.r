@@ -7,7 +7,7 @@ aqm.heatmap = function(x, maxDendrogramSize = 18)
 
   m   = dist2(x$M)
   out = outliers(m, method = "sum")
-  out@description = "sum of distances to other arrays <i>S<sub>a</sub></i>"
+  out@description = c("sum of distances to other arrays <i>S<sub>a</sub></i>", "data-driven")
   
   dend = as.dendrogram(hclust(as.dist(m), method = "single"))
   ord = order.dendrogram(dend)
@@ -19,11 +19,12 @@ aqm.heatmap = function(x, maxDendrogramSize = 18)
   doDend = (ncol(m)<=maxDendrogramSize)
   thelegend = if(doDend)
     {
-        list(
-           top  = list(fun=dendrogramGrob, args=list(x=dend, side="top")),
-           right= list(fun=dendrogramGrob, args=list(x=dend, side="right")))
+      list(right = list(fun=dendrogramGrob, args=list(x=dend, side="right")))
     } else {
-      NULL
+      dummy = list()
+      attr(dummy, "height") = attr(dend, "height")
+      attr(dummy, "position") = numeric(0)
+      list(right = list(fun=dendrogramGrob, args=list(x=dummy, ord=ord, side="right")))
     }
   
   ## Shall we draw side bars?
@@ -43,8 +44,8 @@ aqm.heatmap = function(x, maxDendrogramSize = 18)
         key[[i]] =  list(rect = list(col = pal),
                          text = list(levels(fac)))
         rects[[i]] = list(rect = list(col = "transparent",
-                            fill = cols,
-                            type = "rectangle"))
+                                 fill = cols,
+                                 type = "rectangle"))
         if(i==1) out@colors = cols
       }
     
@@ -54,7 +55,15 @@ aqm.heatmap = function(x, maxDendrogramSize = 18)
     
     if(is.null(thelegend))
       {
-        thelegend = list(list(fun = rectGrob, args = rects))
+        ## cf. dendrogramGrob
+        key.layout = grid.layout(nrow = 1, ncol = ng,
+            heights = unit(1, "null"), widths = unit(1, "lines"), respect = FALSE)
+        thelegend = frameGrob(layout = key.layout)
+        for (i in seq_len(ng)) {
+            addi = rects[[i]]
+            thelegend = placeGrob(thelegend,
+                           rectGrob(gp = do.call(gpar, addi)), row = 1, col = i)
+          }
       } else {
         thelegend$right$args = append(thelegend$right$args,
           list(size.add=1, add = rects))

@@ -180,7 +180,7 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
     hwrite("<br><br>", page = p)
 
     ## recursion, for the barplot with the outliers
-    if(!is.na(module@outliers@description)) {
+    if(!identical(NA_character_, module@outliers@description)) {
       currentIndex = currentIndex + 1
       reportModule(p, aqm.outliers(module), currentIndex, arrayTable, outdir)
     }

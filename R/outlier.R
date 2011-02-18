@@ -14,7 +14,7 @@ findOutliers = function (x, coef = 1.5)
 ## Different methods for outlier detection from empiricical
 ## distributions
 ##---------------------------------------------------------------
-outliers = function(exprs, method = c("KS", "sum", "median"))
+outliers = function(exprs, method = c("KS", "sum", "upperquartile"))
 {
 
   s = switch(method,
@@ -26,8 +26,8 @@ outliers = function(exprs, method = c("KS", "sum", "median"))
     sum = {
       colSums(exprs, na.rm=TRUE)
     },
-    median = {
-      apply(exprs, 2, median, na.rm=TRUE)
+    upperquartile = {
+      apply(exprs, 2, quantile, na.rm=TRUE, probs=0.75)
     },
     stop(sprintf("Invalid method '%s'", method))
     )
@@ -48,6 +48,7 @@ aqm.outliers = function(m)
   n      = length(m@outliers@which)
   
   xlim = c(min(values, na.rm=TRUE), max(values, th, na.rm=TRUE))
+  xlim = xlim + diff(xlim)*c(-1, 1)*0.04
   
   bp = function()
     {
@@ -59,11 +60,15 @@ aqm.outliers = function(m)
     }
 
   mid = "exceeded the threshold and"
-  legend = paste("The figure <!-- FIG --> shows a bar chart of the ", m@outliers@description, 
+  legend = paste("The figure <!-- FIG --> shows a bar chart of the ", m@outliers@description[1], 
     ", the outlier detection criterion from the previous figure. ",
     "The bars are shown in the original order of the arrays. ", 
-    "Based on the distribution of the values across all arrays, a threshold of ", signif(th, 3),
-    " was determined, which is indicated by the vertical line. ",
+    switch(m@outliers@description[2],
+           "data-driven" = paste("Based on the distribution of the values across all arrays, a threshold of", signif(th, 3),
+                                 "was determined"),
+           "fixed" = paste("A threshold of", signif(th, 3), "was used"),
+           stop(paste("Invalid threshold determination method '", m@outliers@description[2], "'", sep=""))),
+    ", which is indicated by the vertical line. ",
     if (n==0)
       paste("None of the arrays", mid, "was considered an outlier.") else if (n==1)
       paste("One array", mid, "was considered an outlier.") else

@@ -59,14 +59,14 @@ aqm.rle = function(x, outlierMethod = "KS")
     "Arrays whose boxes are centered away from 0 and/or are more spread out are potentially problematic.",
     "Outlier detection was performed by computing the Kolmogorov-Smirnov statistic <i>R<sub>a</sub></i>",
     "between each array's RLE values and the pooled, overall distribution of RLE values.")
-  rv@outliers@description  = "Kolmogorov-Smirnov statistic <i>R<sub>a</sub></i> of the RLE values"
+  rv@outliers@description  = c("Kolmogorov-Smirnov statistic <i>R<sub>a</sub></i> of the RLE values", "data-driven")
   return(rv)
 }
 
 ##--------------------------------------------------
 ## NUSE
 ##--------------------------------------------------
-aqm.nuse = function(x, outlierMethod = "median")
+aqm.nuse = function(x, outlierMethod = "upperquartile")
 {
   values = NUSE(x$dataPLM, type="values")
   rv = aqm.boxplot(list(M=values, intgroup=x$intgroup, nchannels=1, numArrays=x$numArrays), outlierMethod=outlierMethod)
@@ -76,9 +76,9 @@ aqm.nuse = function(x, outlierMethod = "median")
 
   rv@legend = paste(figurePhrase(rv@title),
     "For each array, the boxes should be centered around 1. An array were the values are elevated relative to the other arrays",
-    "is typically of lower quality. Outlier detection was performed by computing the median <i>N<sub>a</sub></i>",
-    "between each array's NUSE values and the pooled, overall distribution of NUSE values.")
-  rv@outliers@description  = "median NUSE value <i>N<sub>a</sub></i>"
+    "is typically of lower quality. Outlier detection was performed by computing the 75% quantile <i>N<sub>a</sub></i>",
+    "of each array's NUSE values and looking for arrays with large <i>N<sub>a</sub></i>.")
+  rv@outliers@description  = c("<i>N<sub>a</sub></i>", "data-driven")
   return(rv)
 }
 
