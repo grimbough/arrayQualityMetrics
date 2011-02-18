@@ -3,7 +3,8 @@ dens = function(x)
     rg = quantile(x, na.rm = TRUE, probs = c(0.02, 0.98))
     rg = rg + diff(rg)*c(-1,1)*0.04
     x[ (x<rg[1]) | (x>rg[2]) ] = NA
-
+browser()
+    
     dlist = apply(x, 2, density, na.rm = TRUE)
     names(dlist) = seq_along(dlist)
     
