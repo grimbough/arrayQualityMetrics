@@ -53,9 +53,9 @@ makeTitle = function(reporttitle, outdir, params)
       link.css        = filenames[1],
       body.attributes = c("onload" = "reportinit()"))
 
-    hwrite("<hr>", p)
-    hwrite(reporttitle, p, heading=1)
-    hwrite("<hr>", p)
+    hwrite("<hr>", page = p)
+    hwrite(reporttitle, page = p, heading=1)
+    hwrite("<hr>", page = p)
     return(p)
   }
 
@@ -65,10 +65,10 @@ makeTitle = function(reporttitle, outdir, params)
 ##---------------------------------------------------------
 makeSection = function(p, sectionNumber, module)
 {
-  hwrite("<hr>", p)
+  hwrite("<hr>", page = p)
   sec = paste("<a name= 'S", sectionNumber,"'>Section ", sectionNumber, ": ",
     module@section,"</a>", sep = "")
-  hwrite(sec, p, heading=2)
+  hwrite(sec, page = p, heading=2)
 }
 
 ##---------------------------------------------------------
@@ -79,23 +79,23 @@ makeIndex = function(p, modules)
   currentSectionNumber = 1
   currentSectionName   = "Something else"
 
-  hwrite("<UL>", p)
+  hwrite("<UL>", page = p)
   for(i in seq_len(length(modules)))
     {
       if(modules[[i]]@section != currentSectionName)
         {
           if(currentSectionNumber != 1) ## end the previous section
-            hwrite("</UL>", p)
+            hwrite("</UL>", page = p)
 
           hwrite(paste("<br><li class='tocsection'>Section ", currentSectionNumber,": ",
-                       modules[[i]]@section, "</li><UL>", sep=""), p,
+                       modules[[i]]@section, "</li><UL>", sep=""), page = p,
                  link = paste("#S", currentSectionNumber, sep=""))
           currentSectionNumber = currentSectionNumber+1
         }
-      hwrite(paste("<li class='tocmodule'>", modules[[i]]@title, "</li>", sep=""), p)
+      hwrite(paste("<li class='tocmodule'>", modules[[i]]@title, "</li>", sep=""), page = p)
       currentSectionName = modules[[i]]@section
     }
-  hwrite("</UL></UL>", p)
+  hwrite("</UL></UL>", page = p)
 }
 
 ##---------------------------------------------------------
@@ -109,7 +109,7 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
     svgwarn = FALSE
     if(!is.null(module@plot))
       {
-        hwrite(sprintf("<a name=\"%s\"></a>", cleanstring(module@title)), p)
+        hwrite(sprintf("<a name=\"%s\"></a>", cleanstring(module@title)), page = p)
 
         stopifnot(!any(is.na(module@size)))
         h = module@size["h"]
@@ -141,7 +141,10 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
               annotationInfo = module@svg, name = name)
                  
             if(!annRes$annotateOK)
-              svgwarn = "Note: the figure is static - enhancement with interactive effects failed. This is likely due to a version incompatibility of the 'SVGAnnotation' R package and the 'libcairo' system library. Please contact the maintainer of 'arrayQualityMetrics' to report this problem."
+              svgwarn = paste("Note: the figure is static - enhancement with interactive effects failed.",
+                "This is likely due to a version incompatibility of the 'SVGAnnotation' R package and your",
+                "version of 'Cairo' or 'libcairo'. Please consult the Bioconductor mailing list, or",
+                "contact the maintainer of 'arrayQualityMetrics' to fix this problem.")
           
             sizes = paste(annRes$size)
             img = hwrite(c(aqm.hwriteImage(nameimg, width=sizes[1], height=sizes[2], id=paste("Fig", name, sep=":")),
@@ -153,27 +156,28 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
         pdf(file = file.path(outdir, namepdf), h = h, w = w)
         makePlot(module)
         dev.off()
-        hwrite(paste("<center>", img, "</center>"), p)
+        hwrite(img, page = p)
       } else {
 
         ## No plot
         namepdf = NA
       }
     
-    hwrite("<br>", p)
+    hwrite("<br>", page = p)
 
     if(!is.na(module@title))
-      hwrite(paste("Figure ", currentIndex, ": ", module@title,".<br><br>", sep=""), style="font-weight:bold;font-size:larger")
+      hwrite(paste("Figure ", currentIndex, ": ", module@title,".<br><br>", sep=""),
+             page = p, style="font-weight:bold;font-size:larger")
 
     hwrite(gsub("The figure <!-- FIG -->",
            paste("<b>Figure", currentIndex, "</b>", if(!is.na(namepdf)) hwrite("(PDF file)", link = namepdf)),
-                 module@legend, ignore.case = TRUE), p)
-    hwrite("<br>", p)
+                 module@legend, ignore.case = TRUE), page = p)
+    hwrite("<br>", page = p)
 
     if(!identical(svgwarn, FALSE))
-       hwrite(svgwarn, p)
+       hwrite(svgwarn, page = p)
     
-    hwrite("<br><br>", p)
+    hwrite("<br><br>", page = p)
 
     ## recursion, for the barplot with the outliers
     if(!is.na(module@outliers@description)) {
@@ -193,10 +197,10 @@ makeEnding = function(p)
     version = z$otherPkgs[[1]]$Version
     rversion = sessionInfo()$R.version$version.string
     session = paste("This report has been created with arrayQualityMetrics", version, "under", rversion)
-    hwrite("<hr>", p)
-    hwrite(session, p, style ='font-size:8pt')
-    hwrite("<hr>", p)
-    closePage(p)
+    hwrite("<hr>", page = p)
+    hwrite(session, page = p, style ='font-size:8pt')
+    hwrite("<hr>", page = p)
+    closePage(page = p)
   }
 
 ##----------------------------------------------------------
@@ -210,13 +214,13 @@ reportTable = function(p, arrayTable, tableLegend)
     arrayTable,
     stringsAsFactors = FALSE)
 
-  hwrite("<hr>", p)
-  hwrite(arrayTable, p, 
+  hwrite("<hr>", page = p)
+  hwrite(arrayTable, page = p, 
          row.bgcolor = rep(list("#ffffff", c("#d0d0ff", "#e0e0f0")), ceiling(nrow(arrayTable)/2)),
          table.style = "margin-left:auto;font-size:100%;text-align:right;",
          row.style = list("font-weight:bold"))
 
-  hwrite(paste("<br>", tableLegend, "<br>", sep=""), p)
+  hwrite(paste("<br>", tableLegend, "<br>", sep=""), page = p)
 }
 
 
@@ -271,9 +275,9 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
   outlierMethodLinks  = paste("<a href=\"#", cleanstring(outlierMethodTitles), "\">", sep="")
   
   outlierExplanations = paste(
-    "The columns named C1, C2, ... indicate the calls from the different outlier detection methods:<OL>",
-    paste(sprintf("<LI>C%d: outlier detection by %s%s</a></LI>",
-                   seq(along = wh), outlierMethodLinks, outlierMethodTitles), collapse = ""),
+    "The columns named *1, *2, ... indicate the calls from the different outlier detection methods:<OL>",
+    paste(sprintf("<LI> outlier detection by %s%s</a></LI>",
+                       outlierMethodLinks, outlierMethodTitles), collapse = ""),
     "</OL>The outlier detection criteria are explained below in the respective sections. Arrays that were called outliers ",
     "by at least one criterion are marked by checkbox selection in this table, and are ",
     "indicated by highlighted lines or points in some of the plots below. ",
@@ -282,7 +286,7 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
 
   outliers = matrix(NA, nrow = nrow(arrayTable),
                         ncol = length(wh),
-                        dimnames = list(NULL, sprintf("%sC%d</a>", outlierMethodLinks, seq(along=wh))))
+                        dimnames = list(NULL, sprintf("%s*%d</a>", outlierMethodLinks, seq(along=wh))))
 
   for(j in seq(along = wh))
     {

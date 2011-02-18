@@ -43,7 +43,7 @@ importFrom(graphics, legend)
 importFrom(grDevices, boxplot.stats, colorRampPalette, dev.off, pdf,
            png, rgb)
 
-importFrom(grid, grid.abline)
+importFrom(grid, grid.abline, rectGrob)
 
 importFrom(Hmisc, hoeffd)
 

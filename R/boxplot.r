@@ -10,8 +10,9 @@ aqm.boxplot = function(x, subsample=20000, outlierMethod = "KS") {
     ss  = TRUE
     Mss = x$M
   }
-  out = outliers(Mss, method=outlierMethod)
-
+  out = outliers(Mss, method = outlierMethod)
+  out@description = "Kolmogorov-Smirnov statistic <i>K<sub>a</sub></i>"
+  
   sample_id = rep( seq_len(x$numArrays), each = nrow(Mss) )
   
   if(x$nchannels == 2)  {
@@ -58,11 +59,11 @@ aqm.boxplot = function(x, subsample=20000, outlierMethod = "KS") {
   legend = paste("The figure <!-- FIG --> shows boxplots representing summaries of the signal intensity distributions of the arrays. ",
     legPanels[1],
     "Each box corresponds to one array. Typically, one expects the boxes to have similar positions and widths. If the ",
-    "distribution of an array is very different from the others, this may indicate an experimental problem.", 
+    "distribution of an array is very different from the others, this may indicate an experimental problem. ", 
     "Outlier detection was performed ",
     legPanels[2],
-    "by computing the Kolmogorov-Smirnov statistic <i>K<sub>a</sub></i> between each array's distribution and the distribution",
-    "of the pooled data",
+    "by computing the Kolmogorov-Smirnov statistic <i>K<sub>a</sub></i> between each array's distribution ",
+    "and the distribution of the pooled data.",
     sep="")
 
   new("aqmReportModule",

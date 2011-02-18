@@ -19,17 +19,14 @@ outliers = function(exprs, method = c("KS", "sum", "median"))
 
   s = switch(method,
     KS = {
-      description = "Kolmogorov-Smirnov statistic between each array's distribution and the distribution of the pooled data"
       fx = ecdf(as.vector(exprs))
       suppressWarnings(apply(exprs, 2, function(v)
         ks.test(v, y = fx, alternative="two.sided")$statistic))
     },
     sum = {
-      description = "sum of the values from each array"
       colSums(exprs, na.rm=TRUE)
     },
     median = {
-      description = "median of the values from each array"
       apply(exprs, 2, median, na.rm=TRUE)
     },
     stop(sprintf("Invalid method '%s'", method))
@@ -39,8 +36,7 @@ outliers = function(exprs, method = c("KS", "sum", "median"))
   new("outlierDetection",
       statistic   = s,
       threshold   = fo$threshold,
-      which       = fo$which,
-      description = description)
+      which       = fo$which)
 }
 
 
@@ -51,7 +47,8 @@ aqm.outliers = function(m)
   th     = m@outliers@threshold
   n      = length(m@outliers@which)
   
-  xlim = c(0, max(values, th, na.rm=TRUE))
+  xlim = c(min(values, na.rm=TRUE), max(values, th, na.rm=TRUE))
+  
   bp = function()
     {
       par(mai=c(0.6, 0.5, 0.1, 0.2))
