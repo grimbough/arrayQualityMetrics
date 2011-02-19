@@ -145,7 +145,7 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
         
         sizes = paste(annRes$size)
         img = hwrite(c(aqm.hwriteImage(nameimg, width=sizes[1], height=sizes[2], id=paste("Fig", name, sep=":")),
-          annotationTable(arrayTable, name = name)))
+                       annotationTable(arrayTable, name = name)))
       } ## if
     
     ## Also make a PDF file
@@ -155,26 +155,21 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
     dev.off()
     
     # write the HTML
-    hwrite(sprintf("\n\n<a name=\"%s\" id=\"%s-h\" href=\"javascript: toggle('%s')\" style=\"text-decoration:none;font-weight:bold;font-size:larger\">%s Figure %d: %s.</a><br>\n",
-                                 name,      name,                            name,                     c("block"="-", "none"="+")[module@defaultdisplay], currentIndex, module@title),
-           page = p)
-
-    hwrite(sprintf("<div id=\"%s-b\" style=\"display:%s\">\n",
-                              name,          module@defaultdisplay),
-           page = p)
-
+    hwrite("\n\n", page = p)
+    hwrite(toggleStart(name, display=module@defaultdisplay, text = sprintf("Figure %d: %s.", currentIndex, module@title)), page = p)
+  
     hwrite(img, page = p)
     hwrite("<br>\n", page = p)
     
     hwrite(gsub("The figure <!-- FIG -->",
            paste("<b>Figure ", currentIndex, "</b>", if(!is.na(namepdf)) hwrite(" (PDF file)", link = namepdf), sep=""),
                  module@legend, ignore.case = TRUE), page = p)
-    hwrite("<br>\n", page = p)
+    hwrite("<br><br><br>\n", page = p)
 
     if(!identical(svgwarn, FALSE))
        hwrite(svgwarn, page = p)
     
-    hwrite("<br></div>", page = p)
+    hwrite(toggleEnd(), page = p)
 
     ## recursion, for the barplot with the outliers
     if(!identical(NA_character_, module@outliers@description)) {
@@ -212,41 +207,51 @@ reportTable = function(p, arrayTable, tableLegend)
     stringsAsFactors = FALSE)
 
   hwrite("<hr>", page = p)
+  
+  disp = ifelse(nrow(arrayTable)<=arrayQualityMetricsGlobalParameters$maxNumberOfArraysForShowingArrayMetadataByDefault , "block", "none")
+  hwrite(toggleStart("arraymetadata", disp, "Array metadata and outlier detection overview"), page = p)
   hwrite(arrayTable, page = p, 
          row.bgcolor = rep(list("#ffffff", c("#d0d0ff", "#e0e0f0")), ceiling(nrow(arrayTable)/2)),
-         table.style = "margin-left:auto;font-size:100%;text-align:right;",
+         table.style = "margin-left:auto;text-align:right;",
          row.style = list("font-weight:bold"))
 
-  hwrite(paste("<br>", tableLegend, "<br>", sep=""), page = p)
+  hwrite(paste("<br>", tableLegend, "<br>", toggleEnd(), sep=""), page = p)
 }
 
+##------------------------------------------------------------------
+## Display toggle start and end 
+##----------------------------------------------------------
+toggleStart = function(name, display, text)
+  paste(
+    sprintf("<a name=\"%s\" id=\"%s-h\" href=\"javascript: toggle('%s')\" style=\"text-decoration:none;font-weight:bold;font-size:larger\">%s %s</a><br>\n",
+                      name,      name,                            name,                                  c("block"="-", "none"="+")[display], text),
+    sprintf("<div id=\"%s-b\" style=\"display:%s\">\n",
+                      name,                 display), sep="\n")
 
-##----------------------------------------------------------
-## Create JSON representation of R vectors and matrices of character or numeric.
-## Names and dimnames attributes are stripped. The 'container' argument to
-## RJSONIO::toJSON makes sure that an Array is created also for vectors of length 1.
-##----------------------------------------------------------
-toJSON_strip = function(x)
-{
-  names(x) = dimnames(x) = NULL; return(toJSON(x, container = TRUE))
-}
+toggleEnd = function()
+  "</div>"
 
-##----------------------------------------------------------
-## Create JSON representation of an Array whose elements are defined by an R
-## character vector containing the JSON representation of the elements
+##------------------------------------------------------------------
+## Create JSON representation of R character vectors and matrices
+## Names and dimnames attributes are stripped. 
 ##----------------------------------------------------------
 toJSON_fromchar = function(x)
-{
   paste("[", paste(x, collapse=", "), "]")
-}
 
+toJSON_fromvector = function(x)
+    toJSON_fromchar(paste('"', as.character(x), '"', sep=''))
+
+toJSON_frommatrix = function(x)
+  {
+    stopifnot(length(dim(x))==2)
+    toJSON_fromchar(apply(x, 1, toJSON_fromvector))
+  }
 ##----------------------------------------------------------
 ## remove spaces and punctuation characters
 ## character vector containing the JSON representation of the elements
 ##----------------------------------------------------------
 cleanstring = function(x)
   tolower(gsub("[[:punct:]|[:space:]]", "", x))
-
 
 ##--------------------------------------------------
 ##   write the report
@@ -316,12 +321,12 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
     ## Inject report-specific variables into the JavaScript
     params = c(          
       HIGHLIGHTINITIAL = toJSON_fromchar(ifelse(apply(outliers, 1, any), "true", "false")), 
-      ARRAYMETADATA    = toJSON_strip(as.matrix(arrayTableCompact)),
-      SVGOBJECTNAMES   = toJSON_strip(names(svgdata)),
+      ARRAYMETADATA    = toJSON_frommatrix(arrayTableCompact),
+      SVGOBJECTNAMES   = toJSON_fromvector(names(svgdata)),
       IDFUNS           = toJSON_fromchar(sapply(svgdata, slot, "getPlotObjIdFromReportObjId")),
-      STROKEVALUES     = toJSON_fromchar(lapply(svgdata, function(x) toJSON_strip(t(x@stroke)))),
-      STROKEATTRS      = toJSON_strip(t(sapply(svgdata, function(x) colnames(x@stroke))))))
-  
+      STROKEVALUES     = toJSON_fromchar(lapply(svgdata, function(x) toJSON_frommatrix(t(x@stroke)))),
+      STROKEATTRS      = toJSON_frommatrix(t(sapply(svgdata, function(x) colnames(x@stroke))))))
+
   makeIndex(p = p, modules = modules)
   reportTable(p = p, arrayTable = arrayTableBig,
               tableLegend = outlierExplanations)

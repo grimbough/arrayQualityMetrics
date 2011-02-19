@@ -15,7 +15,7 @@ arrayQualityMetrics(expressionset,
   intgroup = NULL,
   grouprep,
   spatial = TRUE,
-  reporttitle = paste("Quality metrics report for", deparse(substitute(expressionset))))
+  reporttitle = paste("arrayQualityMetrics report for", deparse(substitute(expressionset))))
 }
 
 \arguments{

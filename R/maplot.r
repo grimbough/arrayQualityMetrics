@@ -74,7 +74,7 @@ aqm.maplot = function(x, subsample=20000, Dthresh=0.15) {
   outliertext = sprintf("%s had <i>D</i>&gt;%g and %s marked as outlier%s. ", 
                          vv[1],           Dthresh, vv[2],             vv[3])
   
-  legend = paste("The figure <!-- FIG --> shows the MA plot for each array. M and A are defined as:<br>",
+  legend = paste("The figure <!-- FIG --> shows MA plots. M and A are defined as:<br>",
     "M = log<sub>2</sub>(I<sub>1</sub>) - log<sub>2</sub>(I<sub>2</sub>)<br>",
     "A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>)),<br>",
     if(x$nchannels == 1)

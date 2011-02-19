@@ -64,6 +64,7 @@ aqm.hwriteOpenPage = function(filename, dirname=NULL, title=filename,
   head = paste(meta, hmakeTag('title',title), head, link.javascript, link.css, css, sep='\n')
   head = hmakeTag('head', head, newline=TRUE)
   hwrite(paste(doctype, "<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='", lang, "' lang='", lang, "'>", head,
-               '<body', paste(' ', names(body.attributes), '="', body.attributes, '"', collapse=' '), '>', sep=''), page)
-  page
+               '<body ', paste(names(body.attributes), '="', body.attributes, '"', collapse=' ', sep=''), '>', sep=''),
+         page = page)
+  return(page)
 }

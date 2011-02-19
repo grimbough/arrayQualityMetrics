@@ -45,7 +45,7 @@ function reportinit()
     {
 	checkboxes[a].checked = highlightInitial[a];
         status = checkboxes[a].checked; 
-        setAllPlotObjsInAllPlots("r:"+(a+1), status);
+        setAllPlotObjsInAllPlots("r:"+(a+1), status, false);
     }
 }
 
@@ -61,7 +61,7 @@ function safeGetElementById(id)
 /*------------------------------------------------------------
    Highlighting of Plot Objects 
  ---------------------------------------------------------------*/
-function setAllPlotObjsInAllPlots(reportObjId, status)
+function setAllPlotObjsInAllPlots(reportObjId, status, doTable)
 {
     var i, j, plotObjIds;
 
@@ -71,7 +71,8 @@ function setAllPlotObjsInAllPlots(reportObjId, status)
         for(j=0; j<plotObjIds.length; j++) 
 	    setOnePlotObjInOnePlot(i, plotObjIds[j], status)
 
-        showTipTable(i, reportObjId);
+        if(doTable)
+	    showTipTable(i, reportObjId);
     } 
 }
 
@@ -158,7 +159,7 @@ function plotObjRespond(what, plotObjId, reportObjId, name)
         a = getIndexFromReportObjId(reportObjId)
 	status = !checkboxes[a].checked;
 	checkboxes[a].checked = status;
-	setAllPlotObjsInAllPlots(reportObjId, status);
+	setAllPlotObjsInAllPlots(reportObjId, status, true);
 	break;
     default:
 	throw new Error("Invalid 'what': "+what)
@@ -172,7 +173,7 @@ function checkboxEvent(reportObjId)
 {
     var a = getIndexFromReportObjId(reportObjId);
     var status = checkboxes[a].checked;
-    setAllPlotObjsInAllPlots(reportObjId, status);
+    setAllPlotObjsInAllPlots(reportObjId, status, true);
 }
 
 

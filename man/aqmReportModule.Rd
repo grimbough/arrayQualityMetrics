@@ -30,7 +30,7 @@
 \usage{
 aqm.boxplot(x, subsample=20000, outlierMethod = "KS")
 aqm.density(x)
-aqm.heatmap(x, maxDendrogramSize = 18)
+aqm.heatmap(x)
 aqm.pca(x)
 aqm.maplot(x, subsample=20000, Dthresh=0.15)
 aqm.spatial(x, scale="rank", channels = c("M", "R", "G"))
@@ -52,12 +52,6 @@ aqm.nuse(x, outlierMethod = "upperquartile")
   on the full set of features (which can be hundreds of thousands on
   some arrays), but on a randomly subset whose size is indicated by this
   number.}
-  \item{maxDendrogramSize}{Draw dendrogram alongside the heatmap
-    matrix only if the number of arrays is less than or equal this
-    number. When the number of arrays is large, dendrograms become
-  unreadable; also, there seems to be a bug in
-  \code{\link[latticeExtra:dendrogramGrob]{dendrogramGrob}} which
-  apparently can be circumvented by not drawing dendrograms that are too large. }
   \item{outlierMethod}{As in \code{\link{outliers}}.}
   \item{Dthresh}{In \code{maplot}, the arrays with a Hoeffding D
   statistic larger than this value are called \emph{outliers}. See also

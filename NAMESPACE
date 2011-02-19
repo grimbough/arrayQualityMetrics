@@ -59,8 +59,6 @@ importFrom(methods, as, is)
 
 importFrom(RColorBrewer, brewer.pal, brewer.pal.info)
 
-importFrom(RJSONIO, toJSON)
-
 importFrom(setRNG, setRNG)
 
 ## importFrom(simpleaffy, plot.qc.stats)

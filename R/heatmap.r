@@ -1,5 +1,5 @@
 ## heatmap
-aqm.heatmap = function(x, maxDendrogramSize = 18)
+aqm.heatmap = function(x)
 {
   colourRange = rgb(seq(0, 1, l=256),
                     seq(0, 1, l=256),
@@ -16,7 +16,7 @@ aqm.heatmap = function(x, maxDendrogramSize = 18)
                                     seq_len(x$numArrays), sep="")
 
   ## Shall we draw a dendrogram?
-  if (ncol(m) <= maxDendrogramSize)
+  if (ncol(m) <= arrayQualityMetricsGlobalParameters$maxNumberOfArraysForDrawingDendrogram)
     {
       thelegend = list(right = list(fun=dendrogramGrob, args=list(x=dend, side="right")))
     } else {
@@ -105,7 +105,7 @@ aqm.heatmap = function(x, maxDendrogramSize = 18)
       section   = "Between array comparison",
       title     = "Distances between arrays",
       legend    = legend,
-      size      = c(w = 5 + x$numArrays * 0.1, h = 3 + x$numArrays * 0.1),
+      size      = c(w = 5 + x$numArrays * 0.075, h = 3 + x$numArrays * 0.075),
       outliers  = out)
 }
 
