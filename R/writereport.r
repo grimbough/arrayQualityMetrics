@@ -109,7 +109,11 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
     svgwarn = FALSE
     if(!is.null(module@plot))
       {
-        hwrite(sprintf("<a name=\"%s\"></a>", cleanstring(module@title)), page = p)
+        stopifnot(!is.na(module@title))
+        name = cleanstring(module@title)
+        
+        hwrite(sprintf("<a name=\"%s\" id=\"%s-h\" href=\"javascript: toggle('%s')\" style=\"text-decoration:none\">+</a>",
+                                 name,      name,                            name), page = p)
 
         stopifnot(!any(is.na(module@size)))
         h = module@size["h"]
@@ -118,10 +122,9 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
         stopifnot(length(currentIndex)==1, is.numeric(currentIndex), !is.na(currentIndex))
         dpi = arrayQualityMetricsGlobalParameters$dpi
         
-        if(is.na(module@svg@name))
+        if(is.na(module@svg@numPlotObjects))
           {
             ## no svg - use png
-            name    = paste("fig", currentIndex, sep = "")
             nameimg = paste(name, ".png", sep = "")
             png(file = file.path(outdir, nameimg), h = h*dpi, w = w*dpi)
             makePlot(module)
@@ -129,10 +132,8 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
             img = aqm.hwriteImage(nameimg, id=paste("Fig", name, sep=":"))
           } else {
             ## svg
-            name    = module@svg@name
             nameimg = paste(name, ".svg", sep = "")
             svgtemp = paste(tempfile(), ".svg", sep = "")
-            # svg(file = svgtemp, h = h, w = w)
             Cairo(file = svgtemp, type = "svg", h = h, w = w, units = "in", dpi = dpi)
             makePlot(module)
             dev.off()
@@ -163,7 +164,7 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
         namepdf = NA
       }
     
-    hwrite("<br>", page = p)
+    hwrite(sprintf("<div id=\"%s-b\" style=\"display:block\">", name), page = p)
 
     if(!is.na(module@title))
       hwrite(paste("Figure ", currentIndex, ": ", module@title,".<br><br>", sep=""),
@@ -177,7 +178,7 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
     if(!identical(svgwarn, FALSE))
        hwrite(svgwarn, page = p)
     
-    hwrite("<br><br>", page = p)
+    hwrite("<br><br></div>", page = p)
 
     ## recursion, for the barplot with the outliers
     if(!identical(NA_character_, module@outliers@description)) {
@@ -248,7 +249,7 @@ toJSON_fromchar = function(x)
 ## character vector containing the JSON representation of the elements
 ##----------------------------------------------------------
 cleanstring = function(x)
-  gsub("[[:punct:]|[:space:]]", "", x)
+  tolower(gsub("[[:punct:]|[:space:]]", "", x))
 
 
 ##--------------------------------------------------
@@ -262,7 +263,9 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
   
   ## For all report modules, extract the 'svg' slot, then subset only those that are defined.
   svgdata = lapply(modules, slot, "svg")
-  svgdata = svgdata[ !is.na(sapply(svgdata, slot, "name")) ]
+  names(svgdata) = sapply(modules, function(x) cleanstring(x@title))
+  hassvg  = !is.na(sapply(svgdata, slot, "numPlotObjects")) 
+  svgdata = svgdata[ hassvg]
   
   ## Determine which subset of the modules have computed outliers ('wh'). For each, define 
   ## a corresponding column in the logical matrix 'outliers'.

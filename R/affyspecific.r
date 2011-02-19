@@ -37,7 +37,6 @@ aqm.rnadeg = function(expressionset, x)
         legend  = legend,
         size    = c(w = 7, h = 5.5),
         svg     =  new("svgParameters",
-                       name = "rnadeg",
                        numPlotObjects = x$numArrays) )
 
    }

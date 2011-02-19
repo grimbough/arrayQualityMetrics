@@ -3,7 +3,6 @@ dens = function(x)
     rg = quantile(x, na.rm = TRUE, probs = c(0.02, 0.98))
     rg = rg + diff(rg)*c(-1,1)*0.04
     x[ (x<rg[1]) | (x>rg[2]) ] = NA
-browser()
     
     dlist = apply(x, 2, density, na.rm = TRUE)
     names(dlist) = seq_along(dlist)
@@ -22,7 +21,6 @@ aqm.density = function(x)
 {
   
   lwd = lty = 1
-  name = "density"
   
   if(x$nchannels == 2)
     {  
@@ -54,7 +52,6 @@ aqm.density = function(x)
       }
 
       svgPar = new("svgParameters",
-                   name           = name,
                    numPlotObjects = 3L*x$numArrays,
                    getPlotObjIdFromReportObjId = getPlotObjIdFromReportObjId,
                    getReportObjIdFromPlotObjId = getReportObjIdFromPlotObjId)
@@ -65,7 +62,6 @@ aqm.density = function(x)
       formula = y ~ x
       lay = c(1,1)
       svgPar = new("svgParameters",
-                   name = name,
                    numPlotObjects = x$numArrays)
     }
 

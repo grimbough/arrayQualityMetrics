@@ -78,6 +78,7 @@ aqm.outliers = function(m)
   new("aqmReportModule",
       plot    = bp,
       section = m@section,
+      title   = paste("Outlier detection for", m@title),
       legend  = legend,
       size    = c(w = 4, h = 1 + length(values) * 0.1))
 }

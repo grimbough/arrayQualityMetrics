@@ -175,3 +175,24 @@ function checkboxEvent(reportObjId)
     setAllPlotObjsInAllPlots(reportObjId, status);
 }
 
+
+/*------------------------------------------------------------
+  toggle visibility
+------------------------------------------------------------*/
+function toggle(id){
+  var head = safeGetElementById(id + "-h");
+  var body = safeGetElementById(id + "-b");
+  var dsp, hdtxt;
+  switch(body.style.display){
+    case 'none':
+      dsp = 'block';
+      hdtxt = '-';
+      break;
+    case 'block':
+      dsp = 'none';
+      hdtxt = '+';
+      break;
+  }  
+  body.style.display = dsp;
+  head.innerHTML = hdtxt;
+}

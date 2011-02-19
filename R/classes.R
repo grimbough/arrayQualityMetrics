@@ -21,9 +21,6 @@
 
 setClass("svgParameters",
   representation(
-    ## 'name' is used to construct the ID of Figures and Tables             
-    name            = "character",
-                 
     ## An R function that finds the nodes in the SVG document corresponding to the plot objects.
     ## It should hold that length(getPlotObjNodes(doc)) == numPlotObjects            
     getPlotObjNodes = "function",
@@ -51,7 +48,6 @@ setClass("svgParameters",
     stroke     = "matrix"),   
          
   prototype(
-    name            = NA_character_,
     getPlotObjNodes = getMatplotSeries,
     numPlotObjects  = NA_integer_,             
     getPlotObjIdFromReportObjId = "function(r) { return([r.replace(/^r:/, 'p:')]); }",
@@ -59,7 +55,6 @@ setClass("svgParameters",
     stroke          = matrix(c("1", "3", "0.4", "1"), nrow=2, dimnames = list(NULL, c("width", "opacity")))),
          
   validity = function(object) {
-    if(length(object@name)          !=1) return("Invalid slot 'name'.")
     if(length(object@numPlotObjects)!=1) return("Invalid slot 'numPlotObjects'.")
     if(nrow(object@stroke)          !=2) return("Invalid slot 'stroke'.")
     return(TRUE)

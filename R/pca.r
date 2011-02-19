@@ -21,7 +21,6 @@ aqm.pca = function(x) {
       legend  = legend,
       size    = c(w = 6, h =6),
       svg     = new("svgParameters",
-           name = "pca",
            numPlotObjects = x$numArrays,
            getPlotObjNodes = getPlotPoints,
            stroke = matrix(c("1", "6", "1", "1"), nrow=2, dimnames = list(NULL, c("width", "opacity")))))
