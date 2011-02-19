@@ -43,7 +43,7 @@ aqm.maplot = function(x, subsample=20000, Dthresh=0.15) {
     } else {
       whj = order(stat, decreasing=TRUE)[c(1:4, x$numArrays+c(-3:0))]
       lay = c(4, 2)
-      legOrder = "Shown are the 4 arrays with the highest value of <i>D</i> (top row), and the 4 arrays with the lowest value (bottom row). "
+      legOrder = "Shown are the 4 arrays with the highest value of <i>D<sub>a</sub></i> (top row), and the 4 arrays with the lowest value (bottom row). "
     }
     
   xlim = quantile(A, probs=1e-4*c(1,-1)+c(0,1), na.rm=TRUE)
@@ -71,8 +71,8 @@ aqm.maplot = function(x, subsample=20000, Dthresh=0.15) {
   vv = if(length(out@which)==1)
     c("One array", "was", "") else
     c(paste(length(out@which), "arrays"), "were", "s")
-  outliertext = sprintf("%s had <i>D</i>&gt;%g and %s marked as outlier%s. ", 
-                         vv[1],           Dthresh, vv[2],             vv[3])
+  outliertext = sprintf("%s had <i>D<sub>a</sub></i>&gt;%g and %s marked as outlier%s. ", 
+                         vv[1],                    Dthresh, vv[2],             vv[3])
   
   legend = paste("The figure <!-- FIG --> shows MA plots. M and A are defined as:<br>",
     "M = log<sub>2</sub>(I<sub>1</sub>) - log<sub>2</sub>(I<sub>2</sub>)<br>",
@@ -86,7 +86,7 @@ aqm.maplot = function(x, subsample=20000, Dthresh=0.15) {
     "indicates that the arrays have different background intensities; this may be addressed by background correction. ",
     "A trend in the upper range of A can indicate saturation of the measurements; in mild cases, this may be addressed ",
     "by non-linear normalisation (e.g. quantile normalisation).<br>",
-    "Outlier detection was performed by computing Hoeffding's statistic <i>D<sub>a</sub></i>-on the joint distribution ",
+    "Outlier detection was performed by computing Hoeffding's statistic <i>D<sub>a</sub></i> on the joint distribution ",
     "of A and M for each array. ",
     legOrder,
     "The value of <i>D<sub>a</sub></i> is shown in the panel headings. ",
