@@ -107,78 +107,74 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
     validObject(module, test=FALSE)
     
     svgwarn = FALSE
-    if(!is.null(module@plot))
+
+    stopifnot(!is.na(module@title))
+    name = cleanstring(module@title)
+    
+    stopifnot(!any(is.na(module@size)))
+    h = module@size["h"]
+    w = module@size["w"]
+    
+    stopifnot(length(currentIndex)==1, is.numeric(currentIndex), !is.na(currentIndex))
+    dpi = arrayQualityMetricsGlobalParameters$dpi
+    
+    if(is.na(module@svg@numPlotObjects))
       {
-        stopifnot(!is.na(module@title))
-        name = cleanstring(module@title)
-        
-        hwrite(sprintf("<a name=\"%s\" id=\"%s-h\" href=\"javascript: toggle('%s')\" style=\"text-decoration:none\">+</a>",
-                                 name,      name,                            name), page = p)
-
-        stopifnot(!any(is.na(module@size)))
-        h = module@size["h"]
-        w = module@size["w"]
-
-        stopifnot(length(currentIndex)==1, is.numeric(currentIndex), !is.na(currentIndex))
-        dpi = arrayQualityMetricsGlobalParameters$dpi
-        
-        if(is.na(module@svg@numPlotObjects))
-          {
-            ## no svg - use png
-            nameimg = paste(name, ".png", sep = "")
-            png(file = file.path(outdir, nameimg), h = h*dpi, w = w*dpi)
-            makePlot(module)
-            dev.off()
-            img = aqm.hwriteImage(nameimg, id=paste("Fig", name, sep=":"))
-          } else {
-            ## svg
-            nameimg = paste(name, ".svg", sep = "")
-            svgtemp = paste(tempfile(), ".svg", sep = "")
-            Cairo(file = svgtemp, type = "svg", h = h, w = w, units = "in", dpi = dpi)
-            makePlot(module)
-            dev.off()
-                 
-            annRes = annotateSvgPlot(infile = svgtemp, outfile = nameimg, outdir = outdir,
-              annotationInfo = module@svg, name = name)
-                 
-            if(!annRes$annotateOK)
-              svgwarn = paste("Note: the figure is static - enhancement with interactive effects failed.",
-                "This is likely due to a version incompatibility of the 'SVGAnnotation' R package and your",
-                "version of 'Cairo' or 'libcairo'. Please consult the Bioconductor mailing list, or",
-                "contact the maintainer of 'arrayQualityMetrics' to fix this problem.")
-          
-            sizes = paste(annRes$size)
-            img = hwrite(c(aqm.hwriteImage(nameimg, width=sizes[1], height=sizes[2], id=paste("Fig", name, sep=":")),
-              annotationTable(arrayTable, name = name)))
-          } ## if
-
-        ## Also make a PDF file
-        namepdf = paste(name, ".pdf", sep = "")
-        pdf(file = file.path(outdir, namepdf), h = h, w = w)
+        ## no svg - use png
+        nameimg = paste(name, ".png", sep = "")
+        png(file = file.path(outdir, nameimg), h = h*dpi, w = w*dpi)
         makePlot(module)
         dev.off()
-        hwrite(img, page = p)
+        img = aqm.hwriteImage(nameimg, id=paste("Fig", name, sep=":"))
       } else {
-
-        ## No plot
-        namepdf = NA
-      }
+        ## svg
+        nameimg = paste(name, ".svg", sep = "")
+        svgtemp = paste(tempfile(), ".svg", sep = "")
+        Cairo(file = svgtemp, type = "svg", h = h, w = w, units = "in", dpi = dpi)
+        makePlot(module)
+        dev.off()
+        
+        annRes = annotateSvgPlot(infile = svgtemp, outfile = nameimg, outdir = outdir,
+          annotationInfo = module@svg, name = name)
+        
+        if(!annRes$annotateOK)
+          svgwarn = paste("Note: the figure is static - enhancement with interactive effects failed.",
+            "This is likely due to a version incompatibility of the 'SVGAnnotation' R package and your",
+            "version of 'Cairo' or 'libcairo'. Please consult the Bioconductor mailing list, or",
+            "contact the maintainer of 'arrayQualityMetrics' to fix this problem.")
+        
+        sizes = paste(annRes$size)
+        img = hwrite(c(aqm.hwriteImage(nameimg, width=sizes[1], height=sizes[2], id=paste("Fig", name, sep=":")),
+          annotationTable(arrayTable, name = name)))
+      } ## if
     
-    hwrite(sprintf("<div id=\"%s-b\" style=\"display:block\">", name), page = p)
+    ## Also make a PDF file
+    namepdf = paste(name, ".pdf", sep = "")
+    pdf(file = file.path(outdir, namepdf), h = h, w = w)
+    makePlot(module)
+    dev.off()
+    
+    # write the HTML
+    hwrite(sprintf("\n\n<a name=\"%s\" id=\"%s-h\" href=\"javascript: toggle('%s')\" style=\"text-decoration:none;font-weight:bold;font-size:larger\">%s Figure %d: %s.</a><br>\n",
+                                 name,      name,                            name,                     c("block"="-", "none"="+")[module@defaultdisplay], currentIndex, module@title),
+           page = p)
 
-    if(!is.na(module@title))
-      hwrite(paste("Figure ", currentIndex, ": ", module@title,".<br><br>", sep=""),
-             page = p, style="font-weight:bold;font-size:larger")
+    hwrite(sprintf("<div id=\"%s-b\" style=\"display:%s\">\n",
+                              name,          module@defaultdisplay),
+           page = p)
 
+    hwrite(img, page = p)
+    hwrite("<br>\n", page = p)
+    
     hwrite(gsub("The figure <!-- FIG -->",
-           paste("<b>Figure", currentIndex, "</b>", if(!is.na(namepdf)) hwrite("(PDF file)", link = namepdf)),
+           paste("<b>Figure ", currentIndex, "</b>", if(!is.na(namepdf)) hwrite(" (PDF file)", link = namepdf), sep=""),
                  module@legend, ignore.case = TRUE), page = p)
-    hwrite("<br>", page = p)
+    hwrite("<br>\n", page = p)
 
     if(!identical(svgwarn, FALSE))
        hwrite(svgwarn, page = p)
     
-    hwrite("<br><br></div>", page = p)
+    hwrite("<br></div>", page = p)
 
     ## recursion, for the barplot with the outliers
     if(!identical(NA_character_, module@outliers@description)) {

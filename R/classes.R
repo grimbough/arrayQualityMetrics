@@ -83,22 +83,24 @@ setClass("outlierDetection",
 ##
 setClass("aqmReportModule",
   representation(
-    plot      = "ANY",
-    size      = "numeric",     ## size of the plot in inch
-    section   = "character",
-    title     = "character",
-    legend    = "character",
-    outliers  = "outlierDetection",
-    svg       = "svgParameters"),
+    plot           = "ANY",
+    size           = "numeric",     ## size of the plot in inch
+    section        = "character",
+    title          = "character",
+    legend         = "character",
+    outliers       = "outlierDetection",
+    defaultdisplay = "character",             
+    svg            = "svgParameters"),
 
   prototype(
-    plot      = new("namedList"),
-    size      = c(w=NA_real_, h=NA_real_),
-    section   = NA_character_,
-    title     = NA_character_,
-    legend    = NA_character_,
-    outliers  = new("outlierDetection"),
-    svg       = new("svgParameters")),
+    plot           = new("namedList"),
+    size           = c(w=NA_real_, h=NA_real_),
+    section        = NA_character_,
+    title          = NA_character_,
+    legend         = NA_character_,
+    outliers       = new("outlierDetection"),
+    defaultdisplay = "block",      
+    svg            = new("svgParameters")),
 
   validity = function(object) {
     for(s in c("section", "title", "legend"))
@@ -106,6 +108,8 @@ setClass("aqmReportModule",
         return(sprintf("Invalid slot '%s'.", s))
     if ((length(object@size)!=2) || !identical(names(object@size), c("w", "h")))
       return("Invalid slot 'size'.")
+    if(!(is.character(object@defaultdisplay) && (length(object@defaultdisplay)==1) && (object@defaultdisplay %in% c("block", "none"))))
+      return("Invalid slot 'defaultdisplay'.")
     validObject(object@svg, test=TRUE)
   }
 )

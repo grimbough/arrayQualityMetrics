@@ -182,15 +182,16 @@ function checkboxEvent(reportObjId)
 function toggle(id){
   var head = safeGetElementById(id + "-h");
   var body = safeGetElementById(id + "-b");
-  var dsp, hdtxt;
+  var hdtxt = head.innerHTML;
+  var dsp;
   switch(body.style.display){
     case 'none':
       dsp = 'block';
-      hdtxt = '-';
+      hdtxt = '-' + hdtxt.substr(1);
       break;
     case 'block':
       dsp = 'none';
-      hdtxt = '+';
+      hdtxt = '+' + hdtxt.substr(1);
       break;
   }  
   body.style.display = dsp;
