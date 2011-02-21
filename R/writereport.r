@@ -143,7 +143,7 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
             "version of 'Cairo' or 'libcairo'. Please consult the Bioconductor mailing list, or",
             "contact the maintainer of 'arrayQualityMetrics' to fix this problem.")
         
-        sizes = paste(annRes$size)
+        sizes = paste(round(annRes$size*1.4)) ## FIXME - the *1.4 is a hack, needs to be done more rationally
         img = hwrite(c(aqm.hwriteImage(nameimg, width=sizes[1], height=sizes[2], id=paste("Fig", name, sep=":")),
                        annotationTable(arrayTable, name = name)))
       } ## if
