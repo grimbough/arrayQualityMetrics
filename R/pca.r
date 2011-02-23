@@ -19,7 +19,7 @@ aqm.pca = function(x) {
       section = "Between array comparison",
       title   = "Principal Component Analysis",
       legend  = legend,
-      size    = c(w = 6, h =6),
+      size    = c(w = 1, h = 1) * 4 +  0.2 * sqrt(x$numArrays),
       svg     = new("svgParameters",
            numPlotObjects = x$numArrays,
            getPlotObjNodes = getPlotPoints,

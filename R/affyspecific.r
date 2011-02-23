@@ -35,7 +35,7 @@ aqm.rnadeg = function(expressionset, x)
         section = "Affymetrix specific plots",
         title   = "RNA digestion plot",
         legend  = legend,
-        size    = c(w = 7, h = 5.5),
+        size    = c(w = 5, h = 3.5),
         svg     =  new("svgParameters",
                        numPlotObjects = x$numArrays) )
 

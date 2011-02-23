@@ -11,16 +11,8 @@
 ## The function tries to be clever and guesses the image format from the extension.
 
 aqm.hwriteImage = function (image.url, page = NULL, ..., image.border = 0, width = NULL, 
-    height = NULL, capture = FALSE, id = NULL) 
+    height = NULL, id = NULL) 
 {
-    if (capture) {
-        if (is.null(width)) 
-            width = 400
-        if (is.null(height)) 
-            height = 400
-        dev.print(png, width = width, height = height, image.url)
-    }
-
     getExtension = function(x) { s = strsplit(x, split=".", fixed=TRUE)[[1]] ; s[length(s)] }
     alt = paste(image.url, "appears to be missing or not renderable by this browser.")
     
@@ -32,11 +24,12 @@ aqm.hwriteImage = function (image.url, page = NULL, ..., image.border = 0, width
         ## I also put the 'alt' text both in the alt attribute and as text between <object..> and </object>,
         ##   as IE does not seem to honour the alt attribute.
         hmakeTag("object", type="image/svg+xml", DATA = image.url, border = image.border, 
-                          alt = alt, data = alt, width = width, height = height, id = id)
+          alt = alt, data = alt, style = paste("width:", width, "pt; height: ", height, "pt;", sep=""),
+          id = id)
       }, {
       ## default:
         hmakeTag("img", src = image.url, border = image.border, 
-                          alt = alt, width = width, height = height, id = id)
+          alt = alt, width = width, height = height, id = id)
       })
     hwrite(str, page, ...)
 }
