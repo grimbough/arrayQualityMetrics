@@ -42,7 +42,7 @@ importFrom(graphics, legend)
 
 importFrom(grDevices, boxplot.stats, colorRampPalette, dev.off, pdf, png, rgb)
 
-importFrom(grid, gpar, grid.abline, grid.layout, frameGrob, placeGrob, rectGrob, unit)
+importFrom(grid, gpar, grid.layout, frameGrob, placeGrob, rectGrob, unit)
 
 importFrom(Hmisc, hoeffd)
 
