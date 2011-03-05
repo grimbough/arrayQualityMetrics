@@ -88,7 +88,7 @@ function(expressionset, do.logtransform)
   list(R = R, G = G, Rb = Rb, Gb = Gb,
        sx = sx, sy = sy,
        M = M, A = A, 
-       nchannels = 2, pData = pData(expressionset), fData = fData(expressionset))
+       nchannels = 2, pData = cleanPhenoData(expressionset), fData = fData(expressionset))
 })
 
 ##----------------------------------------------------------
@@ -101,7 +101,7 @@ oneColour = function(expressionset, do.logtransform)
     M = logtransform(M)
   
   list(M = M, A = M, 
-       nchannels = 1, pData = pData(expressionset), fData = fData(expressionset))
+       nchannels = 1, pData = cleanPhenoData(expressionset), fData = fData(expressionset))
 }
 
 ##----------------------------------------------------------
@@ -150,3 +150,56 @@ setMethod("platformspecific",
           oneColour)
 
 
+
+
+
+##------------------------------------------------------------
+## clean up phenoData
+##------------------------------------------------------------
+cleanPhenoData = function(x, maxcol = 10)
+{
+
+  pd = pData(x)
+  
+  if(ncol(pd) > maxcol)
+    {
+      ## Remove columns whose contents are all the same, or all different (except for the first time).
+      ## After that, if there are still more than maxcol columns left, only use the first ones.
+      remove = rep(FALSE, ncol(pd))
+      hadUniqueAlready = FALSE
+      for(i in seq_len(ncol(pd)))
+        {
+          n = nlevels(factor(pd[[i]]))
+          if(n==1)
+            {
+              remove[i] = TRUE
+            } else {
+              if(n==nrow(pd))
+                {
+                  if(hadUniqueAlready)
+                    remove[i] = TRUE else hadUniqueAlready = TRUE
+                }
+            }
+        } ## for i
+      
+      wh = which(!remove)
+      stopifnot(length(wh)>0)
+      if(length(wh) > maxcol)
+        wh = wh[seq_len(maxcol)]
+      
+      pd = pd[, wh, drop=FALSE]
+    } ## if ncol(x)
+  
+  ## Convert everything which is not a factor into a character string, and remove "@"
+  for(i in seq_len(ncol(pd)))
+    {
+      if(is.factor(pd[[i]]))
+        {
+          levels(pd[[i]]) = gsub("@", " ", levels(pd[[i]]), fixed=TRUE)
+        } else {
+          pd[[i]] = gsub("@", " ", as.character(pd[[i]]), fixed=TRUE)
+        }
+    }
+  
+  return(pd)
+}

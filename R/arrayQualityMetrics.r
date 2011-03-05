@@ -70,3 +70,4 @@ arrayQualityMetrics = function(
   aqm.writereport(modules = m, arrayTable = x$pData, reporttitle = reporttitle, outdir = outdir)
 }
 
+

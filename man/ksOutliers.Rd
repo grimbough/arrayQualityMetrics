@@ -14,8 +14,8 @@
  }
 
 \usage{
-findOutliers = function (x, coef = 1.5) 
-outliers(exprs, method = c("KS", "mean", "median"))
+findOutliers(x, coef = 1.5) 
+outliers(exprs, method = c("KS", "mean", "upperquartile"))
 }
 
 \arguments{
@@ -41,7 +41,8 @@ outliers(exprs, method = c("KS", "mean", "median"))
   the value of the \code{\link[stats:ks.test]{ks.test}} test statistic
   between its distribution of intensities and the pooled distribution of
   intensities from all arrays.
- With \code{"mean"} and \code{"median"}, it computes the mean or median.
+  With \code{"mean"} and \code{"upperquartile"}, it computes the mean or
+  the 75 percent quantile.
 }
 
 \author{Wolfgang Huber}
