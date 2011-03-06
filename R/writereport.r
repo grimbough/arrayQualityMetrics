@@ -139,9 +139,9 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
         
         if(!annRes$annotateOK)
           svgwarn = paste("Note: the figure is static - enhancement with interactive effects failed.",
-            "This is likely due to a version incompatibility of the 'SVGAnnotation' R package and your",
-            "version of 'Cairo' or 'libcairo'. Please consult the Bioconductor mailing list, or",
-            "contact the maintainer of 'arrayQualityMetrics' to fix this problem.")
+            "This is either due to a version incompatibility of the 'SVGAnnotation' R package and your",
+            "version of 'Cairo' or 'libcairo', or due to plot misformating. Please consult the Bioconductor mailing list, or",
+            "contact the maintainer of 'arrayQualityMetrics' with a reproducible example in order to fix this problem.")
         
         sizes = paste(round(annRes$size)) 
         img = hwrite(c(aqm.hwriteImage(nameimg, width=sizes[1], height=sizes[2], id=paste("Fig", name, sep=":")),

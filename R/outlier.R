@@ -47,17 +47,38 @@ aqm.outliers = function(m)
   th     = m@outliers@threshold
   n      = length(m@outliers@which)
   
-  xlim = c(min(values, na.rm=TRUE), max(values, th, na.rm=TRUE))
-  xlim = xlim + diff(xlim)*c(-1, 1)*0.04
-  
+  if(length(colors)==1)
+    {
+      colors = rep(colors, length(values))
+    } else {
+      stopifnot(length(colors)==length(values))  ## this should never happen
+    }
+
   bp = function()
     {
       par(mai=c(0.6, 0.5, 0.1, 0.2))
-      b = barplot(values, col = colors, xaxs = "r", names.arg = "",
-              xlab = "", ylab = "", horiz = TRUE, xlim = xlim)
+      xlim = c(min(values, na.rm=TRUE), max(values, th, na.rm=TRUE))
+      xlim = xlim + diff(xlim)*c(-1, 1)*0.04
+      #
+      y = seq(along=values)
+      ylim = y[c(1, length(y))] + 0.5 * c(-1,1)
+      #
+      plot(x = values, y = y, pch = 16, cex = 1.4, col = colors,  xlab = "", ylab = "", yaxt = "n", xlim = xlim, ylim = ylim, bty = "n")
+      dx = diff(par("usr")[1:2]) * 0.025
+      x0 = rep(par("usr")[1], length(values))
+      x1 = values
+      wh = (x1 - x0) > 2*dx
+      segments(x0 = x0[wh] + dx, x1 = x1[wh] - dx, y0 = y[wh], y1 = y[wh], col = colors[wh], lwd = 2)
       abline(v = th, lwd = 2)
-      text(par("usr")[1], b, paste(rev(seq(along=values))), adj = c(1, 0.5), xpd=NA, cex=0.66) 
-    }
+      text(par("usr")[1], y, paste(rev(y)), adj = c(1, 0.5), xpd=NA)
+      
+      ## Ugly barplot:
+      
+      ## b = barplot(values, col = colors, xaxs = "r", names.arg = "",
+      ##         xlab = "", ylab = "", horiz = TRUE, xlim = xlim)
+      ## abline(v = th, lwd = 2)
+      ## text(par("usr")[1], b, paste(rev(seq(along=values))), adj = c(1, 0.5), xpd=NA, cex=0.66)
+     }
 
   mid = "exceeded the threshold and"
   legend = paste("The figure <!-- FIG --> shows a bar chart of the ", m@outliers@description[1], 

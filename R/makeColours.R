@@ -5,30 +5,35 @@
 ##----------------------------------------
 intgroupColours = function(x)
 {
-
-  n = x$numArrays
-  cols = rep("#1F78B4", n)
-  key = NULL
   
   if (length(x$intgroup)>0) {
-    groups  = as.factor(x$pData[[x$intgroup[1]]])
-    igroups = as.integer(groups)
     colours = brewer.pal(9, "Set1")
-    if(nlevels(groups) > length(colours)) {
-      warning(sprintf("'intgroup[1]' has %d levels, but only the first 9 are used for colouring.",
-                      nlevels(groups)))
-      igroups[igroups > length(colours)] = length(colours)+1
-      colours = c(colours, "#101010")
-    } else {
-      colours = colours[seq_len(nlevels(groups))]
-    }
-    cols = colours[igroups]
+    fac  = as.factor(x$pData[[x$intgroup[1]]])
+    fac  = maximumLevels(fac, n = length(colours)) ## make sure that factor has at most n levels
+    colours = colours[seq_len(nlevels(fac))]
+    ac = colours[as.integer(fac)]
+
     key = list(
       rect = list(col = colours),
-      text = list(levels(groups)),
+      text = list(levels(fac)),
       rep = FALSE)
-  } # if
+    
+  } else {
+    key = NULL
+    ac = rep("#1F78B4", x$numArrays)
+  }
 
-  list(arrayColours = cols, key = key)
+  list(arrayColours = ac, key = key)
 }
 
+maximumLevels = function(f, n)
+  {
+    if(nlevels(f) >= n) {
+      warning(sprintf("A factor was provided with %d levels, but only the first %d were used for colouring.",
+                       nlevels(f), n))
+      wipe = (as.integer(f) > n)
+      f[wipe] = levels(f)[n] = "other"
+      f = factor(f) ## remove unneeded factor levels
+    }
+    return(f)
+  }

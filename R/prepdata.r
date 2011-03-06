@@ -1,16 +1,12 @@
 prepdata = function(expressionset, intgroup, do.logtransform)
 {
   cls = class(expressionset)
-  if (is(expressionset, "RGList") ||
-      is(expressionset, "MAList") ||
-      is(expressionset, "marrayRaw") ||
-      is(expressionset, "marrayNorm"))
+  if (is(expressionset, "RGList") || is(expressionset, "MAList"))
     {
       expressionset = try(as(expressionset, "NChannelSet"))
       if(is(expressionset, "try-error"))
         stop(sprintf("Argument 'expressionset' is of class '%s', and its automatic conversion into 'NChannelSet' failed. Please try to convert it manually.\n", paste(cls, collapse=", ")))
     }
-
 
   x = platformspecific(expressionset, do.logtransform)  # see below
 

@@ -16,7 +16,7 @@ annotateSvgPlot = function(infile, outfile, outdir, annotationInfo, name)
     ## from the R plot, on simple pattern matching and on hope that the found patterns
     ## align with the intended plot objects (i.e. not on any explicit identification).
     series = annotationInfo@getPlotObjNodes(doc)
-  
+    
     ## Try to catch some of the brittleness
     if (length(series) != annotationInfo@numPlotObjects)
       {

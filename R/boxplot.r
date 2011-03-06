@@ -71,5 +71,5 @@ aqm.boxplot = function(x, subsample=20000, outlierMethod = "KS") {
       title = "Boxplots",
       legend = legend,
       outliers = out,
-      size = c(w = 3+3*lay[1], h = 2.5 + x$numArrays * 0.1 +  1/x$numArrays))
+      size = c(w = 3+3*lay[1], h = 2.5 + x$numArrays * 0.1 +  1/x$numArrays + length(x$key$rect$col) * 0.2))
 }

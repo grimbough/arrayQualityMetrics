@@ -6,7 +6,6 @@ importClassesFrom(Biobase, NChannelSet)
 importClassesFrom(Biobase, ExpressionSet)
 importClassesFrom(beadarray, beadLevelData, ExpressionSetIllumina)
 importClassesFrom(limma, MAList, RGList)
-importClassesFrom(marray, marrayNorm, marrayRaw)
 
 ##--------------------------------------------------
 ## methods
@@ -18,8 +17,6 @@ importMethodsFrom(Biobase, assayData, channel, dims, exprs,
                   sampleNames)
 
 importMethodsFrom(genefilter, plot)
-
-importMethodsFrom(marray, boxplot, lines)
 
 ## importMethodsFrom(simpleaffy, qc)
 

@@ -24,6 +24,7 @@ aqm.heatmap = function(x)
     }
 
   ## Shall we draw side bars?
+  maxNrColours = 0
   ng = length(x$intgroup)
   if(ng > 0) {
     palettes = c("Set1", "Set2", "Set3", "Accent", "Dark2", "Paired", "Pastel1", "Pastel2")
@@ -33,20 +34,25 @@ aqm.heatmap = function(x)
     key = rects = vector(mode="list", length=ng)
     names(rects) = rep("rect", ng)
     
-    for(i in seq_len(ng))
+     for(i in seq_len(ng))
       {
+        colours = brewer.pal(brewer.pal.info[palettes[i], "maxcolors"], palettes[i])
         fac  = as.factor(x$pData[[x$intgroup[i]]])
-        pal  = brewer.pal(brewer.pal.info[palettes[i], "maxcolors"], palettes[i])
-        pal  = rep(pal, ceiling(nlevels(fac)/length(pal)))[ seq_len(nlevels(fac)) ]
-        cols = pal[as.integer(fac)]
-        key[[i]] =  list(rect = list(col = pal),
+        fac  = maximumLevels(fac, n = length(colours)) ## make sure that factor has at most n levels
+        colours = colours[seq_len(nlevels(fac))]
+        ac = colours[as.integer(fac)]
+
+        key[[i]] =  list(rect = list(col = colours),
                          text = list(levels(fac)))
         rects[[i]] = list(col = "transparent",
-                          fill = cols[ord],
+                          fill = ac[ord],
                           type = "rectangle")
-        if(i==1) out@colors = cols
+        if(i==1) out@colors = ac
+        if(length(colours)>maxNrColours)
+          maxNrColours = length(colours)
       }
-    
+
+      
     key = unlist(key, recursive=FALSE)
     key$rep = FALSE
     thekey = draw.key(key = key) 
@@ -81,8 +87,10 @@ aqm.heatmap = function(x)
     scales = list(x=list(rot=90)),
     legend = thelegend,
     colorkey = list(space ="left"),
-    xlab="", ylab="",
-    col.regions=colourRange, main = thekey)
+    xlab = "",
+    ylab = "",
+    col.regions = colourRange,
+    main = thekey)
 
   nout = length(out@which)
   
@@ -105,7 +113,7 @@ aqm.heatmap = function(x)
       section   = "Between array comparison",
       title     = "Distances between arrays",
       legend    = legend,
-      size      = c(w = 5 + x$numArrays * 0.075, h = 3 + x$numArrays * 0.075),
+      size      = c(w = 5 + x$numArrays * 0.075, h = 3 + x$numArrays * 0.075 + maxNrColours * 0.2),
       outliers  = out)
 }
 

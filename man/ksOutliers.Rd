@@ -15,7 +15,7 @@
 
 \usage{
 findOutliers(x, coef = 1.5) 
-outliers(exprs, method = c("KS", "mean", "upperquartile"))
+outliers(exprs, method = c("KS", "sum", "upperquartile"))
 }
 
 \arguments{
@@ -41,7 +41,7 @@ outliers(exprs, method = c("KS", "mean", "upperquartile"))
   the value of the \code{\link[stats:ks.test]{ks.test}} test statistic
   between its distribution of intensities and the pooled distribution of
   intensities from all arrays.
-  With \code{"mean"} and \code{"upperquartile"}, it computes the mean or
+  With \code{"sum"} and \code{"upperquartile"}, it computes the sum or
   the 75 percent quantile.
 }
 
