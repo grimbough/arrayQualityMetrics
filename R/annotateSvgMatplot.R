@@ -1,32 +1,69 @@
-## --------------------------------------------------
-## Postprocess an SVG file to add mouse events
-## --------------------------------------------------
+## --------------------------------------------------------------------------------------------------------
+## Postprocess an SVG file:
+##  1. add an 'id' attribute to the root svg element
+##  2. the ids of the symbols that are defined in the <defs> elements are -by libcairo- of the form
+##     glyph0-0, glyph1-0 etc. Since we are going to inline the content from all svg files into a single html
+##     document, these id would clash between different svg plots, and need to by made unique. I wonder
+##     whether a more elegant way exists for this.
+##  3. add mouse events to the elements of interest (found by the function annotationInfo@getPlotObjNodes)
+## ---------------------------------------------------------------------------------------------------------
 annotateSvgPlot = function(infile, outfile, outdir, annotationInfo, name) 
   {
      
-    doc = xmlParse(infile)
-    svg = xmlRoot(doc)
-    vb  = getViewBox(doc)
-    
-    ## Extract and check arguments 
+    ## Check argument 
     stopifnot(is(annotationInfo, "svgParameters"))
   
-    ## This part is brittle - 'getPlotObjNodes' will be 'getMatplotSeries' or 'getPlotPoints' from
+    doc = xmlParse(infile)
+    vb  = getViewBox(doc)
+
+    svg = xmlRoot(doc)
+    
+    ## 1. add id
+    xmlAttrs(svg) = c(id = paste("Fig", name, sep=":"))  
+
+    ## monitor our success in finding what we expect
+    isok = c(syms = FALSE, uses = FALSE, plotobjs = FALSE)
+    
+    ## 2. find the children of the <defs> element that are <symbol> 
+    syms = getNodeSet(doc, "//x:defs/x:g/x:symbol", "x") 
+    if(length(syms)>0)
+      {
+        oldids = sapply(syms, function(x) xmlAttrs(x)["id"])
+        if(all(grepl("^glyph", oldids)))
+          {
+            newids = sub("^glyph", paste(name, "-", sep=""), oldids)
+            for(i in seq(along=syms))
+              xmlAttrs(syms[[i]]) = newids[i] 
+            isok["syms"] = TRUE
+          }
+      }
+    
+    ## similarly, find the <use> elements 
+    uses = getNodeSet(doc, "//x:use", "x") 
+    if(length(uses)>0)
+      {
+        oldhrefs = sapply(uses, function(x) xmlAttrs(x)["href"])
+        if(all(grepl("^#glyph", oldhrefs)))
+          {
+            newhrefs = sub("^#glyph", paste("#", name, "-", sep=""), oldhrefs)
+            names(newhrefs) = rep("xlink:href", length(newhrefs))
+            for(i in seq(along=uses))
+              xmlAttrs(uses[[i]]) = newhrefs[i]
+            isok["uses"] = TRUE
+          }
+      }
+
+    browser()
+    
+    ## 3. this part is brittle - 'getPlotObjNodes' will be 'getMatplotSeries' or 'getPlotPoints' from
     ## 'SVGAnnotation', which rely on conventions used by libcairo to produce the SVG
     ## from the R plot, on simple pattern matching and on hope that the found patterns
     ## align with the intended plot objects (i.e. not on any explicit identification).
-    series = annotationInfo@getPlotObjNodes(doc)
+    plotobjs = annotationInfo@getPlotObjNodes(doc)
     
-    ## Try to catch some of the brittleness
-    if (length(series) != annotationInfo@numPlotObjects)
+    if (length(plotobjs) == annotationInfo@numPlotObjects)
       {
-        annotateOK = FALSE
-      }
-    else
-      {
-        annotateOK = TRUE
-        
-        for(i in seq(along=series))
+        for(i in seq(along=plotobjs))
           {
             poid = paste("p", i, sep=":")
             roid = annotationInfo@getReportObjIdFromPlotObjId(poid)
@@ -34,18 +71,19 @@ annotateSvgPlot = function(infile, outfile, outdir, annotationInfo, name)
             
             callbacks = sprintf("top.plotObjRespond('%s', '%s', '%s', '%s')", c("click", "show", "hide"), poid, roid, name)
             
-            xmlAttrs(series[[i]]) = c(
+            xmlAttrs(plotobjs[[i]]) = c(
                       "id"          = poid,
                       "onclick"     = callbacks[1],
                       "onmouseover" = callbacks[2],
                       "onmouseout"  = callbacks[3])
             
-            convertCSSStylesToSVG(series[[i]])
+            convertCSSStylesToSVG(plotobjs[[i]])
           } ## for
-      } ## else
+        isok["plotobjs"] = TRUE
+      }
     
     saveXML(doc, file.path(outdir, outfile))
-    return(list(size = diff(vb), annotateOK = annotateOK))
+    return(list(size = diff(vb), annotateOK = all(isok)))
   }
 
 ##--------------------------------------------------------------------------------------
@@ -55,7 +93,7 @@ annotateSvgPlot = function(infile, outfile, outdir, annotationInfo, name)
 ##---------------------------------------------------------------------------------------
 annotationTable = function(x, name) {
   bgcol = rep(c("#d0d0ff", "#e0e0f0"), ceiling(ncol(x)/2))[seq_len(ncol(x))]
-  tab  = paste("<tr bgcolor='", bgcol, "'><td>", colnames(x), "</td><td style='font-weight:bold'></td></tr>", sep="", collapse="\n")
+  tab  = paste("<tr bgcolor='", bgcol, "'><td>", colnames(x), "</td><td style='font-weight:bold'></td></tr>\n", sep="", collapse="\n")
   tab  = paste("<table id='", paste("Tab", name, sep=":"), "'>", tab, "</table>", sep="")
 }
 

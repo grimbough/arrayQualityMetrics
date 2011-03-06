@@ -68,7 +68,7 @@ importFrom(SVGAnnotation, addECMAScripts, convertCSSStylesToSVG,
 
 importFrom(utils, read.table, sessionInfo)
 
-importFrom(XML, addAttributes, "xmlAttrs<-", xmlParse, xmlRoot, newXMLNode, saveXML)
+importFrom(XML, getNodeSet, xmlAttrs, "xmlAttrs<-", xmlChildren, xmlParse, xmlRoot, saveXML)
 
 ##--------------------------------------------------
 ## export

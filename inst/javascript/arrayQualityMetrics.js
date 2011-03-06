@@ -79,7 +79,7 @@ function setAllPlotObjsInAllPlots(reportObjId, status, doTable)
 function setOnePlotObjInOnePlot(i, plotObjId, status)
 {
     var att;
-    var el = svgObjects[i].contentDocument.getElementById(plotObjId);
+    var el = svgObjects[i].getElementById(plotObjId);
     if(!el) 
 	throw new Error("Did not find Id '" + plotObjId + "'");
     

@@ -48,10 +48,10 @@ makeTitle = function(reporttitle, outdir, params)
     
     copySubstitute(src = filelocs, dest = outdir, recursive = TRUE, symbolValues = params)
                 
-    p = aqm.hwriteOpenPage(file.path(outdir, 'index.html'),
+    p = openPage(filename = file.path(outdir, 'index.html'),
       link.javascript = filenames[2],
       link.css        = filenames[1],
-      body.attributes = c("onload" = "reportinit()"))
+      body.attributes = list("onload" = "reportinit()"))
 
     hwrite("<hr>", page = p)
     hwrite(reporttitle, page = p, heading=1)
@@ -96,6 +96,8 @@ makeIndex = function(p, modules)
       currentSectionName = modules[[i]]@section
     }
   hwrite("</UL></UL>", page = p)
+  
+  browserCompatibilityNote(p) 
 }
 
 ##---------------------------------------------------------
@@ -125,7 +127,9 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
         png(file = file.path(outdir, nameimg), h = h*dpi, w = w*dpi)
         makePlot(module)
         dev.off()
-        img = aqm.hwriteImage(nameimg, id=paste("Fig", name, sep=":"))
+        img = hmakeTag("img", src = nameimg, border = 0, 
+                       alt = nameimg, id = paste("Fig", name, sep=":"))
+        
       } else {
         ## svg
         nameimg = paste(name, ".svg", sep = "")
@@ -134,8 +138,11 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
         makePlot(module)
         dev.off()
         
-        annRes = annotateSvgPlot(infile = svgtemp, outfile = nameimg, outdir = outdir,
-          annotationInfo = module@svg, name = name)
+        annRes = annotateSvgPlot(infile = svgtemp,
+                                 outfile = nameimg,
+                                 outdir = outdir,
+                                 annotationInfo = module@svg,
+                                 name = name)
         
         if(!annRes$annotateOK)
           svgwarn = paste("Note: the figure is static - enhancement with interactive effects failed.",
@@ -144,8 +151,12 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
             "contact the maintainer of 'arrayQualityMetrics' with a reproducible example in order to fix this problem.")
         
         sizes = paste(round(annRes$size)) 
-        img = hwrite(c(aqm.hwriteImage(nameimg, width=sizes[1], height=sizes[2], id=paste("Fig", name, sep=":")),
-                       annotationTable(arrayTable, name = name)))
+        img = hwrite( c( paste(readLines(file.path(outdir, nameimg)), collapse="\n"),
+                         annotationTable(arrayTable, name = name) ))
+
+        ## TO DO: 
+        ##  hwrite(c(aqm.hwriteImage(nameimg, width=sizes[1], height=sizes[2], id=paste("Fig", name, sep=":")),
+        ##               annotationTable(arrayTable, name = name)))
       } ## if
     
     ## Also make a PDF file
@@ -188,14 +199,33 @@ makeEnding = function(p)
     z = sessionInfo("arrayQualityMetrics")
     version = z$otherPkgs[[1]]$Version
     rversion = sessionInfo()$R.version$version.string
-    session = paste("This report has been created with arrayQualityMetrics ", version, " under ", rversion, ".<br>",
-      "The reports have been tested on Firefox 3.6, Safari 5.0 and Chrome 9.0. On Chrome, the report needs to be viewed ",
-      "through a http connection; when viewed from the file system, a security exception is thrown ",
-      "(&quot;Unsafe JavaScript attempt to access frame .... Domains, protocols and ports must match.&quot;).", sep="")
+    session = paste("This report has been created with arrayQualityMetrics ",
+      version, " under ", rversion, ".", sep="")
     hwrite("<hr>", page = p)
     hwrite(session, page = p, style ='font-size:9pt')
     hwrite("<hr>", page = p)
     closePage(page = p)
+  }
+
+##----------------------------------------------------------
+## Browser compatibility
+##----------------------------------------------------------
+browserCompatibilityNote = function(p)
+  {
+    txt = paste("<h3>Browser compatibility</h3>",
+      "This report uses a recent feature of HTML 5 (direct embedding of the &lt;svg&gt; tag), which has not ",
+      "yet been implemented (properly) by all browsers. Thus, unfortunately, browser compatibility ",
+      "currently needs to be  considered:<ul>",
+      "<li> Chrome 9.0 - all works well.",
+      "<li> Firefox 4.0b12 - mostly ok, but there are two problems: false clipping of the lines in the density ",
+          "plot, and <tt>getElementById</tt> is not implemented for <tt>SVGSVGElement</tt>, which prevents the ",
+          "selection of arrays (lines and points) across plots and the table.",
+      "<li> Safari 5.0 - will not work, since it does not support the &lt;svg&gt; tag in HTML", 
+      "</ul>",
+      "For now, Chrome 9.0 appears to be the best browser to view this report.", sep="")
+    hwrite("<hr>", page = p)
+    hwrite(txt, page = p)
+    hwrite("<hr>", page = p)
   }
 
 ##----------------------------------------------------------
@@ -251,7 +281,6 @@ toJSON_frommatrix = function(x)
   }
 ##----------------------------------------------------------
 ## remove spaces and punctuation characters
-## character vector containing the JSON representation of the elements
 ##----------------------------------------------------------
 cleanstring = function(x)
   tolower(gsub("[[:punct:]|[:space:]]", "", x))
