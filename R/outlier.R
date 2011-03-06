@@ -100,6 +100,7 @@ aqm.outliers = function(m)
       plot    = bp,
       section = m@section,
       title   = paste("Outlier detection for", m@title),
+      id      = paste("out", m@id, sep = ""),
       legend  = legend,
       size    = c(w = 4, h = 1 + length(values) * 0.1),
       defaultdisplay = "none")

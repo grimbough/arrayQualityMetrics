@@ -8,13 +8,11 @@ aqm.meansd = function(x) {
   
   legend = "The figure <!-- FIG --> shows a density plot of the standard deviation of the intensities across arrays on the <i>y</i>-axis versus the rank of their mean on the <i>x</i>-axis. The red dots, connected by lines, show the running median of the standard deviation. After normalisation and transformation to a logarithm(-like) scale, one typically expects the red line to be approximately horizontal, that is, show no substantial trend. In some cases, a hump on the right hand of the x-axis can be observed and is symptomatic of a saturation of the intensities."
   
-  title = "Standard deviation versus rank of the mean"
-  section = "Variance mean dependence"
-  
   new("aqmReportModule",
       plot    = msdplo,
-      section = section,
-      title   = title,
+      section = "Variance mean dependence",
+      title   = "Standard deviation versus rank of the mean",
+      id      = "msd",
       legend  = legend,
       size    = c(w=6, h=6))
 }

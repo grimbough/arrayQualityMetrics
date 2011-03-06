@@ -110,6 +110,7 @@ spatialplot = function(whichChannel, x, scale)
       plot = spat,
       section = "Individual array quality",
       title = paste("Spatial distribution of", whichChannel),
+      id = paste("sp", tolower(whichChannel), sep = ""),
       legend = legend,
       outliers = outliers,
       size = c(w = maxx * fac * lay[1], h = (maxy * fac + 0.25) * lay[2]))

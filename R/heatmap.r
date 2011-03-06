@@ -112,6 +112,7 @@ aqm.heatmap = function(x)
       plot      = hfig,
       section   = "Between array comparison",
       title     = "Distances between arrays",
+      id        = "hm",
       legend    = legend,
       size      = c(w = 5 + x$numArrays * 0.075, h = 3 + x$numArrays * 0.075 + maxNrColours * 0.2),
       outliers  = out)

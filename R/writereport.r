@@ -111,7 +111,7 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
     svgwarn = FALSE
 
     stopifnot(!is.na(module@title))
-    name = cleanstring(module@title)
+    name = module@id
     
     stopifnot(!any(is.na(module@size)))
     h = module@size["h"]
@@ -217,15 +217,14 @@ browserCompatibilityNote = function(p)
       "yet been implemented (properly) by all browsers. Thus, unfortunately, browser compatibility ",
       "currently needs to be  considered:<ul>",
       "<li> Chrome 9.0 - all works well.",
-      "<li> Firefox 4.0b12 - mostly ok, but there are two problems: false clipping of the lines in the density ",
-          "plot, and <tt>getElementById</tt> is not implemented for <tt>SVGSVGElement</tt>, which prevents the ",
+      "<li> Firefox 4.0b12 - partially functional; the JavaScript code fails since Firefox does not "
+          "(yet) implement the <tt>getElementById</tt> method for <tt>SVGSVGElement</tt>, which prevents the ",
           "selection of arrays (lines and points) across plots and the table.",
       "<li> Safari 5.0 - will not work, since it does not support the &lt;svg&gt; tag in HTML", 
       "</ul>",
       "For now, Chrome 9.0 appears to be the best browser to view this report.", sep="")
     hwrite("<hr>", page = p)
     hwrite(txt, page = p)
-    hwrite("<hr>", page = p)
   }
 
 ##----------------------------------------------------------
@@ -279,11 +278,6 @@ toJSON_frommatrix = function(x)
     stopifnot(length(dim(x))==2)
     toJSON_fromchar(apply(x, 1, toJSON_fromvector))
   }
-##----------------------------------------------------------
-## remove spaces and punctuation characters
-##----------------------------------------------------------
-cleanstring = function(x)
-  tolower(gsub("[[:punct:]|[:space:]]", "", x))
 
 ##--------------------------------------------------
 ##   write the report
@@ -293,10 +287,14 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
   ## To avoid dealing with this pathologic special case downstream in the HTML
   if(nrow(arrayTable)==0)
     stop("'arrayTable' must not be empty.")
+
+  ## construct short, unique IDs
+  ids = sapply(modules, slot, "id")
+  stopifnot(!any(is.na(ids)), !any(duplicated(modules)))
   
   ## For all report modules, extract the 'svg' slot, then subset only those that are defined.
   svgdata = lapply(modules, slot, "svg")
-  names(svgdata) = sapply(modules, function(x) cleanstring(x@title))
+  names(svgdata) = ids
   hassvg  = !is.na(sapply(svgdata, slot, "numPlotObjects")) 
   svgdata = svgdata[ hassvg]
   
@@ -308,7 +306,7 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
   wh = which(sapply(modules, function(x) length(x@outliers@statistic)>0))
 
   outlierMethodTitles = sapply(modules, slot, "title")[wh]
-  outlierMethodLinks  = paste("<a href=\"#", cleanstring(outlierMethodTitles), "\">", sep="")
+  outlierMethodLinks  = paste("<a href=\"#", ids[wh], "\">", sep="")
   
   outlierExplanations = paste(
     "The columns named *1, *2, ... indicate the calls from the different outlier detection methods:<OL>",

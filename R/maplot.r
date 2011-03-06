@@ -99,6 +99,7 @@ aqm.maplot = function(x, subsample=20000, Dthresh=0.15) {
       plot = ma, 
       section = "Individual array quality",
       title = "MA plots",
+      id = "ma",
       legend = legend,
       outliers = out,
       size = c(w=10, h=6))

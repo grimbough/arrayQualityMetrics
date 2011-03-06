@@ -79,6 +79,7 @@ aqm.density = function(x)
       plot    = den,
       section = "Array intensity distributions",
       title   = "Density plots",
+      id      = "dens",
       legend  = legend,
       size    = c(w = 2+2*lay[1], h = 3.5*lay[2] + length(x$key$rect$col) * 0.2),
       svg     = svgPar

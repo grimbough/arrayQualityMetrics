@@ -34,6 +34,7 @@ aqm.rnadeg = function(expressionset, x)
         plot    = rnaDeg,
         section = "Affymetrix specific plots",
         title   = "RNA digestion plot",
+        id      = "dig",
         legend  = legend,
         size    = c(w = 5, h = 3.5),
         svg     =  new("svgParameters",
@@ -51,6 +52,7 @@ aqm.rle = function(x, outlierMethod = "KS")
 
   rv@title = "Relative Log Expression (RLE)"
   rv@section = "Affymetrix specific plots"
+  rv@id = "rle"
   
   rv@legend = paste(figurePhrase(rv@title),
     "Arrays whose boxes are centered away from 0 and/or are more spread out are potentially problematic.",
@@ -70,7 +72,8 @@ aqm.nuse = function(x, outlierMethod = "upperquartile")
 
   rv@title = "Normalized Unscaled Standard Error (NUSE)"
   rv@section = "Affymetrix specific plots"
-
+  rv@id = "nuse"
+  
   rv@legend = paste(figurePhrase(rv@title),
     "For each array, the boxes should be centered around 1. An array were the values are elevated relative to the other arrays",
     "is typically of lower quality. Outlier detection was performed by computing the 75% quantile <i>N<sub>a</sub></i>",
@@ -128,6 +131,7 @@ aqm.pmmm = function(x)
       plot = PMMM,
       section = "Affymetrix specific plots",
       title = "Perfect matches and mismatches",
+      id = "pmmm",
       legend = legend,
       size = c(w = 6, h = 6))
   

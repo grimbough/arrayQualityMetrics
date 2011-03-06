@@ -69,6 +69,7 @@ aqm.boxplot = function(x, subsample=20000, outlierMethod = "KS") {
       plot = box,
       section = "Array intensity distributions",
       title = "Boxplots",
+      id = "box",
       legend = legend,
       outliers = out,
       size = c(w = 3+3*lay[1], h = 2.5 + x$numArrays * 0.1 +  1/x$numArrays + length(x$key$rect$col) * 0.2))

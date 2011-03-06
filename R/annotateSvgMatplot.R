@@ -1,11 +1,11 @@
 ## --------------------------------------------------------------------------------------------------------
 ## Postprocess an SVG file:
 ##  1. add an 'id' attribute to the root svg element
-##  2. the ids of the symbols that are defined in the <defs> elements are -by libcairo- of the form
+##  2. add mouse events to the elements of interest (found by the function annotationInfo@getPlotObjNodes)
+##  3. the ids of the symbols that are defined in the <defs> elements are -by libcairo- of the form
 ##     glyph0-0, glyph1-0 etc. Since we are going to inline the content from all svg files into a single html
 ##     document, these id would clash between different svg plots, and need to by made unique. I wonder
 ##     whether a more elegant way exists for this.
-##  3. add mouse events to the elements of interest (found by the function annotationInfo@getPlotObjNodes)
 ## ---------------------------------------------------------------------------------------------------------
 annotateSvgPlot = function(infile, outfile, outdir, annotationInfo, name) 
   {
@@ -22,40 +22,9 @@ annotateSvgPlot = function(infile, outfile, outdir, annotationInfo, name)
     xmlAttrs(svg) = c(id = paste("Fig", name, sep=":"))  
 
     ## monitor our success in finding what we expect
-    isok = c(syms = FALSE, uses = FALSE, plotobjs = FALSE)
+    isok = c(symbol = FALSE, clipPath = FALSE, use = FALSE, cp = FALSE, plotobjs = FALSE)
     
-    ## 2. find the children of the <defs> element that are <symbol> 
-    syms = getNodeSet(doc, "//x:defs/x:g/x:symbol", "x") 
-    if(length(syms)>0)
-      {
-        oldids = sapply(syms, function(x) xmlAttrs(x)["id"])
-        if(all(grepl("^glyph", oldids)))
-          {
-            newids = sub("^glyph", paste(name, "-", sep=""), oldids)
-            for(i in seq(along=syms))
-              xmlAttrs(syms[[i]]) = newids[i] 
-            isok["syms"] = TRUE
-          }
-      }
-    
-    ## similarly, find the <use> elements 
-    uses = getNodeSet(doc, "//x:use", "x") 
-    if(length(uses)>0)
-      {
-        oldhrefs = sapply(uses, function(x) xmlAttrs(x)["href"])
-        if(all(grepl("^#glyph", oldhrefs)))
-          {
-            newhrefs = sub("^#glyph", paste("#", name, "-", sep=""), oldhrefs)
-            names(newhrefs) = rep("xlink:href", length(newhrefs))
-            for(i in seq(along=uses))
-              xmlAttrs(uses[[i]]) = newhrefs[i]
-            isok["uses"] = TRUE
-          }
-      }
-
-    browser()
-    
-    ## 3. this part is brittle - 'getPlotObjNodes' will be 'getMatplotSeries' or 'getPlotPoints' from
+    ## 2. this part is brittle - 'getPlotObjNodes' will be 'getMatplotSeries' or 'getPlotPoints' from
     ## 'SVGAnnotation', which rely on conventions used by libcairo to produce the SVG
     ## from the R plot, on simple pattern matching and on hope that the found patterns
     ## align with the intended plot objects (i.e. not on any explicit identification).
@@ -82,9 +51,61 @@ annotateSvgPlot = function(infile, outfile, outdir, annotationInfo, name)
         isok["plotobjs"] = TRUE
       }
     
+    ## 3. find the children of the <defs> element that are <symbol>, and also <clipPath> 
+    isok["symbol"]   = renameNodes(doc, "//x:defs/x:g/x:symbol", prefix = name)
+    isok["clipPath"] = renameNodes(doc, "//x:clipPath", prefix = name)
+    
+    ## similarly, find the <use> elements ...
+    use = getNodeSet(doc, "//x:use", "x") 
+    if(length(use)>0)
+      {
+        oldvalues = sapply(use, function(x) xmlAttrs(x)["href"])
+        stopifnot(all(grepl("^#", oldvalues)))
+        newvalues = sub("#", paste("#", name, "-", sep=""), oldvalues)
+        names(newvalues) = rep("xlink:href", length(newvalues))
+        for(i in seq(along=use))
+          xmlAttrs(use[[i]]) = newvalues[i]
+        isok["use"] = TRUE
+      }
+ 
+    ## ... and the <g> elements that use a clip-path attribute
+    cp = getNodeSet(doc, "//x:g[@clip-path]", "x") 
+    if(length(cp)>0)
+      {
+        oldvalues = sapply(cp, function(x) xmlAttrs(x)["clip-path"])
+        stopifnot(all(grepl("^url\\(#", oldvalues)))
+        newvalues = sub("#", paste("#", name, "-", sep=""), oldvalues)
+        for(i in seq(along=cp))
+          xmlAttrs(cp[[i]]) = newvalues[i]
+        isok["cp"] = TRUE
+      }
+    
     saveXML(doc, file.path(outdir, outfile))
+
+
+    if(!all(isok)) browser()
+    
     return(list(size = diff(vb), annotateOK = all(isok)))
   }
+
+
+renameNodes = function(doc, path, prefix)
+  {
+    ns = getNodeSet(doc, path, "x") 
+    if(length(ns)>0)
+      {
+        oldids = sapply(ns, function(x) xmlAttrs(x)["id"])
+        newids = paste(prefix, "-", oldids, sep="")
+        names(newids) = names(oldids)
+        
+        for(i in seq(along = ns))
+          xmlAttrs(ns[[i]]) = newids[i]
+        TRUE
+      } else {
+        FALSE
+      }
+  }
+
 
 ##--------------------------------------------------------------------------------------
 ## HTML table to show 'tooltips' for mouseover events

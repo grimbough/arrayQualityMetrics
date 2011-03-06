@@ -21,6 +21,7 @@ aqm.probesmap = function(x)
       plot    = den,
       section = "Feature stratification",
       title   = "Feature stratification",
+      id      = "feats",
       legend  = legend,
       size    = c(w=6, h=6))
 }

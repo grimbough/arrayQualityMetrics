@@ -1,13 +1,3 @@
-* vignette should advise to reduce the size of 'pData', if it is large, before calling arrayQualityMetrics
-
-* check density estimation / bandwidth for nCCl4 - should not be wiggly.
-
-* meanSdPlot should use 'smoothScatter' (this is something that should
-  be done in the vsn package) instead of drawing individual dots.
-
-* smoothScatter in MA-plot sometimes gives warnings / fails with an error message about grid size. Fix that.
-
-
 
 ========== Ideas for future development ===============
 
