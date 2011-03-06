@@ -188,9 +188,12 @@ makeEnding = function(p)
     z = sessionInfo("arrayQualityMetrics")
     version = z$otherPkgs[[1]]$Version
     rversion = sessionInfo()$R.version$version.string
-    session = paste("This report has been created with arrayQualityMetrics", version, "under", rversion)
+    session = paste("This report has been created with arrayQualityMetrics ", version, " under ", rversion, ".<br>",
+      "The reports have been tested on Firefox 3.6, Safari 5.0 and Chrome 9.0. On Chrome, the report needs to be viewed ",
+      "through a http connection; when viewed from the file system, a security exception is thrown ",
+      "(&quot;Unsafe JavaScript attempt to access frame .... Domains, protocols and ports must match.&quot;).", sep="")
     hwrite("<hr>", page = p)
-    hwrite(session, page = p, style ='font-size:8pt')
+    hwrite(session, page = p, style ='font-size:9pt')
     hwrite("<hr>", page = p)
     closePage(page = p)
   }
