@@ -217,9 +217,10 @@ browserCompatibilityNote = function(p)
       "yet been implemented (properly) by all browsers. Thus, unfortunately, browser compatibility ",
       "currently needs to be  considered:<ul>",
       "<li> Chrome 9.0 - all works well.",
-      "<li> Firefox 4.0b12 - partially functional; the JavaScript code fails since Firefox does not ",
+      "<li> Firefox 4.0 - partially functional; the JavaScript code fails since Firefox does not ",
           "yet implement the <tt>getElementById</tt> method for <tt>SVGSVGElement</tt>, which prevents the ",
-          "selection of arrays (lines and points) across plots and the table.",
+          "selection of arrays (lines and points) across plots and the table. ",
+      "Suggestions on how to circumvent this are welcome.",
       "<li> Safari 5.0 - will not work, since it does not support the &lt;svg&gt; tag in HTML", 
       "</ul>",
       "For now, Chrome 9.0 appears to be the best browser to view this report.", sep="")
