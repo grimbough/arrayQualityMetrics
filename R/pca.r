@@ -23,7 +23,6 @@ aqm.pca = function(x) {
       size    = c(w = 1, h = 1) * 4 +  0.2 * sqrt(x$numArrays) + c( w = 0, h = 1) * length(x$key$rect$col) * 0.2,
       svg     = new("svgParameters",
            numPlotObjects = x$numArrays,
-           getPlotObjNodes = getPlotPoints,
-           stroke = matrix(c("1", "6", "1", "1"), nrow=2, dimnames = list(NULL, c("width", "opacity")))))
+           getPlotObjNodes = getPlotPoints))
 }
 

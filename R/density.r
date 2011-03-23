@@ -36,24 +36,14 @@ aqm.density = function(x)
 
       ## the mappings between report objects (arrays) and plot objects (lines)
       n = x$numArrays
-      getPlotObjIdFromReportObjId = sprintf("
-   // report object id -> plot object id
-   function(r) {
-     var a = parseInt(r.replace(/^r:/, ''));
-     var n = %d;
-     if(isNaN(a)) throw new Error('Invalid report object id ' + x);
-     return(['p:' + a, 'p:' + (a+n), 'p:' + (a+2*n)]);
-   }", n)
 
-      getReportObjIdFromPlotObjId = function(x) {
-        j = as.integer(sub("^p:", "", x))
-        stopifnot(length(j)==1, !is.na(j), j>0)
-        paste("r", (j-1) %% n + 1, sep = ":")
+      getReportObjIdFromPlotObjId = function(j) {
+        stopifnot(length(j)==1, !is.na(j), j>0L)
+        (j-1L) %% n + 1L
       }
 
       svgPar = new("svgParameters",
                    numPlotObjects = 3L*x$numArrays,
-                   getPlotObjIdFromReportObjId = getPlotObjIdFromReportObjId,
                    getReportObjIdFromPlotObjId = getReportObjIdFromPlotObjId)
 
       
@@ -82,6 +72,5 @@ aqm.density = function(x)
       id      = "dens",
       legend  = legend,
       size    = c(w = 2+2*lay[1], h = 3.5*lay[2] + length(x$key$rect$col) * 0.2),
-      svg     = svgPar
-      ) ## new
+      svg     = svgPar) 
 }

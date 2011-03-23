@@ -51,8 +51,9 @@ makeTitle = function(reporttitle, outdir, params)
     p = openPage(filename = file.path(outdir, 'index.html'),
       link.javascript = filenames[2],
       link.css        = filenames[1],
-      body.attributes = list("onload" = "reportinit()"))
-
+      body.attributes = list("onload" = "reportinit()"),
+      title           = reporttitle)
+  
     hwrite("<hr>", page = p)
     hwrite(reporttitle, page = p, heading=1)
     hwrite("<hr>", page = p)
@@ -213,17 +214,14 @@ makeEnding = function(p)
 browserCompatibilityNote = function(p)
   {
     txt = paste("<h3>Browser compatibility</h3>",
-      "This report uses a recent feature of HTML 5 (direct embedding of the &lt;svg&gt; tag), which has not ",
+      "This report uses recent features of HTML 5, which have not ",
       "yet been implemented (properly) by all browsers. Thus, unfortunately, browser compatibility ",
       "currently needs to be  considered:<ul>",
-      "<li> Chrome 9.0 - all works well.",
-      "<li> Firefox 4.0 - partially functional; the JavaScript code fails since Firefox does not ",
-          "yet implement the <tt>getElementById</tt> method for <tt>SVGSVGElement</tt>, which prevents the ",
-          "selection of arrays (lines and points) across plots and the table. ",
-      "Suggestions on how to circumvent this are welcome.",
-      "<li> Safari 5.0 - will not work, since it does not support the &lt;svg&gt; tag in HTML", 
+      "<li> Firefox 4 - tested, works well",
+      "<li> Chrome 10 - plots will not allow highlighting of elements by clicking, due to insufficient support of DOM Style Sheets.",
+      "<li> Safari 5 - some plots will be missing, since Safari 5.0 does not support the embedding of the &lt;svg&gt; tag in HTML.", 
       "</ul>",
-      "For now, Chrome 9.0 appears to be the best browser to view this report.", sep="")
+      sep="")
     hwrite("<hr>", page = p)
     hwrite(txt, page = p)
   }
@@ -235,7 +233,7 @@ reportTable = function(p, arrayTable, tableLegend)
 {
   s = seq_len(nrow(arrayTable))
   arrayTable = cbind(
-    " " = sprintf("<input type='checkbox' name='ReportObjectCheckBoxes' value='r:%s' onchange='checkboxEvent(\"r:%s\")'>", s, s),
+    " " = sprintf("<input type='checkbox' name='ReportObjectCheckBoxes' value='' onchange='checkboxEvent(%d)'>", s),
     arrayTable,
     stringsAsFactors = FALSE)
 
@@ -285,8 +283,11 @@ toJSON_frommatrix = function(x)
 ##--------------------------------------------------
 aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
 {
+  numReportObjs = nrow(arrayTable) 
+  reportObjs    = seq_len(numReportObjs)
+
   ## To avoid dealing with this pathologic special case downstream in the HTML
-  if(nrow(arrayTable)==0)
+  if(numReportObjs==0)
     stop("'arrayTable' must not be empty.")
 
   ## construct short, unique IDs
@@ -319,15 +320,15 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
     "By clicking the checkboxes in the table, or on the corresponding points/lines in the plots, you can modify the selection. ",
     "To reset the selection, reload the HTML page in your browser.", sep="")
 
-  outliers = matrix(NA, nrow = nrow(arrayTable),
+  outliers = matrix(NA, nrow = numReportObjs,
                         ncol = length(wh),
                         dimnames = list(NULL, sprintf("%s*%d</a>", outlierMethodLinks, seq(along=wh))))
 
   for(j in seq(along = wh))
     {
       o = modules[[wh[j]]]@outliers@which
-      stopifnot(!any(is.na(o)), all( (o>=1) & (o<=nrow(arrayTable))))
-      outliers[,j] = seq_len(nrow(arrayTable)) %in% o
+      stopifnot(!any(is.na(o)), all( (o>=1) & (o<=numReportObjs)))
+      outliers[,j] = reportObjs %in% o
     }
 
 
@@ -336,7 +337,7 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
   ## - 'big', includes outlier status, is shown at the top of the report
   ## - 'compact' , without outlier status, is shown next to the interactive plots
   rowchar = as.character(row.names(arrayTable))
-  rownum  = paste(seq_len(nrow(arrayTable)))
+  rownum  = paste(reportObjs)
   left = if(identical(rowchar, rownum))
     data.frame(array = rownum, sampleNames = rowchar, stringsAsFactors = FALSE) else
     data.frame(array = rownum, stringsAsFactors = FALSE)
@@ -354,17 +355,15 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
       HIGHLIGHTINITIAL = toJSON_fromchar(ifelse(apply(outliers, 1, any), "true", "false")), 
       ARRAYMETADATA    = toJSON_frommatrix(arrayTableCompact),
       SVGOBJECTNAMES   = toJSON_fromvector(names(svgdata)),
-      IDFUNS           = toJSON_fromchar(sapply(svgdata, slot, "getPlotObjIdFromReportObjId")),
-      STROKEVALUES     = toJSON_fromchar(lapply(svgdata, function(x) toJSON_frommatrix(t(x@stroke)))),
-      STROKEATTRS      = toJSON_frommatrix(t(sapply(svgdata, function(x) colnames(x@stroke))))))
+      REPORTOBJSTYLES  = paste(".aqm", reportObjs, " { }", sep="", collapse = "\n")
+    ))
 
   makeIndex(p = p, modules = modules)
   reportTable(p = p, arrayTable = arrayTableBig,
               tableLegend = outlierExplanations)
   
   currentSectionName = "Something Else"
-  currentIndex  = 1
-  currentSection = 1
+  currentIndex = currentSection = 1
   
   for(i in seq(along = modules))
     {
