@@ -214,12 +214,12 @@ makeEnding = function(p)
 browserCompatibilityNote = function(p)
   {
     txt = paste("<h3>Browser compatibility</h3>",
-      "This report uses recent features of HTML 5, which have not ",
+      "This report uses recent features of HTML 5 which have not ",
       "yet been implemented (properly) by all browsers. Thus, unfortunately, browser compatibility ",
       "currently needs to be  considered:<ul>",
       "<li> Firefox 4 - tested, works well",
       "<li> Chrome 10 - plots will not allow highlighting of elements by clicking, due to insufficient support of DOM Style Sheets.",
-      "<li> Safari 5 - some plots will be missing, since Safari 5.0 does not support the embedding of the &lt;svg&gt; tag in HTML.", 
+      "<li> Safari 5 - the interactive (SVG) plots will be missing, since Safari 5.0 does not support the embedding of the &lt;svg&gt; tag in HTML.",
       "</ul>",
       sep="")
     hwrite("<hr>", page = p)

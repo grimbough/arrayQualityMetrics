@@ -37,7 +37,7 @@ annotateSvgPlot = function(infile, outfile, outdir, annotationInfo, name)
             roid = annotationInfo@getReportObjIdFromPlotObjId(i)
             stopifnot(length(roid)==1, is.integer(roid))
             
-            callbacks = sprintf("plotObjRespond(\"%s\", %d, \"%s\")", c("click", "show", "hide"), roid, name)
+            callbacks = sprintf("plotObjRespond('%s', %d, '%s')", c("click", "show", "hide"), roid, name)
             
             xmlAttrs(plotobjs[[i]]) = c(
                       "class"       = paste("aqm", roid, sep=""),
