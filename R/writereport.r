@@ -218,7 +218,7 @@ browserCompatibilityNote = function(p)
       "yet been implemented (properly) by all browsers. Thus, unfortunately, browser compatibility ",
       "currently needs to be  considered:<ul>",
       "<li> Firefox 4 - tested, works well",
-      "<li> Chrome 10 - plots will not allow highlighting of elements by clicking, due to insufficient support of DOM Style Sheets.",
+      "<li> Chrome 10 - tested, works well",
       "<li> Safari 5 - the interactive (SVG) plots will be missing, since Safari 5.0 does not support the embedding of the &lt;svg&gt; tag in HTML.",
       "</ul>",
       sep="")

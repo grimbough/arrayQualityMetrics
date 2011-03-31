@@ -37,8 +37,6 @@ function reportinit()
     /*------- style sheet rules ---------*/
     var ss = document.styleSheets[0];
     ssrules = ss.cssRules ? ss.cssRules : ss.rules; 
-    if(ssrules == null)
-	throw new Error("The cssRules and rules property of document.styleSheets[0] is 'null'. Plots will not be interactive. Try with Firefox 4.");
 
     /*------- checkboxes[a] is (expected to be) of class HTMLInputElement ---*/
     for(a=0; a<checkboxes.length; a++)
@@ -60,7 +58,7 @@ function safeGetElementById(id)
 }
 
 /*------------------------------------------------------------
-   Highlighting of Plot Objects 
+   Highlighting of Report Objects 
  ---------------------------------------------------------------*/
 function setReportObj(reportObjId, status, doTable)
 {
@@ -71,19 +69,28 @@ function setReportObj(reportObjId, status, doTable)
 	    showTipTable(i, reportObjId);
 	} 
     }
-    
-    /* some of this could already be cached in reportInit() */
-    var success = false;
-    i = 0; 
-    while( (!success) & (i < ssrules.length) ) {
-	selector = ssrules[i].selectorText;  // The selector 
-        if (!selector) 
-            continue; // Skip @import and other nonstyle rules
-        if (selector == (".aqm" + reportObjId)) {
-            success = true; 
-	    ssrules[i].style.cssText = cssText[0+status];
-	} else {
-            i++;
+
+    /* This works in Chrome 10, ssrules will be null; we use getElementsByClassName and loop over them */
+    if(ssrules == null) {
+	elements = document.getElementsByClassName("aqm" + reportObjId); 
+	for(i=0; i<elements.length; i++) {
+	    elements[i].style.cssText = cssText[0+status];
+	}
+    } else {
+    /* This works in Firefox 4 */
+	var success = false;
+	i = 0; 
+	/* Some of this looping could already be cached in reportInit() */
+	while( (!success) & (i < ssrules.length) ) {
+	    selector = ssrules[i].selectorText;  // The selector 
+            if (!selector) 
+		continue; // Skip @import and other nonstyle rules
+            if (selector == (".aqm" + reportObjId)) {
+		success = true; 
+		ssrules[i].style.cssText = cssText[0+status];
+	    } else {
+		i++;
+	    }
 	}
     }
 
