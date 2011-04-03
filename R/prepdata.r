@@ -15,7 +15,7 @@ prepdata = function(expressionset, intgroup, do.logtransform)
     intgroup        = intgroup,
     do.logtransform = do.logtransform))
 
-  x = append(x, intgroupColours(x))
+  x = append(x, intgroupColors(x))
   
   return(x)
 }
@@ -90,7 +90,7 @@ function(expressionset, do.logtransform)
 ##----------------------------------------------------------
 ## Common parts of dealing with ExpressionSet and AffyBatch
 ##----------------------------------------------------------
-oneColour = function(expressionset, do.logtransform)
+oneColor = function(expressionset, do.logtransform)
 {
   M = exprs(expressionset)    
   if(do.logtransform)
@@ -107,7 +107,7 @@ setMethod("platformspecific",
           signature(expressionset = "ExpressionSet"),
 function(expressionset, do.logtransform)
 {
-  rv = oneColour(expressionset, do.logtransform)
+  rv = oneColor(expressionset, do.logtransform)
   rv$sx = featureData(expressionset)$X ## spatial x-coordinate
   rv$sy = featureData(expressionset)$Y ## spatial y-coordinate
   return(rv)
@@ -120,7 +120,7 @@ setMethod("platformspecific",
           signature(expressionset = "AffyBatch"),
 function(expressionset, do.logtransform)
 {
-  rv = oneColour(expressionset, do.logtransform)
+  rv = oneColor(expressionset, do.logtransform)
   maxc = ncol(expressionset)
   maxr = nrow(expressionset)
   rv$sx = rep(seq_len(maxc), each = maxr) ## spatial x-coordinate
@@ -143,11 +143,7 @@ function(expressionset, do.logtransform)
 ##----------------------------------------------------------
 setMethod("platformspecific",
           signature(expressionset = "ExpressionSetIllumina"),
-          oneColour)
-
-
-
-
+          oneColor)
 
 ##------------------------------------------------------------
 ## clean up phenoData

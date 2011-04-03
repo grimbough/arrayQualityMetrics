@@ -14,5 +14,6 @@ aqm.meansd = function(x) {
       title   = "Standard deviation versus rank of the mean",
       id      = "msd",
       legend  = legend,
+      colors  = x$arrayColors,
       size    = c(w=6, h=6))
 }

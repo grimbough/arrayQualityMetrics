@@ -43,7 +43,7 @@ outliers = function(exprs, method = c("KS", "sum", "upperquartile"))
 aqm.outliers = function(m)
 {
   values = rev(m@outliers@statistic)
-  colors = rev(m@outliers@colors)
+  colors = rev(m@colors)
   th     = m@outliers@threshold
   n      = length(m@outliers@which)
   
@@ -71,13 +71,6 @@ aqm.outliers = function(m)
       segments(x0 = x0[wh] + dx, x1 = x1[wh] - dx, y0 = y[wh], y1 = y[wh], col = colors[wh], lwd = 2)
       abline(v = th, lwd = 2)
       text(par("usr")[1], y, paste(rev(y)), adj = c(1, 0.5), xpd=NA)
-      
-      ## Ugly barplot:
-      
-      ## b = barplot(values, col = colors, xaxs = "r", names.arg = "",
-      ##         xlab = "", ylab = "", horiz = TRUE, xlim = xlim)
-      ## abline(v = th, lwd = 2)
-      ## text(par("usr")[1], b, paste(rev(seq(along=values))), adj = c(1, 0.5), xpd=NA, cex=0.66)
      }
 
   mid = "exceeded the threshold and"
@@ -103,5 +96,6 @@ aqm.outliers = function(m)
       id      = paste("out", m@id, sep = ""),
       legend  = legend,
       size    = c(w = 4, h = 1 + length(values) * 0.1),
+      colors  = m@colors,
       defaultdisplay = "none")
 }

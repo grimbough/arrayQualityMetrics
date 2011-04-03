@@ -1,8 +1,9 @@
 \name{outliers}
 \alias{outliers}
 \alias{findOutliers}
+\alias{class:outlierDetection}
 
-\title{Functions for determining outliers}
+\title{Outlier detection and reporting in arrayQualityMetrics}
 
 \description{
   \code{outliers} uses a criterion similar to that used in

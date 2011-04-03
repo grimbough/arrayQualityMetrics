@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{Customizing arrayQualityMetrics reports}
+%\VignetteIndexEntry{Advanced topics: Customizing arrayQualityMetrics reports and programmatic processing of the output}
 %\VignetteDepends{arrayQualityMetrics,CCl4,vsn}
 %\VignettePackage{arrayQualityMetrics}
 
@@ -19,8 +19,8 @@
 
 \begin{document}
 
-\title{Customizing arrayQualityMetrics reports}
-\author{Audrey Kauffmann}
+\title{Advanced topics: Customizing arrayQualityMetrics reports and programmatic processing of the output}
+\author{Audrey Kauffmann, Wolfgang Huber}
 \maketitle
 \tableofcontents
 
@@ -31,23 +31,22 @@ options(error=recover)
 %--------------------------------------------------
 \section{Introduction}
 %--------------------------------------------------
-This vignette addresses an advanced topic: how to customize the
-report by selecting specific modules and sections, or adding your own
-ones.
-
 If you are new to this package, then please consult the vignette
-\emph{Microarray quality assessment with arrayQualityMetrics}.
-There, you can learn the basic usage of the
-\Rpackage{arrayQualityMetrics} package: how to use the 
-\Rfunction{arrayQualityMetrics} function to create an array quality report
-for a set of microarrays. 
+\emph{Introduction: microarray quality assessment with arrayQualityMetrics}.
 
-\emph{Sections and modules:} In the documentation of this package, we
+This vignette addresses advanced topics. It explains how to customize
+the report by selecting specific modules and sections, or by adding
+your own ones. Furthermore, we will see how to (programmatically)
+postprocess the results of the outlier detection, or how to adapt the
+detection criteria to your needs.
+
+\emph{Terminology:} In the documentation of this package, we
 refer to a \emph{module} as a self-contained element of a report that
 investigates one particular quality metric. A module consists of a
-figure, some explanatory text, and potentially a set of flags that
-classifies a subset of the arrays in the dataset as outliers
-(according to the particular metric investigated in the module).  We
+figure and an explanatory text. It may also contain a data structure
+(an object of class \Rclass{outlierDetection}) that
+marks a subset of the arrays in the dataset as outliers
+according to the particular metric investigated in the module.  We
 refer to a \emph{section} as a collection of one or more modules that
 are thematically related.
 
@@ -72,7 +71,7 @@ beforehand. These functions are called \Rfunction{prepdata} and
 details. For example,
 
 <<DataPreparation>>=
-dataprep = prepdata(expressionset = nCCl4, 
+preparedData = prepdata(expressionset = nCCl4, 
                     intgroup = c(), 
                     do.logtransform = FALSE)
 @ 
@@ -96,14 +95,52 @@ Here, let us create a report with only two quality metrics modules:
 boxplots and density plots.
 
 <<metrics>>=
-bo = aqm.boxplot(dataprep)
-de = aqm.density(dataprep)
+bo = aqm.boxplot(preparedData)
+de = aqm.density(preparedData)
 qm = list("Boxplot" = bo, "Density" = de)
 @ 
+
+The objects \Robject{bo} and \Robject{de} are of class
+\Rclass{aqmReportModule}; please consult the class' manual page for
+more information.
 
 If you want to create your own modules, please have a look at the code
 for the various existing functions for this purpose, and adapt it.
 The function \Rfunction{aqm.pca} is a good place to start.
+
+%--------------------------------------------------
+\section{Outlier detection}
+%--------------------------------------------------
+Some of the modules perform outlier detection. For instance, in the
+default report produced by \Rfunction{arrayQualityMetrics}, the
+section headed \emph{Boxplots} is followed by one headed \emph{Outlier
+  detection for Boxplots}. In the corresponding
+\Rclass{aqmReportModule} object, this is reflected by a non-trivial
+value for the slot named \Robject{outliers}:
+%
+<<booutliers>>=
+bo@outliers
+@ 
+
+The slot named \Robject{statistic} contains, for each array, a single
+number based on which outlier detection is performed.  For instance,
+in the case of \Robject{bo}, the slot \Robject{bo@outliers@statistic}
+is the Kolmogorov-Smirnov statistic for the comparison between each
+array's intensity distribution and the distribution of the pooled
+data. The slot \Robject{threshold} contains the threshold against
+which the valuess of \Robject{statistic} were compared. Arrays with a
+value of \Robject{statistic} greather than \Robject{threshold} are
+called outliers. Their indices are listed in the vector
+\Robject{which} (which, in the example above, is empty).
+%
+<<echo=FALSE>>=
+stopifnot(length(bo@outliers@which)==0)
+@ 
+%
+The next two slots are used for the description of the outlier
+detection in the report: the slot \Robject{description} contains a
+textual description of the definition of \Robject{statistic} and indicates how \Robject{threshold} was chosen.
+The slot \Robject{colors} contains the colours
 
 %--------------------------------------------------
 \section{Rendering the report}

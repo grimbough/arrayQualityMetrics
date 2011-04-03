@@ -61,7 +61,7 @@ aqm.density = function(x)
     main = if(!is.null(x$key)) draw.key(key = x$key),
     strip = function(..., bg) strip.default(..., bg ="#cce6ff"),
     scales = list(relation="free"),
-    col = x$arrayColours, lwd = lwd, lty = lty)
+    col = x$arrayColors, lwd = lwd, lty = lty)
   
   legend = "The figure <!-- FIG --> shows density estimates (smoothed histograms) of the data. Typically, the distributions of the arrays should have similar shapes and ranges. Arrays whose distributions are very different from the others should be considered for possible problems. Various features of the distributions can be indicative of quality related phenomena. For instance, high levels of background will shift an array's distribution to the right. Lack of signal diminishes its right right tail. A bulge at the upper end of the intensity range often indicates signal saturation."
   
@@ -72,5 +72,6 @@ aqm.density = function(x)
       id      = "dens",
       legend  = legend,
       size    = c(w = 2+2*lay[1], h = 3.5*lay[2] + length(x$key$rect$col) * 0.2),
+      colors  = x$arrayColors,
       svg     = svgPar) 
 }

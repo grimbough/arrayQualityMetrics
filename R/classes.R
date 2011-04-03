@@ -31,14 +31,12 @@ setClass("outlierDetection",
     statistic   = "numeric",
     threshold   = "numeric",
     which       = "integer",
-    description = "character",
-    colors      = "character"),   # conflation of content and rendering...
+    description = "character"),   
   prototype(
     statistic   = numeric(0),
     threshold   = NA_real_,
     which       = NA_integer_,
-    description = NA_character_,
-    colors      = "#b0b0b0"))
+    description = NA_character_))
 
 ##
 ## An object of this class contains everything needed to render a report module
@@ -47,6 +45,7 @@ setClass("aqmReportModule",
   representation(
     plot           = "ANY",
     size           = "numeric",     ## size of the plot in inch
+    colors         = "character",
     section        = "character",
     title          = "character",
     id             = "character",
@@ -58,6 +57,7 @@ setClass("aqmReportModule",
   prototype(
     plot           = new("namedList"),
     size           = c(w=NA_real_, h=NA_real_),
+    colors         = "#b0b0b0",
     section        = NA_character_,
     title          = NA_character_,
     id             = NA_character_,

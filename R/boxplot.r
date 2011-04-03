@@ -12,7 +12,7 @@ aqm.boxplot = function(x, subsample=20000, outlierMethod = "KS") {
   }
   out = outliers(Mss, method = outlierMethod)
   out@description = c("Kolmogorov-Smirnov statistic <i>K<sub>a</sub></i>", "data-driven")
-  out@colors = x$arrayColours
+  out@colors = x$arrayColors
     
   sample_id = rep( seq_len(x$numArrays), each = nrow(Mss) )
   
@@ -40,7 +40,7 @@ aqm.boxplot = function(x, subsample=20000, outlierMethod = "KS") {
         main = if(!is.null(x$key)) draw.key(key = x$key), 
         pch = "|",  col = "black", do.out = FALSE, box.ratio = 2,
         xlab = "", ylab = "Array",
-        fill = x$arrayColours, panel = panel.superpose, 
+        fill = x$arrayColors, panel = panel.superpose, 
         scales = list(x=list(relation="free"), y=list(axs="i")),
         ylim = c(x$numArrays+0.7,0.3),
         prepanel = function(x, y) {
@@ -72,5 +72,6 @@ aqm.boxplot = function(x, subsample=20000, outlierMethod = "KS") {
       id = "box",
       legend = legend,
       outliers = out,
+      colors  = x$arrayColors,
       size = c(w = 3+3*lay[1], h = 2.5 + x$numArrays * 0.1 +  1/x$numArrays + length(x$key$rect$col) * 0.2))
 }

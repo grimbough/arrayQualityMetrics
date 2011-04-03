@@ -23,5 +23,6 @@ aqm.probesmap = function(x)
       title   = "Feature stratification",
       id      = "feats",
       legend  = legend,
+      colors  = x$arrayColors,
       size    = c(w=6, h=6))
 }

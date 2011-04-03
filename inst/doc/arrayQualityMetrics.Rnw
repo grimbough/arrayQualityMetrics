@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{Quality assessment with arrayQualityMetrics}
+%\VignetteIndexEntry{Introduction: microarray quality assessment with arrayQualityMetrics}
 %\VignetteDepends{arrayQualityMetrics,CCl4,ALLMLL,vsn}
 %\VignettePackage{arrayQualityMetrics}
 
@@ -13,13 +13,13 @@
 \newcommand{\Rpackage}[1]{\textit{#1}}
 \newcommand{\Rclass}[1]{\textit{#1}}
 \newcommand{\Rfunction}[1]{{\small\texttt{#1}}}
-\parindent0cm
 
+\parindent0cm
 \SweaveOpts{keep.source=TRUE,eps=FALSE,include=FALSE,width=4,height=4.5}
 
 \begin{document}
 
-\title{Microarray quality assessment with arrayQualityMetrics}
+\title{Introduction: microarray quality assessment with arrayQualityMetrics}
 \author{Audrey Kauffmann, Wolfgang Huber}
 \maketitle
 \tableofcontents
@@ -36,7 +36,7 @@ arrays within a dataset. Some of the metrics can also be used to
 diagnose batch effects, and thus the quality of the overall dataset.
 
 The report can be extended to contain further diagnostics through
-additional arguments, and we will see examples below.
+additional arguments, and we will see examples for this in Section~\ref{sec:ext}.
 
 The aim of the \Rpackage{arrayQualityMetrics} package is to produce
 information that is relevant for your decision making - not, to make
@@ -48,37 +48,69 @@ and how to use the dataset (or subsets of arrays in it) for subsequent
 data analysis.
 
 Different types of microarray data (one colour, two colour,
-Affymetrix, Illumina...) are represented by different object classes
+Affymetrix, Illumina) are represented by different object classes
 in Bioconductor. The function \Rfunction{arrayQualityMetrics} will
 work in the same way for all of them. Further information about
 its arguments can be found in its manual page.
 
 When the function \Rfunction{arrayQualityMetrics} is finished, a
 report is produced in the directory specified by the function's
-\texttt{outdir} argument. By default, a directory with a suitable
-name is created in the current working directory. This directory
-contains an HTML page \texttt{index.html} that can be opened by a
-browser. The report contains a series of plots explained by text.  The
-plots are provided as bitmaps (PNG format) or as vector graphics (SVG
-format). In the former case, the figures are also linked to PDF files
+\texttt{outdir} argument. By default, a directory with a suitable name
+is created in the current working directory. This directory contains
+an HTML page \texttt{index.html} that can be opened by a browser. The
+report contains a series of plots explained by text.  Some of the
+plots are interactive (see Figure~\ref{fig:svgplots}). Technically, this
+is achieved by the use of SVG (scalable vector graphics) and
+JavaScript, and it requires that you use a recent (HTML5 capable) web
+browser\footnote{If in doubt, please see the notes about browser
+  compatibility at the top of the report; or contact the Bioconductor
+  mailing list.}.  Other plots, where interactivity is less relevant,
+are provided as bitmaps (PNG format) and are also linked to PDF files
 that provide high resolution versions e.\,g.\ for publication.
 
-Metadata about the arrays is shown at the top of the report as a
-table.  It is extracted from the \Robject{phenoData} slot of the data
-object supplied to \Rfunction{arrayQualityMetrics}.  It can be useful
-to adjust the contents this slot before producing the report, and to
-make sure it contains the right quantity of information to make an
-informative report - not too much, not too little.
+Plus (+) or minus (-) symbols at the begin of different section
+headings of the report (as in the left panel of
+Figure~\ref{fig:svgplots}) indicate that you can show or hide these
+sections by clicking on the heading. After (re)loading, all sections
+are shown except for the \emph{Outlier detection} barplots, which are
+hidden and can be expanded by clicking on them.
+
+\begin{figure}[t]\begin{center}
+  \includegraphics[width=0.49\textwidth]{pcaplot.png}
+  \includegraphics[width=0.49\textwidth]{arraymetadatatable.png}
+  \caption{\label{fig:svgplots}\textit{Left:} An example plot from the
+    report. The plot shows the arrays (points) in a two-dimensional
+    plot area spanned by the first two axes of a principal component
+    analysis (PCA). By moving the mouse over the points, the
+    corresponding array's metadata is displayed in the table to the
+    right of the plot. By clicking on a point, it can be selected or
+    deselected. Selected arrays are indicated by larger points or
+    wider lines in the plots and by ticked checkboxes in the array
+    table shown in the \textit{right} panel. Arrays can also be
+    (de)selected by clicking the checkboxes.  Initially, when the
+    report is loaded (or reloaded) by the browser, all arrays are
+    selected that were called outliers by at least one criterion.}
+\end{center}\end{figure}
+
+Metadata about the arrays is shown at the top of the report as a table
+(see Figure~\ref{fig:svgplots}).  It is extracted from the
+\Robject{phenoData} slot of the data object supplied to
+\Rfunction{arrayQualityMetrics}.  It can be useful to adjust the
+contents this slot before producing the report, and to make sure it
+contains the right quantity of information to make an informative
+report - not too much, not too little.
 
 In the case of \Rclass{AffyBatch} input, some Affymetrix specific
 sections are added to the standard report. Also for other types of
 arrays, sections can be added to the standard report if certain
-metadata are present in the input object (see Section~\ref{ext}).
+metadata are present in the input object (see Section~\ref{sec:ext}).
 
 The function \Rfunction{arrayQualityMetrics} also produces an R object
-(essentially, a big list) with all the information contained in
-the report, and this object can be used by downstream tools for
-programmatic analysis of the report.
+(essentially, a big list) with all the information contained in the
+report, and this object can be used by downstream tools for
+programmatic analysis of the report. This is discussed in the vignette
+\emph{Advanced topics: Customizing arrayQualityMetrics reports and
+  programmatic processing of the output}
 
 \section{Basic use}
 %
@@ -191,17 +223,15 @@ arrayQualityMetrics(expressionset = nCCl4,
 %--------------------------------------------------
 \subsection{Loading data from ArrayExpress}
 %--------------------------------------------------
-
 You can use the \Rpackage{ArrayExpress}
 package~\cite{Kauffmann:2009b:Bioinf} to download datasets from the
 EBI's ArrayExpress database. The resulting \Rclass{ExpressionSet},
 \Rclass{AffyBatch} or \Rclass{NChannelSet} objects can be directly fed
 into \Rfunction{arrayQualityMetrics}.
 
-\section{Playing with the arguments}
-
-\subsection{Factor of interest}
-
+%--------------------------------------------------
+\section{Making the report more informative by adding a factor of interest}
+%--------------------------------------------------
 A useful feature of \Rfunction{arrayQualityMetrics} is the possibility
 to show the results in the context of an experimental factor of
 interest, i.\,e.\ a categorical variable associated with the arrays
@@ -230,10 +260,11 @@ arrayQualityMetrics(expressionset = nMLL,
                     force = TRUE,
                     intgroup = c("condition", "batch"))
 @
-%
 
+%--------------------------------------------------
 \section{Extended use}
-\label{ext}
+\label{sec:ext}
+%--------------------------------------------------
 Some of the quality metrics that the package can compute require
 specific information about the features on the arrays.  To use these,
 you need to make sure that this information is provided in your input

@@ -1,7 +1,7 @@
 ## heatmap
 aqm.heatmap = function(x)
 {
-  colourRange = rgb(seq(0, 1, l=256),
+  colorRange = rgb(seq(0, 1, l=256),
                     seq(0, 1, l=256),
                     seq(1, 0, l=256))
 
@@ -24,7 +24,7 @@ aqm.heatmap = function(x)
     }
 
   ## Shall we draw side bars?
-  maxNrColours = 0
+  maxNrColors = 0
   ng = length(x$intgroup)
   if(ng > 0) {
     palettes = c("Set1", "Set2", "Set3", "Accent", "Dark2", "Paired", "Pastel1", "Pastel2")
@@ -36,20 +36,20 @@ aqm.heatmap = function(x)
     
      for(i in seq_len(ng))
       {
-        colours = brewer.pal(brewer.pal.info[palettes[i], "maxcolors"], palettes[i])
+        colors = brewer.pal(brewer.pal.info[palettes[i], "maxcolors"], palettes[i])
         fac  = as.factor(x$pData[[x$intgroup[i]]])
-        fac  = maximumLevels(fac, n = length(colours)) ## make sure that factor has at most n levels
-        colours = colours[seq_len(nlevels(fac))]
-        ac = colours[as.integer(fac)]
+        fac  = maximumLevels(fac, n = length(colors)) ## make sure that factor has at most n levels
+        colors = colors[seq_len(nlevels(fac))]
+        ac = colors[as.integer(fac)]
 
-        key[[i]] =  list(rect = list(col = colours),
+        key[[i]] =  list(rect = list(col = colors),
                          text = list(levels(fac)))
         rects[[i]] = list(col = "transparent",
                           fill = ac[ord],
                           type = "rectangle")
         if(i==1) out@colors = ac
-        if(length(colours)>maxNrColours)
-          maxNrColours = length(colours)
+        if(length(colors)>maxNrColors)
+          maxNrColors = length(colors)
       }
 
       
@@ -89,13 +89,13 @@ aqm.heatmap = function(x)
     colorkey = list(space ="left"),
     xlab = "",
     ylab = "",
-    col.regions = colourRange,
+    col.regions = colorRange,
     main = thekey)
 
   nout = length(out@which)
   
-  legend = paste("The figure <!-- FIG --> shows a false colour heatmap of the distances between arrays. ",
-    "The colour scale is chosen to cover the range of distances encountered in the dataset. ",
+  legend = paste("The figure <!-- FIG --> shows a false color heatmap of the distances between arrays. ",
+    "The color scale is chosen to cover the range of distances encountered in the dataset. ",
     "Patterns in this plot can indicate clustering of the arrays either because of intended biological or ",
     "unintended experimental factors (batch effects). ",
     "The distance <i>d<sub>ab</sub></i> between two arrays <i>a</i> and <i>b</i> is computed as the mean absolute difference ",
@@ -114,7 +114,7 @@ aqm.heatmap = function(x)
       title     = "Distances between arrays",
       id        = "hm",
       legend    = legend,
-      size      = c(w = 5 + x$numArrays * 0.075, h = 3 + x$numArrays * 0.075 + maxNrColours * 0.2),
+      size      = c(w = 5 + x$numArrays * 0.075, h = 3 + x$numArrays * 0.075 + maxNrColors * 0.2),
       outliers  = out)
 }
 

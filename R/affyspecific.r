@@ -24,7 +24,7 @@ aqm.rnadeg = function(expressionset, x)
  
     rnaDeg = function() {
       plotAffyRNAdeg(AffyRNAdeg(expressionset, log.it = TRUE),
-                     lwd = 1, col = x$arrayColours)
+                     lwd = 1, col = x$arrayColors)
     }
     
     legend = paste(figurePhrase("RNA digestion"),
@@ -37,6 +37,7 @@ aqm.rnadeg = function(expressionset, x)
         id      = "dig",
         legend  = legend,
         size    = c(w = 5, h = 3.5),
+        colors  = x$arrayColors,
         svg     =  new("svgParameters",
                        numPlotObjects = x$numArrays) )
 
@@ -133,7 +134,8 @@ aqm.pmmm = function(x)
       title = "Perfect matches and mismatches",
       id = "pmmm",
       legend = legend,
-      size = c(w = 6, h = 6))
+      size = c(w = 6, h = 6),
+      colors  = x$arrayColors)
   
 }
 

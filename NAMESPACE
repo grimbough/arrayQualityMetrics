@@ -73,7 +73,7 @@ importFrom(XML, getNodeSet, xmlAttrs, "xmlAttrs<-", xmlChildren, xmlParse, xmlRo
 ##--------------------------------------------------
 ## export
 ##--------------------------------------------------
-exportClasses("aqmReportModule")
+exportClasses("aqmReportModule", "outlierDetection")
 
 export("arrayQualityMetrics")
 export("prepdata", "prepaffy")

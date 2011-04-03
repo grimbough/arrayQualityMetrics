@@ -24,7 +24,7 @@ aqm.spatial = function(x, scale="rank", channels = c("M", "R", "G"))
 spatialplot = function(whichChannel, x, scale) 
 {
     
-  colourRamp = colorRampPalette(rgb(seq(0,1,l=256),seq(0,1,l=256),seq(1,0,l=256)))
+  colorRamp = colorRampPalette(rgb(seq(0,1,l=256),seq(0,1,l=256),seq(1,0,l=256)))
   maxx = max(x$sx, na.rm=TRUE)
   maxy = max(x$sy, na.rm=TRUE)
 
@@ -79,16 +79,16 @@ spatialplot = function(whichChannel, x, scale)
     xlab = whichChannel,
     ylab = "",
     panel = "panel.levelplot.raster",
-    col.regions = colourRamp,
+    col.regions = colorRamp,
     as.table = TRUE,
     layout = lay,  
     asp = "iso",
     strip = function(..., bg, factor.levels) strip.default(..., bg ="#cce6ff", factor.levels = panelNames),
     colorkey = (scale!="rank"))
   
-  legend = paste("The figure <!-- FIG --> shows false colour representations of the arrays' spatial distributions of",
+  legend = paste("The figure <!-- FIG --> shows false color representations of the arrays' spatial distributions of",
     " feature intensities (", whichChannel, "). Normally, when the features are distributed randomly on the arrays, one expects to see a uniform",
-    " distribution; control features with particularly high or low intensities may stand out. The colour scale is",
+    " distribution; control features with particularly high or low intensities may stand out. The color scale is",
     " proportional to ",
     switch(scale,
            rank = "the ranks of ",
@@ -107,13 +107,14 @@ spatialplot = function(whichChannel, x, scale)
   fac = 3 / sqrt(maxx*maxy)
   
   new("aqmReportModule",
-      plot = spat,
-      section = "Individual array quality",
-      title = paste("Spatial distribution of", whichChannel),
-      id = paste("sp", tolower(whichChannel), sep = ""),
-      legend = legend,
+      plot     = spat,
+      section  = "Individual array quality",
+      title    = paste("Spatial distribution of", whichChannel),
+      id       = paste("sp", tolower(whichChannel), sep = ""),
+      legend   = legend,
       outliers = outliers,
-      size = c(w = maxx * fac * lay[1], h = (maxy * fac + 0.25) * lay[2]))
+      colors   = x$arrayColors,
+      size     = c(w = maxx * fac * lay[1], h = (maxy * fac + 0.25) * lay[2]))
 }
 
   
