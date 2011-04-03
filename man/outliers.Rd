@@ -5,7 +5,7 @@
 \title{Helper functions for outlier detection and reporting in arrayQualityMetrics}
 
 \description{
-  For an overview over outlier detection, please see the
+  For an overview of outlier detection, please see the
   corresponding section in the vignette \emph{Advanced topics: Customizing arrayQualityMetrics
     reports and programmatic processing of the output}.
   These two functions are helper functions used by the different report
@@ -36,18 +36,19 @@ boxplotOutliers(x, coef = 1.5)
 }
 
 \details{
-  \code{outliers}: with argument \code{method="KS"}, the function first computes for each array
+  \code{outliers}: with argument \code{method="KS"}, the function first
+  computes for each column of \code{exprs} (i.e. for each array)
   the value of the \code{\link[stats:ks.test]{ks.test}} test statistic
   between its distribution of intensities and the pooled distribution of
   intensities from all arrays.
   With \code{"sum"} and \code{"upperquartile"}, it computes the sum or
   the 75 percent quantile. Subsequently, it calls \code{boxplotOutliers}
-  to identify the outlying arrays.
+  on these values to identify the outlying arrays.
 
   \code{boxplotOutliers} uses a criterion similar to that used in
   \code{\link[grDevices:boxplot.stats]{boxplot.stats}} to
   detect outliers in a set of real numbers. The main difference is that
-  in  \code{findOutliers}, only the outliers to the right
+  in  \code{boxplotOutliers}, only the outliers to the right
   (i.e. extraordinarily large values) are detected.
 }
 

@@ -138,7 +138,7 @@ module, and are documented in the figure caption of the report
 module. For more information, please look at the code of
 the report module generating function of interest -- for instance, at the first few
 lines of the \Rfunction{boxplot} function. The code there uses the helper
-functions \Rfunction{outliers} and \Rfunction{findOutliers}, which
+functions \Rfunction{outliers} and \Rfunction{boxplotOutliers}, which
 are documented in their manual pages.
 
 %--------------------------------------------------
