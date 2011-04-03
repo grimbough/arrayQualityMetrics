@@ -86,6 +86,6 @@ export("aqm.boxplot", "aqm.maplot",  "aqm.density", "aqm.probesmap",
        "aqm.pmmm",    "aqm.spatial")
 
 export("addXYfromGAL")
-export("outliers", "findOutliers")
+export("outliers", "boxplotOutliers")
 
 

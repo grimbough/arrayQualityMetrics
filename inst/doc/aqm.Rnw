@@ -54,10 +54,8 @@ For the following examples, let us load the needed packages and some data.
 
 <<loading, results=hide>>=
 library("arrayQualityMetrics")
-library("CCl4")
-library("vsn")
-data("CCl4")
-nCCl4 = justvsn(CCl4, subsample=2200)
+library("ALLMLL")
+data("MLL.A")
 @
 
 
@@ -71,9 +69,9 @@ beforehand. These functions are called \Rfunction{prepdata} and
 details. For example,
 
 <<DataPreparation>>=
-preparedData = prepdata(expressionset = nCCl4, 
+preparedData = prepdata(expressionset = MLL.A, 
                     intgroup = c(), 
-                    do.logtransform = FALSE)
+                    do.logtransform = TRUE)
 @ 
 
 The arguments \Robject{intgroup} and \Robject{do.logtransform} are the
@@ -113,7 +111,7 @@ The function \Rfunction{aqm.pca} is a good place to start.
 %--------------------------------------------------
 Some of the modules perform outlier detection. For instance, in the
 default report produced by \Rfunction{arrayQualityMetrics}, the
-section headed \emph{Boxplots} is followed by one headed \emph{Outlier
+module headed \emph{Boxplots} is followed by one headed \emph{Outlier
   detection for Boxplots}. In the corresponding
 \Rclass{aqmReportModule} object, this is reflected by a non-trivial
 value for the slot named \Robject{outliers}:
@@ -121,37 +119,39 @@ value for the slot named \Robject{outliers}:
 <<booutliers>>=
 bo@outliers
 @ 
+%
+The slot named \Robject{statistic} contains, for each array, a
+single number based on which outlier detection is performed.  For
+instance, in the case of \Robject{bo}, the slot
+\Robject{bo@outliers@statistic} is the Kolmogorov-Smirnov statistic
+for the comparison between each array's intensity distribution and the
+distribution of the pooled data. The slot \Robject{threshold} contains
+the threshold against which the valuess of \Robject{statistic} were
+compared. Arrays with a value of \Robject{statistic} greather than
+\Robject{threshold} are called outliers. Their indices are listed in
+the vector \Robject{which}.  Finally, the slot \Robject{description}
+contains a textual description of the definition of
+\Robject{statistic} and indicates how the \Robject{threshold} was chosen.
 
-The slot named \Robject{statistic} contains, for each array, a single
-number based on which outlier detection is performed.  For instance,
-in the case of \Robject{bo}, the slot \Robject{bo@outliers@statistic}
-is the Kolmogorov-Smirnov statistic for the comparison between each
-array's intensity distribution and the distribution of the pooled
-data. The slot \Robject{threshold} contains the threshold against
-which the valuess of \Robject{statistic} were compared. Arrays with a
-value of \Robject{statistic} greather than \Robject{threshold} are
-called outliers. Their indices are listed in the vector
-\Robject{which} (which, in the example above, is empty).
-%
-<<echo=FALSE>>=
-stopifnot(length(bo@outliers@which)==0)
-@ 
-%
-Finally, the slot \Robject{description} contains a textual description
-of the definition of \Robject{statistic} and indicates how
-\Robject{threshold} was chosen. 
+The actual details of outlier detection are different for each report
+module, and are documented in the figure caption of the report
+module. For more information, please look at the code of
+the report module generating function of interest -- for instance, at the first few
+lines of the \Rfunction{boxplot} function. The code there uses the helper
+functions \Rfunction{outliers} and \Rfunction{findOutliers}, which
+are documented in their manual pages.
 
 %--------------------------------------------------
 \section{Rendering the report}
 %--------------------------------------------------
 A report is rendered by calling the function
-\Rfunction{aqm.writereport} with a list
-of \Rclass{aqmReportModule} objects.
+\Rfunction{aqm.writereport} with a list of \Rclass{aqmReportModule}
+objects.
 
 <<shortReport>>=
 outdir = tempdir()
 aqm.writereport(modules = qm, reporttitle = "My example", outdir = outdir, 
-                arrayTable = pData(CCl4))
+                arrayTable = pData(MLL.A))
 outdir
 @ 
 

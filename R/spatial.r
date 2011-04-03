@@ -39,7 +39,7 @@ spatialplot = function(whichChannel, x, scale)
       npg[1,1] = 0         ## drop the constant component
       stat[a] = sqrt(sum(npg[1:4, 1:4]) / sum(npg))   # low frequency power
     }
-  fo = findOutliers(stat)
+  fo = boxplotOutliers(stat)
   outliers = new("outlierDetection",
       statistic = stat,
       threshold = fo$threshold,

@@ -13,7 +13,7 @@ the vignette \emph{Advanced topics: Customizing arrayQualityMetrics
 reports and programmatic processing of the output}.}
 
 \section{Creating Objects}{
-See the manual page of \code{\link[aqm.boxplot]{module functions}}.
+Please see the manual page of the module generations functions, e.g. \code{\link{aqm.boxplot}}.
 }
 
 \author{Audrey Kauffmann, Wolfgang Huber}

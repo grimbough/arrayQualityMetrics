@@ -2,7 +2,7 @@
 ## This function is derived from boxplot.stats. The main difference is that it only
 ## detects outliers to the right (i.e. extremely large values).
 ##----------------------------------------------------------------------------------
-findOutliers = function (x, coef = 1.5) 
+boxplotOutliers = function (x, coef = 1.5) 
 {
     stats = stats::fivenum(x, na.rm = TRUE)
     iqr = diff(stats[c(2, 4)])
@@ -32,7 +32,7 @@ outliers = function(exprs, method = c("KS", "sum", "upperquartile"))
     stop(sprintf("Invalid method '%s'", method))
     )
 
-  fo = findOutliers(s)
+  fo = boxplotOutliers(s)
   new("outlierDetection",
       statistic   = s,
       threshold   = fo$threshold,
