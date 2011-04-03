@@ -47,7 +47,6 @@ aqm.heatmap = function(x)
         rects[[i]] = list(col = "transparent",
                           fill = ac[ord],
                           type = "rectangle")
-        if(i==1) out@colors = ac
         if(length(colors)>maxNrColors)
           maxNrColors = length(colors)
       }
@@ -115,6 +114,7 @@ aqm.heatmap = function(x)
       id        = "hm",
       legend    = legend,
       size      = c(w = 5 + x$numArrays * 0.075, h = 3 + x$numArrays * 0.075 + maxNrColors * 0.2),
+      colors    = x$arrayColors,
       outliers  = out)
 }
 

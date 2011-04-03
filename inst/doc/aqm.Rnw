@@ -137,10 +137,9 @@ called outliers. Their indices are listed in the vector
 stopifnot(length(bo@outliers@which)==0)
 @ 
 %
-The next two slots are used for the description of the outlier
-detection in the report: the slot \Robject{description} contains a
-textual description of the definition of \Robject{statistic} and indicates how \Robject{threshold} was chosen.
-The slot \Robject{colors} contains the colours
+Finally, the slot \Robject{description} contains a textual description
+of the definition of \Robject{statistic} and indicates how
+\Robject{threshold} was chosen. 
 
 %--------------------------------------------------
 \section{Rendering the report}

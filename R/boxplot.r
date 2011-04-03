@@ -12,7 +12,6 @@ aqm.boxplot = function(x, subsample=20000, outlierMethod = "KS") {
   }
   out = outliers(Mss, method = outlierMethod)
   out@description = c("Kolmogorov-Smirnov statistic <i>K<sub>a</sub></i>", "data-driven")
-  out@colors = x$arrayColors
     
   sample_id = rep( seq_len(x$numArrays), each = nrow(Mss) )
   
