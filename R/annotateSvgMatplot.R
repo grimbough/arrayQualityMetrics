@@ -28,9 +28,9 @@ annotateSvgPlot = function(infile, outfile, outdir, annotationInfo, name)
     ## 'SVGAnnotation', which rely on conventions used by libcairo to produce the SVG
     ## from the R plot, on simple pattern matching and on hope that the found patterns
     ## align with the intended plot objects (i.e. not on any explicit identification).
-    plotobjs = annotationInfo@getPlotObjNodes(doc)
-    
-    if (length(plotobjs) == annotationInfo@numPlotObjects)
+    plotobjs = try(annotationInfo@getPlotObjNodes(doc))
+
+    if( !is(plotobjs, "try-error") && (length(plotobjs) == annotationInfo@numPlotObjects) )
       {
         for(i in seq(along=plotobjs))
           {
@@ -80,9 +80,6 @@ annotateSvgPlot = function(infile, outfile, outdir, annotationInfo, name)
       }
     
     saveXML(doc, file.path(outdir, outfile))
-
-
-    if(!all(isok)) browser()
     
     return(list(size = diff(vb), annotateOK = all(isok)))
   }
