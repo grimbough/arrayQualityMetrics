@@ -143,7 +143,7 @@ your own application, you can call it on the complete data object.}.
 <<AffyBatchQM,results=hide>>=
 library("arrayQualityMetrics")
 arrayQualityMetrics(expressionset = MLL.A[, 1:5],
-                    outdir = "Report for MLL.A",
+                    outdir = "Report_for_MLL.A",
                     force = TRUE,
                     do.logtransform = TRUE)
 @
