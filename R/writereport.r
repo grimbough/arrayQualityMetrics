@@ -339,7 +339,7 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
   ## - 'compact' , without outlier status, is shown next to the interactive plots
   rowchar = as.character(row.names(arrayTable))
   rownum  = paste(reportObjs)
-  left = if(identical(rowchar, rownum))
+  left = if(!identical(rowchar, rownum))
     data.frame(array = rownum, sampleNames = rowchar, stringsAsFactors = FALSE) else
     data.frame(array = rownum, stringsAsFactors = FALSE)
 

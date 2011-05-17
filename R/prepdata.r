@@ -146,12 +146,17 @@ setMethod("platformspecific",
           oneColor)
 
 ##------------------------------------------------------------
-## clean up phenoData
+## extract and clean up phenoData
 ##------------------------------------------------------------
 cleanPhenoData = function(x, maxcol = 10)
 {
 
   pd = pData(x)
+
+  scd = protocolData(x)[["ScanDate"]]
+  if(!is.null(scd))
+    if(length(scd)==nrow(pd))
+      pd = cbind(pd, ScanDate=scd)
   
   if(ncol(pd) > maxcol)
     {
