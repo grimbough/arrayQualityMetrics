@@ -14,7 +14,7 @@ importMethodsFrom(affy, Mbox, mm, pm)
 
 importMethodsFrom(Biobase, assayData, channel, dims, exprs,
                   fData, featureData, pData, phenoData, rowMedians,
-                  sampleNames)
+                  sampleNames, protocolData)
 
 importMethodsFrom(genefilter, plot)
 
