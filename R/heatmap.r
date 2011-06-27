@@ -2,8 +2,8 @@
 aqm.heatmap = function(x)
 {
   colorRange = rgb(seq(0, 1, l=256),
-                    seq(0, 1, l=256),
-                    seq(1, 0, l=256))
+                   seq(0, 1, l=256),
+                   seq(1, 0, l=256))
 
   m   = dist2(x$M)
   out = outliers(m, method = "sum")
@@ -16,15 +16,18 @@ aqm.heatmap = function(x)
                                     seq_len(x$numArrays), sep="")
 
   ## Shall we draw a dendrogram?
-  if (ncol(m) <= arrayQualityMetricsGlobalParameters$maxNumberOfArraysForDrawingDendrogram)
+  haveDend = (ncol(m) <= arrayQualityMetricsGlobalParameters$maxNumberOfArraysForDrawingDendrogram)
+  if (haveDend)
     {
-      thelegend = list(right = list(fun=dendrogramGrob, args=list(x=dend, side="right")))
+      theLegend = list(right = list(fun=dendrogramGrob, args=list(x=dend, side="right")))
+      fillOrd   = seq_len(x$numArrays)   ## no reordering of the colors in the 'fill' part of 'rects' (see below) is needed
     } else {
-      thelegend = NULL
+      theLegend = NULL
+      fillOrd   = ord
     }
 
   ## Shall we draw side bars?
-  maxNrColors = 0
+  maxNrColors = 0  ## the maximum number of sidebar colors used - this value is used below for the layout
   ng = length(x$intgroup)
   if(ng > 0) {
     palettes = c("Set1", "Set2", "Set3", "Accent", "Dark2", "Paired", "Pastel1", "Pastel2")
@@ -34,18 +37,17 @@ aqm.heatmap = function(x)
     key = rects = vector(mode="list", length=ng)
     names(rects) = rep("rect", ng)
     
-     for(i in seq_len(ng))
+    for(i in seq_len(ng))
       {
         colors = brewer.pal(brewer.pal.info[palettes[i], "maxcolors"], palettes[i])
-        fac  = as.factor(x$pData[[x$intgroup[i]]])
+        fac  = factor(x$pData[[x$intgroup[i]]])
         fac  = maximumLevels(fac, n = length(colors)) ## make sure that factor has at most n levels
         colors = colors[seq_len(nlevels(fac))]
-        ac = colors[as.integer(fac)]
-
+ 
         key[[i]] =  list(rect = list(col = colors),
                          text = list(levels(fac)))
         rects[[i]] = list(col = "transparent",
-                          fill = ac[ord],
+                          fill = colors[as.integer(fac)[fillOrd]],
                           type = "rectangle")
         if(length(colors)>maxNrColors)
           maxNrColors = length(colors)
@@ -56,13 +58,13 @@ aqm.heatmap = function(x)
     key$rep = FALSE
     thekey = draw.key(key = key) 
 
-    if(!is.null(thelegend))
+    if (haveDend)
       {
-        thelegend$right$args = append(thelegend$right$args,
-          list(size.add=1, add = rects))
+        theLegend$right$args = append(theLegend$right$args,
+          list(size.add = 1, add = rects))
       } else {
         ## adapted from 'latticeExtra:dendrogramGrob'
-        lay= grid.layout(nrow = 1, ncol = ng,
+        lay = grid.layout(nrow = 1, ncol = ng,
             heights = unit(1, "null"),
             widths = unit(rep(1, length = ng), rep("lines", ng)), respect = FALSE)
         g = frameGrob(layout = lay)
@@ -71,11 +73,11 @@ aqm.heatmap = function(x)
         for (i in seq_len(ng))
           {
             g = placeGrob(g,
-              rectGrob(y = y, height = dy, vjust =1,
+              rectGrob(y = y, height = dy, vjust = 1,
                        gp = do.call(gpar, rects[[i]])), row = 1, col = i)
           }
         idem = function(x) x
-        thelegend = list(right=list(fun=idem, args=list(x=g)))
+        theLegend = list(right=list(fun=idem, args=list(x=g)))
       }
     
   } else {  
@@ -84,7 +86,7 @@ aqm.heatmap = function(x)
 
   hfig = levelplot(m[ord,ord],
     scales = list(x=list(rot=90)),
-    legend = thelegend,
+    legend = theLegend,
     colorkey = list(space ="left"),
     xlab = "",
     ylab = "",

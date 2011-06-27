@@ -213,7 +213,7 @@ method available in the package \Rpackage{vsn}.
 library("vsn")
 library("CCl4")
 data("CCl4")
-nCCl4 = justvsn(CCl4, subsample = 2000)
+nCCl4 = justvsn(CCl4, subsample = 15000)
 arrayQualityMetrics(expressionset = nCCl4,
                     outdir = "Report_for_nCCl4",
                     force = TRUE)
