@@ -7,55 +7,55 @@
 ##     document, these id would clash between different svg plots, and need to by made unique. I wonder
 ##     whether a more elegant way exists for this.
 ## ---------------------------------------------------------------------------------------------------------
-annotateSvgPlot = function(infile, outfile, outdir, annotationInfo, name) 
+annotateSvgPlot = function(infile, outfile, outdir, annotationInfo, name)
   {
-     
-    ## Check argument 
+
+    ## Check argument
     stopifnot(is(annotationInfo, "svgParameters"))
-  
+
     doc = xmlParse(infile)
     vb  = getViewBox(doc)
 
     svg = xmlRoot(doc)
-    
+
     ## 1. add id
-    xmlAttrs(svg) = c(id = paste("Fig", name, sep=":"))  
+    xmlAttrs(svg) = c(id = paste("Fig", name, sep=":"))
 
     ## monitor our success in finding what we expect
     isok = c(symbol = FALSE, clipPath = FALSE, use = FALSE, cp = FALSE, plotobjs = FALSE)
-    
+
     ## 2. this part is brittle - 'getPlotObjNodes' will be 'getMatplotSeries' or 'getPlotPoints' from
     ## 'SVGAnnotation', which rely on conventions used by libcairo to produce the SVG
     ## from the R plot, on simple pattern matching and on hope that the found patterns
     ## align with the intended plot objects (i.e. not on any explicit identification).
     plotobjs = try(annotationInfo@getPlotObjNodes(doc))
 
-    if( !is(plotobjs, "try-error") && (length(plotobjs) == annotationInfo@numPlotObjects) )
+    if( is(plotobjs, "XMLNodeSet") && (length(plotobjs) == annotationInfo@numPlotObjects) )
       {
         for(i in seq(along=plotobjs))
           {
             roid = annotationInfo@getReportObjIdFromPlotObjId(i)
             stopifnot(length(roid)==1, is.integer(roid))
-            
+
             callbacks = sprintf("plotObjRespond('%s', %d, '%s')", c("click", "show", "hide"), roid, name)
-            
+
             xmlAttrs(plotobjs[[i]]) = c(
                       "class"       = paste("aqm", roid, sep=""),
                       "onclick"     = callbacks[1],
                       "onmouseover" = callbacks[2],
                       "onmouseout"  = callbacks[3])
-            
+
             convertCSSStylesToSVG(plotobjs[[i]])
           } ## for
         isok["plotobjs"] = TRUE
       }
-    
-    ## 3. find the children of the <defs> element that are <symbol>, and also <clipPath> 
+
+    ## 3. find the children of the <defs> element that are <symbol>, and also <clipPath>
     isok["symbol"]   = renameNodes(doc, "//x:defs/x:g/x:symbol", prefix = name)
     isok["clipPath"] = renameNodes(doc, "//x:clipPath", prefix = name)
-    
+
     ## similarly, find the <use> elements ...
-    use = getNodeSet(doc, "//x:use", "x") 
+    use = getNodeSet(doc, "//x:use", "x")
     if(length(use)>0)
       {
         oldvalues = sapply(use, function(x) xmlAttrs(x)["href"])
@@ -66,9 +66,9 @@ annotateSvgPlot = function(infile, outfile, outdir, annotationInfo, name)
           xmlAttrs(use[[i]]) = newvalues[i]
         isok["use"] = TRUE
       }
- 
+
     ## ... and the <g> elements that use a clip-path attribute
-    cp = getNodeSet(doc, "//x:g[@clip-path]", "x") 
+    cp = getNodeSet(doc, "//x:g[@clip-path]", "x")
     if(length(cp)>0)
       {
         oldvalues = sapply(cp, function(x) xmlAttrs(x)["clip-path"])
@@ -78,22 +78,22 @@ annotateSvgPlot = function(infile, outfile, outdir, annotationInfo, name)
           xmlAttrs(cp[[i]]) = newvalues[i]
         isok["cp"] = TRUE
       }
-    
+
     saveXML(doc, file.path(outdir, outfile))
-    
+
     return(list(size = diff(vb), annotateOK = all(isok)))
   }
 
 
 renameNodes = function(doc, path, prefix)
   {
-    ns = getNodeSet(doc, path, "x") 
+    ns = getNodeSet(doc, path, "x")
     if(length(ns)>0)
       {
         oldids = sapply(ns, function(x) xmlAttrs(x)["id"])
         newids = paste(prefix, "-", oldids, sep="")
         names(newids) = names(oldids)
-        
+
         for(i in seq(along = ns))
           xmlAttrs(ns[[i]]) = newids[i]
         TRUE
