@@ -123,21 +123,21 @@ options(error = recover, warn = 2)
 If you are working with Affymetrix GeneChips, an \Rclass{AffyBatch} object
 is the most appropriate way to import your raw data into Bioconductor.
 Starting from CEL files, this is typically done using the function
-\Rfunction{ReadAffy} from the \Rpackage{affy} package\footnote{For 
+\Rfunction{ReadAffy} from the \Rpackage{affy} package\footnote{For
 more information on how to produce an \Rclass{AffyBatch} from your data, please see
 the documentation of the \Rpackage{affy} package.}.  Here, we use the
-dataset \emph{MLL.A}, an object of class \Rclass{AffyBatch} 
+dataset \emph{MLL.A}, an object of class \Rclass{AffyBatch}
 provided in the data package \Rpackage{ALLMLL}.
 %
 <<DataLoading>>=
 library("ALLMLL")
 data("MLL.A")
-@ 
+@
 
 Now that the data are loaded, we can call
 \Rfunction{arrayQualityMetrics}\footnote{For this vignette, in order to save
 computation time, we only call the function on the first 5 arrays; in
-your own application, you can call it on the complete data object.}. 
+your own application, you can call it on the complete data object.}.
 
 %
 <<AffyBatchQM,results=hide>>=
@@ -170,7 +170,7 @@ for each array.
 %
 <<Normalisation, results=hide>>=
 nMLL = rma(MLL.A)
-@ 
+@
 %
 We can then call again the function \Rfunction{arrayQualityMetrics}.
 %
@@ -194,17 +194,31 @@ genechips, you can load your data into Bioconductor as an
 You can then proceed exactly as above.
 
 %--------------------------------------------------
-\subsection{Two colour arrays}
+\subsection{Two colour arrays, NChannelSet, RGList, MAList}
 %--------------------------------------------------
-If you are working on two colour chips, you can create an
-\Rclass{NChannelSet} to contain your data. The documentation of the
-\Rpackage{Biobase} package gives instructions on how to build a
-\Rclass{NChannelSet} from scratch. Furthermore, the package
-\Rpackage{limma} can import a wide range of data formats used for two
-colour arrays, and will produce objects of class \Rclass{RGList},
-\Rclass{MAList}. \Rfunction{arrayQualityMetrics} also understands these.
+The package \Rpackage{limma} imports a wide range of data formats used
+for two colour arrays and produces objects of class \Rclass{RGList} or
+\Rclass{MAList}. When presented with an object of these classes,
+\Rfunction{arrayQualityMetrics} tries to convert them into an
+\Rclass{NChannelSet} and then proceeds with calling its
+\Rclass{NChannelSet} method.
 
-Here, we consider the dataset \Robject{CCl4} from the data package
+Alternatively, you can create an \Rclass{NChannelSet} to contain your
+data ``from scratch''. The documentation of the \Rpackage{Biobase}
+package gives instructions on how to do so.
+
+The \Rfunction{arrayQualityMetrics} function expects the
+\Robject{assayData} slot of the \Rclass{NChannelSet} object to contain
+the elements \Robject{R} and \Robject{G}, for the ``red'' and the
+``green'' intensities. Optionally, it can contain elements
+\Robject{Rb} and \Robject{Gb} for associated ``background''
+intensities.  As an alternative to all that, the
+\Rfunction{arrayQualityMetrics} function also accepts
+\Rclass{NChannelSet} objects with a single slot \Robject{exprs}, and
+will then simply behave like it does for (single-colour)
+\Rclass{ExpressionSet} objects.
+
+As an example, we consider the dataset \Robject{CCl4} from the data package
 \Rpackage{CCl4} and normalize it using the variance stabilization
 method available in the package \Rpackage{vsn}.
 
@@ -236,7 +250,7 @@ A useful feature of \Rfunction{arrayQualityMetrics} is the possibility
 to show the results in the context of an experimental factor of
 interest, i.\,e.\ a categorical variable associated with the arrays
 such as \emph{hybridisation date}, \emph{treatment level} or
-\emph{replicate number}. Specifying a factor does \emph{not} change 
+\emph{replicate number}. Specifying a factor does \emph{not} change
 how the quality metrics are computed. By setting the argument
 \Rfunction{intgroup} to contain the names of one or multiple columns
 of the data object's \Rclass{phenoData} slot\footnote{This is where
@@ -253,7 +267,7 @@ array metadata factors \Robject{condition} and
 <<intgroup1>>=
 pData(nMLL)$condition = rep(letters[1:4], times = 5)
 pData(nMLL)$batch = rep(paste(1:4), each = 5)
-@ 
+@
 <<intgroup2, results=hide>>=
 arrayQualityMetrics(expressionset = nMLL,
                     outdir = "Report_for_nMLL_with_factors",
@@ -293,7 +307,7 @@ and "Y" respectively
 <<XYcoordinates>>=
 featureData(nCCl4)$X = featureData(nCCl4)$Row
 featureData(nCCl4)$Y = featureData(nCCl4)$Column
-@ 
+@
 The next call to \Rfunction{arrayQualityMetrics} with this refined version of
 \Robject{nCCl4} (see Section~\ref{sec:rin}) will now
 include this information in the report, and the spatial distribution
@@ -340,8 +354,8 @@ recorded by a so-called RIN value (see \emph{CCl4} vignette).
 <<pData>>=
 pd = pData(CCl4)
 rownames(pd) = NULL
-pd              
-@ 
+pd
+@
 %
 The RIN is always 9 for the reference (DMSO), the relevant value is that
 for the test sample (CCl4).
@@ -350,7 +364,7 @@ RIN = with(pd, ifelse( Cy3=="CCl4", RIN.Cy3, RIN.Cy5))
 fRIN = factor(RIN)
 levels(fRIN) = c("poor", "medium", "good")
 pData(nCCl4)$"RNA-integrity" = fRIN
-@ 
+@
 %
 Now we can use this to set the argument \Robject{intgroup} when
 calling the function \Rfunction{arrayQualityMetrics}.

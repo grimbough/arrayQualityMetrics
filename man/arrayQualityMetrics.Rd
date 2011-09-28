@@ -26,21 +26,19 @@ arrayQualityMetrics(expressionset,
     \code{\link[Biobase:class.NChannelSet]{NChannelSet}},
     \code{\link[beadarray:class-BeadLevelList]{BeadLevelList}},
     \code{\link[limma:rglist]{RGList}},
-    \code{\link[limma:malist]{MAList}},
-    \code{\link[marray:marrayRaw-class]{marrayRaw}},
-    \code{\link[marray:marrayNorm-class]{marrayNorm}}.}
+    \code{\link[limma:malist]{MAList}}.}
 
 \item{outdir}{the name of the directory in which the report is
   created; a character of length 1.}
-  
+
 \item{force}{if the directory named by \code{outdir} already exists, then, if \code{force} is
   \code{TRUE}, the directory is overwritten, otherwise an
   error is thrown; if the directory does not exist, the value of
   \code{force} is irrelevant; a logical of length 1.}
-  
+
 \item{do.logtransform}{indicates whether the data should be logarithm transformed before
   the analysis; a logical of length 1.}
-  
+
 \item{intgroup}{the name of the sample covariate(s) used to draw
   a colour side bar next to the heatmap. The first element of
   \code{intgroup} is also used define sample groups in

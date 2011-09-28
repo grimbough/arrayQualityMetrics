@@ -16,7 +16,7 @@ prepdata = function(expressionset, intgroup, do.logtransform)
     do.logtransform = do.logtransform))
 
   x = append(x, intgroupColors(x))
-  
+
   return(x)
 }
 
@@ -45,12 +45,31 @@ setGeneric("platformspecific",
            standardGeneric("platformspecific"))
 
 ##--------------------------------------------------
-## NChannelSset (two colors)
+## NChannelSset (either one or two colors)
 ##--------------------------------------------------
 setMethod("platformspecific",
           signature(expressionset = "NChannelSet"),
 function(expressionset, do.logtransform)
 {
+
+  adNames = ls(assayData(expressionset))
+  nIsOne = ("exprs" %in% adNames)
+  nIsTwo = all(c("R","G") %in% adNames)
+  if(!xor(nIsOne, nIsTwo))
+      error("'assayData(expressionset)' must contain either 'exprs', or 'R' and 'G', but not both.")
+
+  if(nIsOne)
+      return(oneColor(expressionset, do.logtransform=do.logtransform, M=assayData(expressionset)$exprs))
+
+  if(!nIsTwo)
+      error("'assayData(expressionset)' must contain either 'exprs', or 'R' and 'G'.")
+
+  adNotUsed = setdiff(adNames, c("R", "G", "Rb", "Gb"))
+  if(length(adNotUsed)>0)
+      warning(sprintf("Elements%s %s of 'assayData(expressionset)' will be ignored.",
+                      if(length(adNotUsed)==1) "" else "s",
+                      paste(adNotUsed, collapse=", ")))
+
   R  = assayData(expressionset)$R   ## red channel foreground
   G  = assayData(expressionset)$G   ## green channel foreground
   Rb = assayData(expressionset)$Rb  ## red channel background
@@ -64,11 +83,11 @@ function(expressionset, do.logtransform)
       G  = logtransform(G)
       Rb = logtransform(Rb)
       Gb = logtransform(Gb)
-    } 
+    }
 
   M = R-G
   A = 0.5*(R+G)
-  
+
   if("dyeswap" %in% colnames(phenoData(expressionset)))
     {
       if(!is.factor(expressionset$dyeswap))
@@ -80,23 +99,25 @@ function(expressionset, do.logtransform)
       rev = as.integer(expressionset$dyeswap)==1
       M[,rev] = -M[,rev]
     }
-  
+
   list(R = R, G = G, Rb = Rb, Gb = Gb,
        sx = sx, sy = sy,
-       M = M, A = A, 
+       M = M, A = A,
        nchannels = 2, pData = cleanPhenoData(expressionset), fData = fData(expressionset))
 })
 
 ##----------------------------------------------------------
 ## Common parts of dealing with ExpressionSet and AffyBatch
 ##----------------------------------------------------------
-oneColor = function(expressionset, do.logtransform)
+oneColor = function(expressionset, do.logtransform, M)
 {
-  M = exprs(expressionset)    
+  if(missing(M))
+      M = exprs(expressionset)
+
   if(do.logtransform)
-    M = logtransform(M)
-  
-  list(M = M, A = M, 
+      M = logtransform(M)
+
+  list(M = M, A = M,
        nchannels = 1, pData = cleanPhenoData(expressionset), fData = fData(expressionset))
 }
 
@@ -112,7 +133,7 @@ function(expressionset, do.logtransform)
   rv$sy = featureData(expressionset)$Y ## spatial y-coordinate
   return(rv)
 })
-          
+
 ##----------------------------------------------------------
 ## AffyBatch
 ##----------------------------------------------------------
@@ -129,7 +150,7 @@ function(expressionset, do.logtransform)
 })
 
 ##----------------------------------------------------------
-## beadLevelData 
+## beadLevelData
 ##----------------------------------------------------------
 setMethod("platformspecific",
           signature(expressionset = "beadLevelData"),
@@ -143,7 +164,8 @@ function(expressionset, do.logtransform)
 ##----------------------------------------------------------
 setMethod("platformspecific",
           signature(expressionset = "ExpressionSetIllumina"),
-          oneColor)
+function(expressionset, do.logtransform)
+    oneColor(expressionset, do.logtransform))
 
 ##------------------------------------------------------------
 ## extract and clean up phenoData
@@ -157,7 +179,7 @@ cleanPhenoData = function(x, maxcol = 10)
   if(!is.null(scd))
     if(length(scd)==nrow(pd))
       pd = cbind(pd, ScanDate=scd)
-  
+
   if(ncol(pd) > maxcol)
     {
       ## Remove columns whose contents are all the same, or all different (except for the first time).
@@ -178,15 +200,15 @@ cleanPhenoData = function(x, maxcol = 10)
                 }
             }
         } ## for i
-      
+
       wh = which(!remove)
       stopifnot(length(wh)>0)
       if(length(wh) > maxcol)
         wh = wh[seq_len(maxcol)]
-      
+
       pd = pd[, wh, drop=FALSE]
     } ## if ncol(x)
-  
+
   ## Convert everything which is not a factor into a character string, and remove "@"
   for(i in seq_len(ncol(pd)))
     {
@@ -197,6 +219,6 @@ cleanPhenoData = function(x, maxcol = 10)
           pd[[i]] = gsub("@", " ", as.character(pd[[i]]), fixed=TRUE)
         }
     }
-  
+
   return(pd)
 }

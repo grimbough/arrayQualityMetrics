@@ -30,24 +30,27 @@ annotateSvgPlot = function(infile, outfile, outdir, annotationInfo, name)
     ## align with the intended plot objects (i.e. not on any explicit identification).
     plotobjs = try(annotationInfo@getPlotObjNodes(doc))
 
-    if( is(plotobjs, "XMLNodeSet") && (length(plotobjs) == annotationInfo@numPlotObjects) )
+    if( (!is(plotobjs, "try-error")) && (length(plotobjs) == annotationInfo@numPlotObjects) )
       {
-        for(i in seq(along=plotobjs))
+         succeeded = 0
+         for(i in seq(along=plotobjs))
           {
             roid = annotationInfo@getReportObjIdFromPlotObjId(i)
             stopifnot(length(roid)==1, is.integer(roid))
-
             callbacks = sprintf("plotObjRespond('%s', %d, '%s')", c("click", "show", "hide"), roid, name)
 
-            xmlAttrs(plotobjs[[i]]) = c(
+            if(!is(try({
+                xmlAttrs(plotobjs[[i]]) = c(
                       "class"       = paste("aqm", roid, sep=""),
                       "onclick"     = callbacks[1],
                       "onmouseover" = callbacks[2],
                       "onmouseout"  = callbacks[3])
-
-            convertCSSStylesToSVG(plotobjs[[i]])
+                convertCSSStylesToSVG(plotobjs[[i]])
+            }), "try-error"))
+                succeeded = succeeded + 1
           } ## for
-        isok["plotobjs"] = TRUE
+          if (succeeded == length(plotobjs))
+              isok["plotobjs"] = TRUE
       }
 
     ## 3. find the children of the <defs> element that are <symbol>, and also <clipPath>
