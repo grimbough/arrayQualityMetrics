@@ -141,6 +141,9 @@ setMethod("platformspecific",
           signature(expressionset = "AffyBatch"),
 function(expressionset, do.logtransform)
 {
+  if(missing(do.logtransform))
+      do.logtransform = TRUE
+
   rv = oneColor(expressionset, do.logtransform)
   maxc = ncol(expressionset)
   maxr = nrow(expressionset)
