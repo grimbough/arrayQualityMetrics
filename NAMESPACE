@@ -10,16 +10,12 @@ importClassesFrom(limma, MAList, RGList)
 ##--------------------------------------------------
 ## methods
 ##--------------------------------------------------
-importMethodsFrom(affy, Mbox, mm, pm)
-
 importMethodsFrom(Biobase, assayData, channel, dims, exprs,
                   fData, featureData, pData, phenoData, rowMedians,
                   sampleNames, protocolData)
 
+importMethodsFrom(affy, Mbox, mm, pm)
 importMethodsFrom(genefilter, plot)
-
-## importMethodsFrom(simpleaffy, qc)
-
 importMethodsFrom(vsn, meanSdPlot)
 
 ##--------------------------------------------------

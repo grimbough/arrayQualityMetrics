@@ -125,7 +125,7 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
       {
         ## no svg - use png
         nameimg = paste(name, ".png", sep = "")
-        png(file = file.path(outdir, nameimg), h = h*dpi, w = w*dpi)
+        png(filename = file.path(outdir, nameimg), height = h*dpi, width = w*dpi)
         makePlot(module)
         dev.off()
         img = hmakeTag("img", src = nameimg, border = 0, 
@@ -135,7 +135,7 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
         ## svg
         nameimg = paste(name, ".svg", sep = "")
         svgtemp = paste(tempfile(), ".svg", sep = "")
-        Cairo(file = svgtemp, type = "svg", h = h, w = w, units = "in", dpi = dpi)
+        Cairo(file = svgtemp, type = "svg", height = h, width = w, units = "in", dpi = dpi)
         makePlot(module)
         dev.off()
         
@@ -162,7 +162,7 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
     
     ## Also make a PDF file
     namepdf = paste(name, ".pdf", sep = "")
-    pdf(file = file.path(outdir, namepdf), h = h, w = w)
+    pdf(file = file.path(outdir, namepdf), height = h, width = w)
     makePlot(module)
     dev.off()
     

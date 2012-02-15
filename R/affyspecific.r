@@ -24,7 +24,7 @@ aqm.rnadeg = function(expressionset, x)
  
     rnaDeg = function() {
       plotAffyRNAdeg(AffyRNAdeg(expressionset, log.it = TRUE),
-                     lwd = 1, col = x$arrayColors)
+                     lwd = 1, cols = x$arrayColors)
     }
     
     legend = paste(figurePhrase("RNA digestion"),

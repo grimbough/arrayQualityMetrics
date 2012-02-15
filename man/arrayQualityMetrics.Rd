@@ -24,7 +24,7 @@ arrayQualityMetrics(expressionset,
     class \code{\link[Biobase:class.ExpressionSet]{ExpressionSet}},
     \code{\link[affy:AffyBatch-class]{AffyBatch}},
     \code{\link[Biobase:class.NChannelSet]{NChannelSet}},
-    \code{\link[beadarray:class-BeadLevelList]{BeadLevelList}},
+    \code{\link[beadarray:class-ExpressionSetIllumina]{ExpressionSetIllumina}},
     \code{\link[limma:rglist]{RGList}},
     \code{\link[limma:malist]{MAList}}.}
 

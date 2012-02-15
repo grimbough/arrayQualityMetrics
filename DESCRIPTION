@@ -1,6 +1,6 @@
 Package: arrayQualityMetrics
 Title: Quality metrics on microarray data sets
-Version: 3.11.0
+Version: 3.11.2
 Author: Audrey Kauffmann, Wolfgang Huber
 Maintainer: Audrey Kauffmann <akauffmann.bioinfo@gmail.com>
 Depends:
@@ -8,7 +8,7 @@ Suggests: ALLMLL, CCl4
 Imports: affy, affyPLM (>= 1.27.3), beadarray, Biobase, Cairo (>= 1.4-6), genefilter,
          graphics, grDevices, grid, Hmisc, hwriter, lattice, latticeExtra,
          limma, methods, RColorBrewer, setRNG, simpleaffy, stats,
-         SVGAnnotation (>= 0.9-0), utils, vsn, XML
+         SVGAnnotation (>= 0.9-0), utils, vsn (>= 3.23.3), XML
 Description: This package generates microarray quality metrics reports for
   data in Bioconductor microarray data containers (ExpressionSet, NChannelSet,
   AffyBatch). Report contain both general and platform-specific sections.
