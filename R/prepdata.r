@@ -1,23 +1,27 @@
 prepdata = function(expressionset, intgroup, do.logtransform)
 {
-  cls = class(expressionset)
-  if (is(expressionset, "RGList") || is(expressionset, "MAList"))
-    {
-      expressionset = try(as(expressionset, "NChannelSet"))
-      if(is(expressionset, "try-error"))
-        stop(sprintf("Argument 'expressionset' is of class '%s', and its automatic conversion into 'NChannelSet' failed. Please try to convert it manually.\n", paste(cls, collapse=", ")))
+    conversions = c(`RGList` = "NChannelSet")
+    for(i in seq(along=conversions)) {
+        if (is(expressionset, names(conversions)[i])) {
+            expressionset = try(as(expressionset, conversions[i]))
+            if(is(expressionset, "try-error")) {
+                stop(sprintf("Argument 'expressionset' is of class '%s', and its automatic conversion into '%s' failed. Please try to convert it manually.\n",
+                             names(conversions)[i], conversions[i]))
+            } else {
+                break
+            }
+        }
     }
 
-  x = platformspecific(expressionset, do.logtransform)  # see below
+    x = platformspecific(expressionset, do.logtransform)  # see below
 
-  x = append(x, list(
+    x = append(x, list(
     numArrays       = ncol(x$M),
     intgroup        = intgroup,
     do.logtransform = do.logtransform))
 
-  x = append(x, intgroupColors(x))
-
-  return(x)
+    x = append(x, intgroupColors(x))
+    return(x)
 }
 
 
@@ -88,23 +92,56 @@ function(expressionset, do.logtransform)
   M = R-G
   A = 0.5*(R+G)
 
-  if("dyeswap" %in% colnames(phenoData(expressionset)))
-    {
-      if(!is.factor(expressionset$dyeswap))
-        stop("'expressionset$dyeswap' must be a factor.")
-      lev = levels(expressionset$dyeswap)
-      if(length(lev) != 2)
-        stop("The factor 'expressionset$dyeswap' must have exactly two levels")
-
-      rev = as.integer(expressionset$dyeswap)==1
-      M[,rev] = -M[,rev]
-    }
+  M = applyDyeSwap(M, phenoData(expressionset))
 
   list(R = R, G = G, Rb = Rb, Gb = Gb,
        sx = sx, sy = sy,
        M = M, A = A,
        nchannels = 2, pData = cleanPhenoData(expressionset), fData = fData(expressionset))
 })
+
+
+##--------------------------------------------------
+## MAList
+##--------------------------------------------------
+setMethod("platformspecific",
+          signature(expressionset = "MAList"),
+function(expressionset, do.logtransform)
+{
+
+  if(do.logtransform)
+      warning("Ignoring argument 'do.logtransform=TRUE', since it does not make sense for 'MAList' objects.")
+
+  M = expressionset$M
+  A = expressionset$A
+
+  R  = 2^(A+M/2)
+  G  = 2^(A-M/2)
+
+  pd = cleanUpPhenoData(expressionset$targets)
+  M = applyDyeSwap(M, pd)
+
+  fd = expressionset$genes
+
+  list(R = R, G = G, Rb = NULL, Gb = NULL,
+       sx = NULL, sy = NULL,
+       M = M, A = A,
+       nchannels = 2, pData = pd, fData = fd)
+})
+
+applyDyeSwap = function(M, pd) {
+  if("dyeswap" %in% colnames(pd)) {
+    if(!is.factor(pd$dyeswap))
+        stop("'pd$dyeswap' must be a factor.")
+    lev = levels(pd$dyeswap)
+    if(length(lev) != 2)
+        stop("The factor 'pd$dyeswap' must have exactly two levels")
+
+    rev = as.integer(pd$dyeswap)==1
+    M[, rev] = -M[, rev]
+  }
+  return(M)
+}
 
 ##----------------------------------------------------------
 ## Common parts of dealing with ExpressionSet and AffyBatch
@@ -173,8 +210,7 @@ function(expressionset, do.logtransform)
 ##------------------------------------------------------------
 ## extract and clean up phenoData
 ##------------------------------------------------------------
-cleanPhenoData = function(x, maxcol = 10)
-{
+cleanPhenoData = function(x, ...) {
 
   pd = pData(x)
 
@@ -182,6 +218,11 @@ cleanPhenoData = function(x, maxcol = 10)
   if(!is.null(scd))
     if(length(scd)==nrow(pd))
       pd = cbind(pd, ScanDate=scd)
+
+  cleanUpPhenoData(pd, ...)
+}
+
+cleanUpPhenoData = function(pd, maxcol = 10) {
 
   if(ncol(pd) > maxcol)
     {

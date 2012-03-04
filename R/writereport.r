@@ -6,12 +6,12 @@ dircreation = function(outdir = getwd(), force = FALSE)
     if(file.exists(outdir)){
       if(!file.info(outdir)$isdir)
         stop(sprintf("'%s' must be a directory.", outdir))
-      
+
       outdirContents = dir(outdir, all.files = TRUE)
       outdirContents = setdiff(outdirContents, c(".", ".."))
-              
-      if(!force && length(outdirContents)>0) 
-        stop(sprintf("'%s' is not empty.", outdir))
+
+      if(!force && length(outdirContents)>0)
+        stop(sprintf("The directory '%s' already exists and is not empty. Please remove the directory before calling 'arrayQualityMetrics' or consider using 'force=TRUE'.", outdir))
       message(sprintf("The report will be written into directory '%s'. ", outdir))
     } else {
       dir.create(outdir, recursive=TRUE)
@@ -24,7 +24,7 @@ dircreation = function(outdir = getwd(), force = FALSE)
 ## Produce a plot
 ##---------------------------------------------------------
 makePlot = function(x) {
-  if (is(x@plot, "trellis")) 
+  if (is(x@plot, "trellis"))
     print(x@plot) else
   if (is(x@plot, "function"))
     do.call(x@plot, args = list())
@@ -45,15 +45,15 @@ makeTitle = function(reporttitle, outdir, params)
     filelocs[ filelocs!="" ]
     if(length(filelocs)<length(filenames))
         stop(sprintf("Could not find all of: '%s'.", paste(filenames, collapse=", ")))
-    
+
     copySubstitute(src = filelocs, dest = outdir, recursive = TRUE, symbolValues = params)
-                
+
     p = openPage(filename = file.path(outdir, 'index.html'),
       link.javascript = filenames[2],
       link.css        = filenames[1],
       body.attributes = list("onload" = "reportinit()"),
       title           = reporttitle)
-  
+
     hwrite("<hr>", page = p)
     hwrite(reporttitle, page = p, heading=1)
     hwrite("<hr>", page = p)
@@ -97,8 +97,8 @@ makeIndex = function(p, modules)
       currentSectionName = modules[[i]]@section
     }
   hwrite("</UL></UL>", page = p)
-  
-  browserCompatibilityNote(p) 
+
+  browserCompatibilityNote(p)
 }
 
 ##---------------------------------------------------------
@@ -108,19 +108,19 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
 {
     stopifnot(is(module, "aqmReportModule"))
     validObject(module, test=FALSE)
-    
+
     svgwarn = FALSE
 
     stopifnot(!is.na(module@title))
     name = module@id
-    
+
     stopifnot(!any(is.na(module@size)))
     h = module@size["h"]
     w = module@size["w"]
-    
+
     stopifnot(length(currentIndex)==1, is.numeric(currentIndex), !is.na(currentIndex))
     dpi = arrayQualityMetricsGlobalParameters$dpi
-    
+
     if(is.na(module@svg@numPlotObjects))
       {
         ## no svg - use png
@@ -128,9 +128,9 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
         png(filename = file.path(outdir, nameimg), height = h*dpi, width = w*dpi)
         makePlot(module)
         dev.off()
-        img = hmakeTag("img", src = nameimg, border = 0, 
+        img = hmakeTag("img", src = nameimg, border = 0,
                        alt = nameimg, id = paste("Fig", name, sep=":"))
-        
+
       } else {
         ## svg
         nameimg = paste(name, ".svg", sep = "")
@@ -138,41 +138,41 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
         Cairo(file = svgtemp, type = "svg", height = h, width = w, units = "in", dpi = dpi)
         makePlot(module)
         dev.off()
-        
+
         annRes = annotateSvgPlot(infile = svgtemp,
                                  outfile = nameimg,
                                  outdir = outdir,
                                  annotationInfo = module@svg,
                                  name = name)
-        
+
         if(!annRes$annotateOK)
           svgwarn = paste("Note: the figure is static - enhancement with interactive effects failed.",
             "This is either due to a version incompatibility of the 'SVGAnnotation' R package and your",
             "version of 'Cairo' or 'libcairo', or due to plot misformating. Please consult the Bioconductor mailing list, or",
             "contact the maintainer of 'arrayQualityMetrics' with a reproducible example in order to fix this problem.")
-        
-        sizes = paste(round(annRes$size)) 
+
+        sizes = paste(round(annRes$size))
         img = hwrite( c( paste(readLines(file.path(outdir, nameimg)), collapse="\n"),
                          annotationTable(arrayTable, name = name) ))
 
-        ## TO DO: 
+        ## TO DO:
         ##  hwrite(c(aqm.hwriteImage(nameimg, width=sizes[1], height=sizes[2], id=paste("Fig", name, sep=":")),
         ##               annotationTable(arrayTable, name = name)))
       } ## if
-    
+
     ## Also make a PDF file
     namepdf = paste(name, ".pdf", sep = "")
     pdf(file = file.path(outdir, namepdf), height = h, width = w)
     makePlot(module)
     dev.off()
-    
+
     # write the HTML
     hwrite("\n\n", page = p)
     hwrite(toggleStart(name, display=module@defaultdisplay, text = sprintf("Figure %d: %s.", currentIndex, module@title)), page = p)
-  
+
     hwrite(img, page = p)
     hwrite("<br>\n", page = p)
-    
+
     hwrite(gsub("The figure <!-- FIG -->",
            paste("<b>Figure ", currentIndex, "</b>", if(!is.na(namepdf)) hwrite(" (PDF file)", link = namepdf), sep=""),
                  module@legend, ignore.case = TRUE), page = p)
@@ -180,7 +180,7 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
 
     if(!identical(svgwarn, FALSE))
        hwrite(svgwarn, page = p)
-    
+
     hwrite(toggleEnd(), page = p)
 
     ## recursion, for the barplot with the outliers
@@ -214,15 +214,8 @@ makeEnding = function(p)
 browserCompatibilityNote = function(p)
   {
     txt = paste("<h3>Browser compatibility</h3>\n",
-      "This report uses recent features of HTML 5 which have not ",
-      "yet been implemented by all browsers. Thus, unfortunately, browser compatibility ",
-      "currently needs to be  considered:<ul>\n",
-      "<li> Firefox 4 - tested, works well,\n",
-      "<li> Chrome 10 - tested, works well,\n",
-      "<li> Safari 5 - the interactive (SVG) plots will be missing, since this browser ",
-      "does not support the embedding of the &lt;svg&gt; tag in HTML.\n",
-      "</ul>",
-      sep="")
+      "This report uses recent features of HTML 5. Functionality has been tested on these browsers: ",
+      "Firefox 10, Chrome 17, Safari 5.1.2\n", sep="")
     hwrite("<hr>\n", page = p)
     hwrite(txt, page = p)
   }
@@ -239,10 +232,10 @@ reportTable = function(p, arrayTable, tableLegend)
     stringsAsFactors = FALSE)
 
   hwrite("<hr>", page = p)
-  
+
   disp = ifelse(nrow(arrayTable)<=arrayQualityMetricsGlobalParameters$maxNumberOfArraysForShowingArrayMetadataByDefault , "block", "none")
   hwrite(toggleStart("arraymetadata", disp, "Array metadata and outlier detection overview"), page = p)
-  hwrite(arrayTable, page = p, 
+  hwrite(arrayTable, page = p,
          row.bgcolor = rep(list("#ffffff", c("#d0d0ff", "#e0e0f0")), ceiling(nrow(arrayTable)/2)),
          table.style = "margin-left:auto;text-align:right;",
          row.style = list("font-weight:bold"))
@@ -251,7 +244,7 @@ reportTable = function(p, arrayTable, tableLegend)
 }
 
 ##------------------------------------------------------------------
-## Display toggle start and end 
+## Display toggle start and end
 ##----------------------------------------------------------
 toggleStart = function(name, display, text)
   paste(
@@ -265,7 +258,7 @@ toggleEnd = function()
 
 ##------------------------------------------------------------------
 ## Create JSON representation of R character vectors and matrices
-## Names and dimnames attributes are stripped. 
+## Names and dimnames attributes are stripped.
 ##----------------------------------------------------------
 toJSON_fromchar = function(x)
   paste("[", paste(x, collapse=", "), "]")
@@ -284,7 +277,7 @@ toJSON_frommatrix = function(x)
 ##--------------------------------------------------
 aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
 {
-  numReportObjs = nrow(arrayTable) 
+  numReportObjs = nrow(arrayTable)
   reportObjs    = seq_len(numReportObjs)
 
   ## To avoid dealing with this pathologic special case downstream in the HTML
@@ -294,14 +287,14 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
   ## construct short, unique IDs
   ids = sapply(modules, slot, "id")
   stopifnot(!any(is.na(ids)), !any(duplicated(modules)))
-  
+
   ## For all report modules, extract the 'svg' slot, then subset only those that are defined.
   svgdata = lapply(modules, slot, "svg")
   names(svgdata) = ids
-  hassvg  = !is.na(sapply(svgdata, slot, "numPlotObjects")) 
+  hassvg  = !is.na(sapply(svgdata, slot, "numPlotObjects"))
   svgdata = svgdata[ hassvg]
-  
-  ## Determine which subset of the modules have computed outliers ('wh'). For each, define 
+
+  ## Determine which subset of the modules have computed outliers ('wh'). For each, define
   ## a corresponding column in the logical matrix 'outliers'.
   ## Further below, a textual representation of 'outliers', ifelse(outliers, "x", "") is added to arrayTable,
   ## and the row-wise OR (more precisely: 'apply(outliers, 1, any)') is used to determine
@@ -310,7 +303,7 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
 
   outlierMethodTitles = sapply(modules, slot, "title")[wh]
   outlierMethodLinks  = paste("<a href=\"#", ids[wh], "\">", sep="")
-  
+
   outlierExplanations = paste(
     "The columns named *1, *2, ... indicate the calls from the different outlier detection methods:<OL>",
     paste(sprintf("<LI> outlier detection by %s%s</a></LI>",
@@ -346,14 +339,14 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
   arrayTableBig     = cbind(left, ifelse(outliers, "x", ""), arrayTable, stringsAsFactors = FALSE)
   arrayTableCompact = cbind(left, arrayTable, stringsAsFactors = FALSE)
   rownames(arrayTableBig) = rownames(arrayTableCompact) = NULL
-  
+
   ## Open and set up the HTML page
   p = makeTitle(
     reporttitle = reporttitle,
     outdir = outdir,
     ## Inject report-specific variables into the JavaScript
-    params = c(          
-      HIGHLIGHTINITIAL = toJSON_fromchar(ifelse(apply(outliers, 1, any), "true", "false")), 
+    params = c(
+      HIGHLIGHTINITIAL = toJSON_fromchar(ifelse(apply(outliers, 1, any), "true", "false")),
       ARRAYMETADATA    = toJSON_frommatrix(arrayTableCompact),
       SVGOBJECTNAMES   = toJSON_fromvector(names(svgdata)),
       REPORTOBJSTYLES  = paste(".aqm", reportObjs, " { }", sep="", collapse = "\n")
@@ -362,10 +355,10 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
   makeIndex(p = p, modules = modules)
   reportTable(p = p, arrayTable = arrayTableBig,
               tableLegend = outlierExplanations)
-  
+
   currentSectionName = "Something Else"
   currentIndex = currentSection = 1
-  
+
   for(i in seq(along = modules))
     {
       if(modules[[i]]@section != currentSectionName)
@@ -381,7 +374,7 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
         outdir=outdir)
       currentSectionName = modules[[i]]@section
     }
-  
+
   makeEnding(p)
   invisible(list(modules=modules, arrayTable=arrayTableBig, reporttitle=reporttitle, outdir=outdir))
 }
