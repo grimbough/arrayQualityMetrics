@@ -98,7 +98,7 @@ makeIndex = function(p, modules)
     }
   hwrite("</UL></UL>", page = p)
 
-  browserCompatibilityNote(p)
+  introductoryNote(p)
 }
 
 ##---------------------------------------------------------
@@ -209,9 +209,9 @@ makeEnding = function(p)
   }
 
 ##----------------------------------------------------------
-## Browser compatibility
+## Introductory Note
 ##----------------------------------------------------------
-browserCompatibilityNote = function(p)
+introductoryNote = function(p)
   {
     txt = paste("<h3>Browser compatibility</h3>\n",
       "This report uses recent features of HTML 5. Functionality has been tested on these browsers: ",
@@ -312,7 +312,11 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
     "by at least one criterion are marked by checkbox selection in this table, and are ",
     "indicated by highlighted lines or points in some of the plots below. ",
     "By clicking the checkboxes in the table, or on the corresponding points/lines in the plots, you can modify the selection. ",
-    "To reset the selection, reload the HTML page in your browser.", sep="")
+    "To reset the selection, reload the HTML page in your browser.", "<br><br>",
+    "At the scope covered by this software, outlier detection is a poorly defined question, and there is no 'right' or 'wrong' answer. ",
+    "These are hints which are intended to be followed up manually. If you want to automate outlier detection, you need to limit the scope ",
+    "to a particular platform and experimental design, and then choose and calibrate the metrics used.",
+  sep="")
 
   outliers = matrix(NA, nrow = numReportObjs,
                         ncol = length(wh),
