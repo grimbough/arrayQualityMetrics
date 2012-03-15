@@ -8,11 +8,11 @@ arrayQualityMetrics = function(
   spatial = TRUE,
   reporttitle = paste("arrayQualityMetrics report for", deparse(substitute(expressionset))))
 {
-  ## Argument checking: 
+  ## Argument checking:
   if(!missing(grouprep))
     .Deprecated(msg = paste("The argument 'grouprep' of the function 'arrayQualityMetrics'",
                   "is deprecated and will be ignored. Use 'intgroup' instead."))
-  
+
   for(v in c("outdir", "reporttitle"))
     if (!(is.character(get(v)) && (length(get(v))==1)))
       stop(sprintf("'%s' should be a character of length 1.", v))
@@ -20,19 +20,12 @@ arrayQualityMetrics = function(
   for(v in c("force", "do.logtransform", "spatial"))
     if (!(is.logical(get(v)) && (length(get(v))==1)))
       stop(sprintf("'%s' should be a logical of length 1.", v))
-  
-  if (!is.null(intgroup)) {
-    if (!is.character(intgroup))
-      stop("'intgroup' should be a 'character'.")
-    if(!all(intgroup %in% colnames(pData(expressionset))))
-      stop("all elements of 'intgroup' should match column names of 'phenoData(expressionset)'.")
-  }
 
   ## output directory
   dircreation(outdir, force)
 
   ## list of report modules
-  m = list()  
+  m = list()
 
   ## to enforce deterministic behaviour (boxplot and maplot do 'random' subsampling)
   old.seed = setRNG(kind = "default", seed = 28051968, normal.kind = "default")
@@ -40,8 +33,8 @@ arrayQualityMetrics = function(
 
   ## create a comprehensive data object 'x', with the original data,
   ##  as well as some generally useful derived statistics of the data
-  x = prepdata(expressionset, intgroup=intgroup, do.logtransform=do.logtransform) 
-  
+  x = prepdata(expressionset, intgroup=intgroup, do.logtransform=do.logtransform)
+
   ##---------Generic modules------
   m$heatmap   = aqm.heatmap(x)
   m$pca       = aqm.pca    (x)
@@ -61,12 +54,12 @@ arrayQualityMetrics = function(
     ## m$qcstats = aqm.qcstats(expressionset) -- Not sure any one cares about this function. It can be resurrected if there is overwhelming demand.
     m$pmmm    = aqm.pmmm(x)
   }
-  
+
   ##---------MA plots and spatial intensity distributions------
   m$maplot = aqm.maplot (x)
-  if (spatial) 
+  if (spatial)
     m = append(m, aqm.spatial(x))
-  
+
   aqm.writereport(modules = m, arrayTable = x$pData, reporttitle = reporttitle, outdir = outdir)
 }
 

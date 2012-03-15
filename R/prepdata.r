@@ -1,35 +1,39 @@
-prepdata = function(expressionset, intgroup, do.logtransform)
-{
-    conversions = c(`RGList` = "NChannelSet")
-    for(i in seq(along=conversions)) {
-        if (is(expressionset, names(conversions)[i])) {
-            expressionset = try(as(expressionset, conversions[i]))
-            if(is(expressionset, "try-error")) {
-                stop(sprintf("Argument 'expressionset' is of class '%s', and its automatic conversion into '%s' failed. Please try to convert it manually.\n",
-                             names(conversions)[i], conversions[i]))
-            } else {
-                break
-            }
-        }
+prepdata = function(expressionset, intgroup, do.logtransform) {
+  conversions = c(`RGList` = "NChannelSet")
+  for(i in seq(along=conversions)) {
+    if (is(expressionset, names(conversions)[i])) {
+      expressionset = try(as(expressionset, conversions[i]))
+      if(is(expressionset, "try-error")) {
+        stop(sprintf("The argument 'expressionset' is of class '%s', and its automatic conversion into '%s' failed. Please try to convert it manually, or contact the creator of that object.\n", names(conversions)[i], conversions[i]))
+      } else {
+        break
+      }
     }
+  }
 
-    x = platformspecific(expressionset, do.logtransform)  # see below
+  x = platformspecific(expressionset, do.logtransform)
 
-    x = append(x, list(
+  if (!is.null(intgroup)) {
+    if (!is.character(intgroup))
+      stop("'intgroup' should be a 'character'.")
+    if(!all(intgroup %in% colnames(x$pData)))
+      stop("all elements of 'intgroup' should match column names of 'pData(expressionset)'.")
+  }
+
+  x = append(x, list(
     numArrays       = ncol(x$M),
     intgroup        = intgroup,
     do.logtransform = do.logtransform))
 
-    x = append(x, intgroupColors(x))
-    return(x)
+  x = append(x, intgroupColors(x))
+  return(x)
 }
 
 
 ##--------------------------------------------------
 ## Little helper function
 ##--------------------------------------------------
-logtransform = function(x)
-{
+logtransform = function(x) {
   if (is.null(x)) {
     NULL
   } else {
@@ -45,7 +49,7 @@ logtransform = function(x)
 ##--------------------------------------------------
 setGeneric("platformspecific",
            function(expressionset,
-                    do.logtransform = TRUE)
+                    do.logtransform)
            standardGeneric("platformspecific"))
 
 ##--------------------------------------------------
@@ -53,8 +57,7 @@ setGeneric("platformspecific",
 ##--------------------------------------------------
 setMethod("platformspecific",
           signature(expressionset = "NChannelSet"),
-function(expressionset, do.logtransform)
-{
+function(expressionset, do.logtransform) {
 
   adNames = ls(assayData(expressionset))
   nIsOne = ("exprs" %in% adNames)
@@ -81,13 +84,12 @@ function(expressionset, do.logtransform)
   sx = featureData(expressionset)$X ## spatial x-coordinate
   sy = featureData(expressionset)$Y ## spatial y-coordinate
 
-  if(do.logtransform)
-    {
-      R  = logtransform(R)
-      G  = logtransform(G)
-      Rb = logtransform(Rb)
-      Gb = logtransform(Gb)
-    }
+  if(do.logtransform) {
+    R  = logtransform(R)
+    G  = logtransform(G)
+    Rb = logtransform(Rb)
+    Gb = logtransform(Gb)
+  }
 
   M = R-G
   A = 0.5*(R+G)
@@ -109,14 +111,13 @@ setMethod("platformspecific",
 function(expressionset, do.logtransform)
 {
 
-  if(do.logtransform)
-      warning("Ignoring argument 'do.logtransform=TRUE', since it does not make sense for 'MAList' objects.")
+  if(!identical(FALSE, do.logtransform))
+    warning("Ignoring argument 'do.logtransform', since there is no such choice for 'MAList' objects.")
 
   M = expressionset$M
   A = expressionset$A
-
-  R  = 2^(A+M/2)
-  G  = 2^(A-M/2)
+  R = A+M/2
+  G = A-M/2
 
   pd = cleanUpPhenoData(expressionset$targets)
   M = applyDyeSwap(M, pd)
@@ -176,11 +177,7 @@ function(expressionset, do.logtransform)
 ##----------------------------------------------------------
 setMethod("platformspecific",
           signature(expressionset = "AffyBatch"),
-function(expressionset, do.logtransform)
-{
-  if(missing(do.logtransform))
-      do.logtransform = TRUE
-
+function(expressionset, do.logtransform) {
   rv = oneColor(expressionset, do.logtransform)
   maxc = ncol(expressionset)
   maxr = nrow(expressionset)
