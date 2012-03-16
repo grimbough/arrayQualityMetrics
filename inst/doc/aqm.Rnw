@@ -26,6 +26,9 @@
 
 <<echo=FALSE,results=hide>>=
 options(error=recover)
+options(bitmapType = "cairo")
+.HaveDummy = !interactive()
+  if(.HaveDummy) pdf("dummy.pdf")
 @ 
 
 %--------------------------------------------------
@@ -160,6 +163,11 @@ Point your browser to the \texttt{index.html} file in that directory.
 %--------------------------------------------------
 \subsection*{Session Info}
 %--------------------------------------------------
+<<echo=FALSE>>=
+if(.HaveDummy) dev.off()
+@ 
+
+
 <<pkgs, results=tex>>=
 toLatex(sessionInfo())
 @

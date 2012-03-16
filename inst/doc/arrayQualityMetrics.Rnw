@@ -114,9 +114,13 @@ programmatic analysis of the report. This is discussed in the vignette
 
 \section{Basic use}
 %
-<<options,echo=FALSE>>=
+<<echo=FALSE,results=hide>>=
 options(error = recover, warn = 2)
-@
+options(bitmapType = "cairo")
+.HaveDummy = !interactive()
+  if(.HaveDummy) pdf("dummy.pdf")
+@ 
+
 %
 
 \subsection{Affymetrix data - before preprocessing}
@@ -381,6 +385,10 @@ of the factor \texttt{RNA-integrity} for each array.
 
 \subsection*{Session Info}
 %
+<<echo=FALSE>>=
+if(.HaveDummy) dev.off()
+@ 
+
 <<pkgs, results=tex, echo=FALSE>>=
 toLatex(sessionInfo())
 @
