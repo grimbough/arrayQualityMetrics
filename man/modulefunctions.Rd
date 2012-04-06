@@ -24,21 +24,21 @@
 }
 
 \usage{
-aqm.boxplot(x, subsample=20000, outlierMethod = "KS")
-aqm.density(x)
-aqm.heatmap(x)
-aqm.pca(x)
-aqm.maplot(x, subsample=20000, Dthresh=0.15)
-aqm.spatial(x, scale="rank", channels = c("M", "R", "G"))
-aqm.meansd(x)
-aqm.probesmap(x)
+aqm.boxplot(x, subsample=20000, outlierMethod = "KS", ...)
+aqm.density(x, ...)
+aqm.heatmap(x, ...)
+aqm.pca(x, ...)
+aqm.maplot(x, subsample=20000, Dthresh=0.15, maxNumArrays=8, nrColumns=4, ...)
+aqm.spatial(x, scale="rank", channels = c("M", "R", "G"), ...)
+aqm.meansd(x, ...)
+aqm.probesmap(x, ...)
 
 # Affymetrix specific sections
 % aqm.qcstats(expressionset)
-aqm.pmmm(x)
-aqm.rnadeg(expressionset, x)
-aqm.rle(x, outlierMethod = "KS")
-aqm.nuse(x, outlierMethod = "upperquartile")
+aqm.pmmm(x, ...)
+aqm.rnadeg(expressionset, x, ...)
+aqm.rle(x, outlierMethod = "KS", ...)
+aqm.nuse(x, outlierMethod = "upperquartile", ...)
 }
 
 \arguments{
@@ -57,13 +57,25 @@ aqm.nuse(x, outlierMethod = "upperquartile")
   ranks of the values; if it is \code{"direct"}, then it is proportional
   to the values themselves. \code{channels} determines for which elements of
   \code{x} spatial plots are made.}
+  \item{maxNumArrays, nrColumns}{The parameter \code{maxNumArrays} determines the number
+  of arrays for which \code{\link{aqm.maplot}} produces a
+  plot. \code{nrColumns} determines the number of columns in the
+  multi-panel plot. In \code{\link{aqm.maplot}}, first \code{maxNumArrays} is
+  incremented to the next multiple of \code{maxNumArrays}. A value of \code{+Inf} is allowed.
+  If this value is larger than or equal to the actual number of arrays
+  in \code{x}, then plots are produced for all arrays. If it is smaller,
+  then plots are shown for the \code{maxNumArrays/2} with the worst
+  values of Hoeffding's D and for the \code{maxNumArrays/2} best.}
+  \item{...}{Will be ignored - the dots are formal arguments which
+  permit that all of these functions can be callled from
+  \code{\link{arrayQualityMetrics}} with the same, overall set of arguments.}
  }
 
 
 \value{
 An object of class \code{\link{aqmReportModule}}.}
 
-\details{ 
+\details{
 For a simple example of the \code{aqm.*} functions, have a
 look at the source code of the \code{aqm.pca} function.  Please see also
 the vignette \emph{Advanced topics: Customizing arrayQualityMetrics

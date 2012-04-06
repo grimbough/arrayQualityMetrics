@@ -1,7 +1,7 @@
-aqm.pca = function(x) {
-
+aqm.pca = function(x, ...)
+{
   pca = prcomp(t(na.omit(x$M)))
- 
+
   pcafig = xyplot(PC2 ~ PC1 , data=as.data.frame(pca$x), pch=19, cex=1, col=x$arrayColors,
     main = if(!is.null(x$key)) draw.key(key = x$key), aspect = "iso")
 
@@ -13,12 +13,12 @@ aqm.pca = function(x) {
     "the multivariate data vector of each array into a two-dimensional plot, such that the spatial arrangement of the ",
     "points in the plot reflects the overall data (dis)similarity between the arrays.",
     sep="")
-  
+
   new("aqmReportModule",
       plot    = pcafig,
       section = "Between array comparison",
       title   = "Principal Component Analysis",
-      id      = "pca", 
+      id      = "pca",
       legend  = legend,
       size    = c(w = 1, h = 1) * 4 +  0.2 * sqrt(x$numArrays) + c( w = 0, h = 1) * length(x$key$rect$col) * 0.2,
       colors  = x$arrayColors,

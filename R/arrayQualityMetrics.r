@@ -6,7 +6,8 @@ arrayQualityMetrics = function(
   intgroup = NULL,
   grouprep,
   spatial = TRUE,
-  reporttitle = paste("arrayQualityMetrics report for", deparse(substitute(expressionset))))
+  reporttitle = paste("arrayQualityMetrics report for", deparse(substitute(expressionset))),
+  ...)
 {
   ## Argument checking:
   if(!missing(grouprep))
@@ -36,29 +37,30 @@ arrayQualityMetrics = function(
   x = prepdata(expressionset, intgroup=intgroup, do.logtransform=do.logtransform)
 
   ##---------Generic modules------
-  m$heatmap   = aqm.heatmap(x)
-  m$pca       = aqm.pca    (x)
+  m$heatmap   = aqm.heatmap(x, ...)
+  m$pca       = aqm.pca    (x, ...)
 
-  m$boxplot   = aqm.boxplot(x)
-  m$density   = aqm.density(x)
-  m$meansd    = aqm.meansd (x)
-  m$probesmap = aqm.probesmap(x)
+  m$boxplot   = aqm.boxplot(x, ...)
+  m$density   = aqm.density(x, ...)
+  m$meansd    = aqm.meansd (x, ...)
+  m$probesmap = aqm.probesmap(x, ...)
 
   ##--------Affymetrix specific modules------------
   if(is(expressionset, "AffyBatch")) {
     x         = prepaffy(expressionset, x)
-    m$rle     = aqm.rle(x)
-    m$nuse    = aqm.nuse(x)
+    m$rle     = aqm.rle(x, ...)
+    m$nuse    = aqm.nuse(x, ...)
 
-    m$rnadeg  = aqm.rnadeg(expressionset, x)
-    ## m$qcstats = aqm.qcstats(expressionset) -- Not sure any one cares about this function. It can be resurrected if there is overwhelming demand.
-    m$pmmm    = aqm.pmmm(x)
+    m$rnadeg  = aqm.rnadeg(expressionset, x, ...)
+    ## m$qcstats = aqm.qcstats(expressionset) -- Not sure any one cares about this function.
+    ## It can be resurrected if there is overwhelming demand.
+    m$pmmm    = aqm.pmmm(x, ...)
   }
 
   ##---------MA plots and spatial intensity distributions------
-  m$maplot = aqm.maplot (x)
+  m$maplot = aqm.maplot (x, ...)
   if (spatial)
-    m = append(m, aqm.spatial(x))
+    m = append(m, aqm.spatial(x, ...))
 
   aqm.writereport(modules = m, arrayTable = x$pData, reporttitle = reporttitle, outdir = outdir)
 }

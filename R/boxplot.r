@@ -1,8 +1,8 @@
 ##----------------------------------------
 ## aqm.boxplot
 ##----------------------------------------
-aqm.boxplot = function(x, subsample=20000, outlierMethod = "KS") {
-  
+aqm.boxplot = function(x, subsample=20000, outlierMethod = "KS", ...)
+{
   if (nrow(x$M)>subsample) {
     ss  = sample(nrow(x$M), subsample)
     Mss = x$M[ss,,drop=FALSE]
@@ -12,9 +12,9 @@ aqm.boxplot = function(x, subsample=20000, outlierMethod = "KS") {
   }
   out = outliers(Mss, method = outlierMethod)
   out@description = c("Kolmogorov-Smirnov statistic <i>K<sub>a</sub></i>", "data-driven")
-    
+
   sample_id = rep( seq_len(x$numArrays), each = nrow(Mss) )
-  
+
   if(x$nchannels == 2)  {
     values    = with(x, c(R[ss,], G[ss,], Mss))
     sample_id = rep(sample_id, times = 3)
@@ -32,14 +32,14 @@ aqm.boxplot = function(x, subsample=20000, outlierMethod = "KS") {
     legPanels = c("", "")
   }
   xAsterisk = quantile(Mss, probs=0.01, na.rm=TRUE)
-  
+
   box = bwplot(formula, groups = sample_id, layout = lay, as.table = TRUE,
         strip = function(..., bg) strip.default(..., bg ="#cce6ff"),
         horizontal = TRUE,
-        main = if(!is.null(x$key)) draw.key(key = x$key), 
+        main = if(!is.null(x$key)) draw.key(key = x$key),
         pch = "|",  col = "black", do.out = FALSE, box.ratio = 2,
         xlab = "", ylab = "Array",
-        fill = x$arrayColors, panel = panel.superpose, 
+        fill = x$arrayColors, panel = panel.superpose,
         scales = list(x=list(relation="free"), y=list(axs="i")),
         ylim = c(x$numArrays+0.7,0.3),
         prepanel = function(x, y) {
@@ -53,11 +53,11 @@ aqm.boxplot = function(x, subsample=20000, outlierMethod = "KS") {
               ltext(xAsterisk, whArray, "*", font=2, cex=2, adj=c(0.5, 0.75))
           }
         })
-  
+
   legend = paste("The figure <!-- FIG --> shows boxplots representing summaries of the signal intensity distributions of the arrays. ",
     legPanels[1],
     "Each box corresponds to one array. Typically, one expects the boxes to have similar positions and widths. If the ",
-    "distribution of an array is very different from the others, this may indicate an experimental problem. ", 
+    "distribution of an array is very different from the others, this may indicate an experimental problem. ",
     "Outlier detection was performed ",
     legPanels[2],
     "by computing the Kolmogorov-Smirnov statistic <i>K<sub>a</sub></i> between each array's distribution ",

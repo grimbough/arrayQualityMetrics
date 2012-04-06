@@ -1,5 +1,5 @@
 ## heatmap
-aqm.heatmap = function(x)
+aqm.heatmap = function(x, ...)
 {
   colorRange = rgb(seq(0, 1, l=256),
                    seq(0, 1, l=256),
@@ -8,7 +8,7 @@ aqm.heatmap = function(x)
   m   = dist2(x$M)
   out = outliers(m, method = "sum")
   out@description = c("sum of distances to other arrays <i>S<sub>a</sub></i>", "data-driven")
-  
+
   dend = as.dendrogram(hclust(as.dist(m), method = "single"))
   ord = order.dendrogram(dend)
 
@@ -36,14 +36,14 @@ aqm.heatmap = function(x)
 
     key = rects = vector(mode="list", length=ng)
     names(rects) = rep("rect", ng)
-    
+
     for(i in seq_len(ng))
       {
         colors = brewer.pal(brewer.pal.info[palettes[i], "maxcolors"], palettes[i])
         fac  = factor(x$pData[[x$intgroup[i]]])
         fac  = maximumLevels(fac, n = length(colors)) ## make sure that factor has at most n levels
         colors = colors[seq_len(nlevels(fac))]
- 
+
         key[[i]] =  list(rect = list(col = colors),
                          text = list(levels(fac)))
         rects[[i]] = list(col = "transparent",
@@ -53,10 +53,10 @@ aqm.heatmap = function(x)
           maxNrColors = length(colors)
       }
 
-      
+
     key = unlist(key, recursive=FALSE)
     key$rep = FALSE
-    thekey = draw.key(key = key) 
+    thekey = draw.key(key = key)
 
     if (haveDend)
       {
@@ -69,7 +69,7 @@ aqm.heatmap = function(x)
             widths = unit(rep(1, length = ng), rep("lines", ng)), respect = FALSE)
         g = frameGrob(layout = lay)
         dy = 1/x$numArrays
-        y  = seq_len(x$numArrays)*dy 
+        y  = seq_len(x$numArrays)*dy
         for (i in seq_len(ng))
           {
             g = placeGrob(g,
@@ -79,10 +79,10 @@ aqm.heatmap = function(x)
         idem = function(x) x
         theLegend = list(right=list(fun=idem, args=list(x=g)))
       }
-    
-  } else {  
+
+  } else {
     thekey = NULL
-  } ## if (ng>0) 
+  } ## if (ng>0)
 
   hfig = levelplot(m[ord,ord],
     scales = list(x=list(rot=90)),
@@ -94,7 +94,7 @@ aqm.heatmap = function(x)
     main = thekey)
 
   nout = length(out@which)
-  
+
   legend = paste("The figure <!-- FIG --> shows a false color heatmap of the distances between arrays. ",
     "The color scale is chosen to cover the range of distances encountered in the dataset. ",
     "Patterns in this plot can indicate clustering of the arrays either because of intended biological or ",
@@ -108,7 +108,7 @@ aqm.heatmap = function(x)
     if(nout>0) paste(if(nout>1) paste(nout, "such arrays were detected, and they are") else
                      "One such array was detected, and it is", "marked by an asterisk, *.") else
                         "No such arrays were detected.", sep="")
-    
+
   new("aqmReportModule",
       plot      = hfig,
       section   = "Between array comparison",

@@ -15,11 +15,12 @@ arrayQualityMetrics(expressionset,
   intgroup = NULL,
   grouprep,
   spatial = TRUE,
-  reporttitle = paste("arrayQualityMetrics report for", deparse(substitute(expressionset))))
+  reporttitle = paste("arrayQualityMetrics report for", deparse(substitute(expressionset))),
+  ...)
 }
 
 \arguments{
-  \item{expressionset}{a Bioconductor microarray dataset container. This
+\item{expressionset}{a Bioconductor microarray dataset container. This
     can be an object of
     class \code{\link[Biobase:class.ExpressionSet]{ExpressionSet}},
     \code{\link[affy:AffyBatch-class]{AffyBatch}},
@@ -54,6 +55,9 @@ arrayQualityMetrics(expressionset,
   hgu133Plus2) when CPU time and RAM resources of the machine would be limiting. }
 
 \item{reporttitle}{title for the report (character of length 1).}
+
+\item{...}{further arguments that will be passed on to the different
+  \code{\link[=aqm.pca]{module functions}}.}
 }
 
 
