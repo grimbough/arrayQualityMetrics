@@ -1,10 +1,35 @@
-aqm.maplot = function(x, subsample=20000, Dthresh=0.15, maxNumArrays=8, nrColumns=4, ...)
+## This function processes the parameters 'maxNumArrays' and
+## 'nrColumns', and it is used by aqm.maplot as well as aqm.spatial
+
+processMaxNumArrays = function(numArrays, maxNumArrays, nrColumns, stat)
 {
   stopifnot(length(maxNumArrays)==1, maxNumArrays>=1,
-            length(Dthresh)==1, Dthresh>0,
-            length(subsample)==1, subsample>0)
+            length(nrColumns)==1, nrColumns>=1)
 
-  maxNumArrays = nrColumns*ceiling(maxNumArrays/nrColumns)  ## make a multiple of 4
+  ## make a multiple of nrColumns
+  maxNumArrays = nrColumns*ceiling(maxNumArrays/nrColumns)
+
+  if(numArrays <= maxNumArrays)
+  {
+      j = seq_len(numArrays)
+      lay = c(nrColumns, ceiling(numArrays/nrColumns))  # number of columns, number of rows
+      legOrder = ""
+  } else {
+      first = seq_len(maxNumArrays/2)
+      last  = numArrays + 1 - rev(first)
+      j = order(stat, decreasing=TRUE)[c(first, last)]
+      lay = c(nrColumns, ceiling(maxNumArrays/nrColumns))
+      legOrder = sprintf("Shown are first the %d arrays with the highest values of %s, then the %d arrays with the lowest values. ",
+          length(first), attr(stat, "name"), length(last))
+    }
+
+  list(j=j, lay=lay, legOrder=legOrder)
+}
+
+aqm.maplot = function(x, subsample=20000, Dthresh=0.15, maxNumArrays=8, nrColumns=4, ...)
+{
+  stopifnot(length(Dthresh)==1, Dthresh>0,
+            length(subsample)==1, subsample>0)
 
   if(x$nchannels==1)
     {
@@ -34,31 +59,21 @@ aqm.maplot = function(x, subsample=20000, Dthresh=0.15, maxNumArrays=8, nrColumn
     {
       hoeffd(sA[,j], sM[,j])$D[1,2]
     })
+  attr(stat, "name") = "<i>D<sub>a</sub></i>"
+
   out = new("outlierDetection",
     statistic = stat,
     threshold = Dthresh,
     which = which(stat > Dthresh),
-    description = c("Hoeffding's statistic <i>D<sub>a</sub></i>", "fixed"))
+    description = c(attr(stat, "name"), "fixed"))
 
-  ## Plot maximally maxNumArrays scatterplots
-  if(x$numArrays <= maxNumArrays)
-    {
-      whj = seq_len(x$numArrays)
-      lay = c(nrColumns, ceiling(x$numArrays/nrColumns))  # number of columns, number of rows
-      legOrder = ""
-    } else {
-      first = seq_len(maxNumArrays/2)
-      last  = x$numArrays + 1 - rev(first)
-      whj = order(stat, decreasing=TRUE)[c(first, last)]
-      lay = c(nrColumns, ceiling(maxNumArrays/nrColumns))
-      legOrder = sprintf("Shown are first% d arrays with the highest values of <i>D<sub>a</sub></i>, then the %d arrays with the lowest values. ", length(first), length(last))
-    }
+  selected = processMaxNumArrays(x$numArrays, maxNumArrays, nrColumns, stat)
 
   xlim = quantile(A, probs=1e-4*c(1,-1)+c(0,1), na.rm=TRUE)
   ylim = quantile(M, probs=1e-4*c(1,-1)+c(0,1), na.rm=TRUE)
-  panelNames = sprintf("array %d (D=%4.2f)", whj, stat[whj])
+  panelNames = sprintf("array %d (D=%4.2f)", selected$j, stat[selected$j])
 
-  i = seq(along=whj)
+  i = seq(along=selected$j)
   df = data.frame(
     i = factor(i, levels = i),
     px = i,
@@ -70,9 +85,9 @@ aqm.maplot = function(x, subsample=20000, Dthresh=0.15, maxNumArrays=8, nrColumn
     ylim = ylim,
     xlab = "A",
     ylab = "M",
-    panel = function(x, y, ...) panel.smoothScatter(x=A[, whj[x]], y=M[, whj[y]], raster=TRUE, nbin=250, ...),
+    panel = function(x, y, ...) panel.smoothScatter(x=A[, selected$j[x]], y=M[, selected$j[y]], raster=TRUE, nbin=250, ...),
     as.table = TRUE,
-    layout = lay,
+    layout = selected$lay,
     asp = "iso",
     strip = function(..., bg, factor.levels) strip.default(..., bg ="#cce6ff", factor.levels = panelNames))
 
@@ -94,9 +109,8 @@ aqm.maplot = function(x, subsample=20000, Dthresh=0.15, maxNumArrays=8, nrColumn
     "indicates that the arrays have different background intensities; this may be addressed by background correction. ",
     "A trend in the upper range of A can indicate saturation of the measurements; in mild cases, this may be addressed ",
     "by non-linear normalisation (e.g. quantile normalisation).<br>",
-    "Outlier detection was performed by computing Hoeffding's statistic <i>D<sub>a</sub></i> on the joint distribution ",
-    "of A and M for each array. ",
-    legOrder,
+    "Outlier detection was performed by computing Hoeffding's statistic <i>D<sub>a</sub></i> on the joint distribution of A and M for each array. ",
+    selected$legOrder,
     "The value of <i>D<sub>a</sub></i> is shown in the panel headings. ",
     outliertext,
     "For more information on Hoeffing's <i>D</i>-statistic, please see the manual page of the function ",
@@ -110,7 +124,7 @@ aqm.maplot = function(x, subsample=20000, Dthresh=0.15, maxNumArrays=8, nrColumn
       id = "ma",
       legend = legend,
       outliers = out,
-      size = c(w=10, h=6),
+      size = with(selected, c(w=2.5*lay[1], h=3*lay[2])),
       colors  = x$arrayColors)
 }
 

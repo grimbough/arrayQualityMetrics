@@ -21,6 +21,11 @@
   \code{\link{aqmReportModule}} representing the various modules of the quality
   report. Given a list of modules, the report
   is then rendered by the \code{\link{aqm.writereport}} function.
+
+  Most users will not call these functions directly, but will use the
+  function \code{\link{arrayQualityMetrics}}, which in turns calls these
+  functions. The function arguments can be provided through the
+  \code{...} argument of \code{\link{arrayQualityMetrics}}.
 }
 
 \usage{
@@ -29,7 +34,7 @@ aqm.density(x, ...)
 aqm.heatmap(x, ...)
 aqm.pca(x, ...)
 aqm.maplot(x, subsample=20000, Dthresh=0.15, maxNumArrays=8, nrColumns=4, ...)
-aqm.spatial(x, scale="rank", channels = c("M", "R", "G"), ...)
+aqm.spatial(x, scale="rank", channels = c("M", "R", "G"), maxNumArrays=8, nrColumns=4, ...)
 aqm.meansd(x, ...)
 aqm.probesmap(x, ...)
 
@@ -58,8 +63,7 @@ aqm.nuse(x, outlierMethod = "upperquartile", ...)
   to the values themselves. \code{channels} determines for which elements of
   \code{x} spatial plots are made.}
   \item{maxNumArrays, nrColumns}{The parameter \code{maxNumArrays} determines the number
-  of arrays for which \code{\link{aqm.maplot}} produces a
-  plot. \code{nrColumns} determines the number of columns in the
+  of arrays for which a plot is produced. \code{nrColumns} determines the number of columns in the
   multi-panel plot. In \code{\link{aqm.maplot}}, first \code{maxNumArrays} is
   incremented to the next multiple of \code{maxNumArrays}. A value of \code{+Inf} is allowed.
   If this value is larger than or equal to the actual number of arrays
