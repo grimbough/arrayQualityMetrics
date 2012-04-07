@@ -124,7 +124,7 @@ aqm.maplot = function(x, subsample=20000, Dthresh=0.15, maxNumArrays=8, nrColumn
       id = "ma",
       legend = legend,
       outliers = out,
-      size = with(selected, c(w=2.5*lay[1], h=3*lay[2])),
+      size = with(selected, c(w=3*lay[1], h=2.5*lay[2])),
       colors  = x$arrayColors)
 }
 
