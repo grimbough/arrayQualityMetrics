@@ -56,7 +56,7 @@ aqm.heatmap = function(x, ...)
 
     key = unlist(key, recursive=FALSE)
     key$rep = FALSE
-    thekey = draw.key(key = key)
+    thekey = safeDrawKey(key = key)
 
     if (haveDend)
       {

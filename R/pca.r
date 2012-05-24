@@ -3,7 +3,7 @@ aqm.pca = function(x, ...)
   pca = prcomp(t(na.omit(x$M)))
 
   pcafig = xyplot(PC2 ~ PC1 , data=as.data.frame(pca$x), pch=19, cex=1, col=x$arrayColors,
-    main = if(!is.null(x$key)) draw.key(key = x$key), aspect = "iso")
+    main = if(!is.null(x$key)) safeDrawKey(key = x$key), aspect = "iso")
 
   legend = paste("The figure <!-- FIG --> shows a scatterplot of the arrays along the first two principal components. ",
     "You can use this plot to explore if the arrays cluster, and whether this is according to an intended experimental factor",

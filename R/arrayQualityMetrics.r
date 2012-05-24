@@ -66,3 +66,10 @@ arrayQualityMetrics = function(
 }
 
 
+## A wrapper around lattice::draw.key that avoids problem that are
+## caused by that function's behaviour of opening a graphics device
+safeDrawKey = function(...) {
+  pdf(tempfile())
+  lattice::draw.key(...)
+  dev.off()
+}
