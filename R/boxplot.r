@@ -36,7 +36,7 @@ aqm.boxplot = function(x, subsample=20000, outlierMethod = "KS", ...)
   box = bwplot(formula, groups = sample_id, layout = lay, as.table = TRUE,
         strip = function(..., bg) strip.default(..., bg ="#cce6ff"),
         horizontal = TRUE,
-        main = if(!is.null(x$key)) safeDrawKey(key = x$key),
+        main = if(!is.null(x$key)) draw.key(key = x$key),
         pch = "|",  col = "black", do.out = FALSE, box.ratio = 2,
         xlab = "", ylab = "Array",
         fill = x$arrayColors, panel = panel.superpose,

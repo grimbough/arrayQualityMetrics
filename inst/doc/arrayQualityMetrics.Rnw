@@ -117,9 +117,7 @@ programmatic analysis of the report. This is discussed in the vignette
 <<echo=FALSE,results=hide>>=
 options(error = recover, warn = 2)
 options(bitmapType = "cairo")
-.HaveDummy = !interactive()
-  if(.HaveDummy) pdf("dummy.pdf")
-@ 
+@
 
 %
 
@@ -385,9 +383,6 @@ of the factor \texttt{RNA-integrity} for each array.
 
 \subsection*{Session Info}
 %
-<<echo=FALSE>>=
-if(.HaveDummy) dev.off()
-@ 
 
 <<pkgs, results=tex, echo=FALSE>>=
 toLatex(sessionInfo())

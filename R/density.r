@@ -58,7 +58,7 @@ aqm.density = function(x, ...)
 
   den = xyplot(formula, ddf, groups = which, layout = lay,
     type = "l", ylab = "Density", xlab="",
-    main = if(!is.null(x$key)) safeDrawKey(key = x$key),
+    main = if(!is.null(x$key)) draw.key(key = x$key),
     strip = function(..., bg) strip.default(..., bg ="#cce6ff"),
     scales = list(relation="free"),
     col = x$arrayColors, lwd = lwd, lty = lty)

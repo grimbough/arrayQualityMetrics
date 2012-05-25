@@ -36,6 +36,9 @@ arrayQualityMetrics = function(
   ##  as well as some generally useful derived statistics of the data
   x = prepdata(expressionset, intgroup=intgroup, do.logtransform=do.logtransform)
 
+  ## open a 'dummy' graphics device for those functions that need an open one
+  pdf(tempfile())
+
   ##---------Generic modules------
   m$heatmap   = aqm.heatmap(x, ...)
   m$pca       = aqm.pca    (x, ...)
@@ -63,13 +66,10 @@ arrayQualityMetrics = function(
     m = append(m, aqm.spatial(x, ...))
 
   aqm.writereport(modules = m, arrayTable = x$pData, reporttitle = reporttitle, outdir = outdir)
-}
 
-
-## A wrapper around lattice::draw.key that avoids problem that are
-## caused by that function's behaviour of opening a graphics device
-safeDrawKey = function(...) {
-  pdf(tempfile())
-  lattice::draw.key(...)
+  ## close the dummy device
   dev.off()
+
 }
+
+
