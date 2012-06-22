@@ -11,14 +11,10 @@ prepdata = function(expressionset, intgroup, do.logtransform) {
     }
   }
 
-  x = platformspecific(expressionset, do.logtransform)
+  x = platformspecific(expressionset, intgroup, do.logtransform)
 
-  if (!is.null(intgroup)) {
-    if (!is.character(intgroup))
-      stop("'intgroup' should be a 'character'.")
-    if(!all(intgroup %in% colnames(x$pData)))
-      stop("all elements of 'intgroup' should match column names of 'pData(expressionset)'.")
-  }
+  if(!all(intgroup %in% colnames(x$pData)))
+    stop("all elements of 'intgroup' should match column names of 'pData(expressionset)'.")
 
   x = append(x, list(
     numArrays       = ncol(x$M),
@@ -49,6 +45,7 @@ logtransform = function(x) {
 ##--------------------------------------------------
 setGeneric("platformspecific",
            function(expressionset,
+                    intgroup,
                     do.logtransform)
            standardGeneric("platformspecific"))
 
@@ -57,7 +54,7 @@ setGeneric("platformspecific",
 ##--------------------------------------------------
 setMethod("platformspecific",
           signature(expressionset = "NChannelSet"),
-function(expressionset, do.logtransform) {
+function(expressionset, intgroup, do.logtransform) {
 
   adNames = ls(assayData(expressionset))
   nIsOne = ("exprs" %in% adNames)
@@ -99,7 +96,7 @@ function(expressionset, do.logtransform) {
   list(R = R, G = G, Rb = Rb, Gb = Gb,
        sx = sx, sy = sy,
        M = M, A = A,
-       nchannels = 2, pData = cleanPhenoData(expressionset), fData = fData(expressionset))
+       nchannels = 2, pData = cleanPhenoData(expressionset, intgroup), fData = fData(expressionset))
 })
 
 
@@ -108,7 +105,7 @@ function(expressionset, do.logtransform) {
 ##--------------------------------------------------
 setMethod("platformspecific",
           signature(expressionset = "MAList"),
-function(expressionset, do.logtransform)
+function(expressionset, intgroup, do.logtransform)
 {
 
   if(!identical(FALSE, do.logtransform))
@@ -119,7 +116,7 @@ function(expressionset, do.logtransform)
   R = A+M/2
   G = A-M/2
 
-  pd = cleanUpPhenoData(expressionset$targets)
+  pd = cleanUpPhenoData(expressionset$targets, intgroup)
   M = applyDyeSwap(M, pd)
 
   fd = expressionset$genes
@@ -147,7 +144,7 @@ applyDyeSwap = function(M, pd) {
 ##----------------------------------------------------------
 ## Common parts of dealing with ExpressionSet and AffyBatch
 ##----------------------------------------------------------
-oneColor = function(expressionset, do.logtransform, M)
+oneColor = function(expressionset, intgroup, do.logtransform, M)
 {
   if(missing(M))
       M = exprs(expressionset)
@@ -156,7 +153,7 @@ oneColor = function(expressionset, do.logtransform, M)
       M = logtransform(M)
 
   list(M = M, A = M,
-       nchannels = 1, pData = cleanPhenoData(expressionset), fData = fData(expressionset))
+       nchannels = 1, pData = cleanPhenoData(expressionset, intgroup), fData = fData(expressionset))
 }
 
 ##----------------------------------------------------------
@@ -164,9 +161,9 @@ oneColor = function(expressionset, do.logtransform, M)
 ##----------------------------------------------------------
 setMethod("platformspecific",
           signature(expressionset = "ExpressionSet"),
-function(expressionset, do.logtransform)
+function(expressionset, intgroup, do.logtransform)
 {
-  rv = oneColor(expressionset, do.logtransform)
+  rv = oneColor(expressionset, intgroup, do.logtransform)
   rv$sx = featureData(expressionset)$X ## spatial x-coordinate
   rv$sy = featureData(expressionset)$Y ## spatial y-coordinate
   return(rv)
@@ -177,8 +174,8 @@ function(expressionset, do.logtransform)
 ##----------------------------------------------------------
 setMethod("platformspecific",
           signature(expressionset = "AffyBatch"),
-function(expressionset, do.logtransform) {
-  rv = oneColor(expressionset, do.logtransform)
+function(expressionset, intgroup, do.logtransform) {
+  rv = oneColor(expressionset, intgroup, do.logtransform)
   maxc = ncol(expressionset)
   maxr = nrow(expressionset)
   rv$sx = rep(seq_len(maxc), each = maxr) ## spatial x-coordinate
@@ -191,7 +188,7 @@ function(expressionset, do.logtransform) {
 ##----------------------------------------------------------
 setMethod("platformspecific",
           signature(expressionset = "beadLevelData"),
-function(expressionset, do.logtransform)
+function(expressionset, intgroup, do.logtransform)
 {
   stop("\n\narrayQualityMetrics does not support bead-level objects of class 'beadLevelData'. Please refer to the vignette 'Analysis of bead-level data using beadarray' of the beadarray package for the processing and quality assessment of such objects. After summarisation of the bead-level data to an object of class 'ExpressionSetIllumina', you can use arrayQualityMetrics on that.\n")
 })
@@ -201,13 +198,13 @@ function(expressionset, do.logtransform)
 ##----------------------------------------------------------
 setMethod("platformspecific",
           signature(expressionset = "ExpressionSetIllumina"),
-function(expressionset, do.logtransform)
-    oneColor(expressionset, do.logtransform))
+function(expressionset, intgroup, do.logtransform)
+    oneColor(expressionset, intgroup, do.logtransform))
 
 ##------------------------------------------------------------
 ## extract and clean up phenoData
 ##------------------------------------------------------------
-cleanPhenoData = function(x, ...) {
+cleanPhenoData = function(x, intgroup) {
 
   pd = pData(x)
 
@@ -216,10 +213,10 @@ cleanPhenoData = function(x, ...) {
     if(length(scd)==nrow(pd))
       pd = cbind(pd, ScanDate=scd)
 
-  cleanUpPhenoData(pd, ...)
+  cleanUpPhenoData(pd, intgroup)
 }
 
-cleanUpPhenoData = function(pd, maxcol = 10) {
+cleanUpPhenoData = function(pd, intgroup, maxcol = 10) {
 
   if(ncol(pd) > maxcol)
     {
@@ -227,7 +224,7 @@ cleanUpPhenoData = function(pd, maxcol = 10) {
       ## After that, if there are still more than maxcol columns left, only use the first ones.
       remove = rep(FALSE, ncol(pd))
       hadUniqueAlready = FALSE
-      for(i in seq_len(ncol(pd)))
+      for(i in which(!(colnames(pd) %in% intgroup)))
         {
           n = nlevels(factor(pd[[i]]))
           if(n==1)

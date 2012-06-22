@@ -3,7 +3,7 @@ arrayQualityMetrics = function(
   outdir = reporttitle,
   force = FALSE,
   do.logtransform = FALSE,
-  intgroup = NULL,
+  intgroup = character(0),
   grouprep,
   spatial = TRUE,
   reporttitle = paste("arrayQualityMetrics report for", deparse(substitute(expressionset))),
@@ -21,6 +21,9 @@ arrayQualityMetrics = function(
   for(v in c("force", "do.logtransform", "spatial"))
     if (!(is.logical(get(v)) && (length(get(v))==1)))
       stop(sprintf("'%s' should be a logical of length 1.", v))
+
+  if (!is.character(intgroup))
+    stop("'intgroup' should be a character.")
 
   ## output directory
   dircreation(outdir, force)
@@ -65,11 +68,11 @@ arrayQualityMetrics = function(
   if (spatial)
     m = append(m, aqm.spatial(x, ...))
 
-  aqm.writereport(modules = m, arrayTable = x$pData, reporttitle = reporttitle, outdir = outdir)
+  res = aqm.writereport(modules = m, arrayTable = x$pData, reporttitle = reporttitle, outdir = outdir)
 
   ## close the dummy device
   dev.off()
-
+  return(res)
 }
 
 

@@ -12,7 +12,7 @@ arrayQualityMetrics(expressionset,
   outdir = reporttitle,
   force = FALSE,
   do.logtransform = FALSE,
-  intgroup = NULL,
+  intgroup = character(0),
   grouprep,
   spatial = TRUE,
   reporttitle = paste("arrayQualityMetrics report for", deparse(substitute(expressionset))),
@@ -45,7 +45,7 @@ arrayQualityMetrics(expressionset,
   \code{intgroup} is also used define sample groups in
   other plots (boxplots, densities).
   \code{intgroup} should be a character vector, and its elements need to match the columns
-  names of \code{phenoData(expressionset)}. If \code{NULL} or of length 0,
+  names of \code{phenoData(expressionset)}. If its length is 0,
   then the plots are not decorated with sample covariate information.}
 
 \item{grouprep}{deprecated. Use argument \code{intgroup} instead.}
