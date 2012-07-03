@@ -72,7 +72,8 @@ arrayQualityMetrics = function(
 
   ## close the dummy device
   dev.off()
-  return(res)
+
+  invisible(res)
 }
 
 
