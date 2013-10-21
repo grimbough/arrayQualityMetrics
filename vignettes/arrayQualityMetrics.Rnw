@@ -4,22 +4,15 @@
 
 \documentclass[11pt]{article}
 
-\usepackage{times}
-\usepackage{a4wide}
-\usepackage{verbatim}
-\usepackage[pdftex,linktocpage]{hyperref}
-
-\newcommand{\Robject}[1]{\texttt{#1}}
-\newcommand{\Rpackage}[1]{\textit{#1}}
-\newcommand{\Rclass}[1]{\textit{#1}}
-\newcommand{\Rfunction}[1]{{\small\texttt{#1}}}
-
-\parindent0cm
-\SweaveOpts{keep.source=TRUE,eps=FALSE,include=FALSE,width=4,height=4.5}
+<<style, eval=TRUE, echo=FALSE, results="hide">>=
+BiocStyle::latex()
+@
 
 \begin{document}
 
 \title{Introduction: microarray quality assessment with arrayQualityMetrics}
+\renewcommand{\thetitle}{Introduction}
+
 \author{Audrey Kauffmann, Wolfgang Huber}
 \maketitle
 \tableofcontents
@@ -114,8 +107,8 @@ programmatic analysis of the report. This is discussed in the vignette
 
 \section{Basic use}
 %
-<<echo=FALSE,results=hide>>=
-options(error = recover, warn = 2)
+<<echo=FALSE,results="hide">>=
+##options(error = recover, warn = 2)
 options(bitmapType = "cairo")
 @
 
@@ -142,7 +135,7 @@ computation time, we only call the function on the first 5 arrays; in
 your own application, you can call it on the complete data object.}.
 
 %
-<<AffyBatchQM,results=hide>>=
+<<AffyBatchQM,results="hide">>=
 library("arrayQualityMetrics")
 arrayQualityMetrics(expressionset = MLL.A[, 1:5],
                     outdir = "Report_for_MLL_A",
@@ -170,13 +163,13 @@ summarisation. The resulting object \Robject{nMLL} is of class
 contains one value (expression estimate) for each gene
 for each array.
 %
-<<Normalisation, results=hide>>=
+<<Normalisation, results="hide">>=
 nMLL = rma(MLL.A)
 @
 %
 We can then call again the function \Rfunction{arrayQualityMetrics}.
 %
-<<ExpressionSet,results=hide>>=
+<<ExpressionSet,results="hide">>=
 arrayQualityMetrics(expressionset = nMLL,
                     outdir = "Report_for_nMLL",
                     force = TRUE)
@@ -225,7 +218,7 @@ As an example, we consider the dataset \Robject{CCl4} from the data package
 method available in the package \Rpackage{vsn}.
 
 %
-<<NChannelSet,results=hide>>=
+<<NChannelSet1,results="hide">>=
 library("vsn")
 library("CCl4")
 data("CCl4")
@@ -270,7 +263,7 @@ array metadata factors \Robject{condition} and
 pData(nMLL)$condition = rep(letters[1:4], times = 5)
 pData(nMLL)$batch = rep(paste(1:4), each = 5)
 @
-<<intgroup2, results=hide>>=
+<<intgroup2, results="hide">>=
 arrayQualityMetrics(expressionset = nMLL,
                     outdir = "Report_for_nMLL_with_factors",
                     force = TRUE,
@@ -371,7 +364,7 @@ pData(nCCl4)$"RNA-integrity" = fRIN
 Now we can use this to set the argument \Robject{intgroup} when
 calling the function \Rfunction{arrayQualityMetrics}.
 %
-<<NChannelSet, results=hide>>=
+<<NChannelSet2, results="hide">>=
 arrayQualityMetrics(expressionset = nCCl4,
                     outdir = "Report_for_nCCl4_with_RIN",
                     force = TRUE,
@@ -384,7 +377,7 @@ of the factor \texttt{RNA-integrity} for each array.
 \subsection*{Session Info}
 %
 
-<<pkgs, results=tex, echo=FALSE>>=
+<<pkgs, results="tex", echo=FALSE>>=
 toLatex(sessionInfo())
 @
 %

@@ -4,27 +4,20 @@
 
 \documentclass[11pt]{article}
 
-\usepackage{times}
-\usepackage{a4wide}
-\usepackage{verbatim}
-\usepackage[pdftex,linktocpage]{hyperref}
-
-\newcommand{\Robject}[1]{\texttt{#1}}
-\newcommand{\Rpackage}[1]{\textit{#1}}
-\newcommand{\Rclass}[1]{\textit{#1}}
-\newcommand{\Rfunction}[1]{{\small\texttt{#1}}}
-\parindent0cm
-
-\SweaveOpts{keep.source=TRUE,eps=FALSE,include=FALSE,width=4,height=4.5}
+<<style, eval=TRUE, echo=FALSE, results="verbatim">>=
+BiocStyle::latex()
+@
 
 \begin{document}
 
 \title{Advanced topics: Customizing arrayQualityMetrics reports and programmatic processing of the output}
+\renewcommand{\thetitle}{Advanced topics}
+
 \author{Audrey Kauffmann, Wolfgang Huber}
 \maketitle
 \tableofcontents
 
-<<echo=FALSE,results=hide>>=
+<<echo=FALSE,results="hide">>=
 options(error=recover)
 options(bitmapType = "cairo")
 .HaveDummy = !interactive()
@@ -55,7 +48,7 @@ are thematically related.
 
 For the following examples, let us load the needed packages and some data.
 
-<<loading, results=hide>>=
+<<loading, results="hide">>=
 library("arrayQualityMetrics")
 library("ALLMLL")
 data("MLL.A")
@@ -168,7 +161,7 @@ if(.HaveDummy) dev.off()
 @ 
 
 
-<<pkgs, results=tex>>=
+<<pkgs, results="tex">>=
 toLatex(sessionInfo())
 @
 
