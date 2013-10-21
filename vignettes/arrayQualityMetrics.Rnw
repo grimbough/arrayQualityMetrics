@@ -1,10 +1,11 @@
 %\VignetteIndexEntry{Introduction: microarray quality assessment with arrayQualityMetrics}
 %\VignetteDepends{arrayQualityMetrics,CCl4,ALLMLL,vsn}
 %\VignettePackage{arrayQualityMetrics}
+%\VignetteEngine{knitr::knitr}
 
 \documentclass[11pt]{article}
 
-<<style, eval=TRUE, echo=FALSE, results="hide">>=
+<<style, eval=TRUE, echo=FALSE, results="asis">>=
 BiocStyle::latex()
 @
 
@@ -107,7 +108,7 @@ programmatic analysis of the report. This is discussed in the vignette
 
 \section{Basic use}
 %
-<<echo=FALSE,results="hide">>=
+<<options,echo=FALSE,results="hide">>=
 ##options(error = recover, warn = 2)
 options(bitmapType = "cairo")
 @
