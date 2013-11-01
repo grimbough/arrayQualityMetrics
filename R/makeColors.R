@@ -29,7 +29,7 @@ intgroupColors = function(x)
 maximumLevels = function(f, n)
   {
     if(nlevels(f) > n) {
-      warning(sprintf("A factor was provided with %d levels, but only %d colors are available. Levels %d ('%s') to %d ('%s') are being collapsed.\n",
+      warning(sprintf("A factor was provided with %d levels, but the colour map used here has only %d colors. Hence, for colouring, levels %d ('%s') to %d ('%s') are being collapsed.\n",
                        nlevels(f), n, n, levels(f)[n], nlevels(f), levels(f)[nlevels(f)]))
       wipe = (as.integer(f) > n)
       f[wipe] = levels(f)[n] = "other"
