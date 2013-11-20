@@ -383,7 +383,6 @@ toLatex(sessionInfo())
 @
 %
 
-\bibliographystyle{unsrt}
 \bibliography{arrayQualityMetrics}
 
 \end{document}

@@ -82,10 +82,46 @@ annotateSvgPlot = function(infile, outfile, outdir, annotationInfo, name)
         isok["cp"] = TRUE
       }
 
-    saveXML(doc, file.path(outdir, outfile))
+    #saveXML(doc, file.path(outdir, outfile))
+    writeLines(saveXML(doc), file.path(outdir, outfile)) # get SVG with line breaks
 
-    return(list(size = diff(vb), annotateOK = all(isok)))
+    return(list(size = diff(vb), annotateOK = all(isok[c("symbol", "use", "plotobjs")]))) # clip-path related annotations are not vital
   }
+
+
+annotateSvgGrid = function(annotationInfo, name) {
+  
+  ## Check argument
+  stopifnot(is(annotationInfo, "svgParameters"))
+  
+  n = annotationInfo@numPlotObjects
+  roid = annotationInfo@getReportObjIdFromPlotObjId(seq(n))
+  isok = FALSE
+  
+  class     = paste0("aqm", roid)
+  callbacks = matrix(sprintf("plotObjRespond('%s', %d, '%s')", c("click", "show", "hide"), rep(roid, each=3), name), nrow=n, ncol=3, byrow=TRUE)
+    
+  if(annotationInfo@gridObjId == "xyplot.lines"){
+    # iterate through line groups
+    for(i in seq(n))
+      grid.garnish(paste(annotationInfo@gridObjId, "group", sep=".", i), group=FALSE, grep=TRUE,
+                   class       = class[i],
+                   onclick     = callbacks[i,1],
+                   onmouseover = callbacks[i,2],
+                   onmouseout  = callbacks[i,3])
+    isok = TRUE
+  }
+  else if(annotationInfo@gridObjId == "xyplot.points"){
+    grid.garnish(annotationInfo@gridObjId, group=FALSE, grep=TRUE,
+                 class       = class,
+                 onclick     = callbacks[,1],
+                 onmouseover = callbacks[,2],
+                 onmouseout  = callbacks[,3])
+    isok = TRUE
+  }
+  
+  return(list(annotateOK = isok))
+}
 
 
 renameNodes = function(doc, path, prefix)
@@ -116,4 +152,3 @@ annotationTable = function(x, name) {
   tab  = paste("<tr bgcolor='", bgcol, "'><td>", colnames(x), "</td><td style='font-weight:bold'></td></tr>\n", sep="", collapse="\n")
   tab  = paste("<table id='", paste("Tab", name, sep=":"), "'>", tab, "</table>", sep="")
 }
-

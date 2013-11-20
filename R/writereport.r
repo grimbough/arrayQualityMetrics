@@ -121,45 +121,57 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
     stopifnot(length(currentIndex)==1, is.numeric(currentIndex), !is.na(currentIndex))
     dpi = arrayQualityMetricsGlobalParameters$dpi
 
-    if(is.na(module@svg@numPlotObjects))
-      {
+    if(is.na(module@svg@numPlotObjects)) {
         ## no svg - use png
         nameimg = paste(name, ".png", sep = "")
-        png(filename = file.path(outdir, nameimg), height = h*dpi, width = w*dpi)
+        
+        png(filename = file.path(outdir, nameimg), height= h*dpi, width = w*dpi)
         makePlot(module)
         dev.off()
         img = hmakeTag("img", src = nameimg, border = 0,
-                       alt = nameimg, id = paste("Fig", name, sep=":"))
-
-      } else {
+                       alt = nameimg, id = paste("Fig", name, sep="ls:"))
+    } 
+    else {
         ## svg
         nameimg = paste(name, ".svg", sep = "")
-        svgtemp = paste(tempfile(), ".svg", sep = "")
-        Cairo(file = svgtemp, type = "svg", height = h, width = w, units = "in", dpi = dpi)
-        makePlot(module)
-        dev.off()
+        
+        if (is(module@plot, "trellis")) {
+          # render grid graphics using gridsvg   
+          
+          path = file.path(outdir, nameimg)
+          eval(substitute(gridsvg(name = path, width = w, height = h, res = dpi, prefix = paste("Fig", name, sep=":"), usePaths = "none")))
+          makePlot(module)
+          
+          annRes = annotateSvgGrid(annotationInfo = module@svg, name = name)
+          
+          dev.off()          
+        }
+       
+        else {
+          # annotate plain R graphics using XML  
+          svgtemp = paste0(tempfile(), ".svg", sep = "")
+        
+          Cairo(file = svgtemp, type = "svg", height = h, width = w, units = "in", dpi = dpi)
+          makePlot(module)
+          dev.off()
 
-        annRes = annotateSvgPlot(infile = svgtemp,
-                                 outfile = nameimg,
-                                 outdir = outdir,
-                                 annotationInfo = module@svg,
-                                 name = name)
-
+          annRes = annotateSvgPlot(infile = svgtemp, outfile = nameimg, outdir = outdir, annotationInfo = module@svg, name = name)
+        }
+        
         if(!annRes$annotateOK)
           svgwarn = paste("Note: the figure is static - enhancement with interactive effects failed.",
             "This is either due to a version incompatibility of the 'SVGAnnotation' R package and your",
             "version of 'Cairo' or 'libcairo', or due to plot misformating. Please consult the Bioconductor mailing list, or",
             "contact the maintainer of 'arrayQualityMetrics' with a reproducible example in order to fix this problem.")
 
-        sizes = paste(round(annRes$size))
-        img = hwrite( c( paste(readLines(file.path(outdir, nameimg)), collapse="\n"),
-                         annotationTable(arrayTable, name = name) ))
-
         ## TO DO:
+        ##  sizes = paste(round(annRes$size))
         ##  hwrite(c(aqm.hwriteImage(nameimg, width=sizes[1], height=sizes[2], id=paste("Fig", name, sep=":")),
         ##               annotationTable(arrayTable, name = name)))
-      } ## if
-
+        img = hwrite( c( paste(readLines(file.path(outdir, nameimg), warn=FALSE), collapse="\n"),
+                         annotationTable(arrayTable, name = name) ))
+      }
+    
     ## Also make a PDF file
     namepdf = paste(name, ".pdf", sep = "")
     pdf(file = file.path(outdir, namepdf), height = h, width = w)

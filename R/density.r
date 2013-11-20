@@ -38,7 +38,7 @@ aqm.density = function(x, ...)
       n = x$numArrays
 
       getReportObjIdFromPlotObjId = function(j) {
-        stopifnot(length(j)==1, !is.na(j), j>0L)
+        stopifnot(!is.na(j), j>0L)
         (j-1L) %% n + 1L
       }
 

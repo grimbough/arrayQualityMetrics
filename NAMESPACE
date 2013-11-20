@@ -33,7 +33,7 @@ importFrom(genefilter, dist2)
 
 importFrom(graphics, legend)
 
-importFrom(grDevices, boxplot.stats, colorRampPalette, dev.off, pdf, png, rgb)
+importFrom(grDevices, boxplot.stats, colorRampPalette, pdf, png, rgb)
 
 importFrom(grid, gpar, grid.layout, frameGrob, placeGrob, rectGrob, unit)
 
@@ -65,6 +65,8 @@ importFrom(SVGAnnotation, addECMAScripts, convertCSSStylesToSVG,
 importFrom(utils, read.table, sessionInfo)
 
 importFrom(XML, getNodeSet, xmlAttrs, "xmlAttrs<-", xmlChildren, xmlParse, xmlRoot, saveXML)
+
+importFrom(gridSVG, gridsvg, dev.off, grid.garnish)
 
 ##--------------------------------------------------
 ## export
