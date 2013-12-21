@@ -133,7 +133,6 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
     } else {
       ## svg
       nameimg = paste(name, ".svg", sep = "")
-      browser()
       if (is(module@plot, "trellis")) {
         ## render grid graphics using gridsvg   
         path = file.path(outdir, nameimg)
