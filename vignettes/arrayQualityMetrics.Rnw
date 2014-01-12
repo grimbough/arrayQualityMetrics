@@ -11,9 +11,8 @@ BiocStyle::latex()
 
 \begin{document}
 
-\title{Introduction: microarray quality assessment with arrayQualityMetrics}
-\renewcommand{\thetitle}{Introduction}
-
+\bioctitle[Introduction]%
+    {Introduction: microarray quality assessment with arrayQualityMetrics}
 \author{Audrey Kauffmann, Wolfgang Huber}
 \maketitle
 \tableofcontents
