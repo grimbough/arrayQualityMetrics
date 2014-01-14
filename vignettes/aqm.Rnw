@@ -1,25 +1,25 @@
 %\VignetteIndexEntry{Advanced topics: Customizing arrayQualityMetrics reports and programmatic processing of the output}
-%\VignetteDepends{arrayQualityMetrics,CCl4,vsn}
+%\VignetteDepends{CCl4,vsn}
 %\VignettePackage{arrayQualityMetrics}
 %\VignetteEngine{knitr::knitr}
 
 \documentclass[11pt]{article}
 
 <<style, eval=TRUE, echo=FALSE, results="asis">>=
+knitr::opts_chunk$set(message=FALSE, warning=FALSE, error=FALSE, tidy=FALSE) # turn off verbosity
 BiocStyle::latex()
 @
 
 \begin{document}
 
-\title{Advanced topics: Customizing arrayQualityMetrics reports and programmatic processing of the output}
-\renewcommand{\thetitle}{Advanced topics}
-
+\bioctitle[Advanced topics]%
+    {Advanced topics: Customizing arrayQualityMetrics reports and programmatic processing of the output}
 \author{Audrey Kauffmann, Wolfgang Huber}
 \maketitle
 \tableofcontents
 
-<<dummy1, echo=FALSE,results="hide">>=
-options(error=recover)
+<<dummy1, include=FALSE>>=
+##options(error=recover)
 options(bitmapType = "cairo")
 .HaveDummy = !interactive()
   if(.HaveDummy) pdf("dummy.pdf")
@@ -67,8 +67,8 @@ details. For example,
 
 <<DataPreparation>>=
 preparedData = prepdata(expressionset = MLL.A, 
-                    intgroup = c(), 
-                    do.logtransform = TRUE)
+                        intgroup = c(), 
+                        do.logtransform = TRUE)
 @ 
 
 The arguments \Robject{intgroup} and \Robject{do.logtransform} are the
@@ -157,12 +157,12 @@ Point your browser to the \texttt{index.html} file in that directory.
 %--------------------------------------------------
 \subsection*{Session Info}
 %--------------------------------------------------
-<<dummy2,echo=FALSE>>=
+<<dummy2, include=FALSE>>=
 if(.HaveDummy) dev.off()
 @ 
 
 
-<<pkgs, results="tex">>=
+<<pkgs, echo=FALSE, results="asis">>=
 toLatex(sessionInfo())
 @
 

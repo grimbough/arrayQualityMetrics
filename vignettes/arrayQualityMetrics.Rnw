@@ -1,11 +1,12 @@
 %\VignetteIndexEntry{Introduction: microarray quality assessment with arrayQualityMetrics}
-%\VignetteDepends{arrayQualityMetrics,CCl4,ALLMLL,vsn}
+%\VignetteDepends{CCl4,ALLMLL,vsn}
 %\VignettePackage{arrayQualityMetrics}
 %\VignetteEngine{knitr::knitr}
 
 \documentclass[11pt]{article}
 
 <<style, eval=TRUE, echo=FALSE, results="asis">>=
+knitr::opts_chunk$set(message=FALSE, warning=FALSE, error=FALSE, tidy=FALSE) # turn off verbosity
 BiocStyle::latex()
 @
 
@@ -107,7 +108,7 @@ programmatic analysis of the report. This is discussed in the vignette
 
 \section{Basic use}
 %
-<<options,echo=FALSE,results="hide">>=
+<<options, include=FALSE>>=
 ##options(error = recover, warn = 2)
 options(bitmapType = "cairo")
 @
@@ -124,7 +125,7 @@ the documentation of the \Rpackage{affy} package.}.  Here, we use the
 dataset \emph{MLL.A}, an object of class \Rclass{AffyBatch}
 provided in the data package \Rpackage{ALLMLL}.
 %
-<<DataLoading,results="hide",error=FALSE>>=
+<<DataLoading>>=
 library("ALLMLL")
 data("MLL.A")
 @
@@ -135,7 +136,7 @@ computation time, we only call the function on the first 5 arrays; in
 your own application, you can call it on the complete data object.}.
 
 %
-<<AffyBatchQM,results="hide",error=FALSE>>=
+<<AffyBatchQM, results="hide">>=
 library("arrayQualityMetrics")
 arrayQualityMetrics(expressionset = MLL.A[, 1:5],
                     outdir = "Report_for_MLL_A",
@@ -163,13 +164,13 @@ summarisation. The resulting object \Robject{nMLL} is of class
 contains one value (expression estimate) for each gene
 for each array.
 %
-<<Normalisation, results="hide",error=FALSE>>=
+<<Normalisation, results="hide">>=
 nMLL = rma(MLL.A)
 @
 %
 We can then call again the function \Rfunction{arrayQualityMetrics}.
 %
-<<ExpressionSet,results="hide",error=FALSE>>=
+<<ExpressionSet>>=
 arrayQualityMetrics(expressionset = nMLL,
                     outdir = "Report_for_nMLL",
                     force = TRUE)
@@ -218,7 +219,7 @@ As an example, we consider the dataset \Robject{CCl4} from the data package
 method available in the package \Rpackage{vsn}.
 
 %
-<<NChannelSet1,results="hide",error=FALSE>>=
+<<NChannelSet1, results="hide">>=
 library("vsn")
 library("CCl4")
 data("CCl4")
@@ -259,11 +260,11 @@ array metadata factors \Robject{condition} and
 \Robject{batch} (see Section~\ref{sec:rin} for a more realistic example).
 
 %
-<<intgroup1,results="hide",error=FALSE>>=
+<<intgroup1>>=
 pData(nMLL)$condition = rep(letters[1:4], times = 5)
 pData(nMLL)$batch = rep(paste(1:4), each = 5)
 @
-<<intgroup2,results="hide",error=FALSE>>=
+<<intgroup2>>=
 arrayQualityMetrics(expressionset = nMLL,
                     outdir = "Report_for_nMLL_with_factors",
                     force = TRUE,
@@ -299,7 +300,7 @@ featureData (the slot of the object containing the annotation of the
 probes). We copy this information into columns named "X"
 and "Y" respectively
 %
-<<XYcoordinates,results="hide",error=FALSE>>=
+<<XYcoordinates>>=
 featureData(nCCl4)$X = featureData(nCCl4)$Row
 featureData(nCCl4)$Y = featureData(nCCl4)$Column
 @
@@ -320,7 +321,7 @@ not. In the \emph{CCl4} example, many of the reporter names are RefSeq
 identifiers, while others are not. Thus, we let \Robject{hasTarget}
 indicate whether the name begins with "NM".
 %
-<<hasTarget,error=FALSE>>=
+<<hasTarget>>=
 featureData(nCCl4)$hasTarget = (regexpr("^NM", featureData(nCCl4)$Name) > 0)
 table(featureData(nCCl4)$hasTarget)
 @
@@ -347,7 +348,7 @@ The RNA hybridized to the arrays in the \Rpackage{CCl4} dataset was
 intentionally made to good, medium or poor quality, and this is
 recorded by a so-called RIN value (see \emph{CCl4} vignette).
 %
-<<pData,error=FALSE>>=
+<<pData>>=
 pd = pData(CCl4)
 rownames(pd) = NULL
 pd
@@ -355,7 +356,7 @@ pd
 %
 The RIN is always 9 for the reference (DMSO), the relevant value is that
 for the test sample (CCl4).
-<<RIN,error=FALSE>>=
+<<RIN>>=
 RIN = with(pd, ifelse( Cy3=="CCl4", RIN.Cy3, RIN.Cy5))
 fRIN = factor(RIN)
 levels(fRIN) = c("poor", "medium", "good")
@@ -365,7 +366,7 @@ pData(nCCl4)$"RNA-integrity" = fRIN
 Now we can use this to set the argument \Robject{intgroup} when
 calling the function \Rfunction{arrayQualityMetrics}.
 %
-<<NChannelSet2, results="hide",error=FALSE>>=
+<<NChannelSet2>>=
 arrayQualityMetrics(expressionset = nCCl4,
                     outdir = "Report_for_nCCl4_with_RIN",
                     force = TRUE,
@@ -378,12 +379,11 @@ of the factor \texttt{RNA-integrity} for each array.
 \subsection*{Session Info}
 %
 
-<<pkgs, results="tex", echo=FALSE,error=FALSE>>=
+<<pkgs, echo=FALSE, results="asis">>=
 toLatex(sessionInfo())
 @
 %
 
-\bibliographystyle{plainnat}
 \bibliography{arrayQualityMetrics}
 
 \end{document}

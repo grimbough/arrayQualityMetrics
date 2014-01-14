@@ -1,11 +1,11 @@
 Package: arrayQualityMetrics
 Title: Quality metrics on microarray data sets
-Version: 3.19.4
+Version: 3.19.5
 Author: Audrey Kauffmann, Wolfgang Huber
 Maintainer: Audrey Kauffmann <akauffmann.bioinfo@gmail.com>
 VignetteBuilder: knitr
 Depends:
-Suggests: ALLMLL, CCl4, BiocStyle
+Suggests: ALLMLL, CCl4, BiocStyle, knitr
 Imports: affy, affyPLM (>= 1.27.3), beadarray, Biobase, Cairo (>= 1.4-6), genefilter,
          graphics, grDevices, grid, gridSVG, Hmisc, hwriter, lattice, latticeExtra,
          limma, methods, RColorBrewer, setRNG, simpleaffy, stats,
