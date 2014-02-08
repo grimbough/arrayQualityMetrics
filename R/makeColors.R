@@ -7,7 +7,7 @@ intgroupColors = function(x)
 {
   
   if (length(x$intgroup)>0) {
-    colors = brewer.pal(9, "Set1")
+    colors = c(brewer.pal(9, "Set1"), brewer.pal(8, "Dark2"))
     fac  = as.factor(x$pData[[x$intgroup[1]]])
     fac  = maximumLevels(fac, n = length(colors)) ## make sure that factor has at most n levels
     colors = colors[seq_len(nlevels(fac))]
@@ -29,7 +29,7 @@ intgroupColors = function(x)
 maximumLevels = function(f, n)
   {
     if(nlevels(f) > n) {
-      warning(sprintf("A factor was provided with %d levels, but the colour map used here has only %d colors. Hence, for colouring, levels %d ('%s') to %d ('%s') are being collapsed.\n",
+      warning(sprintf("A factor was provided with %d levels, but the colour map used here has only %d colours. For the purpose of colouring, levels %d ('%s') to %d ('%s') are being collapsed. Please consider grouping together some of the levels of your factor of interest to reduce the number of levels, this might improve the legibility of the plots.\n",
                        nlevels(f), n, n, levels(f)[n], nlevels(f), levels(f)[nlevels(f)]))
       wipe = (as.integer(f) > n)
       f[wipe] = levels(f)[n] = "other"
