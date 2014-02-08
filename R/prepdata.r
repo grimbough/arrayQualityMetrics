@@ -60,13 +60,13 @@ function(expressionset, intgroup, do.logtransform) {
   nIsOne = ("exprs" %in% adNames)
   nIsTwo = all(c("R","G") %in% adNames)
   if(!xor(nIsOne, nIsTwo))
-      error("'assayData(expressionset)' must contain either 'exprs', or 'R' and 'G', but not both.")
+      stop("'assayData(expressionset)' must contain either 'exprs', or 'R' and 'G', but not both.")
 
   if(nIsOne)
       return(oneColor(expressionset, do.logtransform=do.logtransform, M=assayData(expressionset)$exprs))
 
   if(!nIsTwo)
-      error("'assayData(expressionset)' must contain either 'exprs', or 'R' and 'G'.")
+      stop("'assayData(expressionset)' must contain either 'exprs', or 'R' and 'G'.")
 
   adNotUsed = setdiff(adNames, c("R", "G", "Rb", "Gb"))
   if(length(adNotUsed)>0)

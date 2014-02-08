@@ -54,8 +54,6 @@ importFrom(RColorBrewer, brewer.pal, brewer.pal.info)
 
 importFrom(setRNG, setRNG)
 
-## importFrom(simpleaffy, plot.qc.stats)
-
 importFrom(stats, as.dendrogram, as.dist, density, fft, hclust,
            order.dendrogram, quantile)
 
