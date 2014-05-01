@@ -67,8 +67,8 @@ makeTitle = function(reporttitle, outdir, params)
 makeSection = function(p, sectionNumber, module)
 {
   hwrite("<hr>", page = p)
-  sec = paste("<a name= 'S", sectionNumber,"'>Section ", sectionNumber, ": ",
-    module@section,"</a>", sep = "")
+  sec = paste0("<a name= 'S", sectionNumber,"'>Section ", sectionNumber, ": ",
+    module@section,"</a>")
   hwrite(sec, page = p, heading=2)
 }
 
@@ -88,12 +88,12 @@ makeIndex = function(p, modules)
           if(currentSectionNumber != 1) ## end the previous section
             hwrite("</UL>", page = p)
 
-          hwrite(paste("<br><li class='tocsection'>Section ", currentSectionNumber,": ",
-                       modules[[i]]@section, "</li><UL>", sep=""), page = p,
-                 link = paste("#S", currentSectionNumber, sep=""))
+          hwrite(paste0("<br><li class='tocsection'>Section ", currentSectionNumber,": ",
+                       modules[[i]]@section, "</li><UL>"), page = p,
+                 link = paste0("#S", currentSectionNumber))
           currentSectionNumber = currentSectionNumber+1
         }
-      hwrite(paste("<li class='tocmodule'>", modules[[i]]@title, "</li>", sep=""), page = p)
+      hwrite(paste0("<li class='tocmodule'>", modules[[i]]@title, "</li>"), page = p)
       currentSectionName = modules[[i]]@section
     }
   hwrite("</UL></UL>", page = p)
@@ -123,7 +123,7 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
 
     if(is.na(module@svg@numPlotObjects)) {
       ## no svg - use png
-      nameimg = paste(name, ".png", sep = "")
+      nameimg = paste0(name, ".png")
         
       png(filename = file.path(outdir, nameimg), height= h*dpi, width = w*dpi)
       makePlot(module)
@@ -132,7 +132,7 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
                        alt = nameimg, id = paste("Fig", name, sep="ls:"))
     } else {
       ## svg
-      nameimg = paste(name, ".svg", sep = "")
+      nameimg = paste0(name, ".svg")
       if (is(module@plot, "trellis")) {
         ## render grid graphics using gridsvg   
         path = file.path(outdir, nameimg)
@@ -143,8 +143,7 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
         dev.off()          
       } else {
         ## annotate plain R graphics using XML  
-        svgtemp = paste0(tempfile(), ".svg", sep = "")
-        
+        svgtemp = paste0(tempfile(), ".svg")
         Cairo(file = svgtemp, type = "svg", height = h, width = w, units = "in", dpi = dpi)
         makePlot(module)
         dev.off()
@@ -167,7 +166,7 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
     }
     
     ## Also make a PDF file
-    namepdf = paste(name, ".pdf", sep = "")
+    namepdf = paste0(name, ".pdf")
     pdf(file = file.path(outdir, namepdf), height = h, width = w)
     makePlot(module)
     dev.off()
@@ -180,7 +179,7 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
     hwrite("<br>\n", page = p)
 
     hwrite(gsub("The figure <!-- FIG -->",
-           paste("<b>Figure ", currentIndex, "</b>", if(!is.na(namepdf)) hwrite(" (PDF file)", link = namepdf), sep=""),
+           paste0("<b>Figure ", currentIndex, "</b>", if(!is.na(namepdf)) hwrite(" (PDF file)", link = namepdf)),
                  module@legend, ignore.case = TRUE), page = p)
     hwrite("<br><br><br>\n", page = p)
 
@@ -206,8 +205,8 @@ makeEnding = function(p)
     z = sessionInfo("arrayQualityMetrics")
     version = z$otherPkgs[[1]]$Version
     rversion = sessionInfo()$R.version$version.string
-    session = paste("This report has been created with arrayQualityMetrics ",
-      version, " under ", rversion, ".", sep="")
+    session = paste0("This report has been created with arrayQualityMetrics ",
+      version, " under ", rversion, ".")
     hwrite("<hr>", page = p)
     hwrite(session, page = p, style ='font-size:9pt')
     hwrite("<hr>", page = p)
@@ -219,9 +218,9 @@ makeEnding = function(p)
 ##----------------------------------------------------------
 introductoryNote = function(p)
   {
-    txt = paste("<h3>Browser compatibility</h3>\n",
+    txt = paste0("<h3>Browser compatibility</h3>\n",
       "This report uses recent features of HTML 5. Functionality has been tested on these browsers: ",
-      "Firefox 10, Chrome 17, Safari 5.1.2\n", sep="")
+      "Firefox 10, Chrome 17, Safari 5.1.2\n")
     hwrite("<hr>\n", page = p)
     hwrite(txt, page = p)
   }
@@ -246,7 +245,7 @@ reportTable = function(p, arrayTable, tableLegend)
          table.style = "margin-left:auto;text-align:right;",
          row.style = list("font-weight:bold"))
 
-  hwrite(paste("<br>", tableLegend, "<br>", toggleEnd(), sep=""), page = p)
+  hwrite(paste0("<br>", tableLegend, "<br>", toggleEnd()), page = p)
 }
 
 ##------------------------------------------------------------------
@@ -270,7 +269,7 @@ toJSON_fromchar = function(x)
   paste("[", paste(x, collapse=", "), "]")
 
 toJSON_fromvector = function(x)
-    toJSON_fromchar(paste('"', as.character(x), '"', sep=''))
+    toJSON_fromchar(paste0('"', as.character(x), '"'))
 
 toJSON_frommatrix = function(x)
   {
@@ -308,9 +307,9 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
   wh = which(sapply(modules, function(x) length(x@outliers@statistic)>0))
 
   outlierMethodTitles = sapply(modules, slot, "title")[wh]
-  outlierMethodLinks  = paste("<a href=\"#", ids[wh], "\">", sep="")
+  outlierMethodLinks  = paste0("<a href=\"#", ids[wh], "\">")
 
-  outlierExplanations = paste(
+  outlierExplanations = paste0(
     "The columns named *1, *2, ... indicate the calls from the different outlier detection methods:<OL>",
     paste(sprintf("<LI> outlier detection by %s%s</a></LI>",
                        outlierMethodLinks, outlierMethodTitles), collapse = ""),
@@ -321,12 +320,11 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
     "To reset the selection, reload the HTML page in your browser.", "<br><br>",
     "At the scope covered by this software, outlier detection is a poorly defined question, and there is no 'right' or 'wrong' answer. ",
     "These are hints which are intended to be followed up manually. If you want to automate outlier detection, you need to limit the scope ",
-    "to a particular platform and experimental design, and then choose and calibrate the metrics used.",
-  sep="")
+    "to a particular platform and experimental design, and then choose and calibrate the metrics used.")
 
   outliers = matrix(NA, nrow = numReportObjs,
                         ncol = length(wh),
-                        dimnames = list(NULL, sprintf("%s*%d</a>", outlierMethodLinks, seq(along=wh))))
+                        dimnames = list(NULL, sprintf("%s*%d</a>", outlierMethodLinks, seq_along(wh))))
 
   for(j in seq(along = wh))
     {
@@ -359,7 +357,7 @@ aqm.writereport = function(modules, arrayTable, reporttitle, outdir)
       HIGHLIGHTINITIAL = toJSON_fromchar(ifelse(apply(outliers, 1, any), "true", "false")),
       ARRAYMETADATA    = toJSON_frommatrix(arrayTableCompact),
       SVGOBJECTNAMES   = toJSON_fromvector(names(svgdata)),
-      REPORTOBJSTYLES  = paste(".aqm", reportObjs, " { }", sep="", collapse = "\n")
+      REPORTOBJSTYLES  = paste0(".aqm", reportObjs, " { }", collapse = "\n")
     ))
 
   makeIndex(p = p, modules = modules)

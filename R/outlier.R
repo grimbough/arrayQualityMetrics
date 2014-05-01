@@ -60,7 +60,7 @@ aqm.outliers = function(m)
       xlim = c(min(values, na.rm=TRUE), max(values, th, na.rm=TRUE))
       xlim = xlim + diff(xlim)*c(-1, 1)*0.04
       #
-      y = seq(along=values)
+      y = seq_along(values)
       ylim = y[c(1, length(y))] + 0.5 * c(-1,1)
       #
       plot(x = values, y = y, pch = 16, cex = 1.4, col = colors,  xlab = "", ylab = "", yaxt = "n", xlim = xlim, ylim = ylim, bty = "n")
@@ -74,26 +74,25 @@ aqm.outliers = function(m)
      }
 
   mid = "exceeded the threshold and"
-  legend = paste("The figure <!-- FIG --> shows a bar chart of the ", m@outliers@description[1], 
+  legend = paste0("The figure <!-- FIG --> shows a bar chart of the ", m@outliers@description[1], 
     ", the outlier detection criterion from the previous figure. ",
     "The bars are shown in the original order of the arrays. ", 
     switch(m@outliers@description[2],
            "data-driven" = paste("Based on the distribution of the values across all arrays, a threshold of", signif(th, 3),
                                  "was determined"),
            "fixed" = paste("A threshold of", signif(th, 3), "was used"),
-           stop(paste("Invalid threshold determination method '", m@outliers@description[2], "'", sep=""))),
+           stop(paste0("Invalid threshold determination method '", m@outliers@description[2], "'"))),
     ", which is indicated by the vertical line. ",
     if (n==0)
       paste("None of the arrays", mid, "was considered an outlier.") else if (n==1)
       paste("One array", mid, "was considered an outlier.") else
-      paste(n, "arrays", mid, "were considered outliers."),
-    sep="")
+      paste(n, "arrays", mid, "were considered outliers."))
   
   new("aqmReportModule",
       plot    = bp,
       section = m@section,
       title   = paste("Outlier detection for", m@title),
-      id      = paste("out", m@id, sep = ""),
+      id      = paste("out", m@id),
       legend  = legend,
       size    = c(w = 4, h = 1 + length(values) * 0.1),
       colors  = m@colors,

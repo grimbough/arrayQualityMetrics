@@ -33,7 +33,7 @@ annotateSvgPlot = function(infile, outfile, outdir, annotationInfo, name)
     if( (!is(plotobjs, "try-error")) && (length(plotobjs) == annotationInfo@numPlotObjects) )
       {
          succeeded = 0
-         for(i in seq(along=plotobjs))
+         for(i in seq_along(plotobjs))
           {
             roid = annotationInfo@getReportObjIdFromPlotObjId(i)
             stopifnot(length(roid)==1, is.integer(roid))
@@ -41,7 +41,7 @@ annotateSvgPlot = function(infile, outfile, outdir, annotationInfo, name)
 
             if(!is(try({
                 xmlAttrs(plotobjs[[i]]) = c(
-                      "class"       = paste("aqm", roid, sep=""),
+                      "class"       = paste0("aqm", roid),
                       "onclick"     = callbacks[1],
                       "onmouseover" = callbacks[2],
                       "onmouseout"  = callbacks[3])
@@ -63,9 +63,9 @@ annotateSvgPlot = function(infile, outfile, outdir, annotationInfo, name)
       {
         oldvalues = sapply(use, function(x) xmlAttrs(x)["href"])
         stopifnot(all(grepl("^#", oldvalues)))
-        newvalues = sub("#", paste("#", name, "-", sep=""), oldvalues)
+        newvalues = sub("#", paste0("#", name, "-"), oldvalues)
         names(newvalues) = rep("xlink:href", length(newvalues))
-        for(i in seq(along=use))
+        for(i in seq_along(use))
           xmlAttrs(use[[i]]) = newvalues[i]
         isok["use"] = TRUE
       }
@@ -76,8 +76,8 @@ annotateSvgPlot = function(infile, outfile, outdir, annotationInfo, name)
       {
         oldvalues = sapply(cp, function(x) xmlAttrs(x)["clip-path"])
         stopifnot(all(grepl("^url\\(#", oldvalues)))
-        newvalues = sub("#", paste("#", name, "-", sep=""), oldvalues)
-        for(i in seq(along=cp))
+        newvalues = sub("#", paste0("#", name, "-"), oldvalues)
+        for(i in seq_along(cp))
           xmlAttrs(cp[[i]]) = newvalues[i]
         isok["cp"] = TRUE
       }
@@ -90,25 +90,31 @@ annotateSvgPlot = function(infile, outfile, outdir, annotationInfo, name)
 
 
 annotateSvgGrid = function(annotationInfo, name) {
-  
   ## Check argument
   stopifnot(is(annotationInfo, "svgParameters"))
   
-  n = annotationInfo@numPlotObjects
-  roid = annotationInfo@getReportObjIdFromPlotObjId(seq(n))
+  numPlotObjects = annotationInfo@numPlotObjects
+  roid = annotationInfo@getReportObjIdFromPlotObjId(seq_len(numPlotObjects))
   isok = FALSE
   
   class     = paste0("aqm", roid)
-  callbacks = matrix(sprintf("plotObjRespond('%s', %d, '%s')", c("click", "show", "hide"), rep(roid, each=3), name), nrow=n, ncol=3, byrow=TRUE)
+  callbacks = matrix(sprintf("plotObjRespond('%s', %d, '%s')", c("click", "show", "hide"), rep(roid, each=3), name), nrow=numPlotObjects, ncol=3, byrow=TRUE)
     
   if(annotationInfo@gridObjId == "xyplot.lines"){
-    # iterate through line groups
-    for(i in seq(n))
-      grid.garnish(paste(annotationInfo@gridObjId, "group", sep=".", i), group=FALSE, grep=TRUE,
-                   class       = class[i],
-                   onclick     = callbacks[i,1],
-                   onmouseover = callbacks[i,2],
-                   onmouseout  = callbacks[i,3])
+    # Iterate through line groups
+    # Note: the code below is based on the assumption that the number of report objects equals
+    # length(unique(roid)) and objects with same id are distributed among different panels
+    
+    numReportObjects = length(unique(roid))
+    numPanels = numPlotObjects %/% numReportObjects
+    panelIndices = seq.int(0L, by = numReportObjects, length.out = numPanels)
+    
+    for(i in seq_len(numReportObjects))
+      grid.garnish(paste(annotationInfo@gridObjId, "group", sep=".", i), group=FALSE, grep=TRUE, global=TRUE,
+                   class       = class[panelIndices+i],
+                   onclick     = callbacks[panelIndices+i, 1],
+                   onmouseover = callbacks[panelIndices+i, 2],
+                   onmouseout  = callbacks[panelIndices+i, 3])
     isok = TRUE
   }
   else if(annotationInfo@gridObjId == "xyplot.points"){
@@ -130,10 +136,10 @@ renameNodes = function(doc, path, prefix)
     if(length(ns)>0)
       {
         oldids = sapply(ns, function(x) xmlAttrs(x)["id"])
-        newids = paste(prefix, "-", oldids, sep="")
+        newids = paste0(prefix, "-", oldids)
         names(newids) = names(oldids)
 
-        for(i in seq(along = ns))
+        for(i in seq_along(ns))
           xmlAttrs(ns[[i]]) = newids[i]
         TRUE
       } else {
@@ -149,6 +155,6 @@ renameNodes = function(doc, path, prefix)
 ##---------------------------------------------------------------------------------------
 annotationTable = function(x, name) {
   bgcol = rep(c("#d0d0ff", "#e0e0f0"), ceiling(ncol(x)/2))[seq_len(ncol(x))]
-  tab  = paste("<tr bgcolor='", bgcol, "'><td>", colnames(x), "</td><td style='font-weight:bold'></td></tr>\n", sep="", collapse="\n")
-  tab  = paste("<table id='", paste("Tab", name, sep=":"), "'>", tab, "</table>", sep="")
+  tab  = paste0("<tr bgcolor='", bgcol, "'><td>", colnames(x), "</td><td style='font-weight:bold'></td></tr>\n", collapse="\n")
+  tab  = paste0("<table id='", paste("Tab", name, sep=":"), "'>", tab, "</table>")
 }

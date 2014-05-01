@@ -73,7 +73,7 @@ aqm.maplot = function(x, subsample=20000, Dthresh=0.15, maxNumArrays=8, nrColumn
   ylim = quantile(M, probs=1e-4*c(1,-1)+c(0,1), na.rm=TRUE)
   panelNames = sprintf("array %d (D=%4.2f)", selected$j, stat[selected$j])
 
-  i = seq(along=selected$j)
+  i = seq_along(selected$j)
   df = data.frame(
     i = factor(i, levels = i),
     px = i,
@@ -101,7 +101,7 @@ aqm.maplot = function(x, subsample=20000, Dthresh=0.15, maxNumArrays=8, nrColumn
     "M = log<sub>2</sub>(I<sub>1</sub>) - log<sub>2</sub>(I<sub>2</sub>)<br>",
     "A = 1/2 (log<sub>2</sub>(I<sub>1</sub>)+log<sub>2</sub>(I<sub>2</sub>)),<br>",
     if(x$nchannels == 1)
-      paste("where I<sub>1</sub> is the intensity of the array studied,",
+      paste0("where I<sub>1</sub> is the intensity of the array studied,",
             "and I<sub>2</sub> is the intensity of a \"pseudo\"-array that consists of the median across arrays.") else
       "where I<sub>1</sub> and I<sub>2</sub> are the intensities of the two channels.",
     " Typically, we expect the mass of the distribution in an MA plot to be concentrated along the M = 0 axis, ",
@@ -114,8 +114,7 @@ aqm.maplot = function(x, subsample=20000, Dthresh=0.15, maxNumArrays=8, nrColumn
     "The value of <i>D<sub>a</sub></i> is shown in the panel headings. ",
     outliertext,
     "For more information on Hoeffing's <i>D</i>-statistic, please see the manual page of the function ",
-    "<tt>hoeffd</tt> in the <tt>Hmisc</tt> package.",
-    sep="")
+    "<tt>hoeffd</tt> in the <tt>Hmisc</tt> package.")
 
   new("aqmReportModule",
       plot = ma,

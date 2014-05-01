@@ -13,7 +13,7 @@ dens = function(x)
 
 namedEmptyList = function(n) {
   x = vector(mode="list", length = n)
-  names(x) = sprintf("aqm_%d", seq(along=x))
+  names(x) = sprintf("aqm_%d", seq_along(x))
   return(x)
 }
 

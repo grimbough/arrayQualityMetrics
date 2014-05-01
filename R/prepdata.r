@@ -1,6 +1,6 @@
 prepdata = function(expressionset, intgroup, do.logtransform) {
   conversions = c(`RGList` = "NChannelSet")
-  for(i in seq(along=conversions)) {
+  for(i in seq_along(conversions)) {
     if (is(expressionset, names(conversions)[i])) {
       expressionset = try(as(expressionset, conversions[i]))
       if(is(expressionset, "try-error")) {

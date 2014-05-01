@@ -47,22 +47,21 @@ aqm.boxplot = function(x, subsample=20000, outlierMethod = "KS", ...)
         },
         panel.groups = function(x, y, ...) {
           panel.bwplot(x, y, ...)
-          if(lattice:::packet.number()==lay[1]) {
+          if(packet.number()==lay[1]) {
             whArray = list(...)$group.value
             if (whArray %in% out@which)
               ltext(xAsterisk, whArray, "*", font=2, cex=2, adj=c(0.5, 0.75))
           }
         })
 
-  legend = paste("The figure <!-- FIG --> shows boxplots representing summaries of the signal intensity distributions of the arrays. ",
+  legend = paste0("The figure <!-- FIG --> shows boxplots representing summaries of the signal intensity distributions of the arrays. ",
     legPanels[1],
     "Each box corresponds to one array. Typically, one expects the boxes to have similar positions and widths. If the ",
     "distribution of an array is very different from the others, this may indicate an experimental problem. ",
     "Outlier detection was performed ",
     legPanels[2],
     "by computing the Kolmogorov-Smirnov statistic <i>K<sub>a</sub></i> between each array's distribution ",
-    "and the distribution of the pooled data.",
-    sep="")
+    "and the distribution of the pooled data.")
 
   new("aqmReportModule",
       plot = box,

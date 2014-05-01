@@ -12,8 +12,8 @@ aqm.heatmap = function(x, ...)
   dend = as.dendrogram(hclust(as.dist(m), method = "single"))
   ord = order.dendrogram(dend)
 
-  colnames(m) = rownames(m) = paste(ifelse(seq_len(x$numArrays) %in% out@which, "* ", ""),
-                                    seq_len(x$numArrays), sep="")
+  colnames(m) = rownames(m) = paste0(ifelse(seq_len(x$numArrays) %in% out@which, "* ", ""),
+                                    seq_len(x$numArrays))
 
   ## Shall we draw a dendrogram?
   haveDend = (ncol(m) <= arrayQualityMetricsGlobalParameters$maxNumberOfArraysForDrawingDendrogram)
@@ -95,7 +95,7 @@ aqm.heatmap = function(x, ...)
 
   nout = length(out@which)
 
-  legend = paste("The figure <!-- FIG --> shows a false color heatmap of the distances between arrays. ",
+  legend = paste0("The figure <!-- FIG --> shows a false color heatmap of the distances between arrays. ",
     "The color scale is chosen to cover the range of distances encountered in the dataset. ",
     "Patterns in this plot can indicate clustering of the arrays either because of intended biological or ",
     "unintended experimental factors (batch effects). ",
@@ -107,7 +107,7 @@ aqm.heatmap = function(x, ...)
     "<i>S<sub>a</sub></i> = &Sigma;<sub><i>b</i></sub> <i>d<sub>ab</sub></i> was exceptionally large. ",
     if(nout>0) paste(if(nout>1) paste(nout, "such arrays were detected, and they are") else
                      "One such array was detected, and it is", "marked by an asterisk, *.") else
-                        "No such arrays were detected.", sep="")
+                        "No such arrays were detected.")
 
   new("aqmReportModule",
       plot      = hfig,
