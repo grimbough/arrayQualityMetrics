@@ -127,27 +127,25 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
         
       png(filename = file.path(outdir, nameimg), height= h*dpi, width = w*dpi)
       makePlot(module)
-      dev.off()
+      grDevices::dev.off()
       img = hmakeTag("img", src = nameimg, border = 0,
                        alt = nameimg, id = paste("Fig", name, sep="ls:"))
     } else {
       ## svg
       nameimg = paste0(name, ".svg")
       if (is(module@plot, "trellis")) {
-        ## render grid graphics using gridsvg   
-        path = file.path(outdir, nameimg)
-        eval(substitute(gridsvg(name = path, width = w, height = h, res = dpi, prefix = paste("Fig", name, sep=":"), usePaths = "none")))
+        ## render grid graphics using gridsvg; the below eval/substitute looks clunky but indeed seems to be needed to avoid problems with
+        ## the argument evaluation acrobatics happening in 'gridsvg', and with lazy evaluation   
+        eval(substitute(gridsvg(name = file.path(outdir, nameimg), width = w, height = h, res = dpi, prefix = paste("Fig", name, sep=":"), usePaths = "none")))
         makePlot(module)
-        annRes = annotateSvgGrid(annotationInfo = module@svg, name = name)
-          
-        dev.off()          
+        annRes = annotateSvgGrid(annotationInfo = module@svg, name = name) ## this eventually calls 'grid.garnish'
+        gridSVG::dev.off()          
       } else {
         ## annotate plain R graphics using XML  
         svgtemp = paste0(tempfile(), ".svg")
         Cairo(file = svgtemp, type = "svg", height = h, width = w, units = "in", dpi = dpi)
         makePlot(module)
-        dev.off()
-        
+        grDevices::dev.off() ## close file, then process it with 'annotateSvgPlot'
         annRes = annotateSvgPlot(infile = svgtemp, outfile = nameimg, outdir = outdir, annotationInfo = module@svg, name = name)
       }
         
@@ -169,9 +167,9 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
     namepdf = paste0(name, ".pdf")
     pdf(file = file.path(outdir, namepdf), height = h, width = w)
     makePlot(module)
-    dev.off()
+    grDevices::dev.off()
 
-    # write the HTML
+    ## Write the HTML
     hwrite("\n\n", page = p)
     hwrite(toggleStart(name, display=module@defaultdisplay, text = sprintf("Figure %d: %s.", currentIndex, module@title)), page = p)
 
@@ -188,7 +186,7 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
 
     hwrite(toggleEnd(), page = p)
 
-    ## recursion, for the barplot with the outliers
+    ## Recursion, for the barplot with the outliers
     if(!identical(NA_character_, module@outliers@description)) {
       currentIndex = currentIndex + 1
       reportModule(p, aqm.outliers(module), currentIndex, arrayTable, outdir)

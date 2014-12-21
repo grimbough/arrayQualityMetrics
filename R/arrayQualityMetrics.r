@@ -71,7 +71,7 @@ arrayQualityMetrics = function(
   res = aqm.writereport(modules = m, arrayTable = x$pData, reporttitle = reporttitle, outdir = outdir)
 
   ## close the dummy device
-  dev.off()
+  grDevices::dev.off()
 
   invisible(res)
 }
