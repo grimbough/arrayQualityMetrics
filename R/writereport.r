@@ -134,9 +134,11 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
       ## svg
       nameimg = paste0(name, ".svg")
       if (is(module@plot, "trellis")) {
-        ## render grid graphics using gridsvg; the below eval/substitute looks clunky but indeed seems to be needed to avoid problems with
-        ## the argument evaluation acrobatics happening in 'gridsvg', and with lazy evaluation   
-        eval(substitute(gridsvg(name = file.path(outdir, nameimg), width = w, height = h, res = dpi, prefix = paste("Fig", name, sep=":"), usePaths = "none")))
+        ## Render grid graphics using gridsvg; the below eval/substitute looks clunky but seems needed to avoid problems with
+        ## the argument evaluation acrobatics happening in 'gridsvg', and with lazy evaluation
+        theName = file.path(outdir, nameimg)
+        thePrefix = paste("Fig", name, sep=":")
+        eval(substitute(gridsvg(name = theName, width = w, height = h, res = dpi, prefix = thePrefix, usePaths = "none")))
         makePlot(module)
         annRes = annotateSvgGrid(annotationInfo = module@svg, name = name) ## this eventually calls 'grid.garnish'
         gridSVG::dev.off()          
@@ -152,8 +154,8 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
       if(!annRes$annotateOK)
           svgwarn = paste("Note: the figure is static - enhancement with interactive effects failed.",
             "This is either due to a version incompatibility of the 'SVGAnnotation' R package and your",
-            "version of 'Cairo' or 'libcairo', or due to plot misformating. Please consult the Bioconductor mailing list, or",
-            "contact the maintainer of 'arrayQualityMetrics' with a reproducible example in order to fix this problem.")
+            "version of 'Cairo' or 'libcairo', or due to plot misformating. Please consult the Bioconductor forum, or",
+            "contact the maintainer of 'arrayQualityMetrics' with a reproducible example to help fix this problem.")
 
       ## TO DO:
       ##  sizes = paste(round(annRes$size))
