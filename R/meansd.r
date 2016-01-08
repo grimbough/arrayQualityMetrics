@@ -2,7 +2,6 @@ aqm.meansd = function(x, ...)
 {
   msdplo = function() {
     meanSdPlot(x$M,
-               cex.axis = 0.9,
                ylab = "Standard deviation of the intensities",
                xlab="Rank(mean of intensities)")
   }
