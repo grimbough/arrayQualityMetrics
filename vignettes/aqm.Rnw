@@ -7,7 +7,7 @@
 
 <<style, eval=TRUE, echo=FALSE, results="asis">>=
 knitr::opts_chunk$set(message=FALSE, warning=FALSE, error=FALSE, tidy=FALSE) # turn off verbosity
-BiocStyle::latex()
+BiocStyle:::latex2()
 @
 
 \begin{document}
