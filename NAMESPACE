@@ -31,7 +31,7 @@ importFrom(Cairo, Cairo)
 
 importFrom(genefilter, dist2)
 
-importFrom(graphics, legend)
+importFrom(graphics, abline, legend, lines, par, segments, text)
 
 importFrom(grDevices, boxplot.stats, colorRampPalette, pdf, png, rgb)
 
@@ -48,14 +48,14 @@ importFrom(lattice, barchart, bwplot, densityplot, draw.key,
 
 importFrom(latticeExtra, dendrogramGrob)
 
-importFrom(methods, as, is)
+importFrom(methods, as, is, new, slot, validObject)
 
 importFrom(RColorBrewer, brewer.pal, brewer.pal.info)
 
 importFrom(setRNG, setRNG)
 
-importFrom(stats, as.dendrogram, as.dist, density, fft, hclust,
-           order.dendrogram, quantile)
+importFrom(stats, as.dendrogram, as.dist, density, ecdf, fft, hclust, ks.test,
+           na.omit, order.dendrogram, prcomp, quantile)
 
 importFrom(SVGAnnotation, addECMAScripts, convertCSSStylesToSVG, 
            getMatplotSeries, getPlotPoints, getViewBox)

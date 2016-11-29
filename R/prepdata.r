@@ -116,7 +116,7 @@ function(expressionset, intgroup, do.logtransform)
   R = A+M/2
   G = A-M/2
 
-  pd = cleanUpPhenoData(expressionset$targets, intgroup)
+  pd = cleanPhenoData(expressionset$targets, intgroup)
   M = applyDyeSwap(M, pd)
 
   fd = expressionset$genes
