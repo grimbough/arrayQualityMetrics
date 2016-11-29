@@ -204,59 +204,47 @@ function(expressionset, intgroup, do.logtransform)
 ##------------------------------------------------------------
 ## extract and clean up phenoData
 ##------------------------------------------------------------
-cleanPhenoData = function(x, intgroup) {
+cleanPhenoData = function(x, intgroup, maxcol = 10) {
 
   pd = pData(x)
-
+  protect = which(colnames(pd) %in% intgroup)
+    
   scd = protocolData(x)[["ScanDate"]]
-  if(!is.null(scd))
-    if(length(scd)==nrow(pd))
-      pd = cbind(pd, ScanDate=scd)
+  if ( (!is.null(scd)) && (length(scd) == nrow(pd)) ) {
+    pd = cbind(pd, ScanDate = scd)
+    protect = c(protect, ncol(pd))  
+  }
 
-  cleanUpPhenoData(pd, intgroup)
-}
+  ## Remove columns whose contents are all the same, or all different (except for the first time).
+  ## After that, if there are still more than maxcol columns left, only use the first ones.
+  remove = rep(FALSE, ncol(pd))
+  hadUniqueAlready = FALSE
+  numColsKept = 0
+  for (i in seq_len(ncol(pd))) {
+    n = length(unique(pd[[i]]))
+    if (n == 1) {
+      remove[i] = TRUE
+    } else if (n == nrow(pd)) {
+      if (hadUniqueAlready)
+        remove[i] = TRUE else hadUniqueAlready = TRUE
+    } ## ifelse
+    if (numColsKept >= maxcol) 
+      remove[i] = TRUE
+    if (i %in% protect)
+      remove[i] = FALSE
+    if (!remove[i])
+      numColsKept = numColsKept + 1
+  } ## for i
+  
+  pd = pd[, !remove, drop = FALSE]
 
-cleanUpPhenoData = function(pd, intgroup, maxcol = 10) {
-
-  if(ncol(pd) > maxcol)
-    {
-      ## Remove columns whose contents are all the same, or all different (except for the first time).
-      ## After that, if there are still more than maxcol columns left, only use the first ones.
-      remove = rep(FALSE, ncol(pd))
-      hadUniqueAlready = FALSE
-      for(i in which(!(colnames(pd) %in% intgroup)))
-        {
-          n = nlevels(factor(pd[[i]]))
-          if(n==1)
-            {
-              remove[i] = TRUE
-            } else {
-              if(n==nrow(pd))
-                {
-                  if(hadUniqueAlready)
-                    remove[i] = TRUE else hadUniqueAlready = TRUE
-                }
-            }
-        } ## for i
-
-      wh = which(!remove)
-      stopifnot(length(wh)>0)
-      if(length(wh) > maxcol)
-        wh = wh[seq_len(maxcol)]
-
-      pd = pd[, wh, drop=FALSE]
-    } ## if ncol(x)
-
-  ## Convert everything which is not a factor into a character string, and remove "@"
+  ## Convert everything that is not a factor into a character string, and remove "@"
   for(i in seq_len(ncol(pd)))
-    {
-      if(is.factor(pd[[i]]))
-        {
-          levels(pd[[i]]) = gsub("@", " ", levels(pd[[i]]), fixed=TRUE)
-        } else {
-          pd[[i]] = gsub("@", " ", as.character(pd[[i]]), fixed=TRUE)
-        }
+    if(is.factor(pd[[i]])) {
+      levels(pd[[i]]) = gsub("@", " ", levels(pd[[i]]), fixed=TRUE)
+    } else {
+       pd[[i]] = gsub("@", " ", as.character(pd[[i]]), fixed=TRUE)
     }
 
-  return(pd)
+  pd
 }
