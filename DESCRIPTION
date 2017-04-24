@@ -1,6 +1,6 @@
 Package: arrayQualityMetrics
 Title: Quality metrics report for microarray data sets
-Version: 3.31.2
+Version: 3.32.0
 Author: Audrey Kauffmann, Wolfgang Huber
 Maintainer: Audrey Kauffmann <akauffmann.bioinfo@gmail.com>
 VignetteBuilder: knitr
