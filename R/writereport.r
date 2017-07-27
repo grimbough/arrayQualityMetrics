@@ -140,22 +140,23 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
         thePrefix = paste("Fig", name, sep=":")
         eval(substitute(gridsvg(name = theName, width = w, height = h, res = dpi, prefix = thePrefix, usePaths = "none")))
         makePlot(module)
-        annRes = annotateSvgGrid(annotationInfo = module@svg, name = name) ## this eventually calls 'grid.garnish'
+        #annRes = annotateSvgGrid(annotationInfo = module@svg, name = name) ## this eventually calls 'grid.garnish'
         gridSVG::dev.off()          
       } else {
         ## annotate plain R graphics using XML  
-        svgtemp = paste0(tempfile(), ".svg")
-        Cairo(file = svgtemp, type = "svg", height = h, width = w, units = "in", dpi = dpi)
+        #svgtemp = paste0(tempfile(), ".svg")
+        svgout = file.path(outdir, nameimg)
+        Cairo(file = svgout, type = "svg", height = h, width = w, units = "in", dpi = dpi)
         makePlot(module)
         grDevices::dev.off() ## close file, then process it with 'annotateSvgPlot'
-        annRes = annotateSvgPlot(infile = svgtemp, outfile = nameimg, outdir = outdir, annotationInfo = module@svg, name = name)
+    #    annRes = annotateSvgPlot(infile = svgtemp, outfile = nameimg, outdir = outdir, annotationInfo = module@svg, name = name)
       }
         
-      if(!annRes$annotateOK)
-          svgwarn = paste("Note: the figure is static - enhancement with interactive effects failed.",
-            "This is either due to a version incompatibility of the 'SVGAnnotation' R package and your",
-            "version of 'Cairo' or 'libcairo', or due to plot misformating. Please consult the Bioconductor forum, or",
-            "contact the maintainer of 'arrayQualityMetrics' with a reproducible example to help fix this problem.")
+      # if(!annRes$annotateOK)
+      #     svgwarn = paste("Note: the figure is static - enhancement with interactive effects failed.",
+      #       "This is either due to a version incompatibility of the 'SVGAnnotation' R package and your",
+      #       "version of 'Cairo' or 'libcairo', or due to plot misformating. Please consult the Bioconductor forum, or",
+      #       "contact the maintainer of 'arrayQualityMetrics' with a reproducible example to help fix this problem.")
 
       ## TO DO:
       ##  sizes = paste(round(annRes$size))

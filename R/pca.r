@@ -23,7 +23,7 @@ aqm.pca = function(x, ...)
       colors  = x$arrayColors,
       svg     = new("svgParameters",
            numPlotObjects = x$numArrays,
-           getPlotObjNodes = getPlotPoints,
+           #getPlotObjNodes = getPlotPoints,
            gridObjId = "xyplot.points"))
 }
 

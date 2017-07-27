@@ -8,13 +8,13 @@ setClass("svgParameters",
   representation(
     ## An R function that finds the nodes in the SVG document corresponding to the plot objects.
     ## It should hold that length(getPlotObjNodes(doc)) == numPlotObjects            
-    getPlotObjNodes = "function",
+    #getPlotObjNodes = "function",
     gridObjId = "character",
     numPlotObjects  = "integer",
     getReportObjIdFromPlotObjId = "function"),   
          
   prototype(
-    getPlotObjNodes = getMatplotSeries,
+    #getPlotObjNodes = getMatplotSeries,
     gridObjId = "xyplot.lines",
     numPlotObjects  = NA_integer_,             
     getReportObjIdFromPlotObjId = function(x) x),

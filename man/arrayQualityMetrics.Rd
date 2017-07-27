@@ -15,7 +15,8 @@ arrayQualityMetrics(expressionset,
   intgroup = character(0),
   grouprep,
   spatial = TRUE,
-  reporttitle = paste("arrayQualityMetrics report for", deparse(substitute(expressionset))),
+  reporttitle = paste("arrayQualityMetrics report for", 
+                      deparse(substitute(expressionset))),
   ...)
 }
 

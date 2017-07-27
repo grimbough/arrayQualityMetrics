@@ -1,6 +1,16 @@
 \name{NEWS}
 \title{News for Package 'arrayQualityMetrics'}
 
+\section{Changes in version 3.33.2}{
+  \subsection{USER VISIBLE CHANGES}{
+    \itemize{
+      \item Removed reliance on \code{SVGAnnotation} as the BioCextra 
+      respository is being withdrawn.  Currently SVG plots are now not 
+      interactive.
+    }
+  }
+}
+
 \section{Changes in version 3.13.2}{
   \subsection{USER VISIBLE CHANGES}{
     \itemize{

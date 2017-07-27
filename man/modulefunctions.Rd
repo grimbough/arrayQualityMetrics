@@ -34,7 +34,8 @@ aqm.density(x, ...)
 aqm.heatmap(x, ...)
 aqm.pca(x, ...)
 aqm.maplot(x, subsample=20000, Dthresh=0.15, maxNumArrays=8, nrColumns=4, ...)
-aqm.spatial(x, scale="rank", channels = c("M", "R", "G"), maxNumArrays=8, nrColumns=4, ...)
+aqm.spatial(x, scale="rank", channels = c("M", "R", "G"), 
+            maxNumArrays=8, nrColumns=4, ...)
 aqm.meansd(x, ...)
 aqm.probesmap(x, ...)
 
