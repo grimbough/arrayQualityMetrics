@@ -63,7 +63,10 @@ function(expressionset, intgroup, do.logtransform) {
       stop("'assayData(expressionset)' must contain either 'exprs', or 'R' and 'G', but not both.")
 
   if(nIsOne)
-      return(oneColor(expressionset, do.logtransform=do.logtransform, M=assayData(expressionset)$exprs))
+      return(oneColor(expressionset, 
+                      intgroup = intgroup,
+                      do.logtransform=do.logtransform, 
+                      M=assayData(expressionset)$exprs))
 
   if(!nIsTwo)
       stop("'assayData(expressionset)' must contain either 'exprs', or 'R' and 'G'.")
