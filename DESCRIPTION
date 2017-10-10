@@ -1,6 +1,6 @@
 Package: arrayQualityMetrics
 Title: Quality metrics report for microarray data sets
-Version: 3.33.4
+Version: 3.33.5
 Author: Audrey Kauffmann, Wolfgang Huber
 Maintainer: Mike Smith <mike.smith@embl.de>
 VignetteBuilder: knitr
@@ -9,7 +9,7 @@ Suggests: ALLMLL, CCl4, BiocStyle, knitr
 Imports: affy, affyPLM (>= 1.27.3), beadarray, Biobase, Cairo (>= 1.4-6), genefilter,
          graphics, grDevices, grid, gridSVG (>= 1.4-3), Hmisc, hwriter, lattice, latticeExtra,
          limma, methods, RColorBrewer, setRNG, stats,
-         SVGAnnotation (>= 0.9-0), utils, vsn (>= 3.23.3), XML
+         utils, vsn (>= 3.23.3), XML
 Description: This package generates microarray quality metrics reports for
   data in Bioconductor microarray data containers (ExpressionSet, NChannelSet,
   AffyBatch). One and two color array platforms are supported.
