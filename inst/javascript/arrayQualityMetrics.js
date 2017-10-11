@@ -78,18 +78,10 @@ function setReportObj(reportObjId, status, doTable)
 	}
     } else {
     /* This works in Firefox 4 */
-	var success = false;
-	i = 0; 
-	/* Some of this looping could already be cached in reportInit() */
-	while( (!success) & (i < ssrules.length) ) {
-	    selector = ssrules[i].selectorText;  // The selector 
-            if (!selector) 
-		continue; // Skip @import and other nonstyle rules
-            if (selector == (".aqm" + reportObjId)) {
-		success = true; 
+    for(i=0; i<ssrules.length; i++) {
+        if (ssrules[i].selectorText == (".aqm" + reportObjId)) {
 		ssrules[i].style.cssText = cssText[0+status];
-	    } else {
-		i++;
+		break;
 	    }
 	}
     }
