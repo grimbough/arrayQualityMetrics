@@ -13,3 +13,4 @@ This R package generates microarray quality metrics reports for data in Biocondu
 ---
 
 
+<img source="https://tess.elixir-europe.org/system/content_providers/images/000/000/063/original/deNBI_Logo_rgb.jpg" width=200px>
