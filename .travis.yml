@@ -3,7 +3,7 @@ sudo: false
 cache: packages
 
 before_install:
-  - tlmgr install bera
+  - tlmgr install bera nowidow parnotes marginfix
 
 r:
   - devel
