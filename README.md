@@ -4,9 +4,9 @@ This R package generates microarray quality metrics reports for data in Biocondu
 
 ## Current Status
 
-| BioC |
-| ------------- |
-| [![BioC Status](https://bioconductor.org/shields/build/devel/bioc/arrayQualityMetrics.svg)](http://bioconductor.org/checkResults/devel/bioc-LATEST/arrayQualityMetrics/) |
+| Travis | BioC |
+| ----------- | ------------- |
+| [![Build Status](https://travis-ci.org/grimbough/arrayQualityMetrics.svg?branch=master)](https://travis-ci.org/grimbough/arrayQualityMetrics) | [![BioC Status](https://bioconductor.org/shields/build/devel/bioc/arrayQualityMetrics.svg)](http://bioconductor.org/checkResults/devel/bioc-LATEST/arrayQualityMetrics/) |
 
 ## Funding 
 
