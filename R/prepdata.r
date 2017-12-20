@@ -207,7 +207,7 @@ function(expressionset, intgroup, do.logtransform)
 ##------------------------------------------------------------
 ## extract and clean up phenoData
 ##------------------------------------------------------------
-cleanPhenoData = function(x, intgroup, maxcol = 10) {
+cleanPhenoData = function(x, intgroup, maxcol = 50) {
 
   pd = pData(x)
   protect = which(colnames(pd) %in% intgroup)
