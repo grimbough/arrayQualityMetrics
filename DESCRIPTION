@@ -1,6 +1,6 @@
 Package: arrayQualityMetrics
 Title: Quality metrics report for microarray data sets
-Version: 3.36.0
+Version: 3.37.0
 Author: Audrey Kauffmann, Wolfgang Huber
 Maintainer: Mike Smith <mike.smith@embl.de>
 BugReports: https://github.com/grimbough/arrayQualityMetrics/issues
