@@ -209,10 +209,15 @@ function(expressionset, intgroup, do.logtransform)
 ##------------------------------------------------------------
 cleanPhenoData = function(x, intgroup, maxcol = 50) {
 
-  pd = pData(x)
+  if(class(x) == "data.frame") {
+    pd = x
+    scd = NULL
+  } else {
+    pd = pData(x)
+    scd = protocolData(x)[["ScanDate"]]
+  }
   protect = which(colnames(pd) %in% intgroup)
     
-  scd = protocolData(x)[["ScanDate"]]
   if ( (!is.null(scd)) && (length(scd) == nrow(pd)) ) {
     pd = cbind(pd, ScanDate = scd)
     protect = c(protect, ncol(pd))  
