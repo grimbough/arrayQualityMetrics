@@ -146,7 +146,8 @@ reportModule = function(p, module, currentIndex, arrayTable, outdir)
         ## annotate plain R graphics using XML  
         #svgtemp = paste0(tempfile(), ".svg")
         svgout = file.path(outdir, nameimg)
-        Cairo(file = svgout, type = "svg", height = h, width = w, units = "in", dpi = dpi)
+        #Cairo(file = svgout, type = "svg", height = h, width = w, units = "in", dpi = dpi)
+        svglite(file = svgout, height = h, width = w)
         makePlot(module)
         grDevices::dev.off() ## close file, then process it with 'annotateSvgPlot'
     #    annRes = annotateSvgPlot(infile = svgtemp, outfile = nameimg, outdir = outdir, annotationInfo = module@svg, name = name)

@@ -27,7 +27,8 @@ importFrom(affyPLM, fitPLM, RLE, NUSE)
 
 importFrom(Biobase, copySubstitute)
 
-importFrom(Cairo, Cairo)
+#importFrom(Cairo, Cairo)
+importFrom(svglite, svglite)
 
 importFrom(genefilter, dist2)
 

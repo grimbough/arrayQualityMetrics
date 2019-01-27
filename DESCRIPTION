@@ -7,10 +7,10 @@ BugReports: https://github.com/grimbough/arrayQualityMetrics/issues
 VignetteBuilder: knitr
 Depends:
 Suggests: ALLMLL, CCl4, BiocStyle, knitr
-Imports: affy, affyPLM (>= 1.27.3), beadarray, Biobase, Cairo (>= 1.4-6), genefilter,
-         graphics, grDevices, grid, gridSVG (>= 1.4-3), Hmisc, hwriter, lattice, latticeExtra,
-         limma, methods, RColorBrewer, setRNG, stats,
-         utils, vsn (>= 3.23.3), XML
+Imports: affy, affyPLM (>= 1.27.3), beadarray, Biobase, genefilter,
+         graphics, grDevices, grid, gridSVG (>= 1.4-3), Hmisc, hwriter, 
+         lattice, latticeExtra, limma, methods, RColorBrewer, setRNG, stats,
+         utils, vsn (>= 3.23.3), XML, svglite
 Description: This package generates microarray quality metrics reports for
   data in Bioconductor microarray data containers (ExpressionSet, NChannelSet,
   AffyBatch). One and two color array platforms are supported.
